@@ -1,0 +1,53 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "05-telemetry.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "05-telemetry_0_5DF00EF9-8E74-4F17-B8D3-1A8944C62815.png",
+        "timestamp" : 1785280851.452
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "04-integrity.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "04-integrity_0_D9BD65F1-9EB4-48C4-A2AB-402083FA9FAE.png",
+        "timestamp" : 1785280846.662
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "03-lock-gate.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "03-lock-gate_0_EC014800-DAE9-4ABF-B404-531F5707098D.png",
+        "timestamp" : 1785280841.835
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "02-surfaces.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "02-surfaces_0_DE4F9663-E49D-4733-BBA1-635E737D33A4.png",
+        "timestamp" : 1785280836.771
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "01-overview.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "01-overview_0_ACD9E9C2-0916-4AF6-A4BB-C1984903E97E.png",
+        "timestamp" : 1785280831.798
+      }
+    ],
+    "testIdentifier" : "ProbeScreenshotTests/testCaptureDashboardSections()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineProbeUITests/ProbeScreenshotTests/testCaptureDashboardSections"
+  }
+]

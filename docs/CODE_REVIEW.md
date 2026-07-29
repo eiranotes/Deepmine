@@ -1,0 +1,25 @@
+# Code Review Checklist
+
+- 사양 및 현재 P0 범위와 일치하는가
+- `DeepMineCore`와 시스템 프레임워크 경계를 침범하지 않는가
+- 오류를 삼키지 않고 화면과 App Group 로그에 제한·정제된 진단으로 기록하며 전체 오류는 private OSLog로만 보내는가
+- 공유 JSONL의 append/read/compaction이 app/extension 프로세스 사이에서 잠기는가
+- 권한 거부 또는 entitlement 미승인 시 다른 검증 기능이 계속 동작하는가
+- Live Activity 재시작이 반드시 `end` 완료 후 `request` 순서인가
+- 앱과 LiveActivityIntent의 end→request 전체가 같은 프로세스 간 잠금으로 직렬화되는가
+- 세션 중 임의의 Live Activity 갱신 루프가 없는가
+- Swift 6 actor 격리와 Sendable 경고가 해결되었는가
+- Dynamic Type, VoiceOver, 고대비에서 핵심 상태가 읽히는가
+- 핵심 한국어 정보는 전체 Dynamic Type을 따르고 장식용 영문 코드만 제한적으로 확대되는가
+- 색상은 석탄·혈암·석회·황동 네 가지 기본 안료만 사용하며 상태를 색만으로 전달하지 않는가
+- 생성한 큰 이미지 에셋은 4색 팔레트·최근접 스케일·그레이스케일 판독 조건을 만족하고, 24pt 아이콘을 AI 비트맵으로 대체하지 않았는가
+- 플레이어 화면은 내부 프레임워크명보다 행동 목적과 예상 결과를 먼저 설명하는가
+- 버튼 역할이 primary/secondary/safety/warning으로 구분되고 최소 44pt 터치 영역과 즉시 press 피드백을 갖는가
+- 버튼·토글·패널이 리벳, 금속 깊이, 6–9pt 모서리의 같은 광산 장비 문법을 따르는가
+- Dynamic Island의 compact/expanded 정보가 잘리지 않고 보조 동작이 시스템 기본 파랑을 새 팔레트에 유입하지 않는가
+- UI 변경이 루트 `DESIGN.md`의 4색, 황동 희소성, 모서리, 깊이, 플레이어 언어 규칙과 일치하는가
+- 잠금화면 콘텐츠가 Widget과 캡처 하네스에서 같은 구현을 사용하고 160pt를 넘지 않는가
+- Reduce Motion에서 scale/이동이 제거되고 상태 의미는 텍스트·아이콘·명도로 유지되는가
+- 빌드 성공과 실기기 동작 검증을 문서에서 구분했는가
+- shield 수명주기가 프로세스 간 잠금과 세션별 monitor 이름으로 보호되며, 일치하는 callback만 journal/settings를 해제하는가
+- 소스 entitlement와 실제 서명된 entitlement를 별도로 확인했는가

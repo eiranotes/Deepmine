@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-29T01:25:40Z",
+  "title": "Design System: DeepMine",
+  "extensions": {
+    "colorMeta": {
+      "coal": {
+        "role": "neutral",
+        "displayName": "Coal",
+        "canonical": "#10100F",
+        "tonalRamp": ["#10100F22", "#10100F44", "#10100F66", "#10100F88", "#10100FAA", "#10100FCC", "#10100FEE", "#10100FFF"]
+      },
+      "shale": {
+        "role": "neutral",
+        "displayName": "Shale",
+        "canonical": "#373630",
+        "tonalRamp": ["#37363022", "#37363044", "#37363066", "#37363088", "#373630AA", "#373630CC", "#373630EE", "#373630FF"]
+      },
+      "limestone": {
+        "role": "neutral",
+        "displayName": "Limestone",
+        "canonical": "#E7E0CF",
+        "tonalRamp": ["#E7E0CF22", "#E7E0CF44", "#E7E0CF66", "#E7E0CF88", "#E7E0CFAA", "#E7E0CFCC", "#E7E0CFEE", "#E7E0CFFF"]
+      },
+      "lamp-brass": {
+        "role": "primary",
+        "displayName": "Lamp Brass",
+        "canonical": "#C58C39",
+        "tonalRamp": ["#C58C3922", "#C58C3944", "#C58C3966", "#C58C3988", "#C58C39AA", "#C58C39CC", "#C58C39EE", "#C58C39FF"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "One brand-level title per surface." },
+      "headline": { "displayName": "Headline", "purpose": "Module purposes and action titles." },
+      "body": { "displayName": "Body", "purpose": "Reasons, outcomes, and supporting instructions." },
+      "label": { "displayName": "Label", "purpose": "Stages, states, and compact Live Activity data." }
+    },
+    "shadows": [
+      {
+        "name": "structural-lower-edge",
+        "value": "0 4px 0 #10100F",
+        "purpose": "A hard, zero-blur lower edge used only on pressable hardware plates."
+      }
+    ],
+    "motion": [
+      {
+        "name": "hardware-press",
+        "value": "interactiveSpring(response: 0.18, dampingFraction: 1)",
+        "purpose": "Immediate 3pt press-down feedback and critically damped release."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "no positional motion",
+        "purpose": "Preserve state with color, outline, icon, and copy only."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Hardware Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single lamp-brass commit action on a surface.",
+      "html": "<button class=\"ds-button-primary\"><span>잠금화면 표지 켜기</span><i></i></button>",
+      "css": ".ds-button-primary{position:relative;min-height:50px;padding:0 16px;border:1px solid #10100F;border-radius:6px;background:#C58C39;color:#10100F;font:700 17px/1.25 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 4px 0 #10100F;transition:transform 160ms cubic-bezier(.23,1,.32,1)}.ds-button-primary:focus-visible{outline:2px solid #E7E0CF;outline-offset:2px}.ds-button-primary:active{transform:translateY(3px)}"
+    },
+    {
+      "name": "Secondary Hardware Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A shale equipment plate for supporting actions.",
+      "html": "<button class=\"ds-button-secondary\">새 기록 읽기</button>",
+      "css": ".ds-button-secondary{min-height:50px;padding:0 16px;border:1px solid #E7E0CF4D;border-radius:6px;background:#373630;color:#E7E0CF;font:700 17px/1.25 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 4px 0 #10100F;transition:transform 160ms cubic-bezier(.23,1,.32,1)}.ds-button-secondary:focus-visible{outline:2px solid #E7E0CF;outline-offset:2px}.ds-button-secondary:active{transform:translateY(3px)}"
+    },
+    {
+      "name": "Mission Panel",
+      "kind": "card",
+      "refersTo": "mission-panel",
+      "description": "A riveted shale plate grouping one preparation purpose.",
+      "html": "<section class=\"ds-mission-panel\"><span>첫 번째 준비 · 귀환 신호</span><strong>끝나는 시간을 알려줘요</strong><p>잠금화면 표지가 남은 시간을 보여줘요.</p></section>",
+      "css": ".ds-mission-panel{display:grid;gap:8px;padding:17px;border:1px solid #E7E0CF4D;border-radius:9px;background:#373630;color:#E7E0CF;font-family:-apple-system,BlinkMacSystemFont,sans-serif}.ds-mission-panel span{color:#C58C39;font-size:12px;font-weight:700}.ds-mission-panel strong{font-size:17px}.ds-mission-panel p{margin:0;color:#E7E0CFBF;font-size:15px;line-height:1.35}"
+    },
+    {
+      "name": "Status Plate",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "A compact state plate that never relies on color alone.",
+      "html": "<span class=\"ds-status-chip\">◌ 준비 전</span>",
+      "css": ".ds-status-chip{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border:1px solid #E7E0CF80;border-radius:5px;background:#10100F;color:#E7E0CF;font:700 12px/1.2 -apple-system,BlinkMacSystemFont,sans-serif}"
+    },
+    {
+      "name": "Mine Lever Toggle",
+      "kind": "custom",
+      "refersTo": "mine-toggle",
+      "description": "A square rail and metal handle that preserves binary Toggle semantics.",
+      "html": "<button class=\"ds-mine-toggle\" role=\"switch\" aria-checked=\"true\"><span></span></button>",
+      "css": ".ds-mine-toggle{display:flex;align-items:center;width:52px;height:28px;padding:4px;border:1px solid #C58C39;border-radius:4px;background:#10100F}.ds-mine-toggle span{width:20px;height:20px;margin-left:auto;border-radius:3px;background:#C58C39;transition:transform 180ms cubic-bezier(.23,1,.32,1)}.ds-mine-toggle:focus-visible{outline:2px solid #E7E0CF;outline-offset:2px}.ds-mine-toggle[aria-checked=\"false\"] span{margin-left:0;background:#E7E0CF88}"
+    }
+  ],
+  "narrative": {
+    "northStar": "램프 아래의 갱도 장비판",
+    "overview": "DeepMine은 사용자가 휴대폰을 잠그고 집중하는 동안 곁에 놓이는 작업 장비다. 화면은 어두운 갱도 속에서 손전등 하나로 필요한 계기만 읽는 장면처럼 보여야 한다. 게임의 성격은 픽셀 장면, 광부 실루엣, 황동 표찰에서 나오고 조작 방식은 iOS 사용자가 즉시 이해하는 버튼, Toggle, Live Activity 규칙을 유지한다.",
+    "keyCharacteristics": [
+      "네 가지 안료만 사용하는 램프 중심의 어두운 광산 팔레트",
+      "리벳, 금속 하단 깊이, 각진 레버로 이어지는 장비형 조작",
+      "한국어 행동 목적이 먼저 읽히는 정보 구조",
+      "24pt 픽셀 실루엣과 명도 대비로 이어지는 다중 표면 정체성",
+      "상태를 문양, 문구, 채움 방식으로 중복 전달하는 체계"
+    ],
+    "rules": [
+      { "name": "The Focus-First Rule", "body": "세션 중 표면은 남은 시간과 현재 계획을 조용히 확인시키며, 보상 공개와 강화 연출은 귀환 이후에만 허용한다.", "section": "overview" },
+      { "name": "The Four-Pigment Rule", "body": "보라, 청록, 경고 빨강을 포함한 다섯 번째 기본색은 금지한다.", "section": "colors" },
+      { "name": "The Brass Rarity Rule", "body": "황동 채움은 가장 중요한 현재 행동 하나에만 쓴다.", "section": "colors" },
+      { "name": "The Player-Language Rule", "body": "구현명은 플레이어 표면에 제목으로 노출하지 않는다.", "section": "typography" },
+      { "name": "The No-Glow Rule", "body": "네온 글로우, 8pt를 넘는 블러 그림자, 유리 재질은 금지한다.", "section": "elevation" },
+      { "name": "The Structural-Depth Rule", "body": "깊이는 장식이 아니라 누를 수 있음을 설명해야 한다.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do 석탄, 혈암, 석회, 램프 황동 네 안료만 사용한다.",
+      "Do 주 동작 하나만 황동으로 채우고 나머지 행동은 중립 금속판으로 낮춘다.",
+      "Do 상태를 한국어 문구, SF Symbol, 채움 방식으로 동시에 전달한다.",
+      "Do 잠금화면 160pt, Dynamic Island Expanded 144pt 제약을 먼저 검증한다."
+    ],
+    "donts": [
+      "Don't 보라·청록·빨강 등 상태별 네온색을 다시 추가한다.",
+      "Don't SaaS 대시보드처럼 동일 카드 격자와 큰 지표 숫자를 화면의 주인공으로 만든다.",
+      "Don't 글로우, 그라디언트 텍스트, 유리 카드, 장식용 격자를 사용한다.",
+      "Don't 성공·경고·오류를 색만으로 구분한다."
+    ]
+  }
+}

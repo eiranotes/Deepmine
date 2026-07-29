@@ -1,0 +1,909 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		021FCA607455524DD955B767 /* DeepMineProbeWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F9130B256F6BB3700C9500B0 /* DeepMineProbeWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0509B37399A451B328413970 /* ProbeLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B52D606914B861A5488A54 /* ProbeLogStoreTests.swift */; };
+		0DD1EC73322519D79D4E9CAD /* ProbeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378AED20F46299D5A099CB61 /* ProbeViewModel.swift */; };
+		0EDD07637A616390AE03F224 /* LiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DD6C2BE815A474F0F19B50 /* LiveActivityLifecycle.swift */; };
+		11CC0219B825FAAB05F0026E /* DeepMineActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08FD56040D7558022366865C /* DeepMineActivityAttributes.swift */; };
+		13F89B6F35ECD90016F6FEF9 /* ProbeShieldJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5984E6895BA069557BC1F70 /* ProbeShieldJournal.swift */; };
+		20B54C0C01C866EA11DA5331 /* DeepMineDeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7ECEDF7D4CCABB82AEA3CAD5 /* DeepMineDeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		22B46D4911BEF73225339A55 /* ProbeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */; };
+		2A219F3B8D30C0F7D31823FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F55028A92D4956930038462 /* Assets.xcassets */; };
+		33CD1FAC801643E4E132FAC6 /* PixelMinerIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA955734BEE368632BB32E4 /* PixelMinerIcon.swift */; };
+		3ADB6F6817C645AB06AD6698 /* ScreenTimeProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA5F34F6423AEC1773FF57A /* ScreenTimeProbe.swift */; };
+		41CE658740EAED97F9455D83 /* ProbeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8386662C163891D26E218EF5 /* ProbeModels.swift */; };
+		4F746F77D11593C9F7AC0E6C /* ProbeDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */; };
+		516DBA266E24A69E8DD26DCA /* ProbeSharedWrite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A4C139DFDBDD65BDDA0485B /* ProbeSharedWrite.swift */; };
+		54B916AF0E06204511A8BDD5 /* ProbeLockScreenContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BB9542C3FF5B5E36BFC73C /* ProbeLockScreenContent.swift */; };
+		58DD97A421FC5456CFF8D6D6 /* DeepMineLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8D85918D825D8EBDDCFF1B /* DeepMineLiveActivityWidget.swift */; };
+		5AEAA874E75DE41857F4F1B0 /* ProbeShieldJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5984E6895BA069557BC1F70 /* ProbeShieldJournal.swift */; };
+		68AAD693123ECFF9C9828D69 /* ProbeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */; };
+		692CB9252808A87F7920DBD5 /* ProbeShieldJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5984E6895BA069557BC1F70 /* ProbeShieldJournal.swift */; };
+		6A6AF0003E73096A64919782 /* ProbeIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD2558B68F634F1023BC1762 /* ProbeIntents.swift */; };
+		6FC5D33FA470B43FD9435AE9 /* ProbeAdventureHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A1F917AC6DF98853535DDA /* ProbeAdventureHeader.swift */; };
+		76BA08E71B536087C0CAE4A8 /* ProbeScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01EAF3FDADC537F8C8E66B7 /* ProbeScreenshotTests.swift */; };
+		7983E6F795A88ED801206C71 /* DeepMineProbeWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6746DF888751A7FF9BDED596 /* DeepMineProbeWidgetBundle.swift */; };
+		7B0419A84AC75EE3ACD43404 /* ProbeProcessLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874EC7AA14053694F563AAE6 /* ProbeProcessLock.swift */; };
+		7C0ECFA8B7F83A6917DCFA50 /* ProbeProcessLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874EC7AA14053694F563AAE6 /* ProbeProcessLock.swift */; };
+		819825B10E465F5C36091DEC /* ProbeTelemetryPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D437B1BB8564C74599117B0 /* ProbeTelemetryPanel.swift */; };
+		84FC71023F6FCC15EB0F42A9 /* ProbeProcessLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874EC7AA14053694F563AAE6 /* ProbeProcessLock.swift */; };
+		86DBA359D488331E681DDE17 /* ProbePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90601F7E93C7659EA343E226 /* ProbePalette.swift */; };
+		887FF51117BD771493558C49 /* ProbeDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */; };
+		9446839A3984E92C1A2083D6 /* LiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DD6C2BE815A474F0F19B50 /* LiveActivityLifecycle.swift */; };
+		9DC9813B526C76047EDA17F2 /* DeepMineDeviceActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1CE95B920C7955F63AE257 /* DeepMineDeviceActivityMonitor.swift */; };
+		9DF10FF45586D092FF80112E /* ProbeSharedWrite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A4C139DFDBDD65BDDA0485B /* ProbeSharedWrite.swift */; };
+		A67EE3BABF62EE5C2BAB0E3A /* ClockProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8378B289AF8AC04DD91661E /* ClockProbeTests.swift */; };
+		AB08D74D32D936937EBF5E18 /* ProbeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8386662C163891D26E218EF5 /* ProbeModels.swift */; };
+		AD0BE0A2C3F9F4D1E62A6D43 /* ProbeSharedStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1702A576D351774E174EA34 /* ProbeSharedStoreTests.swift */; };
+		AEB730FDEF45299F6AA78986 /* ProbeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6445B227A3C94A992AC6F276 /* ProbeStore.swift */; };
+		B06D90D7D23ADD9752C74129 /* PixelMinerIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA955734BEE368632BB32E4 /* PixelMinerIcon.swift */; };
+		B2E791D2F9C6FFB7133635B8 /* ProbeDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4C7D6981436E4F8DF0FDE6 /* ProbeDesignSystem.swift */; };
+		B572836585CF9BA970AEC128 /* ProbeDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */; };
+		BA9E3A4054733C5DCF97A5E8 /* DeepMineProbeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359D4A74F48E860234788021 /* DeepMineProbeApp.swift */; };
+		BE9C1E3620792CD91CCA94C7 /* AlarmProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8635C49AADC33644552E853 /* AlarmProbe.swift */; };
+		C844F6439A17EB0564AED480 /* ProbeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8386662C163891D26E218EF5 /* ProbeModels.swift */; };
+		CA2D6B0B0A1149BF46D6D431 /* ProbeControlComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E165FEDA3F1A45C4B9345 /* ProbeControlComponents.swift */; };
+		D25C21FCA4E82D2A7750436D /* ProbeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A3CF15739ED4B8EE979958 /* ProbeDashboardView.swift */; };
+		D3910A66C4F35BFE0EFFAE73 /* ProbeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6445B227A3C94A992AC6F276 /* ProbeStore.swift */; };
+		DAD5599A7D3A59C515F0F904 /* ProbePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90601F7E93C7659EA343E226 /* ProbePalette.swift */; };
+		DB559DCD177B4EA4C50359C8 /* ProbeCommandWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0307A860C9E77D7E35D257B0 /* ProbeCommandWidget.swift */; };
+		E1F340B519A9B3A7A82A879B /* ProbeLockScreenContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BB9542C3FF5B5E36BFC73C /* ProbeLockScreenContent.swift */; };
+		E3FEAD3F5CFC32D75B78BF8E /* ProbeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */; };
+		E8665E827B6E2467977871C4 /* ProbeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF424AC421863524E46E9213 /* ProbeComponents.swift */; };
+		E89874DEB373BD01740F4376 /* ClockProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A52D00F12E3CBDD87AFE89 /* ClockProbe.swift */; };
+		E97C8B91C76CB3F5A0F2E4D9 /* DeepMineActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08FD56040D7558022366865C /* DeepMineActivityAttributes.swift */; };
+		F22A8CF3EC70D147848E9A36 /* ProbeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6445B227A3C94A992AC6F276 /* ProbeStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		317920BFE8A5C85574442D94 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 21F67A7E4B13D916F074246B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ABF634B81B1BD67B65FC1982;
+			remoteInfo = DeepMineProbe;
+		};
+		61EFB0358D61D58807796A50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 21F67A7E4B13D916F074246B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ABF634B81B1BD67B65FC1982;
+			remoteInfo = DeepMineProbe;
+		};
+		B549F34B221DB38926655B0A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 21F67A7E4B13D916F074246B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 49CF56809D983348D026E20F;
+			remoteInfo = DeepMineProbeWidget;
+		};
+		DCC5B4B1D46C88BFD46F76CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 21F67A7E4B13D916F074246B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB862E34C6C0B3CB296D02A8;
+			remoteInfo = DeepMineDeviceActivityMonitor;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F6326BCC50704732A32C1297 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				021FCA607455524DD955B767 /* DeepMineProbeWidget.appex in Embed Foundation Extensions */,
+				20B54C0C01C866EA11DA5331 /* DeepMineDeviceActivityMonitor.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0307A860C9E77D7E35D257B0 /* ProbeCommandWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeCommandWidget.swift; sourceTree = "<group>"; };
+		06B52D606914B861A5488A54 /* ProbeLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeLogStoreTests.swift; sourceTree = "<group>"; };
+		08FD56040D7558022366865C /* DeepMineActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineActivityAttributes.swift; sourceTree = "<group>"; };
+		0EA5F34F6423AEC1773FF57A /* ScreenTimeProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeProbe.swift; sourceTree = "<group>"; };
+		10F0EAAFA40772EF27732BF7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		125C0F107296C61D6838AFA2 /* DeepMineProbeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeepMineProbeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A1CE95B920C7955F63AE257 /* DeepMineDeviceActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineDeviceActivityMonitor.swift; sourceTree = "<group>"; };
+		1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeConstants.swift; sourceTree = "<group>"; };
+		1D437B1BB8564C74599117B0 /* ProbeTelemetryPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeTelemetryPanel.swift; sourceTree = "<group>"; };
+		1E354CC6A628631F1B86369E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		34A52D00F12E3CBDD87AFE89 /* ClockProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockProbe.swift; sourceTree = "<group>"; };
+		359D4A74F48E860234788021 /* DeepMineProbeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineProbeApp.swift; sourceTree = "<group>"; };
+		365E165FEDA3F1A45C4B9345 /* ProbeControlComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeControlComponents.swift; sourceTree = "<group>"; };
+		378AED20F46299D5A099CB61 /* ProbeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeViewModel.swift; sourceTree = "<group>"; };
+		38BB9542C3FF5B5E36BFC73C /* ProbeLockScreenContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeLockScreenContent.swift; sourceTree = "<group>"; };
+		42A3CF15739ED4B8EE979958 /* ProbeDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeDashboardView.swift; sourceTree = "<group>"; };
+		4F55028A92D4956930038462 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		52A1F917AC6DF98853535DDA /* ProbeAdventureHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeAdventureHeader.swift; sourceTree = "<group>"; };
+		6445B227A3C94A992AC6F276 /* ProbeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStore.swift; sourceTree = "<group>"; };
+		6746DF888751A7FF9BDED596 /* DeepMineProbeWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineProbeWidgetBundle.swift; sourceTree = "<group>"; };
+		6A4C139DFDBDD65BDDA0485B /* ProbeSharedWrite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeSharedWrite.swift; sourceTree = "<group>"; };
+		6CB6BDFFBC34A3C22B23D47E /* DeepMineProbe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeepMineProbe.entitlements; sourceTree = "<group>"; };
+		7C76514529D65BB7CFD85F3C /* DeepMineProbeWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeepMineProbeWidget.entitlements; sourceTree = "<group>"; };
+		7ECEDF7D4CCABB82AEA3CAD5 /* DeepMineDeviceActivityMonitor.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DeepMineDeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeDiagnostics.swift; sourceTree = "<group>"; };
+		8386662C163891D26E218EF5 /* ProbeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeModels.swift; sourceTree = "<group>"; };
+		874EC7AA14053694F563AAE6 /* ProbeProcessLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeProcessLock.swift; sourceTree = "<group>"; };
+		90601F7E93C7659EA343E226 /* ProbePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbePalette.swift; sourceTree = "<group>"; };
+		97A74F91C1F9F8C500D92A5D /* DeepMineProbe.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DeepMineProbe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		99FD17796FB028ECFE77F677 /* DeepMineDeviceActivityMonitor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeepMineDeviceActivityMonitor.entitlements; sourceTree = "<group>"; };
+		9D1A164E6ADE4925D2B69248 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9D4C7D6981436E4F8DF0FDE6 /* ProbeDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeDesignSystem.swift; sourceTree = "<group>"; };
+		A652D01AFFDB1AA64BC26471 /* DeepMineProbeUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeepMineProbeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDA955734BEE368632BB32E4 /* PixelMinerIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelMinerIcon.swift; sourceTree = "<group>"; };
+		C5984E6895BA069557BC1F70 /* ProbeShieldJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeShieldJournal.swift; sourceTree = "<group>"; };
+		D1702A576D351774E174EA34 /* ProbeSharedStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeSharedStoreTests.swift; sourceTree = "<group>"; };
+		D7DD6C2BE815A474F0F19B50 /* LiveActivityLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityLifecycle.swift; sourceTree = "<group>"; };
+		D8378B289AF8AC04DD91661E /* ClockProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockProbeTests.swift; sourceTree = "<group>"; };
+		DB8D85918D825D8EBDDCFF1B /* DeepMineLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineLiveActivityWidget.swift; sourceTree = "<group>"; };
+		E01EAF3FDADC537F8C8E66B7 /* ProbeScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeScreenshotTests.swift; sourceTree = "<group>"; };
+		F8635C49AADC33644552E853 /* AlarmProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmProbe.swift; sourceTree = "<group>"; };
+		F9130B256F6BB3700C9500B0 /* DeepMineProbeWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DeepMineProbeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD2558B68F634F1023BC1762 /* ProbeIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeIntents.swift; sourceTree = "<group>"; };
+		FF424AC421863524E46E9213 /* ProbeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeComponents.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		07318F5D69175F0D67622488 /* Monitor */ = {
+			isa = PBXGroup;
+			children = (
+				99FD17796FB028ECFE77F677 /* DeepMineDeviceActivityMonitor.entitlements */,
+				1A1CE95B920C7955F63AE257 /* DeepMineDeviceActivityMonitor.swift */,
+				10F0EAAFA40772EF27732BF7 /* Info.plist */,
+			);
+			path = Monitor;
+			sourceTree = "<group>";
+		};
+		21A1D3113DB014E9BB176FD9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7ECEDF7D4CCABB82AEA3CAD5 /* DeepMineDeviceActivityMonitor.appex */,
+				97A74F91C1F9F8C500D92A5D /* DeepMineProbe.app */,
+				125C0F107296C61D6838AFA2 /* DeepMineProbeTests.xctest */,
+				A652D01AFFDB1AA64BC26471 /* DeepMineProbeUITests.xctest */,
+				F9130B256F6BB3700C9500B0 /* DeepMineProbeWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2DF3F80FD1767895994D01C3 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				E01EAF3FDADC537F8C8E66B7 /* ProbeScreenshotTests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		37F83D718BF1AFD6AFE16A19 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				D8378B289AF8AC04DD91661E /* ClockProbeTests.swift */,
+				06B52D606914B861A5488A54 /* ProbeLogStoreTests.swift */,
+				D1702A576D351774E174EA34 /* ProbeSharedStoreTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		46F4CE0561AA8668657D52AF = {
+			isa = PBXGroup;
+			children = (
+				C9674E34C6787BD618A7AD2D /* DeepMineProbe */,
+				21A1D3113DB014E9BB176FD9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4E01B6F4D7346710ECA39920 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				34A52D00F12E3CBDD87AFE89 /* ClockProbe.swift */,
+				08FD56040D7558022366865C /* DeepMineActivityAttributes.swift */,
+				D7DD6C2BE815A474F0F19B50 /* LiveActivityLifecycle.swift */,
+				BDA955734BEE368632BB32E4 /* PixelMinerIcon.swift */,
+				1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */,
+				82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */,
+				38BB9542C3FF5B5E36BFC73C /* ProbeLockScreenContent.swift */,
+				8386662C163891D26E218EF5 /* ProbeModels.swift */,
+				90601F7E93C7659EA343E226 /* ProbePalette.swift */,
+				874EC7AA14053694F563AAE6 /* ProbeProcessLock.swift */,
+				6A4C139DFDBDD65BDDA0485B /* ProbeSharedWrite.swift */,
+				C5984E6895BA069557BC1F70 /* ProbeShieldJournal.swift */,
+				6445B227A3C94A992AC6F276 /* ProbeStore.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		8011CFC46246391BE8904FE0 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F8635C49AADC33644552E853 /* AlarmProbe.swift */,
+				4F55028A92D4956930038462 /* Assets.xcassets */,
+				6CB6BDFFBC34A3C22B23D47E /* DeepMineProbe.entitlements */,
+				359D4A74F48E860234788021 /* DeepMineProbeApp.swift */,
+				1E354CC6A628631F1B86369E /* Info.plist */,
+				52A1F917AC6DF98853535DDA /* ProbeAdventureHeader.swift */,
+				FF424AC421863524E46E9213 /* ProbeComponents.swift */,
+				365E165FEDA3F1A45C4B9345 /* ProbeControlComponents.swift */,
+				42A3CF15739ED4B8EE979958 /* ProbeDashboardView.swift */,
+				9D4C7D6981436E4F8DF0FDE6 /* ProbeDesignSystem.swift */,
+				1D437B1BB8564C74599117B0 /* ProbeTelemetryPanel.swift */,
+				378AED20F46299D5A099CB61 /* ProbeViewModel.swift */,
+				0EA5F34F6423AEC1773FF57A /* ScreenTimeProbe.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C9674E34C6787BD618A7AD2D /* DeepMineProbe */ = {
+			isa = PBXGroup;
+			children = (
+				8011CFC46246391BE8904FE0 /* App */,
+				07318F5D69175F0D67622488 /* Monitor */,
+				4E01B6F4D7346710ECA39920 /* Shared */,
+				37F83D718BF1AFD6AFE16A19 /* Tests */,
+				2DF3F80FD1767895994D01C3 /* UITests */,
+				EBB64ECC5C3CB9EAF63BE90D /* Widget */,
+			);
+			path = DeepMineProbe;
+			sourceTree = "<group>";
+		};
+		EBB64ECC5C3CB9EAF63BE90D /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				DB8D85918D825D8EBDDCFF1B /* DeepMineLiveActivityWidget.swift */,
+				7C76514529D65BB7CFD85F3C /* DeepMineProbeWidget.entitlements */,
+				6746DF888751A7FF9BDED596 /* DeepMineProbeWidgetBundle.swift */,
+				9D1A164E6ADE4925D2B69248 /* Info.plist */,
+				0307A860C9E77D7E35D257B0 /* ProbeCommandWidget.swift */,
+				FD2558B68F634F1023BC1762 /* ProbeIntents.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		49CF56809D983348D026E20F /* DeepMineProbeWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBD1948343909E0D01F8EDA5 /* Build configuration list for PBXNativeTarget "DeepMineProbeWidget" */;
+			buildPhases = (
+				B780DFE0C34E9AFE2174E5D6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DeepMineProbeWidget;
+			packageProductDependencies = (
+			);
+			productName = DeepMineProbeWidget;
+			productReference = F9130B256F6BB3700C9500B0 /* DeepMineProbeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A4D685696DA799F006494316 /* DeepMineProbeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 537F9496AABFF1DE6FDCB2A3 /* Build configuration list for PBXNativeTarget "DeepMineProbeTests" */;
+			buildPhases = (
+				77F83C08857F29534FC575F1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				18665A7C5304CC1858020F65 /* PBXTargetDependency */,
+			);
+			name = DeepMineProbeTests;
+			packageProductDependencies = (
+			);
+			productName = DeepMineProbeTests;
+			productReference = 125C0F107296C61D6838AFA2 /* DeepMineProbeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		ABF634B81B1BD67B65FC1982 /* DeepMineProbe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 75FDA79CE5B9BBC8053918D9 /* Build configuration list for PBXNativeTarget "DeepMineProbe" */;
+			buildPhases = (
+				D552B1FA09C8772774FA6526 /* Sources */,
+				71C55EAD0D4A4A005C54F109 /* Resources */,
+				F6326BCC50704732A32C1297 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6E12C0C6DE6DA1D231587E53 /* PBXTargetDependency */,
+				BF98AB7066B9A88BE9457B5D /* PBXTargetDependency */,
+			);
+			name = DeepMineProbe;
+			packageProductDependencies = (
+			);
+			productName = DeepMineProbe;
+			productReference = 97A74F91C1F9F8C500D92A5D /* DeepMineProbe.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AE54FF5CC5EAFB97954056D8 /* DeepMineProbeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2F653BA256B48AE286ACE485 /* Build configuration list for PBXNativeTarget "DeepMineProbeUITests" */;
+			buildPhases = (
+				121FC342519068464143F5A6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7845ADDE1EE627A9410D2192 /* PBXTargetDependency */,
+			);
+			name = DeepMineProbeUITests;
+			packageProductDependencies = (
+			);
+			productName = DeepMineProbeUITests;
+			productReference = A652D01AFFDB1AA64BC26471 /* DeepMineProbeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		DB862E34C6C0B3CB296D02A8 /* DeepMineDeviceActivityMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0EC7F84474BECE459F6757DA /* Build configuration list for PBXNativeTarget "DeepMineDeviceActivityMonitor" */;
+			buildPhases = (
+				2DE7461D11E04C724DAB90A9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DeepMineDeviceActivityMonitor;
+			packageProductDependencies = (
+			);
+			productName = DeepMineDeviceActivityMonitor;
+			productReference = 7ECEDF7D4CCABB82AEA3CAD5 /* DeepMineDeviceActivityMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		21F67A7E4B13D916F074246B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					49CF56809D983348D026E20F = {
+						ProvisioningStyle = Automatic;
+					};
+					A4D685696DA799F006494316 = {
+						ProvisioningStyle = Automatic;
+					};
+					ABF634B81B1BD67B65FC1982 = {
+						ProvisioningStyle = Automatic;
+					};
+					AE54FF5CC5EAFB97954056D8 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = ABF634B81B1BD67B65FC1982;
+					};
+					DB862E34C6C0B3CB296D02A8 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 3FFE251E552B8AB95CAB93D5 /* Build configuration list for PBXProject "DeepMine" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 46F4CE0561AA8668657D52AF;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 21A1D3113DB014E9BB176FD9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DB862E34C6C0B3CB296D02A8 /* DeepMineDeviceActivityMonitor */,
+				ABF634B81B1BD67B65FC1982 /* DeepMineProbe */,
+				A4D685696DA799F006494316 /* DeepMineProbeTests */,
+				AE54FF5CC5EAFB97954056D8 /* DeepMineProbeUITests */,
+				49CF56809D983348D026E20F /* DeepMineProbeWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		71C55EAD0D4A4A005C54F109 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A219F3B8D30C0F7D31823FB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		121FC342519068464143F5A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				76BA08E71B536087C0CAE4A8 /* ProbeScreenshotTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DE7461D11E04C724DAB90A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9DC9813B526C76047EDA17F2 /* DeepMineDeviceActivityMonitor.swift in Sources */,
+				E3FEAD3F5CFC32D75B78BF8E /* ProbeConstants.swift in Sources */,
+				887FF51117BD771493558C49 /* ProbeDiagnostics.swift in Sources */,
+				C844F6439A17EB0564AED480 /* ProbeModels.swift in Sources */,
+				84FC71023F6FCC15EB0F42A9 /* ProbeProcessLock.swift in Sources */,
+				692CB9252808A87F7920DBD5 /* ProbeShieldJournal.swift in Sources */,
+				AEB730FDEF45299F6AA78986 /* ProbeStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		77F83C08857F29534FC575F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A67EE3BABF62EE5C2BAB0E3A /* ClockProbeTests.swift in Sources */,
+				0509B37399A451B328413970 /* ProbeLogStoreTests.swift in Sources */,
+				AD0BE0A2C3F9F4D1E62A6D43 /* ProbeSharedStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B780DFE0C34E9AFE2174E5D6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E97C8B91C76CB3F5A0F2E4D9 /* DeepMineActivityAttributes.swift in Sources */,
+				58DD97A421FC5456CFF8D6D6 /* DeepMineLiveActivityWidget.swift in Sources */,
+				7983E6F795A88ED801206C71 /* DeepMineProbeWidgetBundle.swift in Sources */,
+				0EDD07637A616390AE03F224 /* LiveActivityLifecycle.swift in Sources */,
+				33CD1FAC801643E4E132FAC6 /* PixelMinerIcon.swift in Sources */,
+				DB559DCD177B4EA4C50359C8 /* ProbeCommandWidget.swift in Sources */,
+				22B46D4911BEF73225339A55 /* ProbeConstants.swift in Sources */,
+				B572836585CF9BA970AEC128 /* ProbeDiagnostics.swift in Sources */,
+				6A6AF0003E73096A64919782 /* ProbeIntents.swift in Sources */,
+				54B916AF0E06204511A8BDD5 /* ProbeLockScreenContent.swift in Sources */,
+				41CE658740EAED97F9455D83 /* ProbeModels.swift in Sources */,
+				86DBA359D488331E681DDE17 /* ProbePalette.swift in Sources */,
+				7B0419A84AC75EE3ACD43404 /* ProbeProcessLock.swift in Sources */,
+				516DBA266E24A69E8DD26DCA /* ProbeSharedWrite.swift in Sources */,
+				5AEAA874E75DE41857F4F1B0 /* ProbeShieldJournal.swift in Sources */,
+				D3910A66C4F35BFE0EFFAE73 /* ProbeStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D552B1FA09C8772774FA6526 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE9C1E3620792CD91CCA94C7 /* AlarmProbe.swift in Sources */,
+				E89874DEB373BD01740F4376 /* ClockProbe.swift in Sources */,
+				11CC0219B825FAAB05F0026E /* DeepMineActivityAttributes.swift in Sources */,
+				BA9E3A4054733C5DCF97A5E8 /* DeepMineProbeApp.swift in Sources */,
+				9446839A3984E92C1A2083D6 /* LiveActivityLifecycle.swift in Sources */,
+				B06D90D7D23ADD9752C74129 /* PixelMinerIcon.swift in Sources */,
+				6FC5D33FA470B43FD9435AE9 /* ProbeAdventureHeader.swift in Sources */,
+				E8665E827B6E2467977871C4 /* ProbeComponents.swift in Sources */,
+				68AAD693123ECFF9C9828D69 /* ProbeConstants.swift in Sources */,
+				CA2D6B0B0A1149BF46D6D431 /* ProbeControlComponents.swift in Sources */,
+				D25C21FCA4E82D2A7750436D /* ProbeDashboardView.swift in Sources */,
+				B2E791D2F9C6FFB7133635B8 /* ProbeDesignSystem.swift in Sources */,
+				4F746F77D11593C9F7AC0E6C /* ProbeDiagnostics.swift in Sources */,
+				E1F340B519A9B3A7A82A879B /* ProbeLockScreenContent.swift in Sources */,
+				AB08D74D32D936937EBF5E18 /* ProbeModels.swift in Sources */,
+				DAD5599A7D3A59C515F0F904 /* ProbePalette.swift in Sources */,
+				7C0ECFA8B7F83A6917DCFA50 /* ProbeProcessLock.swift in Sources */,
+				9DF10FF45586D092FF80112E /* ProbeSharedWrite.swift in Sources */,
+				13F89B6F35ECD90016F6FEF9 /* ProbeShieldJournal.swift in Sources */,
+				F22A8CF3EC70D147848E9A36 /* ProbeStore.swift in Sources */,
+				819825B10E465F5C36091DEC /* ProbeTelemetryPanel.swift in Sources */,
+				0DD1EC73322519D79D4E9CAD /* ProbeViewModel.swift in Sources */,
+				3ADB6F6817C645AB06AD6698 /* ScreenTimeProbe.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		18665A7C5304CC1858020F65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ABF634B81B1BD67B65FC1982 /* DeepMineProbe */;
+			targetProxy = 61EFB0358D61D58807796A50 /* PBXContainerItemProxy */;
+		};
+		6E12C0C6DE6DA1D231587E53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 49CF56809D983348D026E20F /* DeepMineProbeWidget */;
+			targetProxy = B549F34B221DB38926655B0A /* PBXContainerItemProxy */;
+		};
+		7845ADDE1EE627A9410D2192 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ABF634B81B1BD67B65FC1982 /* DeepMineProbe */;
+			targetProxy = 317920BFE8A5C85574442D94 /* PBXContainerItemProxy */;
+		};
+		BF98AB7066B9A88BE9457B5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DB862E34C6C0B3CB296D02A8 /* DeepMineDeviceActivityMonitor */;
+			targetProxy = DCC5B4B1D46C88BFD46F76CC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		02E823EB250F5137871B0F92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/Widget/DeepMineProbeWidget.entitlements;
+				INFOPLIST_FILE = DeepMineProbe/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.widget;
+				PRODUCT_NAME = DeepMineProbeWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		116B3A183C1426EC4E9D40CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/Widget/DeepMineProbeWidget.entitlements;
+				INFOPLIST_FILE = DeepMineProbe/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.widget;
+				PRODUCT_NAME = DeepMineProbeWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		353A4ACDB9301A6113E6EC2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/App/DeepMineProbe.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = DeepMineProbe/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe;
+				PRODUCT_NAME = DeepMineProbe;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		3B04B954585A6B94363F1ECD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.0.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		51CCF13541760BE14E330334 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = DeepMineProbe;
+			};
+			name = Release;
+		};
+		713B09B6E696993C47E11E57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/App/DeepMineProbe.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = DeepMineProbe/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe;
+				PRODUCT_NAME = DeepMineProbe;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		85B578E314CDA37218E64A89 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.0.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		87CA68A9062D05846F10C13E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/Monitor/DeepMineDeviceActivityMonitor.entitlements;
+				INFOPLIST_FILE = DeepMineProbe/Monitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.monitor;
+				PRODUCT_NAME = DeepMineDeviceActivityMonitor;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AB49710A884B626A688A07A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DeepMineProbe.app/DeepMineProbe";
+			};
+			name = Release;
+		};
+		BC5ACBA51C3001144971DC4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = DeepMineProbe;
+			};
+			name = Debug;
+		};
+		C35612C3D81D0FA7447FCF02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepMineProbe/Monitor/DeepMineDeviceActivityMonitor.entitlements;
+				INFOPLIST_FILE = DeepMineProbe/Monitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.monitor;
+				PRODUCT_NAME = DeepMineDeviceActivityMonitor;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		D7D1618A8EEE7E8183FEA100 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eiraworks.deepmine.probe.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DeepMineProbe.app/DeepMineProbe";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0EC7F84474BECE459F6757DA /* Build configuration list for PBXNativeTarget "DeepMineDeviceActivityMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				87CA68A9062D05846F10C13E /* Debug */,
+				C35612C3D81D0FA7447FCF02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2F653BA256B48AE286ACE485 /* Build configuration list for PBXNativeTarget "DeepMineProbeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC5ACBA51C3001144971DC4E /* Debug */,
+				51CCF13541760BE14E330334 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3FFE251E552B8AB95CAB93D5 /* Build configuration list for PBXProject "DeepMine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3B04B954585A6B94363F1ECD /* Debug */,
+				85B578E314CDA37218E64A89 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		537F9496AABFF1DE6FDCB2A3 /* Build configuration list for PBXNativeTarget "DeepMineProbeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D7D1618A8EEE7E8183FEA100 /* Debug */,
+				AB49710A884B626A688A07A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		75FDA79CE5B9BBC8053918D9 /* Build configuration list for PBXNativeTarget "DeepMineProbe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				713B09B6E696993C47E11E57 /* Debug */,
+				353A4ACDB9301A6113E6EC2B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DBD1948343909E0D01F8EDA5 /* Build configuration list for PBXNativeTarget "DeepMineProbeWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02E823EB250F5137871B0F92 /* Debug */,
+				116B3A183C1426EC4E9D40CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 21F67A7E4B13D916F074246B /* Project object */;
+}

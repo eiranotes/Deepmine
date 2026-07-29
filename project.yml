@@ -1,0 +1,133 @@
+name: DeepMine
+options:
+  bundleIdPrefix: com.eiraworks.deepmine
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    MARKETING_VERSION: "0.0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: true
+targets:
+  DeepMineProbe:
+    type: application
+    platform: iOS
+    sources:
+      - path: DeepMineProbe/App
+      - path: DeepMineProbe/Shared
+    info:
+      path: DeepMineProbe/App/Info.plist
+      properties:
+        CFBundleDisplayName: DeepMine Probe
+        UILaunchScreen: {}
+        NSSupportsLiveActivities: true
+        NSSupportsLiveActivitiesFrequentUpdates: false
+        NSAlarmKitUsageDescription: DeepMine uses alarms to verify that a focus session can end reliably.
+    entitlements:
+      path: DeepMineProbe/App/DeepMineProbe.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - group.com.eiraworks.deepmine
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe
+        PRODUCT_NAME: DeepMineProbe
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: DeepMineProbeWidget
+        embed: true
+      - target: DeepMineDeviceActivityMonitor
+        embed: true
+    scheme:
+      testTargets:
+        - DeepMineProbeTests
+        - DeepMineProbeUITests
+  DeepMineProbeWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: DeepMineProbe/Widget
+      - path: DeepMineProbe/Shared
+        excludes:
+          - ClockProbe.swift
+    info:
+      path: DeepMineProbe/Widget/Info.plist
+      properties:
+        CFBundleDisplayName: DeepMine Probe Widget
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        NSSupportsLiveActivities: true
+    entitlements:
+      path: DeepMineProbe/Widget/DeepMineProbeWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.eiraworks.deepmine
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.widget
+        PRODUCT_NAME: DeepMineProbeWidget
+        APPLICATION_EXTENSION_API_ONLY: true
+        SKIP_INSTALL: true
+        TARGETED_DEVICE_FAMILY: "1"
+  DeepMineDeviceActivityMonitor:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: DeepMineProbe/Monitor
+      - path: DeepMineProbe/Shared/ProbeConstants.swift
+      - path: DeepMineProbe/Shared/ProbeModels.swift
+      - path: DeepMineProbe/Shared/ProbeStore.swift
+      - path: DeepMineProbe/Shared/ProbeDiagnostics.swift
+      - path: DeepMineProbe/Shared/ProbeShieldJournal.swift
+      - path: DeepMineProbe/Shared/ProbeProcessLock.swift
+    info:
+      path: DeepMineProbe/Monitor/Info.plist
+      properties:
+        CFBundleDisplayName: DeepMine Activity Monitor
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.deviceactivity.monitor-extension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).DeepMineDeviceActivityMonitor
+    entitlements:
+      path: DeepMineProbe/Monitor/DeepMineDeviceActivityMonitor.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - group.com.eiraworks.deepmine
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.monitor
+        PRODUCT_NAME: DeepMineDeviceActivityMonitor
+        APPLICATION_EXTENSION_API_ONLY: true
+        SKIP_INSTALL: true
+        TARGETED_DEVICE_FAMILY: "1"
+  DeepMineProbeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: DeepMineProbe/Tests
+    dependencies:
+      - target: DeepMineProbe
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.tests
+        GENERATE_INFOPLIST_FILE: true
+        TARGETED_DEVICE_FAMILY: "1"
+  DeepMineProbeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: DeepMineProbe/UITests
+    dependencies:
+      - target: DeepMineProbe
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.uitests
+        GENERATE_INFOPLIST_FILE: true
+        TARGETED_DEVICE_FAMILY: "1"

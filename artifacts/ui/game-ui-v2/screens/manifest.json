@@ -1,0 +1,62 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "06-device-gate.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "06-device-gate_0_1606E345-13FC-4F26-8362-8973F49EAF6E.png",
+        "timestamp" : 1785282818.741
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "05-mining-journal.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "05-mining-journal_0_9EAE135C-962C-4D34-A98A-FD9C4EC13D97.png",
+        "timestamp" : 1785282813.959
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "04-time-and-supplies.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "04-time-and-supplies_0_D6FAC5F0-015B-41D7-8CE2-A569D4AFDE05.png",
+        "timestamp" : 1785282809.309
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "03-mine-gate.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "03-mine-gate_0_FEC48C4C-0910-496D-BBE9-BFB96E1C3752.png",
+        "timestamp" : 1785282803.979
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "02-return-signal.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "02-return-signal_0_331DC075-C0CE-4B9F-AB1B-ED0F6F7B2940.png",
+        "timestamp" : 1785282799.015
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "01-overview.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "01-overview_0_03802CC0-0AFE-4117-8B84-7DBEEA677F14.png",
+        "timestamp" : 1785282793.513
+      }
+    ],
+    "testIdentifier" : "ProbeScreenshotTests/testCaptureDashboardSections()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineProbeUITests/ProbeScreenshotTests/testCaptureDashboardSections"
+  }
+]
