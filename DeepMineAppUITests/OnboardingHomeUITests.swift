@@ -19,7 +19,8 @@ final class OnboardingHomeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["onboarding-demo-active"].waitForExistence(timeout: 2))
         let timer = app.staticTexts["onboarding-demo-timer"]
         XCTAssertTrue(timer.exists)
-        XCTAssertFalse(timer.label.contains("90분") || timer.label.contains("90 minutes"))
+        // Guards a seconds/minutes mix-up: the practice dig is ten seconds, not ten minutes.
+        XCTAssertFalse(timer.label.contains("10분") || timer.label.contains("10 minutes"))
     }
 
     func testDeterministicDemoCompletionShowsRewardAndSavedUpgrade() {

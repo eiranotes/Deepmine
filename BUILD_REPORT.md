@@ -11,8 +11,8 @@
 | 항목 | 상태 | 최신 근거 |
 |---|---|---|
 | XcodeGen | 검증됨 | `xcodegen generate --spec project.yml` 성공 |
-| Core | 검증됨 | SwiftPM 101/101, 실패 0 (기준 73 + 경제 7 + 리텐션 21) |
-| 앱 전체 suite | 검증됨 | iPhone 17 Pro iOS 26.5에서 180/180, 실패·skip 0 |
+| Core | 검증됨 | SwiftPM 101/101, 실패 0 |
+| 앱 전체 suite | 검증됨 | iPhone 17 Pro iOS 26.5에서 182/182, 실패·skip 0 |
 | 복리 장비 곡선 | 검증됨 | 레벨 1/10/25/59에서 상대 이득이 항상 1.12배임을 회귀 테스트 |
 | 심도 역전 방지 | 검증됨 | 180일 시뮬레이션에서 집중이 많은 페르소나가 더 얕지 않음 |
 | 사다리 잔존 | 검증됨 | 180일에 네 페르소나 모두 드릴 상한 미달 |
@@ -20,7 +20,7 @@
 | 기억 재구매 할인 | 검증됨 | 최고 레벨 이하 50%, 초과 정가 회귀 테스트 |
 | 스트릭 감쇠 1회 | 검증됨 | 2일 결석 시 7→3, 결석일당 누적 아님 |
 | generic iOS build | 검증됨 | `generic/platform=iOS`, `CODE_SIGNING_ALLOWED=NO` 성공 |
-| Swift 파일 크기 | 부분 검증 | 12개 파일 분리. `DeepMineLocalization.swift`만 307줄로 7줄 초과 — enum case는 extension으로 분리할 수 없고 두 enum으로 쪼개면 현지화 parity 계약과 모든 호출부가 깨진다. 로직 없는 키 목록이라 초과 상태로 둔다 |
+| Swift 파일 크기 | 부분 검증 | 15개 파일 분리. `DeepMineLocalization.swift`만 309줄로 9줄 초과 — enum case는 extension으로 분리할 수 없고 두 enum으로 쪼개면 현지화 parity 계약과 모든 호출부가 깨진다. 로직 없는 키 목록이라 초과 상태로 둔다 |
 | 시계 소스 교체 | 미검증(실기기 필요) | 코드는 `CLOCK_MONOTONIC_RAW`로 교체. 실제 슬립 구간 drift는 기기에서만 확인 가능 |
 | Live Activity intent 즉시 적용 | 미검증(실기기 필요) | 앱 프로세스 등록·drain 경로는 구현. 실제 백그라운드 intent 실행은 기기 게이트 |
 | 화면 증거 19장 | 미갱신 | 홈·귀환 보고서가 바뀌어 `artifacts/ui/game-mvp-v1/`의 기존 PNG는 stale이다 |
@@ -51,8 +51,9 @@ xcodebuild build -quiet \
 
 ## Simulator suite
 
-최종 `/tmp/DMGate.xcresult` 요약은 `result: Passed`, `passedTests: 180`, `failedTests: 0`,
-`skippedTests: 0`이다. Core는 별도 SwiftPM 실행에서 101/101이다. 경제 수정만 반영한 중간
+최종 `/tmp/DMShip.xcresult` 요약은 `result: Passed`, `passedTests: 182`, `failedTests: 0`,
+`skippedTests: 0`이다. 경제 수정 단계는 175/175, 리텐션 단계는 180/180이었고 플레이 경험
+작업의 테스트가 더해져 182가 되었다. Core는 별도 SwiftPM 실행에서 101/101이다. 경제 수정만 반영한 중간
 게이트는 175/175였고, 리텐션 기능과 그 테스트 5개가 더해져 180이 되었다.
 
 리텐션 기능을 얹은 첫 실행에서 3건이 실패했고 모두 코드·계약 문제였다. 프레스티지가
@@ -83,6 +84,19 @@ suite 부하에서 타임아웃한 것이었다. 단독 실행에서는 42초로
 | 다음 세 걸음 | 검증됨 | 근거리 우선 정렬, 3개 상한, 추정 불가 시 숫자 생성 안 함 |
 | 성장 곡선 | 검증됨 | 노력과 성장 분리, 기록 1주면 배율 withhold, 포기 세션 제외 |
 | 광맥 도감 | 검증됨 | 발견 횟수 집계와 최초 발견일 최소값, 미발견 5종 표시 |
+
+## Play experience verification
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 이벤트별 햅틱 구분 | 검증됨 | 9종 모두 transient 비어 있지 않고 폴백 존재. 갱도 문과 광맥의 강도·예리도 대비를 회귀 테스트 |
+| 피드백 설정 반영 | 검증됨 | 햅틱·사운드 개별 비활성 시 재생 0 |
+| 귀환 보상 1회 재생 | 검증됨 | 재실행 시 재생 안 함 (기존 receipt 계약 유지) |
+| 연습 채굴 10초 | 검증됨 | `beginOrResumeDemo().remainingSeconds`가 `demoDurationSeconds`와 일치 |
+| 연습 광맥 확정 | 검증됨 | 수정 1개가 실제 지급되고 집중 진행에는 반영 안 됨 |
+| 카운트업·레일 애니메이션 | 미검증(시각) | Reduce Motion 분기는 코드로 존재. 실제 모션 체감은 실기기 게이트 |
+| 광부 작업 루프 | 미검증(시각) | 붕괴 시 정지 분기 존재. 모션 체감은 실기기 게이트 |
+| 커스텀 오디오 자산 | **미구현** | 시스템 사운드 ID를 이벤트별로 배정한 상태. 8-bit SFX 저작은 별도 작업이며 `GameFeedbackEvent.systemSoundID`가 교체 지점 |
 
 ## Balance verification
 

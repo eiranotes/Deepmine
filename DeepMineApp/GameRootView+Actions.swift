@@ -20,7 +20,11 @@ extension GameRootView {
     func purchase(equipment: EquipmentKind) {
         guard let gameStore else { return }
         guard let result = try? gameStore.purchaseEquipment(equipment) else { return }
-        if case .purchased = result { refreshLivePlayer() }
+        guard case let .purchased(_, newLevel, _) = result else { return }
+        let crewStepped = equipment == .drill
+            && MineCrew.size(drillLevel: newLevel) > MineCrew.size(drillLevel: newLevel - 1)
+        feedback.play(crewStepped ? .crewGrew : .upgradeInstalled)
+        refreshLivePlayer()
     }
 
     func select(plan: MinePlan) {

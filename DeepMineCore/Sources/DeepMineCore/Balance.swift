@@ -1,8 +1,18 @@
 import Foundation
 
 public enum Balance {
-    public static let demoDurationSeconds: TimeInterval = 90
+    // The practice dig exists to show the return, not to be a real session. Ninety
+    // seconds of waiting before the first reward is a long time to ask of someone who
+    // has not seen the game yet.
+    public static let demoDurationSeconds: TimeInterval = 10
     public static let demoOreGrant = 100.0
+    /// The practice return always finds a vein. Leaving the first impression to a 12%
+    /// roll means most players never see the mechanic the game is built around.
+    ///
+    /// A crystal vein specifically: the practice ore grant is a flat amount, so a blue
+    /// vein would promise a x1.5 haul the demo does not actually pay. The crystal is
+    /// really handed over.
+    public static let demoGuaranteedVein = VeinKind.crystal
     public static let baseOrePerFocusCredit = 100.0
     public static let minutesPerFocusCredit = 25.0
     public static let growthRate = 1.04

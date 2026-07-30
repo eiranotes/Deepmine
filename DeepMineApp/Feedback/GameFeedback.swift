@@ -11,8 +11,8 @@ final class GameFeedback {
     private let defaults: UserDefaults
     private let receiptKey: String
     private let dismissedKey: String
-    private let haptic: @MainActor (VerificationGrade) -> Void
-    private let sound: @MainActor () -> Void
+    private let hapticPlayer: @MainActor (GameHapticPattern) -> Void
+    private let soundPlayer: @MainActor (SystemSoundID) -> Void
 
     var hapticsEnabled: Bool {
         get { preference(Self.hapticPreferenceKey) }
@@ -27,28 +27,40 @@ final class GameFeedback {
     init(
         defaults: UserDefaults = .standard,
         scope: String = "product",
-        haptic: @escaping @MainActor (VerificationGrade) -> Void = { grade in
-            UINotificationFeedbackGenerator().notificationOccurred(
-                grade == .collapsed ? .warning : .success
-            )
-        },
-        sound: @escaping @MainActor () -> Void = {
-            AudioServicesPlaySystemSound(SystemSoundID(1104))
+        hapticPlayer: (@MainActor (GameHapticPattern) -> Void)? = nil,
+        soundPlayer: @escaping @MainActor (SystemSoundID) -> Void = {
+            AudioServicesPlaySystemSound($0)
         }
     ) {
         self.defaults = defaults
         receiptKey = "deepmine.return.feedback.\(scope)"
         dismissedKey = "deepmine.return.dismissed.\(scope)"
-        self.haptic = haptic
-        self.sound = sound
+        if let hapticPlayer {
+            self.hapticPlayer = hapticPlayer
+        } else {
+            let engine = GameHapticEngine()
+            self.hapticPlayer = { engine.play($0) }
+        }
+        self.soundPlayer = soundPlayer
     }
 
+    /// Fires for any player-caused state change. Cheap enough to call from a view action.
+    func play(_ event: GameFeedbackEvent) {
+        if preference(Self.hapticPreferenceKey) { hapticPlayer(event.haptic) }
+        if preference(Self.soundPreferenceKey) { soundPlayer(event.systemSoundID) }
+    }
+
+    /// The return reward is receipt-guarded so relaunching onto a stored report does not
+    /// replay the celebration. Other events are transient and need no receipt.
     @discardableResult
     func playRewardOnce(completionID: UUID, grade: VerificationGrade) -> Bool {
         guard claim(completionID, key: receiptKey) else { return false }
-        if preference(Self.hapticPreferenceKey) { haptic(grade) }
-        if preference(Self.soundPreferenceKey) { sound() }
+        play(event(for: grade))
         return true
+    }
+
+    private func event(for grade: VerificationGrade) -> GameFeedbackEvent {
+        grade == .collapsed ? .sessionCollapsed : .sessionCompleted
     }
 
     func markDismissed(completionID: UUID) {

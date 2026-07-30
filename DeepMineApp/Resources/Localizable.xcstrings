@@ -5427,6 +5427,40 @@
           }
         }
       }
+    },
+    "home.decoration.label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld mine decorations"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광산 장식 %lld개"
+          }
+        }
+      }
+    },
+    "onboarding.demo.veinBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veins are revealed only when you return. Nothing interrupts you while you focus."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "귀환할 때만 광맥이 공개됩니다. 집중하는 동안에는 아무것도 알려주지 않습니다."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

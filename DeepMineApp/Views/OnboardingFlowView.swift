@@ -9,9 +9,9 @@ struct OnboardingFlowView: View {
     let gameStore: GameStore
     let permissionCoordinator: any OnboardingPermissionCoordinating
     let onFinished: (PlayerState) -> Void
-    @State private var player: PlayerState
-    @State private var remainingSeconds = Int(Balance.demoDurationSeconds)
-    @State private var isRequesting = false
+    @State var player: PlayerState
+    @State var remainingSeconds = Int(Balance.demoDurationSeconds)
+    @State var isRequesting = false
     init(
         gameStore: GameStore,
         player: PlayerState,
@@ -60,7 +60,7 @@ struct OnboardingFlowView: View {
         .foregroundStyle(DeepMinePalette.limestone.color)
         .task(id: player.demoStartedAt) { await monitorDemoIfNeeded() }
     }
-    private func premise(
+    func premise(
         eyebrow: DeepMineStringKey,
         title: DeepMineStringKey,
         body: DeepMineStringKey,
@@ -97,7 +97,7 @@ struct OnboardingFlowView: View {
             .accessibilityIdentifier("onboarding-next")
         }
     }
-    private var demo: some View {
+    var demo: some View {
         VStack(spacing: 17) {
             Spacer()
             DeepMineRivetedPanel {
@@ -134,166 +134,6 @@ struct OnboardingFlowView: View {
                 .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
                 .accessibilityIdentifier("onboarding-demo-start")
             }
-        }
-    }
-    private var reward: some View {
-        VStack(spacing: 17) {
-            Spacer()
-            DeepMineRivetedPanel {
-                VStack(spacing: 14) {
-                    DeepMineStatusMarker(status: .completed)
-                    Text(DeepMineStrings.text(.onboardingDemoRewardTitle))
-                        .font(.title2.weight(.heavy))
-                        .accessibilityIdentifier("onboarding-demo-reward")
-                    Text(DeepMineStrings.text(.onboardingDemoRewardBody))
-                        .multilineTextAlignment(.center)
-                    Divider().overlay(DeepMinePalette.limestone.color.opacity(0.25))
-                    Label(DeepMineStrings.text(.onboardingUpgradeTitle), systemImage: "gearshape.2.fill")
-                        .font(.headline)
-                    Text(DeepMineStrings.text(.onboardingUpgradeBody))
-                        .font(.subheadline)
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.74))
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-            }
-            Spacer()
-            Button { installUpgrade() } label: {
-                DeepMineActionLabel(titleKey: .actionInstallUpgrade, detailKey: .onboardingUpgradeTitle, symbol: "wrench.and.screwdriver.fill")
-            }
-            .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
-            .accessibilityIdentifier("onboarding-demo-upgrade")
-        }
-    }
-    private var permission: some View {
-        let kind = nextPermission
-        return VStack(spacing: 17) {
-            Spacer()
-            DeepMineRivetedPanel {
-                VStack(spacing: 14) {
-                    Image(systemName: permissionSymbol(kind))
-                        .font(.system(size: 38, weight: .bold))
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                    Text(DeepMineStrings.text(permissionTitle(kind)))
-                        .font(.title3.weight(.heavy))
-                        .accessibilityIdentifier("onboarding-permission-\(kind.rawValue)")
-                    Text(DeepMineStrings.text(permissionBody(kind)))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.76))
-                    Text(DeepMineStrings.text(.onboardingPermissionOpen))
-                        .font(.caption)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.64))
-                }
-                .frame(maxWidth: .infinity)
-            }
-            Spacer()
-            Button { Task { await request(kind) } } label: {
-                DeepMineActionLabel(titleKey: .actionEnable, detailKey: nil, symbol: "checkmark")
-            }
-            .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
-            .disabled(isRequesting)
-            .accessibilityIdentifier("onboarding-permission-allow")
-            Button { deferPermission(kind) } label: {
-                Text(DeepMineStrings.text(.actionNotNow))
-            }
-            .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
-            .accessibilityIdentifier("onboarding-permission-defer")
-        }
-    }
-
-    private var timerText: String {
-        String(format: "%d:%02d", remainingSeconds / 60, remainingSeconds % 60)
-    }
-
-    private var timerAccessibilityLabel: String {
-        let minutes = remainingSeconds / 60
-        let seconds = remainingSeconds % 60
-        let minutePart = minutes > 0
-            ? "\(minutes) \(DeepMineStrings.text(.gameMinutes))"
-            : ""
-        return [minutePart, "\(seconds) \(DeepMineStrings.text(.gameSeconds))"]
-            .filter { !$0.isEmpty }
-            .joined(separator: " ")
-    }
-
-    private var nextPermission: OnboardingPermissionKind {
-        if player.focusProtectionPermission == .notAsked { return .focusProtection }
-        if player.endAlertPermission == .notAsked { return .endAlert }
-        return .returnReminder
-    }
-
-    private func advancePremise() {
-        if let updated = try? gameStore.advanceOnboardingPremise() { player = updated }
-    }
-
-    private func startDemo() {
-        guard let state = try? gameStore.beginOrResumeDemo() else { return }
-        remainingSeconds = state.remainingSeconds
-        player = (try? gameStore.playerState()) ?? player
-    }
-
-    private func monitorDemoIfNeeded() async {
-        guard player.onboardingStage == .demo, player.demoStartedAt != nil else { return }
-        while !Task.isCancelled {
-            guard let state = try? gameStore.demoState() else { return }
-            remainingSeconds = state.remainingSeconds
-            if state.remainingSeconds == 0 {
-                _ = try? gameStore.completeDemoIfNeeded()
-                player = (try? gameStore.playerState()) ?? player
-                return
-            }
-            try? await Task.sleep(for: .seconds(1))
-        }
-    }
-
-    private func installUpgrade() {
-        _ = try? gameStore.purchaseDemoUpgrade()
-        player = (try? gameStore.playerState()) ?? player
-    }
-
-    private func request(_ kind: OnboardingPermissionKind) async {
-        isRequesting = true
-        let outcome = await permissionCoordinator.request(kind)
-        isRequesting = false
-        record(kind, outcome: outcome)
-    }
-
-    private func deferPermission(_ kind: OnboardingPermissionKind) {
-        record(kind, outcome: .deferred)
-    }
-
-    private func record(_ kind: OnboardingPermissionKind, outcome: OnboardingPermissionOutcome) {
-        guard let updated = try? gameStore.recordPermission(kind, outcome: outcome) else { return }
-        player = updated
-        if updated.returnReminderPermission != .notAsked,
-           let completed = try? gameStore.finishOnboarding() {
-            player = completed
-            onFinished(completed)
-        }
-    }
-
-    private func permissionTitle(_ kind: OnboardingPermissionKind) -> DeepMineStringKey {
-        switch kind {
-        case .focusProtection: .onboardingPermissionFocusTitle
-        case .endAlert: .onboardingPermissionEndTitle
-        case .returnReminder: .onboardingPermissionReturnTitle
-        }
-    }
-
-    private func permissionBody(_ kind: OnboardingPermissionKind) -> DeepMineStringKey {
-        switch kind {
-        case .focusProtection: .onboardingPermissionFocusBody
-        case .endAlert: .onboardingPermissionEndBody
-        case .returnReminder: .onboardingPermissionReturnBody
-        }
-    }
-
-    private func permissionSymbol(_ kind: OnboardingPermissionKind) -> String {
-        switch kind {
-        case .focusProtection: "door.left.hand.closed"
-        case .endAlert: "bell.and.waves.left.and.right.fill"
-        case .returnReminder: "note.text"
         }
     }
 }

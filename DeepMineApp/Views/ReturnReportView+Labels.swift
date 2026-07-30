@@ -11,6 +11,14 @@ extension ReturnReportView {
     var outcomeKey: DeepMineStringKey {
         outcomeIdentifier == "abandoned" ? .returnOutcomeAbandoned : .returnOutcomeCompleted
     }
+    /// Collapse, vein and clean completion each get their own figure.
+    var outcomeSpriteName: String {
+        if presentation.report.verificationGrade == .collapsed { return "CollapsedSprite" }
+        if presentation.report.vein != nil { return "VeinSprite" }
+        if case .abandoned = presentation.report.outcome { return "CollapsedSprite" }
+        return "CompletedSprite"
+    }
+
     var gradeStatus: DeepMineStatus {
         switch presentation.report.verificationGrade {
         case .sealed: .completed

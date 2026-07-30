@@ -45,6 +45,22 @@
 - [x] 성장 곡선(출정 1회 광석, 12주 스파크라인, 기록 시작 대비 배율)
 - [x] 광맥 도감과 장비 상위 레벨 목표치
 
+## Play experience — implemented
+
+- [x] 이벤트 9종 감각 피드백과 CoreHaptics 패턴, 미지원 기기 폴백 (D-030)
+- [x] 귀환 보상 카운트업과 진행률 레일 채움, Reduce Motion 분기
+- [x] 활성 채굴 광부 작업 루프 (D-031)
+- [x] 연습 채굴 10초와 수정 광맥 확정 발견 (D-032)
+- [x] 결과별 스프라이트(완료·광맥·붕괴)와 홈 갱도 장식 4종 렌더
+- [x] `docs/ACHIEVEMENT_ART_PROMPTS.md` 배지 35종 프롬프트
+
+## Play experience — deferred
+
+- [ ] 커스텀 8-bit SFX 저작. 현재는 이벤트별 시스템 사운드 ID이며 교체 지점은
+      `GameFeedbackEvent.systemSoundID`
+- [ ] 도전과제 배지 이미지 생성·양자화·Asset Catalog 편입
+- [ ] `artifacts/ui/game-mvp-v1/` 화면 재캡처
+
 ## Closeout — in progress
 
 - [x] `xcodegen generate --spec project.yml`

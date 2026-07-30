@@ -80,6 +80,55 @@ final class RetentionSurfaceTests: XCTestCase {
         )
     }
 
+    /// Every event must map to a distinct haptic shape or the feedback carries no
+    /// information beyond "something happened".
+    func testFeedbackEventsHaveDistinguishableHaptics() {
+        let sealedDoor = GameFeedbackEvent.sessionSealed.haptic.transients
+        let vein = GameFeedbackEvent.veinFound.haptic.transients
+        XCTAssertNotEqual(sealedDoor.count, vein.count)
+        // The shaft door is heavy and dull, the vein is light and sharp.
+        XCTAssertGreaterThan(sealedDoor[0].1, vein[0].1)
+        XCTAssertGreaterThan(vein[0].2, sealedDoor[0].2)
+
+        for event in GameFeedbackEvent.allCases {
+            XCTAssertFalse(
+                event.haptic.transients.isEmpty,
+                "\(event.rawValue) would be felt as nothing"
+            )
+            XCTAssertTrue(
+                event.haptic.fallbackNotification != nil
+                    || event.haptic.fallbackImpact != nil,
+                "\(event.rawValue) has no fallback on devices without CoreHaptics"
+            )
+        }
+    }
+
+    func testFeedbackHonoursPreferences() {
+        let suite = "deepmine.tests.feedback.\(UUID().uuidString)"
+        let defaults = try? XCTUnwrap(UserDefaults(suiteName: suite))
+        guard let defaults else { return }
+        defer { defaults.removePersistentDomain(forName: suite) }
+        var haptics = 0
+        var sounds = 0
+        let feedback = GameFeedback(
+            defaults: defaults,
+            scope: "test",
+            hapticPlayer: { _ in haptics += 1 },
+            soundPlayer: { _ in sounds += 1 }
+        )
+        feedback.hapticsEnabled = false
+        feedback.soundEnabled = false
+        feedback.play(.sessionSealed)
+        XCTAssertEqual(haptics, 0)
+        XCTAssertEqual(sounds, 0)
+
+        feedback.hapticsEnabled = true
+        feedback.soundEnabled = true
+        feedback.play(.sessionSealed)
+        XCTAssertEqual(haptics, 1)
+        XCTAssertEqual(sounds, 1)
+    }
+
     private struct Fixture {
         let store: GameStore
         let clock: FakeClock

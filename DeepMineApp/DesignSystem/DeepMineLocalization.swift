@@ -304,4 +304,6 @@ enum DeepMineStringKey: String, CaseIterable, Sendable {
     case statisticsCodexUndiscovered = "statistics.codex.undiscovered"
     case statisticsCodexNote = "statistics.codex.note"
     case equipmentPreview = "equipment.preview"
+    case homeDecorationLabel = "home.decoration.label"
+    case onboardingDemoVeinBody = "onboarding.demo.veinBody"
 }

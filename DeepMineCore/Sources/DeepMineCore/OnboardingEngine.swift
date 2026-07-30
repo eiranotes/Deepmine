@@ -30,7 +30,7 @@ public enum DemoBeginResult: Equatable, Sendable {
 
 public enum DemoCompletionResult: Equatable, Sendable {
     case tooEarly(remainingSeconds: Int)
-    case rewarded(ore: Double)
+    case rewarded(ore: Double, vein: VeinKind)
     case alreadyRewarded
 }
 
@@ -71,7 +71,16 @@ public enum OnboardingEngine {
         state.demoCompletedAt = date
         state.demoRewardReceiptID = receiptID
         state.onboardingStage = .demoReward
-        return .rewarded(ore: Balance.demoOreGrant)
+        // The practice return demonstrates the vein reveal, which is the moment the
+        // whole loop is built around. Its crystal is granted so the reward screen has
+        // something concrete to show.
+        _ = WorldProgression.apply(
+            vein: Balance.demoGuaranteedVein,
+            effectID: receiptID,
+            regionIndex: 0,
+            to: &state
+        )
+        return .rewarded(ore: Balance.demoOreGrant, vein: Balance.demoGuaranteedVein)
     }
 
     public static func purchaseRecommendedUpgrade(

@@ -40,6 +40,7 @@ struct SessionPreflightSheet: View {
     let plan: MinePlan
     let readiness: SessionReadiness
     let projection: SessionRewardProjection
+    let feedback: GameFeedback
     let onStarted: (PersistedGameSession) -> Void
     let onConfigure: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -238,6 +239,8 @@ struct SessionPreflightSheet: View {
         isPreparing = true
         do {
             try await gameStore.start(length: length, plan: plan)
+            // Sealed and open starts feel different because they are different promises.
+            feedback.play(readiness == .sealed ? .sessionSealed : .sessionOpen)
             guard let session = gameStore.activeSession else {
                 isPreparing = false
                 startFailed = true

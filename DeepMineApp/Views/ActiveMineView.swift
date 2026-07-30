@@ -65,8 +65,9 @@ struct ActiveMineView: View {
 
     private var mineHeader: some View {
         HStack(spacing: 14) {
-            Image("MinerSprite")
-                .resizable().interpolation(.none).scaledToFit()
+            // The Live Activity cannot loop, but this screen is not a Live Activity. A
+            // working miner is the only thing here that says the mine is running.
+            WorkingMinerView(isWorking: currentGrade != .collapsed)
                 .frame(width: 72, height: 72)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {

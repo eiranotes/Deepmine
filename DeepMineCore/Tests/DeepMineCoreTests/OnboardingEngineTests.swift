@@ -10,17 +10,28 @@ final class OnboardingEngineTests: XCTestCase {
 
         XCTAssertEqual(
             OnboardingEngine.beginDemo(at: start, in: &state),
-            .started(endsAt: start.addingTimeInterval(90))
+            .started(endsAt: start.addingTimeInterval(Balance.demoDurationSeconds))
         )
         XCTAssertEqual(
-            OnboardingEngine.completeDemo(at: start.addingTimeInterval(89), receiptID: rewardID, in: &state),
+            OnboardingEngine.completeDemo(
+                at: start.addingTimeInterval(Balance.demoDurationSeconds - 1),
+                receiptID: rewardID,
+                in: &state
+            ),
             .tooEarly(remainingSeconds: 1)
         )
         XCTAssertEqual(
-            OnboardingEngine.completeDemo(at: start.addingTimeInterval(90), receiptID: rewardID, in: &state),
-            .rewarded(ore: Balance.demoOreGrant)
+            OnboardingEngine.completeDemo(
+                at: start.addingTimeInterval(Balance.demoDurationSeconds),
+                receiptID: rewardID,
+                in: &state
+            ),
+            .rewarded(ore: Balance.demoOreGrant, vein: Balance.demoGuaranteedVein)
         )
         XCTAssertEqual(state.resources.ore, Balance.drillBasePrice)
+        // The practice vein really pays its crystal, so the reveal is not a claim the
+        // demo fails to honour. It still must not count as focus progress.
+        XCTAssertEqual(state.resources.crystals, 1)
         XCTAssertEqual(state.completedSessionCount, 0)
         XCTAssertEqual(state.lifetimeFocusCredits, 0)
         XCTAssertFalse(state.isDeepMiningUnlocked)

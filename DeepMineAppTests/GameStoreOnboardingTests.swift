@@ -12,12 +12,15 @@ final class GameStoreOnboardingTests: XCTestCase {
         let rewardID = UUID()
         let purchaseID = UUID()
 
-        XCTAssertEqual(try store.beginOrResumeDemo().remainingSeconds, 90)
+        XCTAssertEqual(
+            try store.beginOrResumeDemo().remainingSeconds,
+            Int(Balance.demoDurationSeconds)
+        )
         XCTAssertEqual(system.startCount, 0)
-        clock.advance(seconds: 90)
+        clock.advance(seconds: Balance.demoDurationSeconds)
         XCTAssertEqual(
             try store.completeDemoIfNeeded(receiptID: rewardID),
-            .rewarded(ore: Balance.demoOreGrant)
+            .rewarded(ore: Balance.demoOreGrant, vein: Balance.demoGuaranteedVein)
         )
         XCTAssertEqual(
             try store.purchaseDemoUpgrade(commandID: purchaseID),

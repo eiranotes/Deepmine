@@ -84,16 +84,16 @@ final class GameStoreSessionPresentationTests: XCTestCase {
         let first = GameFeedback(
             defaults: defaults,
             scope: "test",
-            haptic: { _ in hapticCount += 1 },
-            sound: { soundCount += 1 }
+            hapticPlayer: { _ in hapticCount += 1 },
+            soundPlayer: { _ in soundCount += 1 }
         )
 
         XCTAssertTrue(first.playRewardOnce(completionID: completionID, grade: .sealed))
         let relaunched = GameFeedback(
             defaults: defaults,
             scope: "test",
-            haptic: { _ in hapticCount += 1 },
-            sound: { soundCount += 1 }
+            hapticPlayer: { _ in hapticCount += 1 },
+            soundPlayer: { _ in soundCount += 1 }
         )
         XCTAssertFalse(relaunched.playRewardOnce(completionID: completionID, grade: .sealed))
         XCTAssertEqual(hapticCount, 1)

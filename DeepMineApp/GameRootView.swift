@@ -203,6 +203,7 @@ struct GameRootView: View {
                 plan: player.lastSelectedPlan,
                 readiness: readiness,
                 projection: projection,
+                feedback: feedback,
                 onStarted: { session in
                     showingPreflight = false
                     path.append(.activeMine)

@@ -10,6 +10,9 @@ struct DeepMineProgressRail: View {
         return min(1, max(0, value / total))
     }
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var drawnFraction: Double = 0
+
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
@@ -17,7 +20,7 @@ struct DeepMineProgressRail: View {
                     .fill(DeepMinePalette.coal.color)
                 RoundedRectangle(cornerRadius: 3)
                     .fill(DeepMinePalette.brass.color)
-                    .frame(width: proxy.size.width * fraction)
+                    .frame(width: proxy.size.width * drawnFraction)
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 3)
@@ -25,9 +28,21 @@ struct DeepMineProgressRail: View {
             }
         }
         .frame(height: 9)
+        // Filling on appear turns a static bar into a readable amount of progress. The
+        // accessibility value always reports the real fraction, never the drawn one.
+        .onAppear { setFraction(fraction, animated: !reduceMotion) }
+        .onChange(of: fraction) { _, next in setFraction(next, animated: !reduceMotion) }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(Text(fraction, format: .percent.precision(.fractionLength(0))))
+    }
+
+    private func setFraction(_ next: Double, animated: Bool) {
+        guard animated else {
+            drawnFraction = next
+            return
+        }
+        withAnimation(.easeOut(duration: 0.55)) { drawnFraction = next }
     }
 }
 
