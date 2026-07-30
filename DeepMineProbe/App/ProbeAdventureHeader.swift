@@ -56,7 +56,7 @@ struct ProbeHeader: View {
     private var briefing: some View {
         VStack(alignment: .leading, spacing: 13) {
             HStack(alignment: .top, spacing: 12) {
-                PixelMinerIcon(size: 40, lampColor: ProbePalette.brass)
+                PixelMinerIcon(size: 40)
                     .frame(width: 48, height: 48)
                     .background(ProbePalette.coal, in: RoundedRectangle(cornerRadius: 6))
                     .overlay {

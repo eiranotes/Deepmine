@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ABF634B81B1BD67B65FC1982"
-               BuildableName = "DeepMineProbe.app"
-               BlueprintName = "DeepMineProbe"
+               BlueprintIdentifier = "0255D2C26265CC6842D3E0D9"
+               BuildableName = "DeepMineApp.app"
+               BlueprintName = "DeepMineApp"
                ReferencedContainer = "container:DeepMine.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ABF634B81B1BD67B65FC1982"
-            BuildableName = "DeepMineProbe.app"
-            BlueprintName = "DeepMineProbe"
+            BlueprintIdentifier = "0255D2C26265CC6842D3E0D9"
+            BuildableName = "DeepMineApp.app"
+            BlueprintName = "DeepMineApp"
             ReferencedContainer = "container:DeepMine.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -44,9 +44,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A4D685696DA799F006494316"
-               BuildableName = "DeepMineProbeTests.xctest"
-               BlueprintName = "DeepMineProbeTests"
+               BlueprintIdentifier = "6E4E32E9A4FE21117A207880"
+               BuildableName = "DeepMineAppTests.xctest"
+               BlueprintName = "DeepMineAppTests"
                ReferencedContainer = "container:DeepMine.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -55,9 +55,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AE54FF5CC5EAFB97954056D8"
-               BuildableName = "DeepMineProbeUITests.xctest"
-               BlueprintName = "DeepMineProbeUITests"
+               BlueprintIdentifier = "9538B56AE49BCFAD9B241405"
+               BuildableName = "DeepMineAppUITests.xctest"
+               BlueprintName = "DeepMineAppUITests"
                ReferencedContainer = "container:DeepMine.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -79,9 +79,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ABF634B81B1BD67B65FC1982"
-            BuildableName = "DeepMineProbe.app"
-            BlueprintName = "DeepMineProbe"
+            BlueprintIdentifier = "0255D2C26265CC6842D3E0D9"
+            BuildableName = "DeepMineApp.app"
+            BlueprintName = "DeepMineApp"
             ReferencedContainer = "container:DeepMine.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -98,9 +98,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ABF634B81B1BD67B65FC1982"
-            BuildableName = "DeepMineProbe.app"
-            BlueprintName = "DeepMineProbe"
+            BlueprintIdentifier = "0255D2C26265CC6842D3E0D9"
+            BuildableName = "DeepMineApp.app"
+            BlueprintName = "DeepMineApp"
             ReferencedContainer = "container:DeepMine.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

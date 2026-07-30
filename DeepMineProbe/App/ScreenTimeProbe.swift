@@ -6,11 +6,14 @@ import ManagedSettings
 
 enum ScreenTimeProbeError: LocalizedError {
     case authorizationRequired(AuthorizationStatus)
+    case emptySelection
 
     var errorDescription: String? {
         switch self {
         case .authorizationRequired(let status):
             "방해 앱을 가리려면 차단 권한이 필요합니다. 현재 상태: \(status.description)"
+        case .emptySelection:
+            "차단할 앱이나 카테고리를 먼저 선택해 주세요."
         }
     }
 }
@@ -18,6 +21,36 @@ enum ScreenTimeProbeError: LocalizedError {
 struct ShieldApplicationResult: Sendable {
     let elapsed: TimeInterval
     let expiresAt: Date
+}
+
+@MainActor
+protocol ScreenTimeSelectionStoring {
+    func load() throws -> FamilyActivitySelection
+    func save(_ selection: FamilyActivitySelection) throws
+}
+
+@MainActor
+struct SharedScreenTimeSelectionStorage: ScreenTimeSelectionStoring {
+    func load() throws -> FamilyActivitySelection {
+        let directory = try ProbeSharedStores.directoryURL()
+        let url = directory.appending(path: ProbeConstants.selectionFilename)
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            return FamilyActivitySelection()
+        }
+        return try JSONDecoder().decode(
+            FamilyActivitySelection.self,
+            from: Data(contentsOf: url)
+        )
+    }
+
+    func save(_ selection: FamilyActivitySelection) throws {
+        let directory = try ProbeSharedStores.directoryURL()
+        let data = try JSONEncoder().encode(selection)
+        try data.write(
+            to: directory.appending(path: ProbeConstants.selectionFilename),
+            options: .atomic
+        )
+    }
 }
 
 @MainActor
@@ -29,10 +62,12 @@ final class ScreenTimeProbe: ObservableObject {
         named: ManagedSettingsStore.Name(ProbeConstants.shieldStoreName)
     )
     private let center = DeviceActivityCenter()
+    private let selectionStorage: any ScreenTimeSelectionStoring
 
-    init() {
+    init(storage: any ScreenTimeSelectionStoring = SharedScreenTimeSelectionStorage()) {
+        selectionStorage = storage
         do {
-            selection = try Self.loadSelection()
+            selection = try storage.load()
             initializationError = nil
         } catch {
             selection = FamilyActivitySelection()
@@ -47,23 +82,35 @@ final class ScreenTimeProbe: ObservableObject {
     }
 
     func persistSelection() throws {
-        let directory = try ProbeSharedStores.directoryURL()
-        let data = try JSONEncoder().encode(selection)
-        try data.write(
-            to: directory.appending(path: ProbeConstants.selectionFilename),
-            options: .atomic
-        )
+        try replaceSelection(selection)
+    }
+
+    func replaceSelection(_ newSelection: FamilyActivitySelection) throws {
+        try selectionStorage.save(newSelection)
+        selection = newSelection
     }
 
     func applyShields() throws -> ShieldApplicationResult {
+        let startsAt = Date()
+        return try applyShields(
+            sessionID: nil,
+            startsAt: startsAt,
+            expiresAt: startsAt.addingTimeInterval(ProbeConstants.probeDuration)
+        )
+    }
+
+    func applyShields(
+        sessionID: UUID?, startsAt: Date, expiresAt: Date
+    ) throws -> ShieldApplicationResult {
         let status = AuthorizationCenter.shared.authorizationStatus
         guard Self.isAuthorized(status) else {
             throw ScreenTimeProbeError.authorizationRequired(status)
         }
+        guard !selection.applicationTokens.isEmpty || !selection.categoryTokens.isEmpty else {
+            throw ScreenTimeProbeError.emptySelection
+        }
 
         let startedAt = DispatchTime.now().uptimeNanoseconds
-        let startsAt = Date()
-        let expiresAt = startsAt.addingTimeInterval(ProbeConstants.probeDuration)
         let activity = DeviceActivityName(
             "\(ProbeConstants.activityName).\(UUID().uuidString)"
         )
@@ -83,6 +130,7 @@ final class ScreenTimeProbe: ObservableObject {
             )
             try ProbeShieldJournal.save(
                 ProbeShieldExpiry(
+                    sessionID: sessionID,
                     activityName: activity.rawValue,
                     expiresAt: expiresAt
                 )
@@ -122,6 +170,32 @@ final class ScreenTimeProbe: ObservableObject {
         try ProbeShieldJournal.remove()
         let finishedAt = DispatchTime.now().uptimeNanoseconds
         return TimeInterval(finishedAt - startedAt) / 1_000_000_000
+    }
+
+    func clearShields(sessionID: UUID) throws -> TimeInterval? {
+        let startedAt = DispatchTime.now().uptimeNanoseconds
+        let lock = try ProbeProcessLock.acquire(
+            filename: ProbeConstants.shieldLifecycleLockFilename
+        )
+        defer { lock.release() }
+        guard let expiry = try ProbeShieldJournal.load(),
+              expiry.sessionID == sessionID else { return nil }
+        center.stopMonitoring([DeviceActivityName(expiry.activityName)])
+        store.clearAllSettings()
+        try ProbeShieldJournal.removeIfMatching(activityName: expiry.activityName)
+        return TimeInterval(DispatchTime.now().uptimeNanoseconds - startedAt) / 1_000_000_000
+    }
+
+    func shieldIntegrity(sessionID: UUID) -> SessionShieldIntegrity {
+        guard Self.isAuthorized(AuthorizationCenter.shared.authorizationStatus) else {
+            return .removed
+        }
+        guard let expiry = try? ProbeShieldJournal.load(),
+              expiry.sessionID == sessionID else { return .removed }
+        let activity = DeviceActivityName(expiry.activityName)
+        return expiry.expiresAt > Date() && center.activities.contains(activity)
+            ? .maintained
+            : .removed
     }
 
     func recoverExpiredShieldIfNeeded(now: Date = Date()) throws -> String? {
@@ -193,15 +267,4 @@ final class ScreenTimeProbe: ObservableObject {
         return false
     }
 
-    private static func loadSelection() throws -> FamilyActivitySelection {
-        let directory = try ProbeSharedStores.directoryURL()
-        let url = directory.appending(path: ProbeConstants.selectionFilename)
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            return FamilyActivitySelection()
-        }
-        return try JSONDecoder().decode(
-            FamilyActivitySelection.self,
-            from: Data(contentsOf: url)
-        )
-    }
 }

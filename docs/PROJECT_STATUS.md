@@ -1,53 +1,73 @@
 # Project Status
 
+업데이트: 2026-07-30 (경제·리텐션 리뷰 반영)
+
 ## Current state
 
-- 단계: P0 기술 검증 하네스 구현 완료, 실기기 게이트 대기
-- 플랫폼 기준: iOS 26+, Xcode 26.5 / iOS 26.5 SDK
-- 저장소: 신규 로컬 Git 저장소, 현재 P0 기준선 초기 커밋 준비 완료
-- 사양 원본 3종을 `docs/`에 해시 일치 상태로 보존함
+- 단계: Spec §16 P1–P4 gameplay-complete 로컬 MVP 구현 완료. 경제·리텐션 리뷰에서 발견한
+  구조적 결함(장비 정체, 프레스티지 심도 역전, 시스템 표면 intent 무동작, 시계 강등)을 수정
+- 플랫폼: iOS 26+, Xcode 26.5 / iOS 26.5 SDK, Swift 6
+- 기준 커밋: `a361d0c33ae4ba5ef864d8417e871d1dacd64e95`
+- 작업 상태: 구현·문서·화면 증거는 미커밋. 이번 요청은 커밋/푸시 권한을 포함하지 않음
+- 시각 기준: `DESIGN.md`의 네 안료 광산 장비판, 한국어·다크·기본 medium·표준 대비
 
-## Completed
+## Implemented
 
-- 제품 사양, 픽셀 아트 프롬프트 팩, 개발 플레이북 수집
-- P0 이전에 경제 엔진으로 넘어가지 않는 개발 게이트 확정
-- 프로젝트 관리 문서와 구현 계획 초기화
-- 앱, Widget Extension, DeviceActivityMonitor Extension, 테스트 타깃 생성
-- Live Activity, AlarmKit, Screen Time, 시간 무결성, App Group SwiftData 프로브 구현
-- 공유 JSONL의 프로세스 간 파일 잠금/보존 상한, LA 수명주기 잠금, 세션별 shield expiry fail-safe 구현
-- iOS 26.5 시뮬레이터 단위 11개 + UI 2개, 총 13/13 및 generic iOS 빌드 통과
-- iPhone 17 Pro iOS 26.5 시뮬레이터에서 대시보드 실행과 화면 증거 확인
-- 광산 입구, 출정 보급품, 앱 아이콘을 석탄·혈암·석회·황동 4색으로 재양자화하고 앱 Asset Catalog에 편입
-- SaaS형 SHAFT 대시보드를 `귀환 신호 → 갱도 문 → 시간·보급품 → 채굴 일지` 출정 준비 흐름으로 교체
-- 앱, Live Activity, 홈 위젯의 내부 구현 용어를 목적과 결과가 먼저 보이는 한국어 플레이어 용어로 교체
-- 리벳 금속판 버튼, 황동 주 동작, 사각 광산 레버 토글로 조작 문법 통일
-- 현재 4색 UI를 기본 Dynamic Type, 표준 대비, 다크 모드에서 화면 육안 검증
-- 출정 안내, 준비 구역 4종, 실기기 관문을 독립 렌더링하는 UI 캡처 테스트 추가, iPhone 17 Pro PNG 6장 육안 검증
-- iPhone 17 Pro iOS 26.5 시뮬레이터에서 Live Activity 시작 후 Dynamic Island compact/expanded PNG 2장 검증
-- 루트 `DESIGN.md`와 `.impeccable/design.json`에 4색 광산 인터페이스 원칙을 영속화
-- `docs/GAME_DESIGN_REVIEW.md`에 리텐션, 세션 길이 공정성, 귀환 보고서, 스트릭 계약을 별도 검토
-- Widget Extension과 캡처 하네스가 공유하는 160pt 잠금화면 컴포넌트 추가
+- Foundation-only `DeepMineCore`: 세션 상태 기계, 시간 무결성, 보상/피로, 장비, 심도, 지역, 광맥, 일일 목표/휴광일/스트릭, 프레스티지, 주간 장부
+- 명시적 SwiftData v1 저장소: 전체 플레이어 그래프, 세션/귀환 보고서 원자적 커밋, idempotent 명령 receipt, 손상 격리와 fail-closed 신규 스키마 처리
+- 제품 흐름: 2장 설명, 90초 연습, 단계별 권한, 홈, 출정 약속, 활성 채굴, 명시적 포기, 3박자 귀환 보고서
+- 진행 화면: 장비, 주간 일지, 무료 기본 기록, 광산 꾸미기, 설정, 손실 우선 심층 진입 확인
+- 시스템 표면: Live Activity compact/minimal/expanded, 잠금화면/StandBy-shaped content, small/medium widget, 25분 안전 채굴 Control Widget
+- 단일 writer 계약: extension은 snapshot을 읽고 명령만 enqueue하며 앱이 제품 SwiftData를 갱신
+- 4색 픽셀 광부·완료·광맥·붕괴 스프라이트와 리벳 금속판 UI
+- 한국어·영어 현지화와 default-medium 의미 접근성 fixture
+- 결정적 화면 19장 및 contact sheet: `artifacts/ui/game-mvp-v1/`
+- 복리 장비(드릴 1.12 / 광차 1.05·1.07, 비용 1.34, 상한 60을 심도로 해금)
+- lifetime 기준 심도와 굴착 기억 재구매 할인이 적용된 프레스티지
+- 30/90/180일 밸런스 시뮬레이션, 심도 역전 금지와 사다리 잔존 회귀 게이트
 
-## In progress
+## Retention systems
 
-- 승인된 App Group과 FamilyControls entitlement를 포함한 실기기 서명 준비
-- `PROBE_CHECKLIST.md` 10항목 물리 기기 판정
+- 도전과제 30종 7계열. 보상은 수정·장식·테마·배지뿐이고 생산력은 지급하지 않는다 (D-028).
+  기한·갱신·미달성 벌칙이 없어 퀘스트가 아니다 (D-029)
+- 미달성 항목의 조건과 진행률을 보여 몇 주~몇 달 거리의 목표를 가시화
+- 홈의 다음 세 걸음(장비·지역·연속 일수)으로 1~3세션 거리의 목표를 채움
+- 광부 1~12명은 드릴 레벨에서 파생되는 순수 시각 지표로 보상에 관여하지 않는다
+- 성장 곡선(출정 1회 광석, 12주 스파크라인)과 광맥 도감, 장비 상위 레벨 목표치
 
-## Next
+## Retention contract
 
-1. 실기기용 App Group과 FamilyControls entitlement/provisioning을 연결한다.
-2. Dynamic Island가 있는 iOS 26 기기에 설치해 AlarmKit 동시 운용과 실제 잠금 수명주기를 포함한 `PROBE_CHECKLIST.md` 항목을 판정한다.
-3. 결과를 사양과 P1 착수 조건에 반영하며, 그 전에는 P1을 시작하지 않는다.
+- 홈에 노출된 연속 일수·휴광일 상태, 계획별 배율과 광맥 확률, 1탭 추천 강화
+- 귀환 보고서의 심도 증가·오늘 목표·연속 일수·광맥 실제 수량
+- 오늘 목표, 주 1회 자동 휴광일, 심도·장비·지역·테마·영구 강화의 가시적 누적 진행
+- 홈에서 한 가지 `다음 약속`, 귀환 보고서의 완료→보상→다음 약속
+- 광맥 8회 드라이 스펠 보호와 무료 주간 회고
+- `마치기`와 `다음 출정 준비` 동등 위계, 강제 재시작/소급 스트릭 파괴 없음
+- 상세 설계: `docs/GAME_IMPLEMENTATION.md`, `docs/GAME_DESIGN_REVIEW.md`
 
-## Known risks
+## Verification state
 
-- FamilyControls Individual entitlement는 별도 승인 전 실제 차단 기능이 동작하지 않을 수 있다.
-- Dynamic Island의 compact/expanded 렌더링은 시뮬레이터에서 확인했지만, Live Activity 재시작 AppIntent와 AlarmKit 동시 사용은 실기기 확인이 필요하다.
-- App Group의 실제 컨테이너 공유와 DeviceActivityMonitor 실행도 실기기 검증이 필요하다.
-- 현재 시뮬레이터의 `Sign to Run Locally` 산출물은 앱과 두 익스텐션 모두 서명 entitlement가 비어 있어 App Group/FamilyControls 경계를 증명하지 못한다.
-- P0 코드는 컴파일·단위 검증된 기술 하네스이며 제품 경제 엔진이나 출시 UI를 포함하지 않는다.
-- 현재 생성 에셋은 P0의 목적을 설명하기 위한 게임형 시각 언어이며 출시용 지역 아트의 최종본으로 판정하지 않는다.
-- 실제 VoiceOver 초점 순서, press-down 촉감, Reduce Motion 전환은 물리 기기 접근성 검증이 남아 있다.
-- 이전 v2의 Accessibility Extra Large 증거는 보존하지만, 사용자 요청에 따라 현재 v3 시각 판정은 기본 `medium` 크기만 실행했다.
-- Simulator의 `Device → Lock`이 비활성이라 실제 SpringBoard 잠금화면 합성과 시스템 크롭은 확인하지 못했다. 동일한 160pt 공유 컴포넌트의 기본 사양 렌더링만 자동 캡처하고 실제 잠금 수명주기는 실기기 게이트로 남긴다.
-- 게임 디자인 검토는 구현 결정이 아니다. 세션 길이 가중치와 심층 실패/일일 스트릭 계약을 Phase 2–3 전에 확정해야 한다.
+- Core 자동 테스트: 73/73 통과
+- 핵심 실제 흐름: 연습 보상→권한 3단계→홈→출정→활성→포기→귀환→장비 handoff 통과
+- 화면 캡처: 19/19 생성·육안 확인
+- Activity/Widget 독립 검토: 구현·fixture 계약 통과
+- 전체 시뮬레이터 suite: 175/175 통과, 실패·skip 0
+- generic iOS unsigned build: 통과
+- 총 자동 검사: Core 73 + Xcode 175 = 248 통과
+- 기계 검사: Swift≤300줄, xcstrings JSON, 네 안료 hex, 19개 PNG, diff whitespace 통과
+
+## Physical-device release gates
+
+1. 승인된 FamilyControls/App Group entitlement와 실제 방해 앱 선택·차단·해제
+2. DeviceActivityMonitor 종료/stale callback과 앱 종료·재부팅 복원
+3. AlarmKit과 커스텀 Live Activity의 실제 동시 운용
+4. 실제 Dynamic Island, SpringBoard 잠금화면, StandBy, Control Center 등록·크롭·수명주기
+5. 실제 extension→app App Group 명령 왕복과 crash window
+6. VoiceOver 초점, Increase Contrast, Reduce Motion, 햅틱·사운드 체감
+
+## Explicit non-goals
+
+- StoreKit/구독/결제와 유료 분석
+- 서버, 계정, 클라우드 동기화
+- 소셜, 순위표, 퀘스트, 시즌, 경쟁형 스트릭
+- 물리 기기 증거 없이 출시 준비 완료 판정

@@ -18,4 +18,6 @@ The current visual pass intentionally does not include an accessibility-extra-la
 
 The lock-screen image renders the exact `ProbeLockScreenContent` shared by the Widget Extension inside its 160pt content constraint. Simulator's `Device → Lock` command was disabled, so it does not prove SpringBoard's final composition, system crop behavior, or the physical-device lifecycle.
 
+The current nine screenshots use the generated `MinerSprite` asset instead of the earlier code-drawn rectangle silhouette. Its source and 24×24 four-pigment processing evidence are in `artifacts/imagegen/dynamic-island-miner-v1/`.
+
 The latest closeout result bundle remains ignored build evidence: 11 unit tests and two UI tests pass. The UI suite proves the app started a Live Activity, returned to SpringBoard, rendered the compact Dynamic Island, expanded it by long press, and rendered the shared lock-screen content. It does not prove AlarmKit coexistence, approved FamilyControls/App Group entitlements, or physical-device lifecycle behavior.

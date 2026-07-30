@@ -1,53 +1,111 @@
-# BUILD REPORT
+# Build Report
 
-업데이트: 2026-07-29
+업데이트: 2026-07-30 (경제·리텐션 리뷰 반영)
 
-| 항목 | 상태 | 근거 / 사유 |
+## Result
+
+경제·리텐션 리뷰에서 확인한 구조적 결함을 수정하고 Spec §16 P1–P4 로컬 MVP를 다시
+검증했다. 이 결과는 게임 규칙과 production view 렌더링을 검증하지만, 승인 entitlement와
+실제 하드웨어 시스템 통합은 여전히 검증하지 않는다.
+
+| 항목 | 상태 | 최신 근거 |
 |---|---|---|
-| 문서 원본 보존 | 검증됨 | 첨부 파일과 저장소 파일의 SHA-256 일치 확인 |
-| Xcode 프로젝트 생성 | 검증됨 | XcodeGen으로 앱, Widget, DeviceActivityMonitor, 테스트 타깃 생성 및 목록 확인 |
-| generic iOS 빌드 | 검증됨 | iOS 26.5 SDK, Swift 6, 코드 서명 비활성화 빌드 성공 |
-| 자동 테스트 | 검증됨 | iOS 26.5 시뮬레이터에서 단위 11개 + UI 2개, 합계 13/13 통과 |
-| 화면별 UI 캡처 | 검증됨 | 기본 `medium` 글자 크기·표준 대비·다크 모드에서 출정 안내와 준비 구역 4종, 실기기 관문 PNG 6장을 추출·육안 확인 |
-| Live Activity 시작 / Dynamic Island 렌더링 | 검증됨 | iPhone 17 Pro 시뮬레이터에서 앱 버튼으로 Activity를 시작하고 SpringBoard compact/expanded 상태 PNG 2장 육안 확인 |
-| 잠금화면 Live Activity 콘텐츠 | 부분 검증 | 실제 Widget과 공유하는 최대 160pt 컴포넌트를 기본 사양에서 캡처해 잘림·정보 위계를 확인. Simulator `Device → Lock`이 비활성이라 SpringBoard 최종 합성과 수명주기는 실기기 확인 필요 |
-| Live Activity stale 전환 | 미검증 | 60초 완료 후 상태 전환과 잠금화면 수명주기는 실기기 게이트에서 확인 필요 |
-| LiveActivityIntent 재시작 | 미검증 | App Group 프로세스 잠금 아래 end→request 구현됨; 앱/intent 동시 실행은 실기기 필요 |
-| AlarmKit 동시 운용 | 미검증 | 권한 요청과 60초 timer schedule 구현됨; 실제 Dynamic Island 충돌 관찰 필요 |
-| FamilyControls 권한 / 선택 | 미검증 | Individual 권한, picker, 선택 저장 구현됨; 승인 entitlement 필요 |
-| ManagedSettings shield | 미검증 | 세션별 monitor, 프로세스 잠금, expiry journal, rollback/startup fail-safe 구현됨; 실기기 필요 |
-| 시간 무결성 관측 | 검증됨 | Date/mach_continuous_time 분류 4개 경계 테스트 통과 |
-| App Group SwiftData 왕복 | 미검증 | 메모리/디스크 재개방 테스트는 통과; 실제 widget→app 경계는 실기기 필요 |
-| DeepMine 게임형 UI | 검증됨 | 석탄·혈암·석회·황동 네 안료로 양자화한 광산 장면·보급품·앱 아이콘, 리벳 금속판 버튼, 사각 레버 토글, 문양 기반 상태를 앱/Live Activity/위젯에 적용 |
-| 시뮬레이터 UI | 검증됨 | 사용자 요청대로 iPhone 17 Pro iOS 26.5의 기본 `medium` 크기·표준 대비·다크 모드만 현재 v3 시각 판정에 사용 |
-| Reduce Motion / 실제 터치 반응 | 미검증 | 코드에 Reduce Motion 분기와 press-down spring을 구현했으나 Simulator 접근성 자동화 브리지가 창을 읽지 못해 실제 제스처 검증은 실기기 필요 |
-| 시뮬레이터 서명 entitlement | 미검증 | Sign to Run Locally 결과 앱/두 익스텐션의 서명 entitlement가 빈 dict여서 App Group/FamilyControls 실제 경계 검증 불가 |
-| 실기기 P0 검증 | 미검증 | 실기기 설치와 사용자 권한 승인 필요 |
+| XcodeGen | 검증됨 | `xcodegen generate --spec project.yml` 성공 |
+| Core | 검증됨 | SwiftPM 101/101, 실패 0 (기준 73 + 경제 7 + 리텐션 21) |
+| 앱 전체 suite | 검증됨 | iPhone 17 Pro iOS 26.5에서 180/180, 실패·skip 0 |
+| 복리 장비 곡선 | 검증됨 | 레벨 1/10/25/59에서 상대 이득이 항상 1.12배임을 회귀 테스트 |
+| 심도 역전 방지 | 검증됨 | 180일 시뮬레이션에서 집중이 많은 페르소나가 더 얕지 않음 |
+| 사다리 잔존 | 검증됨 | 180일에 네 페르소나 모두 드릴 상한 미달 |
+| 심도 해금 상한 | 검증됨 | `maximumEquipmentLevel(forDepth:)` 경계와 `depthLocked` 구매 결과 |
+| 기억 재구매 할인 | 검증됨 | 최고 레벨 이하 50%, 초과 정가 회귀 테스트 |
+| 스트릭 감쇠 1회 | 검증됨 | 2일 결석 시 7→3, 결석일당 누적 아님 |
+| generic iOS build | 검증됨 | `generic/platform=iOS`, `CODE_SIGNING_ALLOWED=NO` 성공 |
+| Swift 파일 크기 | 부분 검증 | 12개 파일 분리. `DeepMineLocalization.swift`만 307줄로 7줄 초과 — enum case는 extension으로 분리할 수 없고 두 enum으로 쪼개면 현지화 parity 계약과 모든 호출부가 깨진다. 로직 없는 키 목록이라 초과 상태로 둔다 |
+| 시계 소스 교체 | 미검증(실기기 필요) | 코드는 `CLOCK_MONOTONIC_RAW`로 교체. 실제 슬립 구간 drift는 기기에서만 확인 가능 |
+| Live Activity intent 즉시 적용 | 미검증(실기기 필요) | 앱 프로세스 등록·drain 경로는 구현. 실제 백그라운드 intent 실행은 기기 게이트 |
+| 화면 증거 19장 | 미갱신 | 홈·귀환 보고서가 바뀌어 `artifacts/ui/game-mvp-v1/`의 기존 PNG는 stale이다 |
+| StoreKit/서버/소셜 | 미구현 | 현재 게임 범위에서 명시적으로 제외 |
+| 물리 기기 시스템 통합 | 미검증 | `docs/DEFECTS.md`의 GATE-001~006 |
 
-## Verification commands
+## Fresh commands
 
 ```sh
 xcodegen generate --spec project.yml
-xcrun simctl ui 64C7804C-355B-4444-90EE-C8ED0D9355CF content_size medium
-xcrun simctl ui 64C7804C-355B-4444-90EE-C8ED0D9355CF increase_contrast disabled
-xcrun simctl ui 64C7804C-355B-4444-90EE-C8ED0D9355CF appearance dark
-xcodebuild -project DeepMine.xcodeproj -scheme DeepMineProbe \
+swift test --package-path DeepMineCore
+swift run --package-path DeepMineCore DeepMineBalanceCLI --seed 260729 --days 180 \
+  --output /tmp/deepmine-balance.csv
+xcodebuild build-for-testing -quiet \
+  -project DeepMine.xcodeproj -scheme DeepMineApp \
   -destination 'platform=iOS Simulator,id=64C7804C-355B-4444-90EE-C8ED0D9355CF' \
-  -derivedDataPath DerivedData/MineUIV3 \
-  -resultBundlePath artifacts/ui/mine-ui-v3/FinalTests-8.xcresult test
-xcodebuild -project DeepMine.xcodeproj -scheme DeepMineProbe \
-  -destination 'generic/platform=iOS' -derivedDataPath DerivedData/MineUIV3Generic \
-  CODE_SIGNING_ALLOWED=NO build
-xcodebuild -project DeepMine.xcodeproj -scheme DeepMineProbe \
+  -derivedDataPath /tmp/DMTest CODE_SIGNING_ALLOWED=NO
+xcodebuild test-without-building -quiet \
+  -project DeepMine.xcodeproj -scheme DeepMineApp \
   -destination 'platform=iOS Simulator,id=64C7804C-355B-4444-90EE-C8ED0D9355CF' \
-  -only-testing:DeepMineProbeUITests/ProbeScreenshotTests/testCaptureDynamicIsland \
-  -resultBundlePath artifacts/ui/mine-ui-v3/DynamicIslandCaptures-3.xcresult test
-xcrun xcresulttool get test-results summary \
-  --path artifacts/ui/mine-ui-v3/FinalTests-8.xcresult
+  -derivedDataPath /tmp/DMTest -resultBundlePath /tmp/DMResultFinal.xcresult \
+  CODE_SIGNING_ALLOWED=NO
+xcodebuild build -quiet \
+  -project DeepMine.xcodeproj -scheme DeepMineApp \
+  -destination 'generic/platform=iOS' \
+  -derivedDataPath /tmp/DMGeneric CODE_SIGNING_ALLOWED=NO
 ```
 
-UI 증거: `artifacts/ui/mine-ui-v3/screens/01-overview.png`부터 `06-device-gate.png`까지의 기본 화면 6장, `07-dynamic-island-compact.png`, `08-dynamic-island-expanded.png`, `09-lock-screen-live-activity.png`까지 총 9장. 현재 v3에서는 큰 글씨 테스트를 실행하지 않았다. 09번은 Widget Extension과 동일한 본문 구현의 160pt 제약 캡처이며 실제 잠금화면 전체 합성 캡처는 아니다.
+## Simulator suite
 
-Xcode 26.5 참고: AppIntents를 사용하지 않는 `DeepMineDeviceActivityMonitor`에도 `ExtractAppIntentsMetadata` 단계가 자동 실행되어 `No AppIntents.framework dependency found` 경고 1건이 출력된다. 타깃 빌드와 테스트는 성공하며, 불필요한 framework 링크로 경고를 숨기지 않는다.
+최종 `/tmp/DMGate.xcresult` 요약은 `result: Passed`, `passedTests: 180`, `failedTests: 0`,
+`skippedTests: 0`이다. Core는 별도 SwiftPM 실행에서 101/101이다. 경제 수정만 반영한 중간
+게이트는 175/175였고, 리텐션 기능과 그 테스트 5개가 더해져 180이 되었다.
 
-마지막 검증: 2026-07-29. `FinalTests-8.xcresult`에서 단위 테스트 11/11, UI 캡처 테스트 2/2, 총 13/13과 코드 서명 비활성 generic iOS build가 성공했다. Dynamic Island compact/expanded와 공유 잠금화면 콘텐츠의 기본 사양 렌더링을 육안 확인했다. 자동 서명 결과의 빈 entitlement, AlarmKit 동시 운용, AppIntent 실행, 실제 잠금 수명주기는 물리 기기 게이트에서 별도로 판정한다.
+리텐션 기능을 얹은 첫 실행에서 3건이 실패했고 모두 코드·계약 문제였다. 프레스티지가
+도전과제를 평가하게 되어 fixture가 이미 충족한 항목이 소급 지급된 것(의도된 동작, 단정값
+갱신), 홈의 단일 약속 문장이 세 걸음으로 바뀌어 UI 테스트의 식별자가 사라진 것, 그리고
+`rewardProjection`이 렌더링 중 저장소를 다시 읽어 복구 fixture의 실패 예산을 먼저 소진한
+것이다. 마지막 항목은 `rewardProjection(for:)` 오버로드를 추가해 렌더링 경로에서 저장소
+읽기를 제거했다.
+
+직전 실행은 174/175였고 유일한 실패는 `GameSurfaceScreenshotTests`의 캡처 대기 5초가 전체
+suite 부하에서 타임아웃한 것이었다. 단독 실행에서는 42초로 통과했으므로 결함이 아니라 스케줄
+지연이며, 캡처 하네스의 대기를 15초로 올려 해소했다.
+
+그 전 실행에서 나온 실제 회귀 2건은 코드로 수정했다. 홈의 추천 강화를 computed property로
+둔 탓에 `body` 평가마다 저장소를 다시 읽었고(낭비되는 I/O이자 복구 fixture의 실패 예산을
+먼저 소진), `recommendedUpgrade(for:)` 오버로드와 `@State` 캐시로 렌더링 중 읽기를 없앴다.
+나머지 1건은 UI 테스트가 제거된 `equipment-task14-handoff` 식별자를 참조한 것이다.
+
+## Retention systems verification
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 도전과제 보상 정책 | 검증됨 | `AchievementReward`에 생산력 케이스가 없고, 수정 지급 상한과 지표 화이트리스트를 회귀 테스트 |
+| 도전과제 멱등성 | 검증됨 | 재평가 시 재지급 없음, 이미 보유한 외형은 대체 지급 없이 nil |
+| 저장 호환 | 검증됨 | `earnedAchievementIDs` 없는 이전 저장이 빈 집합으로 디코드 |
+| 프레스티지 보존 | 검증됨 | 달성 기록이 프레스티지에서 유지 |
+| 광부 파생 | 검증됨 | 5레벨 단위 증가, 12명 상한, 보상식에 광부 항이 없음을 배율 비교로 확인 |
+| 다음 세 걸음 | 검증됨 | 근거리 우선 정렬, 3개 상한, 추정 불가 시 숫자 생성 안 함 |
+| 성장 곡선 | 검증됨 | 노력과 성장 분리, 기록 1주면 배율 withhold, 포기 세션 제외 |
+| 광맥 도감 | 검증됨 | 발견 횟수 집계와 최초 발견일 최소값, 미발견 5종 표시 |
+
+## Balance verification
+
+30/90/180일 시뮬레이션 결과와 판정은 `docs/BALANCE_REPORT.md`에 있다. 요약:
+
+- 첫 강화 1세션, 스탠다드 첫 프레스티지 10일 — 이전과 동일
+- 심도가 집중량에 대해 단조. 동일 집중은 심연 광맥 보너스 차이 내에서 동일 심도
+- 180일에 라이트 드릴 23 / 스탠다드 28 / 헤비 21(직전 프레스티지) — 상한 60 미달
+- 30일 헤비/라이트 광석 격차 60.29배. 가드레일을 25배에서 80배로 재설정 (D-026)
+- 집중 크레딧 격차 10.0배, 심도 격차 14.64배 — 플레이 양 지표는 기존 기준 유지
+
+## Known stale evidence
+
+`artifacts/ui/game-mvp-v1/`의 19장 PNG는 이번 변경 이전에 캡처한 것이다. 홈 masthead,
+계획 설명, 1탭 추천 강화, 귀환 보고서의 심도·목표·연속 일수·광맥 수량, 장비 화면의 심도
+해금 표시가 반영되어 있지 않다. 화면 캡처 테스트는 suite에 포함되어 실행되지만 PNG를
+저장소로 내보내는 단계는 이번 작업에서 수행하지 않았다.
+
+## Physical-device release gates
+
+`docs/DEFECTS.md`의 GATE-001~006이 그대로 유효하다. 이번 변경으로 다음 항목의 중요도가
+올라갔다.
+
+- Live Activity intent가 백그라운드 앱 프로세스에서 실제로 명령을 적용하는지 (D-027)
+- 화면이 꺼진 실제 세션에서 `CLOCK_MONOTONIC_RAW` drift가 임계 안에 있는지
+- 포기 버튼이 잠금화면에서 실제로 차단을 즉시 해제하는지

@@ -1,9 +1,75 @@
 import ActivityKit
+import DeepMineCore
 import Foundation
 
 enum LiveActivityLifecycle {
     static func start(duration: TimeInterval = ProbeConstants.probeDuration) async throws -> String {
         try await replaceAll(duration: duration)
+    }
+
+    static func restart(duration: TimeInterval = ProbeConstants.probeDuration) async throws -> String {
+        try await replaceAll(duration: duration)
+    }
+
+    static func startSession(
+        id: UUID,
+        startedAt: Date,
+        endsAt: Date,
+        snapshot: GameSurfaceSnapshot
+    ) async throws -> String {
+        let lock = try await lifecycleLock()
+        defer { lock.release() }
+        try await endAll()
+        let attributes = DeepMineActivityAttributes(
+            sessionID: id,
+            startedAt: startedAt,
+            endsAt: endsAt
+        )
+        let content = try activityContent(snapshot: snapshot, staleDate: endsAt)
+        return try Activity<DeepMineActivityAttributes>.request(
+            attributes: attributes,
+            content: content,
+            pushType: nil
+        ).id
+    }
+
+    static func completeSession(
+        id: UUID,
+        snapshot: GameSurfaceSnapshot,
+        now: Date = Date()
+    ) async throws {
+        let lock = try await lifecycleLock()
+        defer { lock.release() }
+        let dismissalDate = completionDismissalDate(snapshot: snapshot, now: now)
+        let content = try activityContent(snapshot: snapshot, staleDate: dismissalDate)
+        for activity in Activity<DeepMineActivityAttributes>.activities
+        where activity.attributes.sessionID == id {
+            await activity.update(content)
+            await activity.end(content, dismissalPolicy: .after(dismissalDate))
+        }
+    }
+
+    static func endSessionImmediately(id: UUID) async {
+        for activity in Activity<DeepMineActivityAttributes>.activities
+        where activity.attributes.sessionID == id {
+            await activity.end(nil, dismissalPolicy: .immediate)
+        }
+    }
+
+    static func completionDismissalDate(
+        snapshot: GameSurfaceSnapshot,
+        now: Date
+    ) -> Date {
+        let requested = Date(timeIntervalSince1970: snapshot.staleAfter)
+        let latest = now.addingTimeInterval(Balance.completedActivityRetentionSeconds)
+        return min(max(now, requested), latest)
+    }
+
+    private static func replaceAll(duration: TimeInterval) async throws -> String {
+        let lock = try await lifecycleLock()
+        defer { lock.release() }
+        try await endAll()
+        return try requestProbe(duration: duration)
     }
 
     private static func endAll() async throws {
@@ -15,52 +81,68 @@ enum LiveActivityLifecycle {
             }
             await Task.yield()
         }
-
         let remaining = Activity<DeepMineActivityAttributes>.activities.count
         guard remaining == 0 else {
             throw LiveActivityLifecycleError.activitiesRemain(remaining)
         }
     }
 
-    static func restart(duration: TimeInterval = ProbeConstants.probeDuration) async throws -> String {
-        try await replaceAll(duration: duration)
-    }
-
-    private static func replaceAll(duration: TimeInterval) async throws -> String {
-        let lock = try await Task.detached {
-            try ProbeProcessLock.acquire(
-                filename: ProbeConstants.liveActivityLifecycleLockFilename
-            )
-        }.value
-        defer { lock.release() }
-
-        try await endAll()
-        return try requestNew(duration: duration)
-    }
-
-    private static func requestNew(duration: TimeInterval) throws -> String {
+    private static func requestProbe(duration: TimeInterval) throws -> String {
         let startedAt = Date()
         let endsAt = startedAt.addingTimeInterval(duration)
+        let snapshot = GameSurfaceSnapshot(
+            phase: .mining,
+            sessionID: UUID().uuidString,
+            outcomeID: nil,
+            planID: "deep",
+            regionID: "crystal",
+            depthMeters: 148,
+            expectedOre: 100,
+            earnedOre: 0,
+            streakDays: 7,
+            timerStartedAt: startedAt.timeIntervalSince1970,
+            timerEndsAt: endsAt.timeIntervalSince1970,
+            verificationGradeID: "sealed",
+            veinID: nil,
+            upgradeRecommendation: nil,
+            todayFocusedMinutes: 25,
+            todayGoalMinutes: 100,
+            generatedAt: startedAt.timeIntervalSince1970,
+            staleAfter: endsAt.timeIntervalSince1970
+        )
         let attributes = DeepMineActivityAttributes(
             sessionID: UUID(),
             startedAt: startedAt,
             endsAt: endsAt
         )
-        let state = DeepMineActivityAttributes.ContentState(
-            phase: .mining,
-            expectedReward: 100,
-            depth: 148,
-            streakDays: 7,
-            planID: "deep",
-            themeID: "zone-3"
-        )
-        let content = ActivityContent(state: state, staleDate: endsAt)
-        let activity = try Activity<DeepMineActivityAttributes>.request(
+        return try Activity<DeepMineActivityAttributes>.request(
             attributes: attributes,
-            content: content,
+            content: try activityContent(snapshot: snapshot, staleDate: endsAt),
             pushType: nil
-        )
-        return activity.id
+        ).id
+    }
+
+    private static func activityContent(
+        snapshot: GameSurfaceSnapshot,
+        staleDate: Date
+    ) throws -> ActivityContent<DeepMineActivityAttributes.ContentState> {
+        let state = DeepMineActivityAttributes.ContentState(snapshot: snapshot)
+        let encoded = try JSONEncoder().encode(state)
+        guard encoded.count < Balance.activityContentMaximumBytes else {
+            throw GameSurfaceSnapshotStoreError.payloadTooLarge(
+                actual: encoded.count,
+                limit: Balance.activityContentMaximumBytes
+            )
+        }
+        return ActivityContent(state: state, staleDate: staleDate)
+    }
+
+    private static func lifecycleLock() async throws -> ProbeProcessLock {
+        try await Task.detached {
+            try ProbeProcessLock.acquire(
+                filename: ProbeConstants.liveActivityLifecycleLockFilename
+            )
+        }.value
     }
 }
 

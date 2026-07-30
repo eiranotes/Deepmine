@@ -254,7 +254,10 @@ struct ProbeDashboardView: View {
     }
 
     private var lockScreenPreview: some View {
-        ProbeLockScreenPreview()
+        GameActivitySurfaceFixtureView(
+            stateName: "surface-mining",
+            surfaceName: "lock"
+        )
     }
 
     private var liveState: ProbeDisplayState { state(for: ["LiveActivity", "LiveActivityIntent"]) }

@@ -1,8 +1,15 @@
 import Foundation
 
 struct ProbeShieldExpiry: Codable, Equatable, Sendable {
+    let sessionID: UUID?
     let activityName: String
     let expiresAt: Date
+
+    init(sessionID: UUID? = nil, activityName: String, expiresAt: Date) {
+        self.sessionID = sessionID
+        self.activityName = activityName
+        self.expiresAt = expiresAt
+    }
 }
 
 enum ProbeShieldJournal {

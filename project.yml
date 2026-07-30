@@ -14,17 +14,26 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
     ENABLE_USER_SCRIPT_SANDBOXING: true
+packages:
+  DeepMineCore:
+    path: DeepMineCore
 targets:
-  DeepMineProbe:
+  DeepMineApp:
     type: application
     platform: iOS
     sources:
       - path: DeepMineProbe/App
       - path: DeepMineProbe/Shared
+      - path: DeepMineProbe/Widget/ProbeIntents.swift
+      - path: DeepMineApp
+        excludes:
+          - Resources
+      - path: DeepMineApp/Resources
+        buildPhase: resources
     info:
       path: DeepMineProbe/App/Info.plist
       properties:
-        CFBundleDisplayName: DeepMine Probe
+        CFBundleDisplayName: DeepMine
         UILaunchScreen: {}
         NSSupportsLiveActivities: true
         NSSupportsLiveActivitiesFrequentUpdates: false
@@ -37,26 +46,35 @@ targets:
           - group.com.eiraworks.deepmine
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe
-        PRODUCT_NAME: DeepMineProbe
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine
+        PRODUCT_NAME: DeepMineApp
+        PRODUCT_MODULE_NAME: DeepMineProbe
         TARGETED_DEVICE_FAMILY: "1"
     dependencies:
+      - package: DeepMineCore
+        product: DeepMineCore
       - target: DeepMineProbeWidget
         embed: true
       - target: DeepMineDeviceActivityMonitor
         embed: true
     scheme:
       testTargets:
-        - DeepMineProbeTests
-        - DeepMineProbeUITests
+        - DeepMineAppTests
+        - DeepMineAppUITests
   DeepMineProbeWidget:
     type: app-extension
     platform: iOS
     sources:
       - path: DeepMineProbe/Widget
+        excludes:
+          - ProbeCommandWidget.swift
+          - ProbeDiagnosticIntents.swift
       - path: DeepMineProbe/Shared
         excludes:
           - ClockProbe.swift
+          - ProbeSharedWrite.swift
+      - path: DeepMineApp/Resources/Localizable.xcstrings
+        buildPhase: resources
     info:
       path: DeepMineProbe/Widget/Info.plist
       properties:
@@ -71,11 +89,14 @@ targets:
           - group.com.eiraworks.deepmine
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.widget
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.widget
         PRODUCT_NAME: DeepMineProbeWidget
         APPLICATION_EXTENSION_API_ONLY: true
         SKIP_INSTALL: true
         TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - package: DeepMineCore
+        product: DeepMineCore
   DeepMineDeviceActivityMonitor:
     type: app-extension
     platform: iOS
@@ -102,32 +123,40 @@ targets:
           - group.com.eiraworks.deepmine
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.monitor
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.monitor
         PRODUCT_NAME: DeepMineDeviceActivityMonitor
         APPLICATION_EXTENSION_API_ONLY: true
         SKIP_INSTALL: true
         TARGETED_DEVICE_FAMILY: "1"
-  DeepMineProbeTests:
+    dependencies:
+      - package: DeepMineCore
+        product: DeepMineCore
+  DeepMineAppTests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: DeepMineProbe/Tests
+      - path: DeepMineAppTests
     dependencies:
-      - target: DeepMineProbe
+      - target: DeepMineApp
+      - package: DeepMineCore
+        product: DeepMineCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.tests
         GENERATE_INFOPLIST_FILE: true
         TARGETED_DEVICE_FAMILY: "1"
-  DeepMineProbeUITests:
+  DeepMineAppUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
       - path: DeepMineProbe/UITests
+      - path: DeepMineAppUITests
+        optional: true
     dependencies:
-      - target: DeepMineProbe
+      - target: DeepMineApp
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.probe.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.uitests
         GENERATE_INFOPLIST_FILE: true
         TARGETED_DEVICE_FAMILY: "1"

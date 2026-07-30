@@ -12,7 +12,8 @@
 - Dynamic Type, VoiceOver, 고대비에서 핵심 상태가 읽히는가
 - 핵심 한국어 정보는 전체 Dynamic Type을 따르고 장식용 영문 코드만 제한적으로 확대되는가
 - 색상은 석탄·혈암·석회·황동 네 가지 기본 안료만 사용하며 상태를 색만으로 전달하지 않는가
-- 생성한 큰 이미지 에셋은 4색 팔레트·최근접 스케일·그레이스케일 판독 조건을 만족하고, 24pt 아이콘을 AI 비트맵으로 대체하지 않았는가
+- 생성 이미지 에셋은 4색 팔레트·최근접 스케일·그레이스케일 판독 조건을 만족하는가
+- 24pt 생성 스프라이트는 24×24 논리 그리드, 이진 alpha, 1x/2x/3x 정수배 파일을 사용하고 compact Dynamic Island에서 읽히는가
 - 플레이어 화면은 내부 프레임워크명보다 행동 목적과 예상 결과를 먼저 설명하는가
 - 버튼 역할이 primary/secondary/safety/warning으로 구분되고 최소 44pt 터치 영역과 즉시 press 피드백을 갖는가
 - 버튼·토글·패널이 리벳, 금속 깊이, 6–9pt 모서리의 같은 광산 장비 문법을 따르는가
@@ -23,3 +24,13 @@
 - 빌드 성공과 실기기 동작 검증을 문서에서 구분했는가
 - shield 수명주기가 프로세스 간 잠금과 세션별 monitor 이름으로 보호되며, 일치하는 callback만 journal/settings를 해제하는가
 - 소스 entitlement와 실제 서명된 entitlement를 별도로 확인했는가
+- 모든 게임 수치 상수가 `DeepMineCore/Balance.swift`에 있고 UI가 수식을 재구현하지 않는가
+- 세션 완료가 플레이어/보고서/세션 정리를 원자적으로 저장하고 completion ID를 두 번 적용하지 않는가
+- extension이 제품 SwiftData를 직접 쓰지 않고 snapshot DTO와 bounded command queue만 사용하는가
+- 귀환 보고서를 소비하기 전에는 완료 snapshot을, 소비한 뒤에는 waiting snapshot을 게시하는가
+- stale/missing passive surface가 가짜 0 자원이나 완료를 표시하지 않는가
+- 심층 실패가 이미 획득한 목표·스트릭을 되돌리지 않고 프레스티지가 문서화한 필드만 초기화하는가
+- `마치기`가 다음 세션 CTA보다 시각적으로 불리하지 않고 자동 재시작을 유도하지 않는가
+- 저장 복구, 권한 거부, empty/error 상태가 플레이 가능한 다음 행동을 제시하는가
+- UI test fixture가 실제 App Group 저장소와 명령 큐를 건드리지 않는가
+- Swift 파일이 300줄 이하이고 새 병렬 상태 소스나 호환 분기가 생기지 않았는가

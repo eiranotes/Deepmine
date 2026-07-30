@@ -49,7 +49,7 @@ final class ProbeScreenshotTests: XCTestCase {
 
     func testCaptureDynamicIsland() {
         app = XCUIApplication()
-        app.launchEnvironment["DEEPMINE_SCREENSHOT_SECTION"] = "surfaces"
+        configureProbeLaunch(section: "surfaces")
         app.launch()
 
         let startButton = app.buttons.matching(
@@ -62,7 +62,7 @@ final class ProbeScreenshotTests: XCTestCase {
         XCUIDevice.shared.press(.home)
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         XCTAssertTrue(springboard.wait(for: .runningForeground, timeout: 5))
-        sleep(1)
+        sleep(2)
         captureScreen(named: "07-dynamic-island-compact")
 
         let island = springboard.coordinate(
@@ -75,7 +75,7 @@ final class ProbeScreenshotTests: XCTestCase {
 
     private func launchAndCapture(section: String, identifier: String, name: String) {
         app = XCUIApplication()
-        app.launchEnvironment["DEEPMINE_SCREENSHOT_SECTION"] = section
+        configureProbeLaunch(section: section)
         app.launch()
         let sectionElement = app.otherElements[identifier]
         XCTAssertTrue(sectionElement.waitForExistence(timeout: 5))
@@ -95,5 +95,12 @@ final class ProbeScreenshotTests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    private func configureProbeLaunch(section: String) {
+        app.launchEnvironment["DEEPMINE_SCREENSHOT_SECTION"] = section
+        app.launchEnvironment["DEEPMINE_UI_FIXTURE"] = "diagnostics"
+        app.launchEnvironment["DEEPMINE_UI_RESET"] = "1"
+        app.launchEnvironment["DEEPMINE_UI_STORE_ID"] = "\(name)-\(section)"
     }
 }
