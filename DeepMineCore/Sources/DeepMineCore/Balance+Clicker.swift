@@ -41,9 +41,14 @@ extension Balance {
 
     // MARK: Striking
 
+    /// The three existing tools take clicker roles rather than being replaced: the drill
+    /// is the hand, the cart is the machine, the lamp is luck. Their compounding rates
+    /// are the ones already tuned in `Balance`, so one upgrade curve drives both economies.
     public static let baseTapDamage = 1.0
     public static let baseCriticalChance = 0.05
     public static let baseCriticalMultiplier = 2.5
+    public static let lampCriticalChanceIncreasePerLevel = 0.01
+    public static let lampCriticalMultiplierIncreasePerLevel = 0.03
     public static let maximumCriticalChance = 0.6
 
     /// The impact meter fills as taps land and decays when they stop, so sustained
@@ -56,11 +61,14 @@ extension Balance {
 
     // MARK: Automation
 
-    public static let baseDamagePerSecond = 0.0
-    public static let drillDamagePerLevel = 0.8
-    /// Automation compounds on the same rate the drill's reward multiplier already uses,
-    /// so one upgrade line drives both hands and machines.
+    /// A cart at base level hauls nothing on its own. The first cart upgrade is the
+    /// moment the mine starts running without you, which is the beat every idle game is
+    /// built around — it should be bought, not given.
+    public static let automationDamagePerLevel = 0.5
     public static let automationGrowthRate = 1.12
+    /// Seconds of automation folded into one simulation step. Long enough that a step is
+    /// cheap, short enough that the ore counter still moves visibly.
+    public static let automationStepSeconds: TimeInterval = 0.25
 
     /// A single resolution never breaks more than this many segments. Offline catch-up
     /// can imply thousands; the caller is told it was truncated rather than being handed
