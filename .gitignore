@@ -1,0 +1,59 @@
+# Xcode / Swift
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Per-user Xcode state (schemes must be SHARED to be committed --
+# see xcshareddata exception below; CI needs a shared scheme)
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/xcshareddata/
+
+# Swift Package Manager
+.build/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+Packages/
+# Package.resolved IS committed on purpose: it pins dependency versions
+# so CI and a clean checkout resolve identically.
+
+# CocoaPods / Carthage (only relevant if the imported project uses them)
+Pods/
+Carthage/Build/
+
+# Signing + secrets. Nothing in these categories may enter the repository.
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.cer
+*.certSigningRequest
+.env
+.env.*
+secrets.plist
+GoogleService-Info.plist
+
+# Test / instrumentation output
+*.xcresult/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editors
+.idea/
+*.swp
