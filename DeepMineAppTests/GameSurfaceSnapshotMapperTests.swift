@@ -1,7 +1,7 @@
 import DeepMineCore
 import Foundation
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 final class GameSurfaceSnapshotMapperTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)

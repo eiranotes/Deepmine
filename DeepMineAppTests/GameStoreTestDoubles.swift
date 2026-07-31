@@ -1,6 +1,6 @@
 import DeepMineCore
 import Foundation
-@testable import DeepMineProbe
+@testable import DeepMine
 
 struct GameStoreFixture {
     let repository: FakeSessionRepository

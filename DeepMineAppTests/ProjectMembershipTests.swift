@@ -10,7 +10,7 @@ final class ProjectMembershipTests: XCTestCase {
             contentsOf: root.appending(path: "project.yml"),
             encoding: .utf8
         )
-        let widgetStart = try XCTUnwrap(project.range(of: "  DeepMineProbeWidget:"))
+        let widgetStart = try XCTUnwrap(project.range(of: "  DeepMineWidget:"))
         let widgetTail = project[widgetStart.lowerBound...]
         let monitorStart = try XCTUnwrap(
             widgetTail.range(of: "  DeepMineDeviceActivityMonitor:")

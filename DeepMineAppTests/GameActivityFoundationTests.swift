@@ -3,7 +3,7 @@ import DeepMineCore
 import Foundation
 import UIKit
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 @MainActor
 final class GameActivityFoundationTests: XCTestCase {

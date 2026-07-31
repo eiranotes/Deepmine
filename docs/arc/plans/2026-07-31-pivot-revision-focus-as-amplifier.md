@@ -170,9 +170,9 @@ Additions, in dependency order:
 | Step | Work | Gate |
 |---|---|---|
 | P0-1 | ✅ Preserve `pomodoro-v1-focus-blocking` + `pre-pivot-v1` | Done |
-| P0-2 | Confirm the D-033/D-035 revisions in §2 | Decisions recorded |
-| P0-3 | Rewrite Spec §1.2 identity: two inputs, focus optional | Spec coherent |
-| P0-4 | Small deletion (§3.1) + module rename | Build and suite green |
+| P0-2 | ✅ Confirm the D-033/D-035 revisions in §2 | D-037, D-038 |
+| P0-3 | ✅ Rewrite Spec §1.2 identity: two inputs, focus optional | Spec coherent |
+| P0-4 | ✅ Small deletion (§3.1) + module rename, in four commits | Build and suite green |
 | P1-1 | `BigNumber` + `RockSegment` + damage, Core only | Core tests green |
 | P1-2 | `TapEngine` + `AutomationEngine` + `Balance` retarget | Balance CLI reruns |
 | P1-3 | Rock art 24 images through the existing pipeline | Palette verified |
@@ -192,3 +192,24 @@ commit was not.
   and amplifier users separately, or the amplifier will be either mandatory or pointless.
 - Keeping the amplifier keeps `FamilyControls` review scrutiny at submission, even though
   it no longer blocks shipping.
+
+## 8. P0 completion note (2026-07-31)
+
+P0 is done in four reviewable commits rather than the single 2,000-line deletion the
+earlier plan required.
+
+| Commit | Content | Gate |
+|---|---|---|
+| `67d8bda` | Audit and decisions D-033..D-036 | — |
+| `42390a1` | Direction revision, spec §1.2, fatigue soft cap removed | Core 91/91 |
+| `f95451d` | Streak reduced, ledger rescoped to lifetime | Suite 186/186 |
+| `ffb5018` | StandBy and Control Center widget removed | Suite 182/182 |
+| (pending) | Module rename to `DeepMine` | — |
+
+Deferred deliberately: the `DeepMineProbe/` directory keeps its name. The `Probe*` types
+inside it are the Phase 0 diagnostics harness, which still exists behind the hidden
+settings path and is honestly named. Renaming 40+ paths in `project.yml` would be churn
+with no functional gain.
+
+Next is P1, which is where the clicker is actually built: `BigNumber`, `RockSegment`,
+`TapEngine`, `AutomationEngine`. Everything so far was clearing the way.

@@ -1,6 +1,6 @@
 @preconcurrency import FamilyControls
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 @MainActor
 final class ScreenTimeSelectionStorageTests: XCTestCase {

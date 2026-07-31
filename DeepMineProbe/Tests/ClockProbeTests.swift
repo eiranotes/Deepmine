@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 final class ClockProbeTests: XCTestCase {
     func testNormalDriftIsValid() {

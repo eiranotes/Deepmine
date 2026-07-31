@@ -48,12 +48,12 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine
         PRODUCT_NAME: DeepMineApp
-        PRODUCT_MODULE_NAME: DeepMineProbe
+        PRODUCT_MODULE_NAME: DeepMine
         TARGETED_DEVICE_FAMILY: "1"
     dependencies:
       - package: DeepMineCore
         product: DeepMineCore
-      - target: DeepMineProbeWidget
+      - target: DeepMineWidget
         embed: true
       - target: DeepMineDeviceActivityMonitor
         embed: true
@@ -61,7 +61,7 @@ targets:
       testTargets:
         - DeepMineAppTests
         - DeepMineAppUITests
-  DeepMineProbeWidget:
+  DeepMineWidget:
     type: app-extension
     platform: iOS
     sources:
@@ -83,14 +83,14 @@ targets:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
         NSSupportsLiveActivities: true
     entitlements:
-      path: DeepMineProbe/Widget/DeepMineProbeWidget.entitlements
+      path: DeepMineProbe/Widget/DeepMineWidget.entitlements
       properties:
         com.apple.security.application-groups:
           - group.com.eiraworks.deepmine
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.eiraworks.deepmine.widget
-        PRODUCT_NAME: DeepMineProbeWidget
+        PRODUCT_NAME: DeepMineWidget
         APPLICATION_EXTENSION_API_ONLY: true
         SKIP_INSTALL: true
         TARGETED_DEVICE_FAMILY: "1"

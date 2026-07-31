@@ -1,6 +1,6 @@
 import DeepMineCore
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 final class GameWidgetFoundationTests: XCTestCase {
     func testOnlyFreshWaitingSnapshotCreatesSafeTwentyFiveMinuteStart() {

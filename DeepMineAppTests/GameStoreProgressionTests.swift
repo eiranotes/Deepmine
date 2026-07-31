@@ -1,7 +1,7 @@
 import DeepMineCore
 import Foundation
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 @MainActor
 final class GameStoreProgressionTests: XCTestCase {

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 @MainActor
 final class ProbeSharedStoreTests: XCTestCase {

@@ -1,6 +1,6 @@
 import DeepMineCore
 import XCTest
-@testable import DeepMineProbe
+@testable import DeepMine
 
 @MainActor
 final class GameStoreOnboardingTests: XCTestCase {
