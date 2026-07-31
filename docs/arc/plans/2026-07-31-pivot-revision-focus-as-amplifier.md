@@ -144,6 +144,12 @@ A clicker's central object is the thing you hit, and no asset in the catalog dep
 quantization → nearest-neighbour resize → mechanical palette verification. The pipeline and
 scripts already exist (`scripts/process_game_assets.py`).
 
+**Prompts and placeholders shipped in P1-3** (`docs/ROCK_ART_PROMPTS.md`,
+`GameArtCatalog`). Every slot renders a procedural stand-in in the same four pigments until
+an imageset with the matching name is installed, at which point the real art takes over
+with no code change. The art gap therefore no longer blocks building the clicker loop —
+P2-1 can be played and screenshotted before a single image exists.
+
 **The four pigments are the differentiation.** Idle clickers converge on glossy gradients,
 neon numbers and cartoon gloss. A coal-and-brass mine rendered in four flat colours does
 not look like any of them, and the constraint is already enforced mechanically — 237 PNGs
@@ -173,9 +179,10 @@ Additions, in dependency order:
 | P0-2 | ✅ Confirm the D-033/D-035 revisions in §2 | D-037, D-038 |
 | P0-3 | ✅ Rewrite Spec §1.2 identity: two inputs, focus optional | Spec coherent |
 | P0-4 | ✅ Small deletion (§3.1) + module rename, in four commits | Build and suite green |
-| P1-1 | `BigNumber` + `RockSegment` + damage, Core only | Core tests green |
-| P1-2 | `TapEngine` + `AutomationEngine` + `Balance` retarget | Balance CLI reruns |
-| P1-3 | Rock art 24 images through the existing pipeline | Palette verified |
+| P1-1 | ✅ `BigNumber` + `RockSegment` + damage, Core only | Core 130/130 |
+| P1-2 | ✅ `StrikeEngine`: tap, impact meter, automation (D-039) | Core 153/153 |
+| P1-3 | ✅ Swappable art layer + 24 placeholders + prompt document | Suite green |
+| P1-4 | Rock art 24 images through the existing pipeline | Palette verified |
 | P2-1 | Tap → break → ore → buy vertical slice on a new root screen | Playable |
 | P2-2 | Offline calculator + collection sheet | Relaunch verified |
 | P2-3 | Focus amplifier re-entry: reuse preflight/active/LA behind an entry point | Optional path works |

@@ -91,6 +91,41 @@
 - [x] Swift 파일 300줄, 4색 계약, 현지화 JSON, 캡처 수량 기계 검사
 - [x] 최종 self-review와 상태 문서 closeout
 
+## 아이들 클리커 피벗
+
+### P0 — 길 치우기 (완료)
+
+- [x] 피벗 이전 상태를 브랜치 `pomodoro-v1-focus-blocking`과 태그 `pre-pivot-v1`로 보존
+- [x] 코드 감사와 결정 D-033..D-039 기록
+- [x] 사양 §1.2 정체성 재작성: 방치 생산이 기본, 집중은 선택적 증폭기
+- [x] 피로 소프트캡, 집중 스트릭, 주간 장부, StandBy, Control Center 위젯 제거
+- [x] 모듈명 `DeepMineProbe` → `DeepMine`
+
+### P1 — 클리커 코어
+
+- [x] `BigNumber` 가수/지수 산술과 표기 분리
+- [x] `RockSegment` 결정적 생성, 4단계 파괴, 광맥층
+- [x] `RockEngine` 넘침 이월과 절단 보고
+- [x] `StrikeEngine` 탭 데미지·크리티컬·임팩트 미터
+- [x] 자동화 데미지와 장비 3종 역할 재조준 (D-039)
+- [x] 교체 가능한 아트 레이어, 플레이스홀더 24종, `docs/ROCK_ART_PROMPTS.md`
+- [ ] 암반 아트 24장 실제 생성과 팔레트 검증
+- [ ] 밸런스 CLI를 데미지/내구도 기준으로 재조준
+
+### P2 — 실제로 플레이 가능하게
+
+- [ ] 탭→파괴→광석→구매 수직 슬라이스를 새 루트 화면에
+- [ ] 고정 스텝 시뮬레이션 루프
+- [ ] 오프라인 계산기와 수령 시트
+- [ ] 집중 증폭기 재진입 경로 (기존 preflight/active/Live Activity 재사용)
+
+### P3 — 장기 성장과 리텐션
+
+- [ ] 성장 천장 3종 제거와 재튜닝 (`docs/arc/plans/2026-07-31-long-run-progression.md`)
+- [ ] 공명 결절(golden cookie), 지역 전환 규칙
+- [ ] 도전과제 지표를 클리커 지표로 재조준
+- [ ] 8비트 SFX 실제 제작 (`GameFeedbackEvent.systemSoundID`가 교체 지점)
+
 ## Physical-device release gate — pending
 
 - [ ] 승인된 App Group/FamilyControls entitlement로 서명·설치
