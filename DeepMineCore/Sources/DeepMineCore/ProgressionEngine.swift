@@ -29,6 +29,18 @@ public enum ProgressionEngine {
         return safeBase > Int.max - bonus ? Int.max : safeBase + bonus
     }
 
+    /// Segment index to metres. This is coordinate geometry for the rock generator, not
+    /// a second source of truth for the player's depth — `PlayerState.depthMeters` still
+    /// owns that. The two converge in P2-1, when breaking segments becomes the thing that
+    /// actually moves the player down.
+    public static func depthMeters(forSegmentIndex index: Int) -> Int {
+        max(0, index) * Balance.metersPerSegment
+    }
+
+    public static func segmentIndex(forDepth depth: Int) -> Int {
+        max(0, depth) / Balance.metersPerSegment
+    }
+
     @discardableResult
     public static func apply(
         reward: RewardResult,
