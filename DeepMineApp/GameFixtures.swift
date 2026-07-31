@@ -17,7 +17,6 @@ enum GameSurface: String, CaseIterable, Sendable {
     case activityMinimal
     case activityExpanded
     case lockScreen
-    case standBy
     case widgetSmall
     case widgetMedium
     case controlCenter
@@ -105,7 +104,7 @@ enum GameFixtures {
         switch surface {
         case .onboarding: scenario = .fresh
         case .preflight: scenario = .progressed
-        case .activeMine, .activityCompact, .activityMinimal, .activityExpanded, .lockScreen, .standBy:
+        case .activeMine, .activityCompact, .activityMinimal, .activityExpanded, .lockScreen:
             scenario = .activeSealed
         case .returnReport: scenario = .completed
         case .journal: scenario = .emptyJournal

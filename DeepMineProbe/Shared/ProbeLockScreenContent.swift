@@ -5,15 +5,6 @@ enum GameActivityLayout {
     static let lockScreenMaximumHeight: CGFloat = 160
 }
 
-enum GameActivityPresentationRole: Equatable {
-    case lockScreen
-    case standBy
-
-    static func resolve(isActivityFullscreen: Bool) -> Self {
-        isActivityFullscreen ? .standBy : .lockScreen
-    }
-}
-
 struct ProbeLockScreenContent: View {
     let startedAt: Date
     let endsAt: Date
@@ -102,86 +93,3 @@ struct ProbeLockScreenContent: View {
     }
 }
 
-struct GameStandByContent: View {
-    let startedAt: Date
-    let endsAt: Date
-    let snapshot: GameSurfaceSnapshot
-    var isStale = false
-    @Environment(\.locale) private var locale
-
-    private var phase: GameSurfacePhase { snapshot.activityPhase(isStale: isStale) }
-
-    var body: some View {
-        ZStack {
-            Image(GameArtName.region(snapshot.regionID, prefix: "StandBy"))
-                .resizable()
-                .interpolation(.none)
-                .antialiased(false)
-                .scaledToFill()
-                .accessibilityHidden(true)
-            ProbePalette.coal.opacity(0.38)
-            HStack(spacing: 0) {
-                Color.clear.frame(maxWidth: .infinity)
-                GameSurfaceMark(
-                    phase: phase,
-                    size: 72,
-                    planID: snapshot.planID,
-                    veinID: snapshot.veinID
-                )
-                    .frame(maxWidth: .infinity)
-                VStack(alignment: .leading, spacing: 10) {
-                    standbyTitle
-                    if phase == .mining {
-                        SurfaceRemainingTimer(
-                            startedAt: startedAt,
-                            endsAt: endsAt,
-                            identifier: "activity-standby-timer"
-                        )
-                            .font(.largeTitle.monospacedDigit().weight(.black))
-                        SurfaceProgressRail(
-                            startedAt: startedAt,
-                            endsAt: endsAt,
-                            phase: phase,
-                            identifier: "activity-standby-progress"
-                        )
-                    } else if phase == .completed || phase == .vein || phase == .collapsed {
-                        Text(GameSurfaceText.number(snapshot.earnedOre, locale: locale))
-                            .font(.largeTitle.monospacedDigit().weight(.black))
-                        Text(GameSurfaceText.grade(snapshot.verificationGradeID, locale: locale))
-                            .font(.headline.weight(.bold))
-                    }
-                    Text(
-                        "\(GameSurfaceText.plan(snapshot.planID, locale: locale)) · "
-                            + GameSurfaceText.region(snapshot.regionID, locale: locale)
-                    )
-                    .font(.headline)
-                    .foregroundStyle(ProbePalette.highlight)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .padding(24)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(
-            GameSurfaceText.accessibilityLabel(snapshot, isStale: isStale, locale: locale)
-        )
-        .accessibilityIdentifier("activity-standby-\(phase.rawValue)")
-    }
-
-    @ViewBuilder
-    private var standbyTitle: some View {
-        if phase == .vein,
-           let veinName = GameSurfaceText.vein(snapshot.veinID, locale: locale) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(veinName)
-                Text(GameSurfaceText.localized("surface.found", locale: locale))
-            }
-            .font(.title2.weight(.black))
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("activity-standby-vein-name")
-        } else {
-            Text(GameSurfaceText.phase(snapshot, isStale: isStale, locale: locale))
-                .font(.title2.weight(.black))
-        }
-    }
-}

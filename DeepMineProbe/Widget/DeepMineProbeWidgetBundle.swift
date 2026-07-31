@@ -7,6 +7,5 @@ struct DeepMineProbeWidgetBundle: WidgetBundle {
         DeepMineLiveActivityWidget()
         DeepMineAlarmLiveActivityWidget()
         DeepMineHomeWidget()
-        DeepMineControlWidget()
     }
 }

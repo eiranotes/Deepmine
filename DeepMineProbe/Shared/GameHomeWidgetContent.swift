@@ -9,7 +9,6 @@ enum GameHomeWidgetFamily: Equatable, Sendable {
 
 enum GamePassiveSurfaceKinds {
     static let homeWidget = "com.eiraworks.deepmine.home"
-    static let safeControl = "com.eiraworks.deepmine.safe-control"
 }
 
 enum GameSystemEntryPolicy {
@@ -20,55 +19,6 @@ enum GameSystemEntryPolicy {
             return nil
         }
         return .startSession(length: .minutes25, plan: .safe)
-    }
-}
-
-struct GameControlValue: Sendable {
-    let stateID: String
-    let phase: GameSurfacePhase
-    let canStart: Bool
-
-    static func make(from result: GameSurfaceSnapshotReadResult) -> Self {
-        switch result {
-        case .missing:
-            Self(stateID: "missing", phase: .waiting, canStart: false)
-        case .stale:
-            Self(stateID: "stale", phase: .waiting, canStart: false)
-        case let .fresh(snapshot):
-            Self(
-                stateID: snapshot.phase.rawValue,
-                phase: snapshot.phase,
-                canStart: snapshot.phase == .waiting
-            )
-        }
-    }
-
-    func title(locale: Locale) -> String {
-        let key = switch stateID {
-        case "waiting": "surface.intent.safe25"
-        case "mining": "state.mining"
-        case "completed", "vein": "surface.resultReady"
-        case "collapsed": "state.collapsed"
-        default: "state.stale"
-        }
-        return GameSurfaceText.localized(key, locale: locale)
-    }
-}
-
-struct GameControlSurfaceLabel: View {
-    let value: GameControlValue
-    @Environment(\.locale) private var locale
-
-    var body: some View {
-        HStack(spacing: 7) {
-            GameSurfaceMark(phase: value.phase, size: 22)
-            Text(value.title(locale: locale))
-                .font(.caption.weight(.bold))
-                .lineLimit(2)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(value.title(locale: locale))
-        .accessibilityIdentifier("control-\(value.stateID)")
     }
 }
 

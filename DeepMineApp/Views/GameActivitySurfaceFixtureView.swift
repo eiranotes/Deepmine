@@ -90,13 +90,6 @@ struct GameActivitySurfaceFixtureView: View {
                 .padding(12)
                 .frame(maxWidth: 371, maxHeight: GameActivityLayout.expandedMaximumHeight)
                 .background(ProbePalette.shale, in: RoundedRectangle(cornerRadius: 9))
-            case "standby":
-                GameStandByContent(
-                    startedAt: startedAt,
-                    endsAt: endsAt,
-                    snapshot: snapshot,
-                    isStale: isStale
-                )
                 .background(ProbePalette.shale)
             default:
                 ProbeLockScreenContent(

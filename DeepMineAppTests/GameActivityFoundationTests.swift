@@ -7,16 +7,6 @@ import XCTest
 
 @MainActor
 final class GameActivityFoundationTests: XCTestCase {
-    func testIPhoneMediumFamilyUsesLockScreenUnlessActivityIsFullscreen() {
-        XCTAssertEqual(
-            GameActivityPresentationRole.resolve(isActivityFullscreen: false),
-            .lockScreen
-        )
-        XCTAssertEqual(
-            GameActivityPresentationRole.resolve(isActivityFullscreen: true),
-            .standBy
-        )
-    }
 
     func testAlarmCountdownProjectsSystemDatesAndAlertAsReturnReady() {
         let snapshot = GameActivitySurfaceFixture.snapshot(named: "surface-mining")

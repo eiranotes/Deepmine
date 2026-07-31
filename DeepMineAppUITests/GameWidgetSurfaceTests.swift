@@ -61,18 +61,8 @@ final class GameWidgetSurfaceTests: XCTestCase {
         }
     }
 
-    func testControlReflectsStateAndUsesOneSafeAction() {
-        for state in ["waiting", "mining", "completed", "vein", "collapsed", "stale", "missing"] {
-            launch(state: state, surface: "control", language: "ko")
-            XCTAssertTrue(element("control-fixture-\(state)").waitForExistence(timeout: 5))
-            let action = element("control-action")
-            XCTAssertTrue(action.exists)
-            XCTAssertGreaterThanOrEqual(action.frame.height, 44)
-            app.terminate()
-        }
-    }
 
-    func testEnglishWidgetAndControlCopyFitsDefaultSpec() {
+    func testEnglishWidgetCopyFitsDefaultSpec() {
         launch(state: "waiting", surface: "small", language: "en")
         let start = element("widget-start")
         XCTAssertTrue(start.waitForExistence(timeout: 5))
@@ -81,10 +71,6 @@ final class GameWidgetSurfaceTests: XCTestCase {
         launch(state: "mining", surface: "medium", language: "en")
         XCTAssertTrue(matchingLabel("20 minutes remaining").waitForExistence(timeout: 5))
         app.terminate()
-        launch(state: "stale", surface: "control", language: "en")
-        let recovery = element("control-action")
-        XCTAssertTrue(recovery.waitForExistence(timeout: 5))
-        XCTAssertTrue(recovery.label.contains("Open the app to recover"), recovery.label)
     }
 
     private func launch(state: String, surface: String, language: String) {

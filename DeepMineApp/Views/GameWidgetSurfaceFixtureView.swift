@@ -17,11 +17,7 @@ struct GameWidgetSurfaceFixtureView: View {
     var body: some View {
         ZStack {
             ProbePalette.coal.ignoresSafeArea()
-            if surfaceName == "control" {
-                controlFixture
-            } else {
-                homeFixture
-            }
+            homeFixture
         }
         .preferredColorScheme(.dark)
     }
@@ -34,20 +30,4 @@ struct GameWidgetSurfaceFixtureView: View {
             .background(ProbePalette.shale, in: RoundedRectangle(cornerRadius: 18))
     }
 
-    private var controlFixture: some View {
-        let value = GameControlValue.make(from: result)
-        return VStack(spacing: 0) {
-            Button(intent: OpenAndStartSafeMineIntent()) {
-                GameControlSurfaceLabel(value: value)
-                    .foregroundStyle(ProbePalette.limestone)
-                    .frame(minWidth: 132, minHeight: 64)
-                    .background(ProbePalette.shale, in: RoundedRectangle(cornerRadius: 12))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(value.title(locale: locale))
-            .accessibilityIdentifier("control-action")
-        }
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("control-fixture-\(value.stateID)")
-    }
 }

@@ -3,13 +3,12 @@ import XCTest
 @testable import DeepMineProbe
 
 final class GamePassiveSurfaceRefreshTests: XCTestCase {
-    func testSuccessfulSnapshotWriteReloadsWidgetAndControlKinds() throws {
+    func testSuccessfulSnapshotWriteReloadsTheHomeWidget() throws {
         let fixture = try makeFixture()
 
         try fixture.writer.write(GameWidgetSnapshotFixtures.freshWaiting())
 
         XCTAssertEqual(fixture.receipts.timelineKinds, [GamePassiveSurfaceKinds.homeWidget])
-        XCTAssertEqual(fixture.receipts.controlKinds, [GamePassiveSurfaceKinds.safeControl])
     }
 
     func testRejectedOversizedWriteDoesNotIssueRefresh() throws {
@@ -36,7 +35,6 @@ final class GamePassiveSurfaceRefreshTests: XCTestCase {
 
         XCTAssertThrowsError(try fixture.writer.write(oversized))
         XCTAssertTrue(fixture.receipts.timelineKinds.isEmpty)
-        XCTAssertTrue(fixture.receipts.controlKinds.isEmpty)
     }
 
     private func makeFixture() throws -> Fixture {
@@ -46,8 +44,7 @@ final class GamePassiveSurfaceRefreshTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let receipts = RefreshReceipts()
         let refresher = GamePassiveSurfaceRefresher(
-            reloadTimeline: { receipts.appendTimeline($0) },
-            reloadControl: { receipts.appendControl($0) }
+            reloadTimeline: { receipts.appendTimeline($0) }
         )
         return Fixture(
             writer: GameSurfaceSnapshotWriter(
@@ -67,13 +64,10 @@ private struct Fixture {
 private final class RefreshReceipts: @unchecked Sendable {
     private let lock = NSLock()
     private var timelines: [String] = []
-    private var controls: [String] = []
 
     var timelineKinds: [String] { lock.withLock { timelines } }
-    var controlKinds: [String] { lock.withLock { controls } }
 
     func appendTimeline(_ kind: String) { lock.withLock { timelines.append(kind) } }
-    func appendControl(_ kind: String) { lock.withLock { controls.append(kind) } }
 }
 
 private extension GameWidgetSnapshotFixtures {

@@ -65,7 +65,6 @@ final class GameSurfaceScreenshotTests: XCTestCase {
         captureActivity(surface: "compact", name: "13-activity-compact")
         captureActivity(surface: "expanded", name: "14-activity-expanded")
         captureActivity(surface: "lock", name: "15-lock-screen")
-        captureActivity(surface: "standby", name: "16-standby")
     }
 
     func testCaptureWidgetAndControlSurfaces() {
@@ -76,10 +75,6 @@ final class GameSurfaceScreenshotTests: XCTestCase {
         captureWidget(
             state: "vein", surface: "medium",
             identifier: "widget-medium-vein", name: "18-widget-medium"
-        )
-        captureWidget(
-            state: "mining", surface: "control",
-            identifier: "control-fixture-mining", name: "19-control-center"
         )
     }
 

@@ -11,7 +11,7 @@ final class GameActivitySurfaceTests: XCTestCase {
 
     func testKoreanStatesRenderAcrossEveryActivitySurface() {
         let states = ["mining", "completed", "vein", "collapsed"]
-        let surfaces = ["minimal", "compact", "expanded", "lock", "standby"]
+        let surfaces = ["minimal", "compact", "expanded", "lock"]
 
         for state in states {
             for surface in surfaces {
@@ -28,7 +28,6 @@ final class GameActivitySurfaceTests: XCTestCase {
     func testKoreanDetailedSurfacesExposeTruthfulOutcomeData() {
         assertLabel("예상 광석", state: "mining", surface: "lock", language: "ko")
         assertLabel("획득 광석", state: "completed", surface: "lock", language: "ko")
-        assertLabel("수정", state: "vein", surface: "standby", language: "ko")
         assertLabel("붕괴", state: "collapsed", surface: "expanded", language: "ko")
     }
 
@@ -38,13 +37,11 @@ final class GameActivitySurfaceTests: XCTestCase {
 
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         XCTAssertLessThanOrEqual(root.frame.height, 160.5)
-        XCTAssertFalse(element("activity-standby-mining").exists)
     }
 
     func testEnglishSemanticsAreLocalizedForEveryTerminalState() {
         assertLabel("Mining", state: "mining", surface: "lock", language: "en")
         assertLabel("Focus promise completed", state: "completed", surface: "lock", language: "en")
-        assertLabel("Rare vein found", state: "vein", surface: "standby", language: "en")
         assertLabel("Collapsed", state: "collapsed", surface: "expanded", language: "en")
     }
 
@@ -68,7 +65,7 @@ final class GameActivitySurfaceTests: XCTestCase {
     }
 
     func testStaleMiningProjectsOnlyToNeutralReturnReady() {
-        for surface in ["minimal", "compact", "expanded", "lock", "standby"] {
+        for surface in ["minimal", "compact", "expanded", "lock"] {
             launch(state: "stale", surface: surface, language: "ko")
             XCTAssertTrue(
                 element("activity-\(surface)-waiting").waitForExistence(timeout: 5),
@@ -87,7 +84,7 @@ final class GameActivitySurfaceTests: XCTestCase {
     }
 
     func testMiningNeverDisclosesTerminalSentinels() {
-        for surface in ["expanded", "lock", "standby"] {
+        for surface in ["expanded", "lock"] {
             launch(state: "mining", surface: surface, language: "ko")
             XCTAssertTrue(element("activity-\(surface)-mining").waitForExistence(timeout: 5))
             XCTAssertFalse(matchingLabel("98.8만").exists, "Mining disclosed earned ore")
@@ -136,17 +133,6 @@ final class GameActivitySurfaceTests: XCTestCase {
         XCTAssertFalse(String(describing: progress.value ?? "").isEmpty)
     }
 
-    func testStandByKnownAndUnknownVeinsNeverInventIdentity() {
-        launch(state: "vein", surface: "standby", language: "ko")
-        XCTAssertTrue(element("activity-standby-vein-name").waitForExistence(timeout: 5))
-        XCTAssertTrue(matchingLabel("수정 광맥").exists)
-        app.terminate()
-
-        launch(state: "vein-unknown", surface: "standby", language: "ko")
-        XCTAssertTrue(element("activity-standby-vein").waitForExistence(timeout: 5))
-        XCTAssertTrue(matchingLabel("결과 준비").exists)
-        XCTAssertFalse(matchingLabel("청색 광맥").exists)
-    }
 
     private func assertLabel(
         _ label: String,

@@ -115,27 +115,13 @@ private struct GameActivityFamilyContent: View {
     let endsAt: Date
     let snapshot: GameSurfaceSnapshot
     let isStale: Bool
-    @Environment(\.isActivityFullscreen) private var isActivityFullscreen
-
-    private var role: GameActivityPresentationRole {
-        .resolve(isActivityFullscreen: isActivityFullscreen)
-    }
 
     var body: some View {
-        if role == .standBy {
-            GameStandByContent(
-                startedAt: startedAt,
-                endsAt: endsAt,
-                snapshot: snapshot,
-                isStale: isStale
-            )
-        } else {
-            ProbeLockScreenContent(
-                startedAt: startedAt,
-                endsAt: endsAt,
-                snapshot: snapshot,
-                isStale: isStale
-            )
-        }
+        ProbeLockScreenContent(
+            startedAt: startedAt,
+            endsAt: endsAt,
+            snapshot: snapshot,
+            isStale: isStale
+        )
     }
 }

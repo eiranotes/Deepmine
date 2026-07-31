@@ -21,21 +21,6 @@ final class GameWidgetFoundationTests: XCTestCase {
         }
     }
 
-    func testControlValueNeverAdvertisesStartForRecoveryOrActiveState() {
-        XCTAssertTrue(
-            GameControlValue.make(
-                from: GameWidgetSnapshotFixtures.result(named: "waiting")
-            ).canStart
-        )
-
-        for state in ["mining", "completed", "vein", "collapsed", "stale", "missing"] {
-            XCTAssertFalse(
-                GameControlValue.make(
-                    from: GameWidgetSnapshotFixtures.result(named: state)
-                ).canStart
-            )
-        }
-    }
 
     func testWidgetFixturesKeepMiningAndTerminalDataSeparated() throws {
         let mining = try fresh("mining")
