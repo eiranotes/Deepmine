@@ -27,7 +27,7 @@ public enum AchievementMetric: String, Codable, CaseIterable, Sendable {
     case lifetimeFocusMinutes
     case depthMeters
     case streakDays
-    case goalDaysEarned
+    case miningDays
     case distinctVeinKinds
     case veinDiscoveries
     case drillLevel
@@ -103,7 +103,7 @@ public enum AchievementEngine {
             )
             values[.depthMeters] = state.depthMeters
             values[.streakDays] = state.streakDays
-            values[.goalDaysEarned] = state.dailyRecords.count(where: \.goalEarned)
+            values[.miningDays] = state.dailyRecords.count
             values[.distinctVeinKinds] = Set(state.history.compactMap(\.vein)).count
             values[.veinDiscoveries] = state.history.count { $0.vein != nil }
             values[.drillLevel] = state.equipment.drill

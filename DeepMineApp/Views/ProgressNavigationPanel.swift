@@ -20,14 +20,6 @@ struct ProgressNavigationContext {
                 player: player,
                 onPlayerChange: onPlayerChange
             )
-        case .journal:
-            JournalView(
-                gameStore: gameStore,
-                player: player,
-                referenceDate: referenceDate,
-                calendar: calendar,
-                timeZone: timeZone
-            )
         case .statistics:
             StatisticsView(
                 gameStore: gameStore,
@@ -62,12 +54,6 @@ struct ProgressNavigationPanel: View {
                     symbol: "wrench.and.screwdriver",
                     identifier: "mine-home-equipment",
                     route: .equipment(nil)
-                )
-                ledgerButton(
-                    title: .navigationJournal,
-                    symbol: "book.closed.fill",
-                    identifier: "mine-home-journal",
-                    route: .journal
                 )
                 ledgerButton(
                     title: .navigationStatistics,

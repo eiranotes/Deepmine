@@ -60,7 +60,7 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
-    func testWeeklyLedgerUsesInjectedReferenceClockAndWeekBoundary() throws {
+    func testMineLedgerSummarisesTheWholeRetainedHistory() throws {
         let timeZone = TimeZone(secondsFromGMT: 0)!
         var calendar = Calendar(identifier: .iso8601)
         calendar.timeZone = timeZone
@@ -77,11 +77,10 @@ final class GameStoreProgressionTests: XCTestCase {
             timeZone: timeZone
         )
 
-        let ledger = try fixture.store.weeklyLedger()
-
-        XCTAssertEqual(ledger.focusedMinutes, 50)
-        XCTAssertEqual(ledger.totalSessions, 1)
-        XCTAssertEqual(ledger.completedSessions, 1)
+        let ledger = try fixture.store.mineLedger()
+        // Lifetime scope, so the run that fell outside the old ISO week now counts.
+        XCTAssertEqual(ledger.recordedRuns, 2)
+        XCTAssertEqual(ledger.completedRuns, 2)
         XCTAssertEqual(ledger.deepestReturnMeters, 160)
         XCTAssertEqual(ledger.planMix.first { $0.plan == .survey }?.count, 1)
         XCTAssertEqual(ledger.veinHistory.map(\.vein), [.crystal])

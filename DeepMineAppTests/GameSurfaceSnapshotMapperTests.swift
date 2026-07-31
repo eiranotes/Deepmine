@@ -132,7 +132,7 @@ final class GameSurfaceSnapshotMapperTests: XCTestCase {
     }
 
     private func makePlayer() throws -> PlayerState {
-        let day = try StreakEngine.dayKey(for: now, calendar: calendar, timeZone: timeZone)
+        let day = try MiningStreak.dayKey(for: now, calendar: calendar, timeZone: timeZone)
         return PlayerState(
             resources: Resources(ore: 500), runFocusCredits: 12,
             lifetimeFocusCredits: 12, completedSessionCount: 8,

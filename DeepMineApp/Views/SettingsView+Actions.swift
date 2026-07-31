@@ -47,12 +47,6 @@ extension SettingsView {
             }
         }
     }
-    func saveGoal() {
-        guard let gameStore else { notice = .progressStorageBody; return }
-        do {
-            onGoalSaved(try gameStore.configureDailyGoal(minutes: goalMinutes))
-        } catch { notice = .progressStorageBody }
-    }
     func request(_ kind: OnboardingPermissionKind) async {
         let outcome = await system.request(kind)
         persistPermission(kind, outcome: outcome)

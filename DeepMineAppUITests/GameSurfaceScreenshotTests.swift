@@ -37,8 +37,6 @@ final class GameSurfaceScreenshotTests: XCTestCase {
         captureScreen(after: "equipment-screen", named: "06-equipment")
 
         launch("progress-populated")
-        open("mine-home-journal")
-        captureScreen(after: "journal-screen", named: "07-journal")
 
         launch("progress-populated")
         open("mine-home-statistics")

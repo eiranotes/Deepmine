@@ -49,7 +49,6 @@ struct SettingsView: View {
             VStack(spacing: 17) {
                 if hasRecoveryNotice { recoveryPanel }
                 destinationPanel
-                goalPanel
                 restPanel
                 permissionPanel
                 feedbackPanel
@@ -83,47 +82,6 @@ struct SettingsView: View {
             VStack(spacing: 12) {
                 routeButton(.navigationThemes, symbol: "paintbrush", id: "settings-open-themes", action: onOpenThemes)
                 routeButton(.navigationPrestige, symbol: "arrow.down.to.line.compact", id: "settings-open-prestige", action: onOpenPrestige)
-            }
-        }
-    }
-    private var goalPanel: some View {
-        DeepMineRivetedPanel {
-            VStack(alignment: .leading, spacing: 12) {
-                Label(DeepMineStrings.text(.gameDailyGoal), systemImage: "scope")
-                    .font(.headline)
-                Text(DeepMineStrings.text(.settingsGoalBody)).font(.subheadline)
-                HStack(spacing: 8) {
-                    compactGoalButton("25", id: "settings-goal-minimum") { goalMinutes = 25 }
-                    compactGoalButton("−", id: "settings-goal-decrement") {
-                        goalMinutes = max(25, goalMinutes - 5)
-                    }
-                    Spacer()
-                    Text("\(goalMinutes) \(DeepMineStrings.text(.gameMinutes))")
-                        .font(.title3.monospacedDigit().weight(.heavy))
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                        .accessibilityIdentifier("settings-goal-value")
-                    Spacer()
-                    compactGoalButton("+", id: "settings-goal-increment") {
-                        goalMinutes = min(360, goalMinutes + 5)
-                    }
-                    compactGoalButton("360", id: "settings-goal-maximum") { goalMinutes = 360 }
-                }
-                Button { saveGoal() } label: {
-                    DeepMineActionLabel(titleKey: .actionSave, detailKey: nil, symbol: "tray.and.arrow.down")
-                }
-                .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
-                .disabled(goalMinutes == player.dailyGoalMinutes || gameStore == nil)
-                .accessibilityIdentifier("settings-goal-save")
-                if savedGoalMinutes == goalMinutes {
-                    Text(DeepMineStrings.text(.settingsGoalSaved))
-                        .font(.caption)
-                        .accessibilityIdentifier("settings-goal-saved")
-                } else if notice == .progressStorageBody {
-                    Text(DeepMineStrings.text(.progressStorageBody))
-                        .font(.caption)
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                        .accessibilityIdentifier("settings-goal-error")
-                }
             }
         }
     }

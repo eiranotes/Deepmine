@@ -31,23 +31,6 @@ final class SettingsPrestigeUITests: XCTestCase {
         XCTAssertTrue(reveal("theme-selected-ruins").waitForExistence(timeout: 3))
     }
 
-    func testDailyGoalSupportsBothBoundariesAndPersistsOnlyAfterSave() {
-        let storeID = "goal-boundaries-\(UUID().uuidString)"
-        launch("settings-ready", storeID: storeID)
-        openSettings()
-        open("settings-goal-minimum")
-        XCTAssertTrue(element("settings-goal-value").label.contains("25"))
-        open("settings-goal-save")
-        XCTAssertTrue(element("settings-goal-saved").waitForExistence(timeout: 3))
-        open("settings-goal-maximum")
-        XCTAssertTrue(element("settings-goal-value").label.contains("360"))
-        open("settings-goal-save")
-        app.terminate()
-
-        launch("settings-ready", reset: false, storeID: storeID)
-        openSettings()
-        XCTAssertTrue(element("settings-goal-value").label.contains("360"))
-    }
 
     func testPermissionFailureCanRetryAndBlockListCanBeSaved() {
         launch("settings-needs-list")

@@ -5,24 +5,7 @@ import XCTest
 
 @MainActor
 final class GameStoreSettingsPrestigeTests: XCTestCase {
-    func testDailyGoalAcceptsMinimumAndMaximum() throws {
-        let fixture = makeFixture()
 
-        XCTAssertEqual(try fixture.store.configureDailyGoal(minutes: 25).dailyGoalMinutes, 25)
-        XCTAssertEqual(try fixture.store.configureDailyGoal(minutes: 360).dailyGoalMinutes, 360)
-        XCTAssertEqual(fixture.repository.playerSaveAttempts, 2)
-    }
-
-    func testInvalidDailyGoalDoesNotSave() throws {
-        let fixture = makeFixture()
-        let original = fixture.repository.player
-
-        XCTAssertThrowsError(try fixture.store.configureDailyGoal(minutes: 24)) { error in
-            XCTAssertEqual(error as? StreakError, .invalidDailyGoal)
-        }
-        XCTAssertEqual(fixture.repository.player, original)
-        XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
-    }
 
     func testThemeSelectionOnlyPersistsAChangedUnlockedTheme() throws {
         let fixture = makeFixture(player: PlayerState(

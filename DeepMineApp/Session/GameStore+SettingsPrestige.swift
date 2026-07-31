@@ -57,13 +57,6 @@ extension GameStore {
             )
         }
     }
-    @discardableResult
-    func configureDailyGoal(minutes: Int) throws -> PlayerState {
-        var player = try repository.loadPlayer()
-        try StreakEngine.configureDailyGoal(minutes: minutes, in: &player)
-        try repository.savePlayer(player)
-        return player
-    }
 
     @discardableResult
     func selectTheme(_ theme: MineTheme) throws -> ThemeSelectionResult {

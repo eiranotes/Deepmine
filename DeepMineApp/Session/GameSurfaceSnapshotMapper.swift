@@ -189,7 +189,7 @@ enum GameSurfaceSnapshotMapper {
         calendar: Calendar,
         timeZone: TimeZone
     ) throws -> (focused: Int, goal: Int) {
-        let key = try StreakEngine.dayKey(
+        let key = try MiningStreak.dayKey(
             for: date,
             calendar: calendar,
             timeZone: timeZone
@@ -206,7 +206,7 @@ enum GameSurfaceSnapshotMapper {
         calendar: Calendar,
         timeZone: TimeZone
     ) throws -> RewardInput {
-        let key = try StreakEngine.dayKey(
+        let key = try MiningStreak.dayKey(
             for: date,
             calendar: calendar,
             timeZone: timeZone

@@ -166,6 +166,9 @@ final class GameStoreTests: XCTestCase {
         XCTAssertEqual(fixture.repository.player.dailyRecords.last?.dayKey, DayKey(
             year: 2026, month: 7, day: 30
         ))
+        XCTAssertEqual(fixture.repository.player.latestDayKey, DayKey(
+            year: 2026, month: 7, day: 30
+        ))
     }
 
     func testRelaunchAfterEndAppliesRewardExactlyOnce() async throws {

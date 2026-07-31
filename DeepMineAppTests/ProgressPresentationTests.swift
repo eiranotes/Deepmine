@@ -5,15 +5,10 @@ import XCTest
 final class ProgressPresentationTests: XCTestCase {
     func testOverflowFixtureContainsFiveHundredActualWeeklyEntries() {
         let player = GameFixtures.progressOverflowPlayer
-        let ledger = WeeklyLedgerEngine.summarize(
-            player,
-            referenceDate: GameFixtures.referenceDate,
-            calendar: GameFixtures.progressCalendar,
-            timeZone: GameFixtures.progressTimeZone
-        )
+        let ledger = MineLedgerEngine.summarize(player)
 
         XCTAssertEqual(player.history.count, 500)
-        XCTAssertEqual(ledger.totalSessions, 500)
+        XCTAssertEqual(ledger.recordedRuns, 500)
         XCTAssertEqual(ledger.entries.count, 500)
         XCTAssertTrue(ledger.entries.allSatisfy { $0.endedAt <= GameFixtures.referenceDate })
     }

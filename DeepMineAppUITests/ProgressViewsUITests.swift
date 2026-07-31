@@ -9,9 +9,8 @@ final class ProgressViewsUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testHomeRoutesToAllThreeProgressLedgers() {
+    func testHomeRoutesToEveryProgressLedger() {
         assertRoute(button: "mine-home-equipment", fixture: "progress-populated", screen: "equipment-screen")
-        assertRoute(button: "mine-home-journal", fixture: "progress-populated", screen: "journal-screen")
         assertRoute(button: "mine-home-statistics", fixture: "progress-populated", screen: "statistics-screen")
 
         launch("return-normal")
@@ -65,18 +64,6 @@ final class ProgressViewsUITests: XCTestCase {
         XCTAssertFalse(element("equipment-upgrade-drill").isEnabled)
     }
 
-    func testJournalHasPurposefulEmptyAndPopulatedStates() {
-        launch("progress-empty")
-        open("mine-home-journal")
-        XCTAssertTrue(element("journal-empty").waitForExistence(timeout: 3))
-        app.terminate()
-
-        launch("progress-populated")
-        open("mine-home-journal")
-        XCTAssertTrue(element("journal-entry").waitForExistence(timeout: 3))
-        XCTAssertTrue(element("journal-entry-abandoned").exists)
-        XCTAssertTrue(reveal("journal-entry-completed").exists)
-    }
 
     func testStatisticsReadAtZeroAndFiveHundredHistoryEntries() {
         launch("progress-empty")
@@ -90,12 +77,12 @@ final class ProgressViewsUITests: XCTestCase {
         let completions = element("statistics-total-sessions").label
         XCTAssertTrue(completions.contains("완료한 채굴"))
         XCTAssertTrue(completions.contains("428 / 500"))
-        let focus = element("statistics-focus").label
-        XCTAssertTrue(focus.contains("주간 집중"))
-        XCTAssertTrue(focus.contains("1.3만") && focus.contains("분"))
         let depth = element("statistics-depth").label
         XCTAssertTrue(depth.contains("최고 귀환 심도"))
-        XCTAssertTrue(depth.contains("1,607m"))
+        // Depth is lifetime and monotonic, so the current depth IS the deepest ever.
+        // The old 1,607m was only the deepest entry the 500-record cap still held, which
+        // under-reports once history is truncated.
+        XCTAssertTrue(depth.contains("1.5만m"))
         XCTAssertTrue(element("statistics-ore").label.contains("귀환 광석"))
         XCTAssertTrue(element("statistics-plan-mix").exists)
         XCTAssertTrue(element("statistics-vein-history").exists)
@@ -130,16 +117,6 @@ final class ProgressViewsUITests: XCTestCase {
         XCTAssertTrue(upgrade.label.contains("Drill"))
         XCTAssertTrue(upgrade.label.contains("Upgrade"))
         XCTAssertTrue(upgrade.label.contains("Ore"))
-        app.terminate()
-
-        launch("progress-populated", language: "en")
-        open("mine-home-journal")
-        XCTAssertTrue(element("journal-entry-abandoned").label.contains("Returned early"))
-        XCTAssertTrue(app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "minutes")
-        ).firstMatch.exists)
-        let completed = reveal("journal-entry-completed")
-        XCTAssertTrue(completed.label.contains("Completed"))
         app.terminate()
 
         launch("progress-populated", language: "en")

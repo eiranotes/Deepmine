@@ -118,7 +118,7 @@ extension GameStore {
         abandonmentMinutes: Int? = nil
     ) throws -> SessionRewardProjection {
         let now = clock.wallNow()
-        let day = try StreakEngine.dayKey(for: now, calendar: calendar, timeZone: timeZone)
+        let day = try MiningStreak.dayKey(for: now, calendar: calendar, timeZone: timeZone)
         let daily = player.dailyRecords.first { $0.dayKey == day }
         let sharedID = UUID(uuidString: "44454550-4D49-4E45-0000-000000000120")!
         let base = RewardInput(
@@ -197,7 +197,7 @@ extension GameStore {
         player: PlayerState
     ) throws -> ReturnUpgradeRecommendation? {
         let now = clock.wallNow()
-        let day = try StreakEngine.dayKey(for: now, calendar: calendar, timeZone: timeZone)
+        let day = try MiningStreak.dayKey(for: now, calendar: calendar, timeZone: timeZone)
         let daily = player.dailyRecords.first { $0.dayKey == day }
         let input = RewardInput(
             completionID: UUID(uuidString: "44454550-4D49-4E45-0000-000000000130")!,

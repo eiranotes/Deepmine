@@ -138,10 +138,9 @@ enum BalanceSimulator {
                         reward: reward, input: input,
                         completedAt: simulationDate(day: day, minute: sessionIndex), to: &state
                     )
-                    _ = try StreakEngine.recordSession(
-                        focusedMinutes: reward.focusedMinutes,
+                    try MiningStreak.record(
                         at: simulationDate(day: day, minute: sessionIndex),
-                        plan: persona.plan, outcome: outcome, in: &state,
+                        in: &state,
                         calendar: Calendar(identifier: .gregorian),
                         timeZone: TimeZone(secondsFromGMT: 0)!
                     )

@@ -111,11 +111,11 @@ public enum AchievementCatalog {
             threshold: Balance.streakDayThirty, reward: .badge
         ),
         AchievementDefinition(
-            id: "goal.30days", family: .discipline, metric: .goalDaysEarned,
+            id: "days.30", family: .discipline, metric: .miningDays,
             threshold: 30, reward: .crystals(4)
         ),
         AchievementDefinition(
-            id: "goal.100days", family: .discipline, metric: .goalDaysEarned,
+            id: "days.100", family: .discipline, metric: .miningDays,
             threshold: 100, reward: .badge
         )
     ]

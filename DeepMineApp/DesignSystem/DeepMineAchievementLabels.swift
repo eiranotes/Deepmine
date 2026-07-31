@@ -22,7 +22,7 @@ enum DeepMineAchievementLabels {
         case .lifetimeFocusMinutes: .achievementMetricFocusHours
         case .depthMeters: .achievementMetricDepth
         case .streakDays: .achievementMetricStreak
-        case .goalDaysEarned: .achievementMetricGoalDays
+        case .miningDays: .achievementMetricMiningDays
         case .distinctVeinKinds: .achievementMetricVeinKinds
         case .veinDiscoveries: .achievementMetricVeinFinds
         case .drillLevel: .achievementMetricDrill

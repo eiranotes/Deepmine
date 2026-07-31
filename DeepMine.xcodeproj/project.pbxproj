@@ -10,7 +10,6 @@
 		004244F7EC6798B657E09071 /* ProgressNavigationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED98FF202518512570A38F1 /* ProgressNavigationPanel.swift */; };
 		00F296E44C464148163D48CC /* GameStoreSessionPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AB07777F0EEC0CB44B6DA77 /* GameStoreSessionPresentationTests.swift */; };
 		01DA113C30EF4C014D5A8802 /* DeepMineNumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 997B7D20C599D65040BA8193 /* DeepMineNumberFormatter.swift */; };
-		03A8CD5F0D1B3D1BFED5BD5B /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719A4FF4BF8BE963DE6CCF47 /* JournalView.swift */; };
 		086EC97608EB3E6A191D84FA /* AlarmProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8635C49AADC33644552E853 /* AlarmProbe.swift */; };
 		0A44B3611E43D1E57FBA0ABA /* GamePassiveSurfaceRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F24EE8E74C255D28D9189 /* GamePassiveSurfaceRefresher.swift */; };
 		0A641826A14C8B69935E9146 /* GameWidgetSnapshotFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA072484F9FCBFDD04BD59 /* GameWidgetSnapshotFixtures.swift */; };
@@ -306,7 +305,6 @@
 		6C0C91E6DEC1DECBA48795F0 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		6CB6BDFFBC34A3C22B23D47E /* DeepMineProbe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeepMineProbe.entitlements; sourceTree = "<group>"; };
 		6E9CC8F91DB5AC17C2B2D40D /* GameStoreTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStoreTestDoubles.swift; sourceTree = "<group>"; };
-		719A4FF4BF8BE963DE6CCF47 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		7757AD1BE084A3D3E1FEDCCC /* ReturnReportView+Labels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReturnReportView+Labels.swift"; sourceTree = "<group>"; };
 		7B32C53C6EC065E9A0636987 /* GameSurfaceSnapshotMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSurfaceSnapshotMapperTests.swift; sourceTree = "<group>"; };
 		7C357AB0AC1BA6B6E87A5014 /* GameStoreProgressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStoreProgressionTests.swift; sourceTree = "<group>"; };
@@ -532,7 +530,6 @@
 				839872E7B0F15C853F978CDF /* EquipmentView+Rows.swift */,
 				80675BB78D1F3C44DDEAF76A /* GameActivitySurfaceFixtureView.swift */,
 				4ACC97A18C69FBD1F5D16EEC /* GameWidgetSurfaceFixtureView.swift */,
-				719A4FF4BF8BE963DE6CCF47 /* JournalView.swift */,
 				83C3E455F24CC7548B032FE8 /* MineDecorationScene.swift */,
 				A5A3B460982A6A0E04E74F17 /* MineHomeView.swift */,
 				F679F08EC59CDA83604BA350 /* MineHomeView+Panels.swift */,
@@ -1070,7 +1067,6 @@
 				860B63B1964C0F03E80F2E31 /* GameSurfaceText.swift in Sources */,
 				6963EFFC152A9E1A68E35CE8 /* GameWidgetSnapshotFixtures.swift in Sources */,
 				4492817583CEFD77B47F3378 /* GameWidgetSurfaceFixtureView.swift in Sources */,
-				03A8CD5F0D1B3D1BFED5BD5B /* JournalView.swift in Sources */,
 				FA045611EF86369FE0D35025 /* LiveActivityLifecycle.swift in Sources */,
 				DE8CFD782D5E8F85ECDFC4D6 /* MineDecorationScene.swift in Sources */,
 				2A5199B3B47ADFFB306F3B4B /* MineHomeView+Panels.swift in Sources */,

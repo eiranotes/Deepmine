@@ -17,7 +17,7 @@ struct StatisticsView: View {
             timeZone: timeZone
         )
     }
-    @State var ledger: WeeklyLedger?
+    @State var ledger: MineLedger?
     @State var loadFailed = false
 
     var body: some View {
@@ -25,7 +25,7 @@ struct StatisticsView: View {
             VStack(spacing: 17) {
                 if loadFailed { recoveryPanel }
                 if let ledger, !loadFailed {
-                    if ledger.totalSessions == 0 { zeroPanel }
+                    if ledger.recordedRuns == 0 { zeroPanel }
                     gauges(ledger)
                     growthPanel
                     codexPanel
@@ -53,23 +53,15 @@ struct StatisticsView: View {
         .accessibilityIdentifier("statistics-zero")
     }
 
-    private func gauges(_ ledger: WeeklyLedger) -> some View {
+    private func gauges(_ ledger: MineLedger) -> some View {
         DeepMineRivetedPanel {
             VStack(spacing: 0) {
                 Text(DeepMineStrings.text(.navigationStatistics))
                     .font(.caption.weight(.bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 statRow(
-                    title: .gameWeeklyFocus,
-                    value: "\(DeepMineNumberFormatter.string(Double(ledger.focusedMinutes))) "
-                        + DeepMineStrings.text(.gameMinutes),
-                    symbol: "hourglass",
-                    identifier: "statistics-focus"
-                )
-                divider
-                statRow(
                     title: .gameCompletions,
-                    value: "\(ledger.completedSessions) / \(ledger.totalSessions)",
+                    value: "\(ledger.completedRuns) / \(ledger.recordedRuns)",
                     symbol: "checkmark.seal.fill",
                     identifier: "statistics-total-sessions"
                 )
@@ -119,7 +111,7 @@ struct StatisticsView: View {
         Divider().overlay(DeepMinePalette.limestone.color.opacity(0.22))
     }
 
-    private func planMix(_ ledger: WeeklyLedger) -> some View {
+    private func planMix(_ ledger: MineLedger) -> some View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 12) {
                 Label(DeepMineStrings.text(.gamePlanMix), systemImage: "signpost.right.and.left")
@@ -141,7 +133,7 @@ struct StatisticsView: View {
                     .accessibilityIdentifier("statistics-plan-\(item.plan.rawValue)")
                     DeepMineProgressRail(
                         value: Double(item.count),
-                        total: Double(max(1, ledger.totalSessions)),
+                        total: Double(max(1, ledger.recordedRuns)),
                         accessibilityLabel: DeepMineStrings.text(
                             DeepMineProgressLabels.planKey(item.plan)
                         )
@@ -151,7 +143,7 @@ struct StatisticsView: View {
         }
     }
 
-    private func veinHistory(_ ledger: WeeklyLedger) -> some View {
+    private func veinHistory(_ ledger: MineLedger) -> some View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 12) {
                 Label(DeepMineStrings.text(.gameVeinHistory), systemImage: "sparkles")
@@ -207,14 +199,9 @@ struct StatisticsView: View {
     private func load() {
         do {
             ledger = if let gameStore {
-                try gameStore.weeklyLedger()
+                try gameStore.mineLedger()
             } else {
-                WeeklyLedgerEngine.summarize(
-                    player,
-                    referenceDate: referenceDate,
-                    calendar: calendar,
-                    timeZone: timeZone
-                )
+                MineLedgerEngine.summarize(player)
             }
             loadFailed = false
         } catch {

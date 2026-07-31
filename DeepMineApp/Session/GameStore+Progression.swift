@@ -3,13 +3,8 @@ import Foundation
 
 @MainActor
 extension GameStore {
-    func weeklyLedger() throws -> WeeklyLedger {
-        WeeklyLedgerEngine.summarize(
-            try repository.loadPlayer(),
-            referenceDate: clock.wallNow(),
-            calendar: calendar,
-            timeZone: timeZone
-        )
+    func mineLedger() throws -> MineLedger {
+        MineLedgerEngine.summarize(try repository.loadPlayer())
     }
 
     @discardableResult
@@ -72,7 +67,7 @@ extension GameStore {
         for player: PlayerState,
         verificationGrade: VerificationGrade
     ) throws -> RewardInput {
-        let day = try StreakEngine.dayKey(
+        let day = try MiningStreak.dayKey(
             for: clock.wallNow(),
             calendar: calendar,
             timeZone: timeZone

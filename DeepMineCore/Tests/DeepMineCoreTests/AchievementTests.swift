@@ -34,7 +34,7 @@ final class AchievementTests: XCTestCase {
     func testEveryMetricIsCumulativeOrCurrentLevel() {
         let allowed: Set<AchievementMetric> = [
             .completedSessions, .lifetimeFocusMinutes, .depthMeters, .streakDays,
-            .goalDaysEarned, .distinctVeinKinds, .veinDiscoveries, .drillLevel,
+            .miningDays, .distinctVeinKinds, .veinDiscoveries, .drillLevel,
             .lowestEquipmentLevel, .sealedCompletions, .prestigeCount,
             .deepCompletions, .surveyCompletions
         ]

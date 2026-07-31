@@ -277,7 +277,7 @@ enum DeepMineStringKey: String, CaseIterable, Sendable {
     case achievementMetricFocusHours = "achievement.metric.focusHours"
     case achievementMetricDepth = "achievement.metric.depth"
     case achievementMetricStreak = "achievement.metric.streak"
-    case achievementMetricGoalDays = "achievement.metric.goalDays"
+    case achievementMetricMiningDays = "achievement.metric.miningDays"
     case achievementMetricVeinKinds = "achievement.metric.veinKinds"
     case achievementMetricVeinFinds = "achievement.metric.veinFinds"
     case achievementMetricDrill = "achievement.metric.drill"

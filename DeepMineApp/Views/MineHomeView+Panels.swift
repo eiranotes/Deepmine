@@ -10,16 +10,6 @@ extension MineHomeView {
                 .foregroundStyle(DeepMinePalette.brass.color)
             Text("\(DeepMineStrings.text(.homeStreakActive)) \(player.streakDays)\(DeepMineStrings.text(.gameDays))")
                 .font(.caption.weight(.semibold))
-            Text("·")
-                .font(.caption)
-                .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.5))
-            Text(DeepMineStrings.text(
-                hasRestDayAvailable ? .homeRestDayAvailable : .homeRestDayUsed
-            ))
-            .font(.caption2)
-            .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.64))
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("mine-home-streak")

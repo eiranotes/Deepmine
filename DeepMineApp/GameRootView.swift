@@ -3,7 +3,7 @@ import SwiftUI
 
 enum GameRoute: Hashable {
     case activeMine, returnReport, equipment(ReturnUpgradeRecommendation?)
-    case journal, statistics, achievements
+    case statistics, achievements
     case themes, settings, prestige, diagnostics
 }
 
@@ -134,14 +134,6 @@ struct GameRootView: View {
                 player: player,
                 handoffRecommendation: recommendation,
                 onPlayerChange: { player = $0 }
-            )
-        case .journal:
-            JournalView(
-                gameStore: gameStore,
-                player: player,
-                referenceDate: progressReferenceDate,
-                calendar: progressCalendar,
-                timeZone: progressTimeZone
             )
         case .statistics:
             StatisticsView(

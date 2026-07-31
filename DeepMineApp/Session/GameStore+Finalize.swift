@@ -26,14 +26,6 @@ extension GameStore {
 
         var player = try repository.loadPlayer()
         let context = outcomeContext(for: session, completed: completed)
-        // Close out missed days first: the streak a session is paid at must be the
-        // settled one, not a stale value from before an absence.
-        try StreakEngine.settle(
-            at: context.completedAt,
-            in: &player,
-            calendar: calendar,
-            timeZone: timeZone
-        )
 
         let vein = rollVein(for: session, context: context, player: &player)
         let depthBefore = player.depthMeters
@@ -55,16 +47,13 @@ extension GameStore {
         var streakEarnedToday = false
         var earnedAchievements: [String] = []
         if applied == .applied {
-            let update = try StreakEngine.recordSession(
-                focusedMinutes: reward.focusedMinutes,
+            let streak = try MiningStreak.record(
                 at: context.completedAt,
-                plan: session.plan,
-                outcome: context.outcome,
                 in: &player,
                 calendar: calendar,
                 timeZone: timeZone
             )
-            streakEarnedToday = update.goalEarnedNow
+            streakEarnedToday = streak.grewToday
             // A boost is only spent on a session that actually paid out, so a
             // mid-session return never burns the doubled reward it was saved for.
             if case .completed = context.outcome {
@@ -85,7 +74,7 @@ extension GameStore {
                 .map(\.definition.id)
         }
 
-        let today = try StreakEngine.dayKey(
+        let today = try MiningStreak.dayKey(
             for: context.completedAt,
             calendar: calendar,
             timeZone: timeZone
@@ -174,7 +163,7 @@ extension GameStore {
         vein: VeinKind?,
         player: PlayerState
     ) throws -> RewardInput {
-        let day = try StreakEngine.dayKey(
+        let day = try MiningStreak.dayKey(
             for: context.completedAt,
             calendar: calendar,
             timeZone: timeZone

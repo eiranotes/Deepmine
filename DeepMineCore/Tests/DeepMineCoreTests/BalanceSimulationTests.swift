@@ -47,8 +47,9 @@ final class BalanceSimulationTests: XCTestCase {
         // growth, not to equalise personas. Play-amount metrics stay at 10x below.
         XCTAssertGreaterThan(result.heavyLightOreGap, 10)
         XCTAssertLessThanOrEqual(result.heavyLightOreGap, 80)
-        // Rose from 60.29 when the daily soft cap stopped discounting heavy days.
-        XCTAssertEqual(result.heavyLightOreGap, 61.581264, accuracy: 0.000001)
+        // 60.29 with the soft cap, 61.58 without it, 61.87 once the streak became a
+        // simple consecutive-day count instead of a daily minute goal.
+        XCTAssertEqual(result.heavyLightOreGap, 61.874623, accuracy: 0.000001)
     }
 
     func testDepthNeverInvertsAgainstFocusAcrossPrestige() throws {

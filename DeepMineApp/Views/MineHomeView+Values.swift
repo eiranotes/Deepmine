@@ -83,14 +83,6 @@ extension MineHomeView {
         }
     }
 
-    var hasRestDayAvailable: Bool {
-        guard let week = try? WeeklyLedgerEngine.currentISOWeek(
-            for: Date(),
-            calendar: .current,
-            timeZone: .current
-        ) else { return false }
-        return !player.usedRestWeeks.contains(week)
-    }
 
     var isEquipmentDepthLocked: Bool {
         let unlocked = player.unlockedEquipmentLevel
