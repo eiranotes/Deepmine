@@ -91,6 +91,9 @@ public struct PlayerState: Codable, Equatable, Sendable {
     public internal(set) var lastSelectedPlan: MinePlan
     public internal(set) var lastSelectedDuration: SessionLength
     public internal(set) var mineFace: MineFaceState
+    /// When the mine was last paid out. Nil means never settled, which is why a fresh
+    /// install cannot claim an offline haul for the epoch.
+    public internal(set) var lastSettledAt: Date?
 
     /// Derived from the rock the player has actually broken. Depth is the identity
     /// number of the mine, and in a clicker the only honest way to earn it is to break
@@ -160,7 +163,8 @@ public struct PlayerState: Codable, Equatable, Sendable {
         returnReminderPermission: OnboardingPermissionOutcome = .notAsked,
         lastSelectedPlan: MinePlan = .safe,
         lastSelectedDuration: SessionLength = .minutes25,
-        mineFace: MineFaceState = MineFaceState()
+        mineFace: MineFaceState = MineFaceState(),
+        lastSettledAt: Date? = nil
     ) {
         self.resources = resources
         self.equipment = equipment
@@ -203,6 +207,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         self.lastSelectedPlan = lastSelectedPlan
         self.lastSelectedDuration = lastSelectedDuration
         self.mineFace = mineFace
+        self.lastSettledAt = lastSettledAt
     }
 
     public init(from decoder: Decoder) throws {
@@ -285,6 +290,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
                 segmentIndex: ProgressionEngine.segmentIndex(forDepth: legacyDepth)
             )
         }
+        lastSettledAt = try container.decodeIfPresent(Date.self, forKey: .lastSettledAt)
     }
 
     /// Saves written before the remembered peak existed fall back to current levels,

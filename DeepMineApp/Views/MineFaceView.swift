@@ -1,15 +1,17 @@
 import DeepMineCore
 import SwiftUI
 
-/// The clicker's root screen: tap the rock, break it, collect ore, buy machinery.
+/// The rock section of the mine screen: tap it, break it, collect ore.
 ///
-/// This screen owns the automation tick. It is the only place a timer advances the mine,
-/// so on-screen progress and offline catch-up cannot disagree about how fast the mine runs.
+/// Embedded at the top of `MineHomeView` rather than owning a screen, because in an idle
+/// clicker the tap target and the progression panels belong on one surface.
+///
+/// This view owns the automation tick. It is the only place a timer advances the mine, so
+/// on-screen progress and offline catch-up cannot disagree about how fast the mine runs.
 @MainActor
 struct MineFaceView: View {
     @Binding var player: PlayerState
     let feedback: GameFeedback
-    var onOpenEquipment: () -> Void = {}
     var onPersist: (PlayerState) -> Void = { _ in }
 
     @State private var generator = SeededGenerator(seed: UInt64.random(in: .min ... .max))
@@ -26,15 +28,12 @@ struct MineFaceView: View {
     private var power: StrikePower { MiningLoop.power(for: player) }
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 10) {
             header
             rock
             progress
-            footer
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(DeepMinePalette.coal.color)
+        .frame(maxWidth: .infinity)
         .onReceive(tick) { now in
             let elapsed = now.timeIntervalSince(lastTick)
             lastTick = now
@@ -46,15 +45,9 @@ struct MineFaceView: View {
 
     private var header: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("\(DeepMineStrings.text(.gameDepth)) \(player.depthMeters)m")
-                    .font(.title2.weight(.heavy))
-                    .accessibilityIdentifier("mine-depth")
-                Text(DeepMineNumberFormatter.string(player.resources.ore))
-                    .font(.headline.monospacedDigit())
-                    .foregroundStyle(DeepMinePalette.brass.color)
-                    .accessibilityIdentifier("mine-ore")
-            }
+            Text("\(DeepMineStrings.text(.gameDepth)) \(player.depthMeters)m")
+                .font(.headline.monospacedDigit())
+                .accessibilityIdentifier("mine-depth")
             Spacer()
             if power.isAutomated {
                 Text("\(DeepMineNumberFormatter.string(power.damagePerSecond.doubleValue))/s")
@@ -103,17 +96,6 @@ struct MineFaceView: View {
                     .accessibilityIdentifier("mine-seam")
             }
         }
-    }
-
-    private var footer: some View {
-        Button(action: onOpenEquipment) {
-            DeepMineActionLabel(
-                titleKey: .navigationEquipment,
-                detailKey: nil,
-                symbol: "wrench.and.screwdriver"
-            )
-        }
-        .accessibilityIdentifier("mine-open-equipment")
     }
 
     private func strike(onWeakPoint: Bool) {

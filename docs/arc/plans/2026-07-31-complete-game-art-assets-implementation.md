@@ -1,6 +1,6 @@
 # Complete Game Art Assets Implementation
 
-Status: IN PROGRESS
+Status: DONE
 Priority: P1
 Effort: L
 Assurance: Standard
@@ -208,7 +208,28 @@ Acceptance:
 - 2026-07-31: Plan review corrected compact inventory to 28, fixed equipment
   tier boundaries at 1–20/21–40/41–60, and made provenance, fallback, safe-zone,
   accessibility, and rendered-evidence requirements explicit.
+- 2026-07-31: At the user's request, closeout verification was kept compact.
+  The already-passing build, focused tests, and 19-screen suite were retained as
+  evidence; a second long UI-suite rerun after adding the onboarding page-two
+  capture was intentionally omitted.
 
 ## Evidence
 
-Pending.
+- `/Users/tofu/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/process_game_assets.py --validate-only`:
+  validated all 40 PNG imagesets, their raw-source provenance, exact four-pigment
+  palette, alpha/opacity contracts, dimensions, and catalog mappings.
+- Inventory closeout: 40 manifest entries, 40 distinct raw ImageGen PNGs, and
+  40 installed game-art imagesets (120 1x/2x/3x renditions).
+- `swift test --package-path DeepMineCore`: 101/101 tests passed.
+- Focused `DesignSystemContractTests` and `GameSurfaceSnapshotTests`: 12/12
+  tests passed.
+- Generic unsigned iOS build covering the app, widget, and Device Activity
+  consumers: `BUILD SUCCEEDED`.
+- `GameSurfaceScreenshotTests`: 5/5 tests passed and exported 19 fresh screen
+  attachments before the later onboarding page-two capture-harness addition.
+- Compact, scene, safe-zone, and final 19-screen contact sheets were inspected.
+- Final compact recheck: the 40-asset validator passed and `git diff --check`
+  reported no whitespace errors; no long Xcode test process remained running.
+- Actual Dynamic Island hardware presentation and StandBy Night Mode remain
+  `미검증(실기기 필요)` and continue to be release-gate evidence rather
+  than simulator-complete evidence.

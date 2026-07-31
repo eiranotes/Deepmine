@@ -142,7 +142,14 @@ final class GameSurfaceSnapshotMapperTests: XCTestCase {
                 sessionCount: 1, goalEarned: false, streakApplied: false,
                 wasRestDay: false, isFinalized: false
             )],
-            lastSelectedPlan: .deep, lastSelectedDuration: .minutes50
+            lastSelectedPlan: .deep, lastSelectedDuration: .minutes50,
+            // Depth comes from broken rock now (D-040), so "in the crystal region" has
+            // to be expressed as a segment index rather than as focus credits.
+            mineFace: MineFaceState(
+                segmentIndex: ProgressionEngine.segmentIndex(
+                    forDepth: Balance.crystalRegionDepth
+                )
+            )
         )
     }
 }

@@ -77,7 +77,10 @@ extension GameFixtures {
             unlockedThemes: unlockedThemes,
             selectedTheme: selectedTheme,
             prestigeIndex: prestigeIndex,
-            onboardingStage: .complete
+            onboardingStage: .complete,
+            // Themes unlock on depth, and depth is broken rock now (D-040). A settings
+            // fixture with no mine face has every depth-gated row locked.
+            mineFace: MineFaceState(segmentIndex: 400)
         )
     }
 }

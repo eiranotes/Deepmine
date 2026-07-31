@@ -127,7 +127,11 @@ extension GameFixtures {
             streakDays: 30,
             unlockedThemes: Set(MineTheme.allCases),
             selectedTheme: .abyss,
-            onboardingStage: .complete
+            onboardingStage: .complete,
+            // 15,000m of broken rock. Depth is no longer derived from focus credits
+            // (D-040), so the statistics screen's deepest-ever reading has to come from
+            // the mine face.
+            mineFace: MineFaceState(segmentIndex: 3_750)
         )
     }
 
@@ -141,7 +145,11 @@ extension GameFixtures {
             equipment: equipment,
             lifetimeFocusCredits: lifetimeFocusCredits,
             completedSessionCount: 3,
-            onboardingStage: .complete
+            onboardingStage: .complete,
+            // Equipment tiers are gated on depth, and depth comes from broken rock now
+            // (D-040). Without a mine face this fixture is a surface player, so every
+            // upgrade renders locked and the screen under test never appears.
+            mineFace: MineFaceState(segmentIndex: 400)
         )
     }
 

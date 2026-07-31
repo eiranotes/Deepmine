@@ -41,7 +41,13 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
             lifetimeFocusCredits: 64,
             bonusDepthMeters: 60,
             dailyGoalMinutes: 100,
-            streakDays: 7
+            streakDays: 7,
+            // This fixture was deep because 64 focus credits used to buy ~1,430m. Depth
+            // comes from rock now (D-040), so the same player has to be expressed as
+            // broken segments — otherwise the depth achievements stop paying out and
+            // the crystal tally below changes for a reason that has nothing to do with
+            // what this test is about.
+            mineFace: MineFaceState(segmentIndex: 358)
         )
         let fixture = makeFixture(player: player)
         let commandID = UUID()

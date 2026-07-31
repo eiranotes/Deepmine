@@ -3,6 +3,11 @@ import SwiftUI
 
 struct MineHomeView: View {
     let player: PlayerState
+    /// The rock lives at the top of this screen rather than on one of its own. In an
+    /// idle clicker the tap target and the progression panels are the same surface —
+    /// splitting them would put every route one navigation step away from the thing the
+    /// player is actually doing.
+    var mineFace: AnyView?
     let recommendation: UpgradeRecommendation?
     /// Expected ore for the currently selected plan, used only to turn an ore shortfall
     /// into an estimated number of expeditions. Nil when it cannot be computed.
@@ -18,6 +23,11 @@ struct MineHomeView: View {
         ScrollView {
             VStack(spacing: 17) {
                 masthead
+                if let mineFace {
+                    mineFace
+                        .frame(height: 300)
+                        .accessibilityIdentifier("mine-home-rock")
+                }
                 mineControlScene
                 equipmentSummary
                 startButton

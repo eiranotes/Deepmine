@@ -12,6 +12,11 @@ final class GameSurfaceScreenshotTests: XCTestCase {
     func testCaptureCoreLoopScreens() {
         launch("fresh")
         captureScreen(after: "onboarding-premise-blocks", named: "01-onboarding")
+        app.buttons["onboarding-next"].tap()
+        captureScreen(
+            after: "onboarding-premise-sessions",
+            named: "01b-onboarding-sessions"
+        )
 
         launch("progress-populated")
         captureScreen(after: "mine-home-screen", named: "02-mine-home")

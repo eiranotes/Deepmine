@@ -2090,13 +2090,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "One expedition away: turn your first focus promise into depth."
+            "value": "After one expedition: your first promise speeds up the mine."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "출정 1회 뒤: 첫 집중 약속을 심도로 바꿉니다."
+            "value": "출정 1회 뒤: 첫 집중 약속이 채굴 속도를 올립니다."
           }
         }
       }
@@ -2847,6 +2847,118 @@
         }
       }
     },
+    "offline.away.hours": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Away for %dh %dm"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자리를 비운 %d시간 %d분"
+          }
+        }
+      }
+    },
+    "offline.away.minutes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Away for %d min"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자리를 비운 %d분"
+          }
+        }
+      }
+    },
+    "offline.capped": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automation banks up to %d hours"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 채굴은 %d시간까지 쌓인다"
+          }
+        }
+      }
+    },
+    "offline.collect": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collect"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수령"
+          }
+        }
+      }
+    },
+    "offline.ore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ore mined"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐낸 광석"
+          }
+        }
+      }
+    },
+    "offline.segments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rock broken"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "부순 암반"
+          }
+        }
+      }
+    },
+    "offline.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The mine kept working"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광산은 계속 돌았다"
+          }
+        }
+      }
+    },
     "onboarding.blocks.body": {
       "extractionState": "stale",
       "localizations": {
@@ -3125,13 +3237,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose 15, 25, or 50 minutes. Return after the promise to turn focus into ore and depth."
+            "value": "Promise 15, 25, or 50 minutes. Finish and return to earn ore and dig faster."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "15·25·50분 중 하나를 약속하세요. 끝까지 집중하고 귀환하면 광석과 심도가 됩니다."
+            "value": "15·25·50분 중 하나를 약속하세요. 끝까지 집중하고 귀환하면 광석이 늘고 채굴이 빨라집니다."
           }
         }
       }
@@ -3159,13 +3271,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Focus becomes depth on return"
+            "value": "Focus makes the mine run faster"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "집중은 귀환 뒤 심도가 됩니다"
+            "value": "집중은 채굴 속도를 올립니다"
           }
         }
       }

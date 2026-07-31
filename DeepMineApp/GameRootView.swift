@@ -23,6 +23,8 @@ struct GameRootView: View {
     @State var savedGoalMinutes: Int?
     @State var homeRecommendation: UpgradeRecommendation?
     @State var homeProjectedOre: Double?
+    @State var offlineSettlement: OfflineSettlement?
+    @Environment(\.scenePhase) private var scenePhase
 
     init(
         repository: GameRepository,
@@ -76,16 +78,10 @@ struct GameRootView: View {
                     ) { completed in
                         player = completed
                     }
-                } else if showsClickerRoot {
-                    MineFaceView(
-                        player: $player,
-                        feedback: feedback,
-                        onOpenEquipment: { path.append(.equipment(nil)) },
-                        onPersist: persistMineFace
-                    )
                 } else {
                     MineHomeView(
                         player: player,
+                        mineFace: clickerSection,
                         recommendation: homeRecommendation,
                         projectedOrePerSession: homeProjectedOre,
                         onSelectPlan: select(plan:),
@@ -106,18 +102,58 @@ struct GameRootView: View {
         }
         .tint(DeepMinePalette.brass.color)
         .sheet(isPresented: $showingPreflight) { preflightSheet }
+        .sheet(item: $offlineSettlement) { settlement in
+            OfflineReturnSheet(settlement: settlement) { offlineSettlement = nil }
+        }
         .task { await recoverSession() }
+        .task { settleOfflineProduction() }
+        .onChange(of: scenePhase) { _, phase in
+            // Returning from the background is the same event as launching, as far as
+            // the mine is concerned: time passed and it was working.
+            if phase == .active { settleOfflineProduction() }
+        }
         .onChange(of: player) { _, _ in refreshRecommendation() }
+    }
+
+    /// Pays out the time the app was closed, and offers the result if it is worth
+    /// interrupting for. Fixtures are excluded so screen tests stay deterministic.
+    func settleOfflineProduction() {
+        guard showsClickerRoot, let repository else { return }
+        var updated = player
+        let settlement = MiningLoop.settleOffline(
+            since: updated.lastSettledAt,
+            now: Date(),
+            in: &updated
+        )
+        player = updated
+        try? repository.save(updated)
+        if settlement.isWorthReporting {
+            offlineSettlement = settlement
+            feedback.play(.sessionCompleted)
+        }
     }
 
     var shouldShowOnboarding: Bool {
         !forceHome && player.onboardingStage != .complete
     }
 
-    /// Fixtures still render the pre-pivot home so the existing screen tests keep their
-    /// subject. Live play goes to the rock.
+    /// Fixtures render deterministic screens for capture tests, so the live mine — which
+    /// mutates on a timer — is excluded from them.
     var showsClickerRoot: Bool {
         fixtureState == nil
+    }
+
+    @ViewBuilder
+    var clickerSectionView: some View {
+        MineFaceView(
+            player: $player,
+            feedback: feedback,
+            onPersist: persistMineFace
+        )
+    }
+
+    var clickerSection: AnyView? {
+        showsClickerRoot ? AnyView(clickerSectionView) : nil
     }
 
     /// The clicker mutates the player on a timer, and writing every tick would be a

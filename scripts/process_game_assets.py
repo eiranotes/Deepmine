@@ -363,6 +363,39 @@ def validate_entry(spec: dict[str, object]) -> dict[str, object]:
     }
 
 
+def validate_provenance(entries: list[dict[str, object]]) -> None:
+    expected = {spec["id"]: spec["family"] for spec in ASSETS}
+    actual = {str(entry["id"]): str(entry["family"]) for entry in entries}
+    if actual != expected:
+        raise ValueError("manifest IDs and family contracts must match the 40-asset inventory")
+    hashes: list[str] = []
+    prompts: list[str] = []
+    for entry in entries:
+        asset_id = str(entry["id"])
+        raw_path = ROOT / str(entry["raw_source"])
+        processed_path = ROOT / str(entry["processed_source"])
+        if not raw_path.is_file() or not processed_path.is_file():
+            raise FileNotFoundError(f"{asset_id}: provenance source is missing")
+        with Image.open(raw_path) as opened:
+            if opened.format != "PNG":
+                raise ValueError(f"{asset_id}: provenance raw source is not PNG")
+        with Image.open(processed_path) as opened:
+            if opened.format != "PNG":
+                raise ValueError(f"{asset_id}: processed source is not PNG")
+        current_hash = sha256(raw_path)
+        if current_hash != entry["raw_sha256"]:
+            raise ValueError(f"{asset_id}: raw source SHA no longer matches the manifest")
+        hashes.append(current_hash)
+        prompt = str(entry.get("prompt", "")).strip()
+        if not prompt:
+            raise ValueError(f"{asset_id}: final prompt provenance is missing")
+        prompts.append(prompt)
+    if len(set(hashes)) != 40:
+        raise ValueError("all 40 assets require distinct generated raw sources")
+    if len(set(prompts)) != 40:
+        raise ValueError("all 40 assets require distinct final prompts")
+
+
 def contact_sheet(entries: list[dict[str, object]], family_names: set[str], output: Path) -> None:
     selected = [entry for entry in entries if entry["family"] in family_names]
     columns = 4
@@ -434,15 +467,13 @@ def main() -> None:
         entries = json.loads(MANIFEST.read_text())
     else:
         entries = [process_asset(spec) for spec in ASSETS]
-        hashes = [entry["raw_sha256"] for entry in entries]
-        if len(set(hashes)) != 40:
-            raise ValueError("all 40 assets require distinct generated raw sources")
         MANIFEST.write_text(json.dumps(entries, indent=2) + "\n")
         contact_sheet(entries, {"icon", "miner", "decoration", "onboarding"}, ARTIFACTS / "contact-sheet-compact.png")
         contact_sheet(entries, {"theme", "di", "standby"}, ARTIFACTS / "contact-sheet-scenes.png")
         safe_zone_sheet(entries, ARTIFACTS / "safe-zone-overlays.png")
     if len(entries) != 40:
         raise ValueError("manifest must contain exactly 40 entries")
+    validate_provenance(entries)
     reports = [validate_entry(entry) for entry in entries]
     REPORT.write_text(json.dumps(reports, indent=2) + "\n")
     print(f"Validated {len(reports)} PNG game-art imagesets")

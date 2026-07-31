@@ -70,6 +70,21 @@ extension Balance {
     /// cheap, short enough that the ore counter still moves visibly.
     public static let automationStepSeconds: TimeInterval = 0.25
 
+    // MARK: Offline
+
+    /// The mine keeps working while the app is closed, but not forever. A cap is what
+    /// makes returning worth doing daily instead of once a month — and it is the honest
+    /// alternative to a game that plays itself completely.
+    public static let maximumOfflineHours: TimeInterval = 8
+    /// Offline pays less than being present. Enough that closing the app is never the
+    /// optimal strategy, not so little that sleeping feels punished.
+    public static let offlineEfficiency = 0.75
+    /// Below this, a return is not worth interrupting the player with a sheet.
+    public static let minimumOfflineSecondsToReport: TimeInterval = 60
+    /// A clock that jumped backwards, or a wildly future timestamp, settles nothing
+    /// rather than paying out a fabricated haul.
+    public static let maximumPlausibleOfflineSeconds: TimeInterval = 60 * 60 * 24 * 30
+
     /// A single resolution never breaks more than this many segments. Offline catch-up
     /// can imply thousands; the caller is told it was truncated rather than being handed
     /// a silently wrong result or an unbounded loop.

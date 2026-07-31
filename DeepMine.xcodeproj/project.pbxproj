@@ -14,6 +14,7 @@
 		0A44B3611E43D1E57FBA0ABA /* GamePassiveSurfaceRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F24EE8E74C255D28D9189 /* GamePassiveSurfaceRefresher.swift */; };
 		0C123C762CD6E6DD1AF2CA0F /* GameModels+DailyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69765ADB8B4B0E8FF633FAD3 /* GameModels+DailyRecord.swift */; };
 		0CC4B79C94D6844CFEF91CF2 /* ProbeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */; };
+		0D53AFA2B6B8E70FE703A32A /* OfflineReturnSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996993341D0DA6273439D01C /* OfflineReturnSheet.swift */; };
 		0DB4CCE9F457D15C5E6A4926 /* PrestigeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37B72D0BA2B69E49716A690 /* PrestigeView.swift */; };
 		0E253D42D7509474667BB933 /* GameReturnReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971A22CC22F957CA6B7E0C6F /* GameReturnReport.swift */; };
 		1167D473393E6EDD14713067 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 20BB8206912A1AD832B8876F /* Localizable.xcstrings */; };
@@ -337,6 +338,7 @@
 		91CA63E3D62BA77D5C8C9B5F /* GamePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePersistenceTests.swift; sourceTree = "<group>"; };
 		9493FB441E3FB899CAEBCAE1 /* ReturnReportRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReportRecoveryView.swift; sourceTree = "<group>"; };
 		971A22CC22F957CA6B7E0C6F /* GameReturnReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameReturnReport.swift; sourceTree = "<group>"; };
+		996993341D0DA6273439D01C /* OfflineReturnSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineReturnSheet.swift; sourceTree = "<group>"; };
 		997B7D20C599D65040BA8193 /* DeepMineNumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineNumberFormatter.swift; sourceTree = "<group>"; };
 		99FD17796FB028ECFE77F677 /* DeepMineDeviceActivityMonitor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeepMineDeviceActivityMonitor.entitlements; sourceTree = "<group>"; };
 		9C49B51EBDECEF5799580E31 /* GamePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePersistence.swift; sourceTree = "<group>"; };
@@ -549,6 +551,7 @@
 				F679F08EC59CDA83604BA350 /* MineHomeView+Panels.swift */,
 				F28D2714CE09BE1B2DE62D18 /* MineHomeView+Values.swift */,
 				C72DF5C037AC9D06994EF9B8 /* MinerCrewScene.swift */,
+				996993341D0DA6273439D01C /* OfflineReturnSheet.swift */,
 				B9BD3B4D7AC3DF2DAD89061F /* OnboardingFlowView.swift */,
 				1522CF958F09E2922D7DC920 /* OnboardingFlowView+Steps.swift */,
 				E37B72D0BA2B69E49716A690 /* PrestigeView.swift */,
@@ -1098,6 +1101,7 @@
 				198850CF2F5E4770185B791F /* MineHomeView+Values.swift in Sources */,
 				BE48A3F917050FA698D78285 /* MineHomeView.swift in Sources */,
 				E9AAC8DE8B8D663FC39D8FDA /* MinerCrewScene.swift in Sources */,
+				0D53AFA2B6B8E70FE703A32A /* OfflineReturnSheet.swift in Sources */,
 				75CE89B6EECA67613B499C3F /* OnboardingFlowView+Steps.swift in Sources */,
 				69CB8ADA26580FDB66D3205E /* OnboardingFlowView.swift in Sources */,
 				7F44BEC7E9CF49913510EF27 /* PixelMinerIcon.swift in Sources */,
