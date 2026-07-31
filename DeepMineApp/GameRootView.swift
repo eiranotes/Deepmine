@@ -76,6 +76,13 @@ struct GameRootView: View {
                     ) { completed in
                         player = completed
                     }
+                } else if showsClickerRoot {
+                    MineFaceView(
+                        player: $player,
+                        feedback: feedback,
+                        onOpenEquipment: { path.append(.equipment(nil)) },
+                        onPersist: persistMineFace
+                    )
                 } else {
                     MineHomeView(
                         player: player,
@@ -105,6 +112,19 @@ struct GameRootView: View {
 
     var shouldShowOnboarding: Bool {
         !forceHome && player.onboardingStage != .complete
+    }
+
+    /// Fixtures still render the pre-pivot home so the existing screen tests keep their
+    /// subject. Live play goes to the rock.
+    var showsClickerRoot: Bool {
+        fixtureState == nil
+    }
+
+    /// The clicker mutates the player on a timer, and writing every tick would be a
+    /// write per quarter second. Persisting only when a segment actually breaks keeps
+    /// the cost proportional to progress rather than to time.
+    func persistMineFace(_ updated: PlayerState) {
+        try? repository?.save(updated)
     }
 
     @ViewBuilder

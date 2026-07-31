@@ -103,6 +103,8 @@ enum DeepMineStringKey: String, CaseIterable, Sendable {
     case stateStale = "state.stale"
     case stateWaiting = "state.waiting"
     case gameDepth = "game.depth"
+    case mineIntegrity = "mine.integrity"
+    case mineSeam = "mine.seam"
     case gameOre = "game.ore"
     case gameCrystals = "game.crystals"
     case gameCoreShards = "game.coreShards"

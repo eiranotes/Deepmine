@@ -178,6 +178,14 @@ enum BalanceSimulator {
                     }
                 }
             }
+            // The mine runs whether or not the player opened the app. Idle production is
+            // the baseline economy now, and it is what actually moves depth — without
+            // this the simulated ceiling never rises and the model describes a game the
+            // player cannot be in.
+            let idleUpdate = MiningLoop.advance(seconds: 86_400, in: &state)
+            dailyOre += idleUpdate.oreGained.doubleValue
+            totalOre += idleUpdate.oreGained.doubleValue
+
             rows.append(BalanceDayRow(
                 persona: persona.id, day: day,
                 sessions: isActive ? persona.lengths.count : 0,

@@ -73,7 +73,14 @@ final class RetentionEngineTests: XCTestCase {
     }
 
     func testStreakStepDisappearsAtTopTierAndRegionAtDeepest() {
-        let maxed = PlayerState(lifetimeFocusCredits: 400, streakDays: 30)
+        // Depth now comes from broken rock, not focus credits, so "deepest" has to be
+        // expressed as a segment index past the abyss gate.
+        let abyssIndex = ProgressionEngine.segmentIndex(forDepth: Balance.abyssRegionDepth)
+        let maxed = PlayerState(
+            lifetimeFocusCredits: 400,
+            streakDays: 30,
+            mineFace: MineFaceState(segmentIndex: abyssIndex)
+        )
         let steps = NextStepPlanner.steps(for: maxed, expectedOrePerSession: 1_000)
         XCTAssertFalse(steps.contains { $0.kind == .streak })
         XCTAssertFalse(steps.contains { $0.kind == .region })

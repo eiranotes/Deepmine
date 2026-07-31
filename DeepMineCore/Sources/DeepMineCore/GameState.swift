@@ -90,14 +90,19 @@ public struct PlayerState: Codable, Equatable, Sendable {
     public internal(set) var returnReminderPermission: OnboardingPermissionOutcome
     public internal(set) var lastSelectedPlan: MinePlan
     public internal(set) var lastSelectedDuration: SessionLength
+    public internal(set) var mineFace: MineFaceState
 
-    /// Lifetime, never reset. Depth is the identity number of the mine, so prestige
-    /// must not be able to make a player who focused more show less.
+    /// Derived from the rock the player has actually broken. Depth is the identity
+    /// number of the mine, and in a clicker the only honest way to earn it is to break
+    /// through it — focus credits amplify how fast that happens, they do not grant depth
+    /// on their own.
+    ///
+    /// Single source of truth: `mineFace.segmentIndex`. `bonusDepthMeters` remains for
+    /// abyss vein grants, which skip rock rather than break it.
     public var depthMeters: Int {
-        ProgressionEngine.depth(
-            lifetimeFocusCredits: lifetimeFocusCredits,
-            bonusDepthMeters: bonusDepthMeters
-        )
+        let base = mineFace.depthMeters
+        let bonus = max(0, bonusDepthMeters)
+        return base > Int.max - bonus ? Int.max : base + bonus
     }
 
     public var unlockedEquipmentLevel: Int {
@@ -154,7 +159,8 @@ public struct PlayerState: Codable, Equatable, Sendable {
         endAlertPermission: OnboardingPermissionOutcome = .notAsked,
         returnReminderPermission: OnboardingPermissionOutcome = .notAsked,
         lastSelectedPlan: MinePlan = .safe,
-        lastSelectedDuration: SessionLength = .minutes25
+        lastSelectedDuration: SessionLength = .minutes25,
+        mineFace: MineFaceState = MineFaceState()
     ) {
         self.resources = resources
         self.equipment = equipment
@@ -196,6 +202,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         self.returnReminderPermission = returnReminderPermission
         self.lastSelectedPlan = lastSelectedPlan
         self.lastSelectedDuration = lastSelectedDuration
+        self.mineFace = mineFace
     }
 
     public init(from decoder: Decoder) throws {
@@ -264,6 +271,20 @@ public struct PlayerState: Codable, Equatable, Sendable {
         lastSelectedDuration = try container.decodeIfPresent(
             SessionLength.self, forKey: .lastSelectedDuration
         ) ?? .minutes25
+        // Saves written before the pivot have no rock face. Seeding it from the depth
+        // those saves had earned under the old focus-derived rule keeps an existing
+        // player's progress instead of dropping them back to the surface.
+        if let face = try container.decodeIfPresent(MineFaceState.self, forKey: .mineFace) {
+            mineFace = face
+        } else {
+            let legacyDepth = ProgressionEngine.depth(
+                lifetimeFocusCredits: lifetimeFocusCredits,
+                bonusDepthMeters: 0
+            )
+            mineFace = MineFaceState(
+                segmentIndex: ProgressionEngine.segmentIndex(forDepth: legacyDepth)
+            )
+        }
     }
 
     /// Saves written before the remembered peak existed fall back to current levels,

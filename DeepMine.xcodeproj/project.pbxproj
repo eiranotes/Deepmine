@@ -32,6 +32,7 @@
 		296384B347E6E1EA86DB23B6 /* GameStoreOnboardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6021994C4AC62981A2EE6A /* GameStoreOnboardingTests.swift */; };
 		2A5199B3B47ADFFB306F3B4B /* MineHomeView+Panels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F679F08EC59CDA83604BA350 /* MineHomeView+Panels.swift */; };
 		2CF834F07B773C33A68D84EB /* ReturnReportUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D43E90C1EA27821BBA3A46 /* ReturnReportUITests.swift */; };
+		2E337CC2654289AACE118891 /* RockFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D040AE37186AF0038649866 /* RockFaceView.swift */; };
 		2EEDC994FAD46F562EF698A3 /* GameStore+SettingsPrestige.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8C4A1571EAF01A69E1CA98 /* GameStore+SettingsPrestige.swift */; };
 		3058EEE6271C31DB59B80472 /* ActiveMineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82960D4F361696499525AF88 /* ActiveMineUITests.swift */; };
 		30AEEF6F9D56B412A4EF586C /* ReturnReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FB5BC8BED8AA30D9D41148 /* ReturnReportView.swift */; };
@@ -107,6 +108,7 @@
 		887FF51117BD771493558C49 /* ProbeDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CF5FF5890ACBE8170D2002 /* ProbeDiagnostics.swift */; };
 		896E52BC4CDD81ED0C338FC2 /* GameSurfaceText.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EA56E6D6084779DC4994FE /* GameSurfaceText.swift */; };
 		8ADD4B5F2AACB48537477485 /* GameSurfaceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF9FE89B315CAA73AC503AB9 /* GameSurfaceSnapshot.swift */; };
+		8B29E0B7A93638E5D0F81903 /* MineFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A44B6B95B9D3FEE03B55160 /* MineFaceView.swift */; };
 		8B5C98125B8BBB0A8E9AF96E /* RetentionSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C21B4580F287BDD7E87D8E75 /* RetentionSurfaceTests.swift */; };
 		8F5F4D60ED76F764CE99138A /* LiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DD6C2BE815A474F0F19B50 /* LiveActivityLifecycle.swift */; };
 		8FB9D3F8E091E0D5B102AAAC /* GameActivityFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAE1F21E62F3C1352E6747F /* GameActivityFoundationTests.swift */; };
@@ -291,6 +293,7 @@
 		48901813B855AC4566B294AE /* DeepMineCountingNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineCountingNumber.swift; sourceTree = "<group>"; };
 		48F547ED1BCC70B57DDE9EAE /* SettingsView+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Actions.swift"; sourceTree = "<group>"; };
 		494AD32360B4E279B1916191 /* GameStoreSettingsPrestigeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStoreSettingsPrestigeTests.swift; sourceTree = "<group>"; };
+		4A44B6B95B9D3FEE03B55160 /* MineFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineFaceView.swift; sourceTree = "<group>"; };
 		4AB07777F0EEC0CB44B6DA77 /* GameStoreSessionPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStoreSessionPresentationTests.swift; sourceTree = "<group>"; };
 		4ACC97A18C69FBD1F5D16EEC /* GameWidgetSurfaceFixtureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWidgetSurfaceFixtureView.swift; sourceTree = "<group>"; };
 		4AE9776C94B6BCEAC40A31B2 /* GameSurfaceCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSurfaceCommandRunner.swift; sourceTree = "<group>"; };
@@ -304,6 +307,7 @@
 		579919B888B2F3124E534A08 /* ProgressViewsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewsUITests.swift; sourceTree = "<group>"; };
 		58980CE3F0BD848525CB4C3A /* GameFeedbackEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFeedbackEvent.swift; sourceTree = "<group>"; };
 		596DF35F00A525609C06D6F9 /* GameArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameArtView.swift; sourceTree = "<group>"; };
+		5D040AE37186AF0038649866 /* RockFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RockFaceView.swift; sourceTree = "<group>"; };
 		6327E35C3CE1E2999DB2D8BA /* GameCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCommandRunner.swift; sourceTree = "<group>"; };
 		6445B227A3C94A992AC6F276 /* ProbeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStore.swift; sourceTree = "<group>"; };
 		6458A14E6DBFC75F9BD75B87 /* GameActivitySurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActivitySurfaceTests.swift; sourceTree = "<group>"; };
@@ -540,6 +544,7 @@
 				80675BB78D1F3C44DDEAF76A /* GameActivitySurfaceFixtureView.swift */,
 				4ACC97A18C69FBD1F5D16EEC /* GameWidgetSurfaceFixtureView.swift */,
 				83C3E455F24CC7548B032FE8 /* MineDecorationScene.swift */,
+				4A44B6B95B9D3FEE03B55160 /* MineFaceView.swift */,
 				A5A3B460982A6A0E04E74F17 /* MineHomeView.swift */,
 				F679F08EC59CDA83604BA350 /* MineHomeView+Panels.swift */,
 				F28D2714CE09BE1B2DE62D18 /* MineHomeView+Values.swift */,
@@ -553,6 +558,7 @@
 				F5FB5BC8BED8AA30D9D41148 /* ReturnReportView.swift */,
 				227D43619A91203D7469CBF5 /* ReturnReportView+Beats.swift */,
 				7757AD1BE084A3D3E1FEDCCC /* ReturnReportView+Labels.swift */,
+				5D040AE37186AF0038649866 /* RockFaceView.swift */,
 				145F31027325954957927D1B /* SessionPreflightSheet.swift */,
 				4446BD0517F7609600C385B1 /* SettingsView.swift */,
 				48F547ED1BCC70B57DDE9EAE /* SettingsView+Actions.swift */,
@@ -1087,6 +1093,7 @@
 				4492817583CEFD77B47F3378 /* GameWidgetSurfaceFixtureView.swift in Sources */,
 				FA045611EF86369FE0D35025 /* LiveActivityLifecycle.swift in Sources */,
 				DE8CFD782D5E8F85ECDFC4D6 /* MineDecorationScene.swift in Sources */,
+				8B29E0B7A93638E5D0F81903 /* MineFaceView.swift in Sources */,
 				2A5199B3B47ADFFB306F3B4B /* MineHomeView+Panels.swift in Sources */,
 				198850CF2F5E4770185B791F /* MineHomeView+Values.swift in Sources */,
 				BE48A3F917050FA698D78285 /* MineHomeView.swift in Sources */,
@@ -1119,6 +1126,7 @@
 				BF146062F70B5F21DFA942DE /* ReturnReportView+Beats.swift in Sources */,
 				D0DA7013BEDA52EA8CAA1869 /* ReturnReportView+Labels.swift in Sources */,
 				30AEEF6F9D56B412A4EF586C /* ReturnReportView.swift in Sources */,
+				2E337CC2654289AACE118891 /* RockFaceView.swift in Sources */,
 				67525D90F2CF990F54D0D7FA /* ScreenTimeProbe.swift in Sources */,
 				96B3CB2687AC2A388D54A3C9 /* SessionPreflightSheet.swift in Sources */,
 				69E6060BB7BAB4112A16B03B /* SessionSystemCoordinator.swift in Sources */,
