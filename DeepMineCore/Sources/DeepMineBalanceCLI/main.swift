@@ -155,11 +155,6 @@ enum BalanceSimulator {
                     dailyFocused += reward.focusedMinutes
                     dailyOre += reward.ore
                     totalOre += reward.ore
-                    let fatigued = reward.breakdown.fatigueSegments
-                        .filter { $0.multiplier < Balance.freshFatigueMultiplier }
-                        .reduce(0) { $0 + $1.minutes }
-                    dailyFatigued += fatigued
-                    totalFatigued += fatigued
                     if let recommendation = try nextRecommendation(
                         persona: persona, after: sessionIndex, dailyMinutes: dailyFocused,
                         state: state
@@ -230,7 +225,7 @@ enum BalanceSimulator {
             growthFocusCredits: state.lifetimeFocusCredits,
             streakDays: state.streakDays, dailySessionNumber: dailySession,
             equipment: state.equipment, vein: vein,
-            resonanceBoostActive: resonance, startingDailyMinutes: dailyMinutes,
+            resonanceBoostActive: resonance,
             permanentUpgrades: state.permanentUpgrades
         )
     }
@@ -245,7 +240,7 @@ enum BalanceSimulator {
                     outcome: .completed, sessionLength: length, plan: .safe,
                     verificationGrade: .sealed, growthFocusCredits: lifetime,
                     streakDays: 1, dailySessionNumber: 1, equipment: EquipmentLevels(),
-                    vein: nil, resonanceBoostActive: false, startingDailyMinutes: 0
+                    vein: nil, resonanceBoostActive: false
                 )
                 let reward = try RewardCalculator.calculate(input)
                 ore += reward.ore

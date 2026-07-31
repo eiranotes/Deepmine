@@ -155,7 +155,6 @@ public enum PrestigeEngine {
             equipment: input.equipment,
             vein: input.vein,
             resonanceBoostActive: input.resonanceBoostActive,
-            startingDailyMinutes: input.startingDailyMinutes,
             permanentUpgrades: state.permanentUpgrades
         )
     }

@@ -192,7 +192,6 @@ extension GameStore {
             equipment: player.equipment,
             vein: vein,
             resonanceBoostActive: player.resonanceBoostPending,
-            startingDailyMinutes: daily?.focusedMinutes ?? 0,
             permanentUpgrades: player.permanentUpgrades
         )
     }

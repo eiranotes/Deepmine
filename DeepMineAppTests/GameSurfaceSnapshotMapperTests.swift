@@ -107,7 +107,7 @@ final class GameSurfaceSnapshotMapperTests: XCTestCase {
             plan: .survey, verificationGrade: .sealed,
             growthFocusCredits: player.lifetimeFocusCredits, streakDays: player.streakDays,
             dailySessionNumber: 2, equipment: player.equipment, vein: nil,
-            resonanceBoostActive: false, startingDailyMinutes: 40
+            resonanceBoostActive: false
         )
         let completed = try RewardCalculator.calculate(base)
         return SessionRewardProjection(

@@ -1,52 +1,5 @@
 import Foundation
 
-public enum FatigueCalculator {
-    public static func breakdown(
-        startingDailyMinutes: Int,
-        sessionMinutes: Int
-    ) -> FatigueBreakdown {
-        let start = max(0, startingDailyMinutes)
-        var position = start
-        var remaining = max(0, sessionMinutes)
-        var segments: [FatigueSegment] = []
-
-        while remaining > 0 {
-            let boundary: Int?
-            let multiplier: Double
-            if position < Balance.firstFatigueThresholdMinutes {
-                boundary = Balance.firstFatigueThresholdMinutes
-                multiplier = Balance.freshFatigueMultiplier
-            } else if position < Balance.secondFatigueThresholdMinutes {
-                boundary = Balance.secondFatigueThresholdMinutes
-                multiplier = Balance.tiredFatigueMultiplier
-            } else {
-                boundary = nil
-                multiplier = Balance.exhaustedFatigueMultiplier
-            }
-
-            let minutes = boundary.map { min(remaining, $0 - position) } ?? remaining
-            segments.append(FatigueSegment(
-                startMinute: position,
-                minutes: minutes,
-                multiplier: multiplier
-            ))
-            position += minutes
-            remaining -= minutes
-        }
-
-        guard sessionMinutes > 0 else {
-            return FatigueBreakdown(segments: [], effectiveMultiplier: 1)
-        }
-        let weightedMinutes = segments.reduce(0.0) {
-            $0 + Double($1.minutes) * $1.multiplier
-        }
-        return FatigueBreakdown(
-            segments: segments,
-            effectiveMultiplier: weightedMinutes / Double(sessionMinutes)
-        )
-    }
-}
-
 public enum RewardCalculator {
     public static func calculate(_ input: RewardInput) throws -> RewardResult {
         try validate(input)
@@ -79,10 +32,6 @@ public enum RewardCalculator {
             vein: input.vein,
             resonanceBoostActive: input.resonanceBoostActive
         )
-        let fatigue = FatigueCalculator.breakdown(
-            startingDailyMinutes: input.startingDailyMinutes,
-            sessionMinutes: focusedMinutes
-        )
         let abandonment = abandonmentMultiplier(for: input)
         let permanent = PrestigeEngine.memoryMultiplier(
             level: input.permanentUpgrades.excavationMemory
@@ -98,10 +47,8 @@ public enum RewardCalculator {
             dailyOrder: dailyOrder,
             equipment: equipment,
             vein: vein,
-            fatigue: fatigue.effectiveMultiplier,
             abandonment: abandonment,
-            permanent: permanent,
-            fatigueSegments: fatigue.segments
+            permanent: permanent
         )
         let ore = finiteProduct([baseOre, breakdown.combinedMultiplier])
         return RewardResult(
@@ -141,9 +88,6 @@ public enum RewardCalculator {
         }
         guard input.dailySessionNumber >= 1 else {
             throw RewardCalculationError.invalidValue(field: "dailySessionNumber")
-        }
-        guard input.startingDailyMinutes >= 0 else {
-            throw RewardCalculationError.invalidValue(field: "startingDailyMinutes")
         }
         let validPermanentLevels = 0...Balance.maximumPermanentUpgradeLevel
         guard validPermanentLevels.contains(input.permanentUpgrades.excavationMemory),

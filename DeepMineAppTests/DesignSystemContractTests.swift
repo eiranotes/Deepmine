@@ -83,7 +83,6 @@ final class DesignSystemContractTests: XCTestCase {
             equipment: abandoned.player.equipment,
             vein: report.vein,
             resonanceBoostActive: abandoned.player.resonanceBoostPending,
-            startingDailyMinutes: 0,
             permanentUpgrades: abandoned.player.permanentUpgrades
         )
         XCTAssertEqual(

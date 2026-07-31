@@ -99,7 +99,6 @@ public struct RewardInput: Codable, Equatable, Sendable {
     public let equipment: EquipmentLevels
     public let vein: VeinKind?
     public let resonanceBoostActive: Bool
-    public let startingDailyMinutes: Int
     public let permanentUpgrades: PermanentUpgradeLevels
 
     public init(
@@ -114,7 +113,6 @@ public struct RewardInput: Codable, Equatable, Sendable {
         equipment: EquipmentLevels,
         vein: VeinKind?,
         resonanceBoostActive: Bool,
-        startingDailyMinutes: Int,
         permanentUpgrades: PermanentUpgradeLevels = PermanentUpgradeLevels()
     ) {
         self.completionID = completionID
@@ -128,30 +126,7 @@ public struct RewardInput: Codable, Equatable, Sendable {
         self.equipment = equipment
         self.vein = vein
         self.resonanceBoostActive = resonanceBoostActive
-        self.startingDailyMinutes = startingDailyMinutes
         self.permanentUpgrades = permanentUpgrades
-    }
-}
-
-public struct FatigueSegment: Codable, Equatable, Sendable {
-    public let startMinute: Int
-    public let minutes: Int
-    public let multiplier: Double
-
-    public init(startMinute: Int, minutes: Int, multiplier: Double) {
-        self.startMinute = startMinute
-        self.minutes = minutes
-        self.multiplier = multiplier
-    }
-}
-
-public struct FatigueBreakdown: Codable, Equatable, Sendable {
-    public let segments: [FatigueSegment]
-    public let effectiveMultiplier: Double
-
-    public init(segments: [FatigueSegment], effectiveMultiplier: Double) {
-        self.segments = segments
-        self.effectiveMultiplier = effectiveMultiplier
     }
 }
 
@@ -166,13 +141,11 @@ public struct RewardMultiplierBreakdown: Codable, Equatable, Sendable {
     public let dailyOrder: Double
     public let equipment: Double
     public let vein: Double
-    public let fatigue: Double
     public let abandonment: Double
     public let permanent: Double
-    public let fatigueSegments: [FatigueSegment]
 
     public var combinedMultiplier: Double {
-        [growth, length, plan, verification, streak, dailyOrder, equipment, vein, fatigue, abandonment, permanent]
+        [growth, length, plan, verification, streak, dailyOrder, equipment, vein, abandonment, permanent]
             .reduce(1.0) { partial, next in
                 guard partial != 0, next != 0 else { return 0 }
                 guard partial <= Double.greatestFiniteMagnitude / next else {

@@ -35,39 +35,7 @@ final class SessionRewardTests: XCTestCase {
         XCTAssertEqual(try reward(plan: .safe, grade: .collapsed).ore, 55, accuracy: 1e-12)
     }
 
-    func testFatigueSplitsMinutesAcrossThresholds() {
-        let split = FatigueCalculator.breakdown(
-            startingDailyMinutes: 230,
-            sessionMinutes: 25
-        )
-        XCTAssertEqual(split.segments, [
-            FatigueSegment(startMinute: 230, minutes: 10, multiplier: 1),
-            FatigueSegment(startMinute: 240, minutes: 15, multiplier: 0.5)
-        ])
-        XCTAssertEqual(split.effectiveMultiplier, 0.7, accuracy: 1e-12)
 
-        XCTAssertEqual(
-            FatigueCalculator.breakdown(startingDailyMinutes: 240, sessionMinutes: 25)
-                .effectiveMultiplier,
-            0.5
-        )
-        XCTAssertEqual(
-            FatigueCalculator.breakdown(startingDailyMinutes: 350, sessionMinutes: 20)
-                .effectiveMultiplier,
-            0.375
-        )
-        XCTAssertEqual(
-            FatigueCalculator.breakdown(startingDailyMinutes: 360, sessionMinutes: 10)
-                .effectiveMultiplier,
-            0.25
-        )
-    }
-
-    func testFatigueSplitChangesReward() throws {
-        let result = try reward(startingDailyMinutes: 230)
-        XCTAssertEqual(result.breakdown.fatigue, 0.7, accuracy: 1e-12)
-        XCTAssertEqual(result.ore, 77, accuracy: 1e-12)
-    }
 
     func testClockForwardBackwardThresholdAndReboot() {
         let start = ClockAnchor(wallClock: Date(timeIntervalSince1970: 1_000), monotonicNanoseconds: 100_000_000_000)
@@ -134,8 +102,7 @@ final class SessionRewardTests: XCTestCase {
             dailySessionNumber: 2,
             equipment: EquipmentLevels(drill: 2, cart: 2, lamp: 1),
             vein: .blue,
-            resonanceBoostActive: true,
-            startingDailyMinutes: 0
+            resonanceBoostActive: true
         )
         let result = try RewardCalculator.calculate(input)
         let b = result.breakdown
@@ -147,7 +114,6 @@ final class SessionRewardTests: XCTestCase {
         XCTAssertEqual(b.dailyOrder, 1.05)
         XCTAssertEqual(b.equipment, 1.12 * 1.05)
         XCTAssertEqual(b.vein, 3)
-        XCTAssertEqual(b.fatigue, 1)
         XCTAssertEqual(b.abandonment, 1)
         XCTAssertEqual(result.ore, b.baseOre * b.combinedMultiplier, accuracy: 1e-9)
     }
@@ -201,7 +167,7 @@ final class SessionRewardTests: XCTestCase {
             plan: .safe, verificationGrade: .sealed, growthFocusCredits: 0,
             streakDays: 0, dailySessionNumber: 1,
             equipment: EquipmentLevels(drill: 0, cart: 1, lamp: 1), vein: nil,
-            resonanceBoostActive: false, startingDailyMinutes: 0
+            resonanceBoostActive: false
         )
         XCTAssertThrowsError(try RewardCalculator.calculate(invalidEquipment))
     }
@@ -228,16 +194,14 @@ final class SessionRewardTests: XCTestCase {
         plan: MinePlan = .safe,
         grade: VerificationGrade = .sealed,
         outcome: SessionOutcome = .completed,
-        growthCredits: Double = 0,
-        startingDailyMinutes: Int = 0
+        growthCredits: Double = 0
     ) throws -> RewardResult {
         try RewardCalculator.calculate(makeInput(
             length: length,
             plan: plan,
             grade: grade,
             outcome: outcome,
-            growthCredits: growthCredits,
-            startingDailyMinutes: startingDailyMinutes
+            growthCredits: growthCredits
         ))
     }
 
@@ -246,15 +210,14 @@ final class SessionRewardTests: XCTestCase {
         plan: MinePlan = .safe,
         grade: VerificationGrade = .sealed,
         outcome: SessionOutcome = .completed,
-        growthCredits: Double = 0,
-        startingDailyMinutes: Int = 0
+        growthCredits: Double = 0
     ) -> RewardInput {
         RewardInput(
             completionID: UUID(), outcome: outcome, sessionLength: length,
             plan: plan, verificationGrade: grade,
             growthFocusCredits: growthCredits, streakDays: 1,
             dailySessionNumber: 1, equipment: EquipmentLevels(), vein: nil,
-            resonanceBoostActive: false, startingDailyMinutes: startingDailyMinutes
+            resonanceBoostActive: false
         )
     }
 

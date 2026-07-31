@@ -137,14 +137,14 @@ final class GameStoreTests: XCTestCase {
             sessionLength: .minutes15, plan: .safe, verificationGrade: .sealed,
             growthFocusCredits: 20, streakDays: 0, dailySessionNumber: 1,
             equipment: EquipmentLevels(), vein: report.vein,
-            resonanceBoostActive: false, startingDailyMinutes: 0
+            resonanceBoostActive: false
         )
         let baselineInput = RewardInput(
             completionID: report.completionID, outcome: .completed,
             sessionLength: .minutes15, plan: .safe, verificationGrade: .sealed,
             growthFocusCredits: 0, streakDays: 0, dailySessionNumber: 1,
             equipment: EquipmentLevels(), vein: report.vein,
-            resonanceBoostActive: false, startingDailyMinutes: 0
+            resonanceBoostActive: false
         )
         let capped = try RewardCalculator.calculate(cappedInput).ore
         let baseline = try RewardCalculator.calculate(baselineInput).ore

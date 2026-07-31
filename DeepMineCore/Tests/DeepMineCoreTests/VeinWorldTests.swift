@@ -211,7 +211,7 @@ final class VeinWorldTests: XCTestCase {
             completionID: UUID(), outcome: .completed, sessionLength: .minutes25,
             plan: .safe, verificationGrade: .sealed, growthFocusCredits: 0,
             streakDays: 1, dailySessionNumber: 1, equipment: EquipmentLevels(),
-            vein: nil, resonanceBoostActive: false, startingDailyMinutes: 0
+            vein: nil, resonanceBoostActive: false
         )
         let base = try RewardCalculator.calculate(input)
         let blue = try RewardCalculator.calculate(VeinEngine.applying(vein: .blue, to: input))

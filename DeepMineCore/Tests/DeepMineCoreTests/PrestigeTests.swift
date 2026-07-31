@@ -155,7 +155,7 @@ final class PrestigeTests: XCTestCase {
             plan: .safe, verificationGrade: .sealed, growthFocusCredits: 0,
             streakDays: 1, dailySessionNumber: 1,
             equipment: EquipmentLevels(drill: 1, cart: 2, lamp: 1),
-            vein: nil, resonanceBoostActive: false, startingDailyMinutes: 0,
+            vein: nil, resonanceBoostActive: false,
             permanentUpgrades: PermanentUpgradeLevels(compressedTime: 1)
         )
         // 200 base x (1.30 + 0.05 compressed) length x 1.07 cart, now a clean product
@@ -220,7 +220,7 @@ final class PrestigeTests: XCTestCase {
             completionID: UUID(), outcome: .completed, sessionLength: length,
             plan: .safe, verificationGrade: .sealed, growthFocusCredits: growthFocusCredits,
             streakDays: 1, dailySessionNumber: 1, equipment: EquipmentLevels(),
-            vein: nil, resonanceBoostActive: false, startingDailyMinutes: 0,
+            vein: nil, resonanceBoostActive: false,
             permanentUpgrades: upgrades
         )
     }

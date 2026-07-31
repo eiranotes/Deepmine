@@ -142,7 +142,6 @@ public enum VeinEngine {
             equipment: input.equipment,
             vein: vein,
             resonanceBoostActive: input.resonanceBoostActive,
-            startingDailyMinutes: input.startingDailyMinutes,
             permanentUpgrades: input.permanentUpgrades
         )
     }

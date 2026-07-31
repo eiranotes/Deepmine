@@ -224,7 +224,6 @@ enum GameSurfaceSnapshotMapper {
             equipment: player.equipment,
             vein: nil,
             resonanceBoostActive: player.resonanceBoostPending,
-            startingDailyMinutes: daily?.focusedMinutes ?? 0,
             permanentUpgrades: player.permanentUpgrades
         )
     }

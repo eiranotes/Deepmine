@@ -95,7 +95,6 @@ public enum UpgradeAdvisor {
             equipment: equipment,
             vein: nil,
             resonanceBoostActive: input.resonanceBoostActive,
-            startingDailyMinutes: input.startingDailyMinutes,
             permanentUpgrades: input.permanentUpgrades
         )
         let baseOre = try RewardCalculator.calculate(projection).ore

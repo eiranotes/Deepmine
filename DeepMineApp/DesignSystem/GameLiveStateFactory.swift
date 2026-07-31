@@ -80,7 +80,6 @@ extension GameFixtures {
             equipment: player.equipment,
             vein: vein,
             resonanceBoostActive: player.resonanceBoostPending,
-            startingDailyMinutes: 0,
             permanentUpgrades: player.permanentUpgrades
         )
         do {

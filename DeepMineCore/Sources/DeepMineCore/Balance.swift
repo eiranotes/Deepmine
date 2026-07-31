@@ -35,11 +35,6 @@ public enum Balance {
     public static let deepCollapseMultiplier = 0.0
 
     public static let abandonmentMultiplier = 0.5
-    public static let firstFatigueThresholdMinutes = 240
-    public static let secondFatigueThresholdMinutes = 360
-    public static let freshFatigueMultiplier = 1.0
-    public static let tiredFatigueMultiplier = 0.5
-    public static let exhaustedFatigueMultiplier = 0.25
 
     public static let streakDayThree = 3
     public static let streakDaySeven = 7

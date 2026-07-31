@@ -20,7 +20,7 @@ final class BalanceSimulationTests: XCTestCase {
         XCTAssertEqual(lines.count, 1 + PersonaID.allCases.count * 30)
     }
 
-    func testPersonaTargetsAndSoftCap() throws {
+    func testPersonaTargetsWithoutSoftCap() throws {
         let result = try BalanceSimulator.run(seed: 260_729, days: 30)
         let light = try XCTUnwrap(result.summaries.first { $0.persona == .light })
         let standard = try XCTUnwrap(result.summaries.first { $0.persona == .standard })
@@ -31,12 +31,12 @@ final class BalanceSimulationTests: XCTestCase {
             return (1...2).contains(session)
         })
         XCTAssertTrue((7...10).contains(try XCTUnwrap(standard.firstPrestigeDay)))
-        XCTAssertGreaterThan(heavy.fatiguedMinutes, 0)
         XCTAssertLessThanOrEqual(result.heavyLightFocusGap, 10)
         XCTAssertEqual(BalanceSimulator.personas.map(\.dailyGoalMinutes), [25, 100, 100, 50])
         XCTAssertNil(light.firstPrestigeDay)
-        let heavyDays = result.rows.filter { $0.persona == .heavy }
-        XCTAssertEqual(heavyDays.map(\.fatiguedMinutes), Array(repeating: 10, count: 30))
+        // The fatigue soft cap is gone (D-034), so a heavy schedule is no longer
+        // penalised for long days.
+        XCTAssertEqual(heavy.fatiguedMinutes, 0)
     }
 
     func testBoundedGrowthKeepsGrossOreGapWithinObservedGuardrail() throws {
@@ -47,7 +47,8 @@ final class BalanceSimulationTests: XCTestCase {
         // growth, not to equalise personas. Play-amount metrics stay at 10x below.
         XCTAssertGreaterThan(result.heavyLightOreGap, 10)
         XCTAssertLessThanOrEqual(result.heavyLightOreGap, 80)
-        XCTAssertEqual(result.heavyLightOreGap, 60.293686, accuracy: 0.000001)
+        // Rose from 60.29 when the daily soft cap stopped discounting heavy days.
+        XCTAssertEqual(result.heavyLightOreGap, 61.581264, accuracy: 0.000001)
     }
 
     func testDepthNeverInvertsAgainstFocusAcrossPrestige() throws {

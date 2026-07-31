@@ -271,7 +271,7 @@ final class ProgressionTests: XCTestCase {
             completionID: UUID(), outcome: outcome, sessionLength: length,
             plan: .safe, verificationGrade: .sealed, growthFocusCredits: 0,
             streakDays: 1, dailySessionNumber: 1, equipment: EquipmentLevels(),
-            vein: nil, resonanceBoostActive: false, startingDailyMinutes: 0
+            vein: nil, resonanceBoostActive: false
         )
     }
 }

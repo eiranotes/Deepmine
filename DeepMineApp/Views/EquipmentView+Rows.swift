@@ -168,7 +168,6 @@ extension EquipmentView {
             equipment: projected,
             vein: nil,
             resonanceBoostActive: false,
-            startingDailyMinutes: 0,
             permanentUpgrades: player.permanentUpgrades
         )).ore else { return nil }
         return String(

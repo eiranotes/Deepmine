@@ -133,7 +133,6 @@ extension GameStore {
             equipment: player.equipment,
             vein: nil,
             resonanceBoostActive: player.resonanceBoostPending,
-            startingDailyMinutes: daily?.focusedMinutes ?? 0,
             permanentUpgrades: player.permanentUpgrades
         )
         let elapsed = min(length.minutes, max(0, abandonmentMinutes ?? length.minutes / 2))
@@ -149,7 +148,6 @@ extension GameStore {
             equipment: base.equipment,
             vein: nil,
             resonanceBoostActive: base.resonanceBoostActive,
-            startingDailyMinutes: base.startingDailyMinutes,
             permanentUpgrades: base.permanentUpgrades
         )
         return SessionRewardProjection(
@@ -213,7 +211,6 @@ extension GameStore {
             equipment: player.equipment,
             vein: nil,
             resonanceBoostActive: player.resonanceBoostPending,
-            startingDailyMinutes: daily?.focusedMinutes ?? 0,
             permanentUpgrades: player.permanentUpgrades
         )
         let baselineChance = VeinEngine.chance(
