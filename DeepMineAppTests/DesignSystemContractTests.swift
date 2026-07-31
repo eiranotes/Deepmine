@@ -116,4 +116,19 @@ final class DesignSystemContractTests: XCTestCase {
         XCTAssertNil(DeepMineMotion.pressAnimation(reduceMotion: true))
         XCTAssertNotNil(DeepMineMotion.pressAnimation(reduceMotion: false))
     }
+
+    func testEquipmentArtTierBoundariesClampToShippedRange() {
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: -4), 1)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 1), 1)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 20), 1)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 21), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 40), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 41), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 60), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 600), 3)
+        XCTAssertEqual(
+            DeepMineArt.equipment(.drill, level: 21),
+            "Equipment_drill_tier2"
+        )
+    }
 }

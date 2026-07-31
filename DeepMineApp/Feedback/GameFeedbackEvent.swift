@@ -40,7 +40,7 @@ enum GameFeedbackEvent: String, CaseIterable, Sendable {
         switch self {
         case .sessionSealed: .doubleThud
         case .sessionOpen: .softTap
-        case .sessionCompleted: .risingTriple
+        case .sessionCompleted: .oreCascade
         case .veinFound: .sparkle
         case .upgradeInstalled: .crispTap
         case .crewGrew: .softTap
@@ -58,6 +58,7 @@ enum GameHapticPattern: Sendable {
     case crispTap
     case doubleThud
     case risingTriple
+    case oreCascade
     case sparkle
     case descendingPair
     case harshBuzz
@@ -69,6 +70,8 @@ enum GameHapticPattern: Sendable {
         case .crispTap: [(0, 0.7, 0.85)]
         case .doubleThud: [(0, 1.0, 0.25), (0.13, 0.85, 0.2)]
         case .risingTriple: [(0, 0.5, 0.4), (0.09, 0.7, 0.6), (0.19, 1.0, 0.85)]
+        case .oreCascade:
+            [(0, 0.32, 0.72), (0.07, 0.46, 0.58), (0.14, 0.64, 0.4), (0.24, 1.0, 0.18)]
         case .sparkle: [(0, 0.35, 1.0), (0.06, 0.5, 1.0), (0.11, 0.4, 1.0), (0.17, 0.75, 1.0)]
         case .descendingPair: [(0, 0.8, 0.5), (0.14, 0.45, 0.25)]
         case .harshBuzz: [(0, 1.0, 1.0), (0.08, 1.0, 0.9), (0.16, 0.9, 0.8)]
@@ -77,7 +80,7 @@ enum GameHapticPattern: Sendable {
 
     var fallbackNotification: UINotificationFeedbackGenerator.FeedbackType? {
         switch self {
-        case .risingTriple: .success
+        case .risingTriple, .oreCascade: .success
         case .descendingPair: .warning
         case .harshBuzz: .error
         default: nil

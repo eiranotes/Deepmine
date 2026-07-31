@@ -35,7 +35,7 @@ struct OnboardingFlowView: View {
                                 eyebrow: .onboardingBlocksEyebrow,
                                 title: .onboardingBlocksTitle,
                                 body: .onboardingBlocksBody,
-                                symbol: "door.left.hand.closed",
+                                assetName: "Onboarding_blocks",
                                 identifier: "onboarding-premise-blocks"
                             )
                         case .premiseSessions:
@@ -43,7 +43,7 @@ struct OnboardingFlowView: View {
                                 eyebrow: .onboardingSessionsEyebrow,
                                 title: .onboardingSessionsTitle,
                                 body: .onboardingSessionsBody,
-                                symbol: "arrow.down.to.line.compact",
+                                assetName: "Onboarding_sessions",
                                 identifier: "onboarding-premise-sessions"
                             )
                         case .demo: demo
@@ -64,14 +64,12 @@ struct OnboardingFlowView: View {
         eyebrow: DeepMineStringKey,
         title: DeepMineStringKey,
         body: DeepMineStringKey,
-        symbol: String,
+        assetName: String,
         identifier: String
     ) -> some View {
         VStack(spacing: 24) {
             Spacer()
-            Image(systemName: symbol)
-                .font(.system(size: 46, weight: .bold))
-                .foregroundStyle(DeepMinePalette.brass.color)
+            DeepMinePixelImage(name: assetName, size: 88)
                 .frame(width: 88, height: 88)
                 .background(DeepMinePalette.shale.color, in: RoundedRectangle(cornerRadius: 9))
                 .accessibilityHidden(true)

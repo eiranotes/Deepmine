@@ -8,7 +8,12 @@ struct GameMinimalActivityContent: View {
     @Environment(\.locale) private var locale
 
     var body: some View {
-        GameSurfaceMark(phase: snapshot.activityPhase(isStale: isStale), size: 20)
+        GameSurfaceMark(
+            phase: snapshot.activityPhase(isStale: isStale),
+            size: 20,
+            planID: snapshot.planID,
+            veinID: snapshot.veinID
+        )
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(
                 GameSurfaceText.accessibilityLabel(snapshot, isStale: isStale, locale: locale)
@@ -28,7 +33,12 @@ struct GameCompactActivityContent: View {
     var body: some View {
         let phase = snapshot.activityPhase(isStale: isStale)
         HStack(spacing: 6) {
-            GameSurfaceMark(phase: phase, size: 22)
+            GameSurfaceMark(
+                phase: phase,
+                size: 22,
+                planID: snapshot.planID,
+                veinID: snapshot.veinID
+            )
             SurfaceCompactValue(
                 startedAt: startedAt,
                 endsAt: endsAt,
@@ -65,7 +75,12 @@ struct SurfaceExpandedPhaseMark: View {
 
     var body: some View {
         let phase = snapshot.activityPhase(isStale: isStale)
-        GameSurfaceMark(phase: phase, size: 24)
+        GameSurfaceMark(
+            phase: phase,
+            size: 24,
+            planID: snapshot.planID,
+            veinID: snapshot.veinID
+        )
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(
                 GameSurfaceText.phase(snapshot, isStale: isStale, locale: locale)
@@ -126,29 +141,40 @@ struct GameExpandedActivityContent: View {
     private var phase: GameSurfacePhase { snapshot.activityPhase(isStale: isStale) }
 
     var body: some View {
-        VStack(spacing: 7) {
-            HStack {
-                Text(GameSurfaceText.plan(snapshot.planID, locale: locale))
-                Spacer()
-                Text("\(snapshot.depthMeters)m")
-                if phase == .mining {
-                    SurfaceRemainingTimer(
-                        startedAt: startedAt,
-                        endsAt: endsAt,
-                        identifier: "activity-expanded-timer"
-                    )
+        ZStack {
+            Image(GameArtName.region(snapshot.regionID, prefix: "DIBanner"))
+                .resizable()
+                .interpolation(.none)
+                .antialiased(false)
+                .scaledToFill()
+                .opacity(0.42)
+                .accessibilityHidden(true)
+            ProbePalette.coal.opacity(0.42)
+            VStack(spacing: 7) {
+                HStack {
+                    Text(GameSurfaceText.plan(snapshot.planID, locale: locale))
+                    Spacer()
+                    Text("\(snapshot.depthMeters)m")
+                    if phase == .mining {
+                        SurfaceRemainingTimer(
+                            startedAt: startedAt,
+                            endsAt: endsAt,
+                            identifier: "activity-expanded-timer"
+                        )
+                    }
                 }
+                .font(.caption.weight(.bold))
+                SurfaceProgressRail(
+                    startedAt: startedAt,
+                    endsAt: endsAt,
+                    phase: phase,
+                    identifier: "activity-expanded-progress"
+                )
+                valueRow
+                actionRow
             }
-            .font(.caption.weight(.bold))
-            SurfaceProgressRail(
-                startedAt: startedAt,
-                endsAt: endsAt,
-                phase: phase,
-                identifier: "activity-expanded-progress"
-            )
-            valueRow
-            actionRow
         }
+        .clipped()
         .frame(maxHeight: GameActivityLayout.expandedMaximumHeight)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("activity-expanded-\(phase.rawValue)")

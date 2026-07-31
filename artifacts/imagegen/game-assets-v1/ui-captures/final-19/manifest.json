@@ -1,0 +1,203 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "54679257-58A1-4694-AA3C-1AC4B31575F7.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "16-standby_0_76DE4F58-261E-4205-BE37-7C23774074E1.png",
+        "timestamp" : 1785457785.717
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "20F36911-0FDD-4B29-8F14-683393270A6A.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "15-lock-screen_0_EB8FBF16-6746-467E-A2BB-C42558E16B3E.png",
+        "timestamp" : 1785457779.398
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "450711FE-A89C-4422-B06B-DB524BAA69F0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "14-activity-expanded_0_D4D01E22-505D-4C8A-8E4A-CF34F227F2A7.png",
+        "timestamp" : 1785457774.03
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "A9D93D66-1E0D-4FAE-8EF5-348C6D7AB5AC.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "13-activity-compact_0_84D958EF-6909-4A8A-84FD-3D213ED40152.png",
+        "timestamp" : 1785457768.363
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "9101E8FC-2CEF-4D6F-ABA9-96BC6589B0D8.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "12-activity-minimal_0_5CAD5F84-5E5F-4A13-9A9E-690137B9173E.png",
+        "timestamp" : 1785457761.916
+      }
+    ],
+    "testIdentifier" : "GameSurfaceScreenshotTests/testCaptureActivitySurfaces()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineAppUITests/GameSurfaceScreenshotTests/testCaptureActivitySurfaces"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "2F486E37-5B5F-451E-8D80-408FD163376D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "05-return-report_0_D80783DA-CD61-4626-8A20-002047CA8695.png",
+        "timestamp" : 1785457820.591
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "CD5B844A-C70C-433D-BE54-DA02AF302B42.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "04-active-mine_0_C6667364-9A4B-4763-854D-47B49D7FD63A.png",
+        "timestamp" : 1785457813.607
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "97A51C22-0145-4324-B8E9-6C50E3AACC58.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "03-preflight_0_20C9D636-FAD5-4BB2-973A-BB3725F4F309.png",
+        "timestamp" : 1785457807.557
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "FD1BE0C6-850C-413E-989A-BFB6629FAD02.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "02-mine-home_0_29524C55-EAA0-436B-BFC4-7C0C999A6C69.png",
+        "timestamp" : 1785457797.923
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "D5E08305-8071-4321-8723-DDBB3797C85E.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "01-onboarding_0_52AE57F8-2787-453C-8DE6-4E169A05AEB2.png",
+        "timestamp" : 1785457791.892
+      }
+    ],
+    "testIdentifier" : "GameSurfaceScreenshotTests/testCaptureCoreLoopScreens()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineAppUITests/GameSurfaceScreenshotTests/testCaptureCoreLoopScreens"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "D15C615C-DAC4-456A-BC8B-21FAF791754D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "08-statistics_0_7114CD90-5FCF-4B18-92F6-94E711DF9E8C.png",
+        "timestamp" : 1785457850.772
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "12B8CC31-2AA1-4162-878D-EEAAB5C06B96.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "07-journal_0_F3910B7B-B650-4D7D-87B5-2A4D14D55D10.png",
+        "timestamp" : 1785457840.921
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "A8D5D28C-7064-4F9C-9BDD-5A1F16D257DD.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "06-equipment_0_9BF75713-E9C4-477B-8D56-811AD3D87BF3.png",
+        "timestamp" : 1785457831.076
+      }
+    ],
+    "testIdentifier" : "GameSurfaceScreenshotTests/testCaptureProgressScreens()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineAppUITests/GameSurfaceScreenshotTests/testCaptureProgressScreens"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "7FDA7A85-75A3-4C59-9C00-510AC340C447.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "11-deep-descent_0_3FC9E9AA-B4CD-421D-967B-128E5FF3A974.png",
+        "timestamp" : 1785457888.115
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "306989D0-8074-4A36-925D-49B941FB80AE.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "10-settings_0_6516AC80-A0AA-4985-9DB9-13FECAEEF95A.png",
+        "timestamp" : 1785457873.527
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "347C986A-6685-470B-A121-DF89C923DED9.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "09-mine-themes_0_70405A8A-C0E2-4B38-AB89-AEFB8F16E4D2.png",
+        "timestamp" : 1785457863.365
+      }
+    ],
+    "testIdentifier" : "GameSurfaceScreenshotTests/testCaptureSettingsScreens()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineAppUITests/GameSurfaceScreenshotTests/testCaptureSettingsScreens"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "6B161D87-3E39-43EE-9496-9AB48FD37D85.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "19-control-center_0_D22919A6-4CD4-4DDA-ACE1-A3CC840951C7.png",
+        "timestamp" : 1785457904.388
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "1FD401F5-E500-41DA-B43C-6B1633428CD6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "18-widget-medium_0_711BAABD-44B4-4693-A794-960D040C75AB.png",
+        "timestamp" : 1785457899.397
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "64C7804C-355B-4444-90EE-C8ED0D9355CF",
+        "deviceName" : "Adelie iPhone 17 Pro iOS 26.5",
+        "exportedFileName" : "D39B3F64-6DBF-4A5A-A6DD-68E5316397CF.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "17-widget-small_0_D0AF80ED-73CC-4D9D-BBFB-D672698E44AF.png",
+        "timestamp" : 1785457894.156
+      }
+    ],
+    "testIdentifier" : "GameSurfaceScreenshotTests/testCaptureWidgetAndControlSurfaces()",
+    "testIdentifierURL" : "test://com.apple.xcode/DeepMine/DeepMineAppUITests/GameSurfaceScreenshotTests/testCaptureWidgetAndControlSurfaces"
+  }
+]

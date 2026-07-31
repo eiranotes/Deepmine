@@ -18,6 +18,7 @@ extension EquipmentView {
                     equipment: DeepMineEquipmentDisplay(
                         titleKey: DeepMineProgressLabels.equipmentKey(kind),
                         symbol: DeepMineProgressLabels.equipmentSymbol(kind),
+                        assetName: DeepMineArt.equipment(kind, level: level),
                         level: level,
                         detail: DeepMineStrings.text(DeepMineProgressLabels.equipmentEffectKey(kind)),
                         status: maximum ? .completed : (recommended ? .attention : .notStarted)

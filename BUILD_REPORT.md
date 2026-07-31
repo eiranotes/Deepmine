@@ -1,18 +1,42 @@
 # Build Report
 
-업데이트: 2026-07-30 (경제·리텐션 리뷰 반영)
+업데이트: 2026-07-31 (게임 아트 40종 생성·전 화면 반영)
+
+## 2026-07-31 complete game-art set
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 게임 아트 원본 | 검증됨 | 내장 ImageGen으로 40개 고유 PNG 원본 생성. 매니페스트의 raw SHA 40개가 모두 고유 |
+| 후처리 계약 | 검증됨 | `process_game_assets.py --validate-only`: 40 imageset, 120 PNG, 정확한 네 안료, 브라스 10% 미만, 선언 크기와 알파·Contents.json 통과 |
+| 앱·시스템 표면 배선 | 검증됨(빌드) | 광맥 5, 장비 9, 테마 4, 장식 4, 광부 2, DI 4, StandBy 4, 자원 3, 영구 강화 3, 온보딩 2를 app/widget asset consumer와 함께 generic iOS build |
+| ID fallback·장비 티어 | 검증됨(단위) | plan/region/vein unknown fallback과 레벨 1/20/21/40/41/60·범위 밖 clamp, focused Xcode 12/12 |
+| 화면 증거 | 검증됨(시뮬레이터) | `GameSurfaceScreenshotTests` 5/5, PNG 19장과 contact sheet를 `artifacts/imagegen/game-assets-v1/ui-captures/`에 내보냄 |
+| Dynamic Island·StandBy Night Mode | 미검증(실기기 필요) | 시뮬레이터 fixture와 safe-zone overlay는 확인. 실제 SpringBoard crop·적색 단색 가독성은 물리 기기 게이트 |
+
+## 2026-07-31 system surface and ore payoff
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| iPhone 잠금화면 정렬 | 검증됨(시뮬레이터) | `ActivityFamily.medium`을 StandBy로 오인하던 분기를 `isActivityFullscreen` 역할 판정으로 교체. 160pt UI 회귀와 fixture 육안 확인 |
+| AlarmKit Live Activity 계약 | 검증됨(빌드·단위) | `AlarmAttributes<DeepMineAlarmMetadata>`용 `ActivityConfiguration`을 Widget bundle에 등록하고 countdown/alert 투영 및 4KB 미만 왕복 검사 |
+| 실제 Dynamic Island 표시 | 미검증(실기기 필요) | 활성 세션은 AlarmKit countdown 하나가 소유하고, 커스텀 Activity는 AlarmKit 실패 또는 귀환 완료 표면에만 사용. 실제 SpringBoard 표시는 물리 기기 게이트 |
+| 귀환 광석 적재 연출 | 검증됨(시뮬레이터) | 획득량에 따라 3–9개 광석이 광차에 적재되고 완료 햅틱이 낙하→광차 충돌 리듬으로 변경. Reduce Motion은 최종 상태로 즉시 표시 |
+| 광석 적재 햅틱 체감 | 미검증(실기기 필요) | CoreHaptics 패턴과 UIKit 성공 폴백은 테스트됨. 실제 강도·스피커 조합은 물리 기기에서 확인 필요 |
 
 ## Result
 
-경제·리텐션 리뷰에서 확인한 구조적 결함을 수정하고 Spec §16 P1–P4 로컬 MVP를 다시
-검증했다. 이 결과는 게임 규칙과 production view 렌더링을 검증하지만, 승인 entitlement와
-실제 하드웨어 시스템 통합은 여전히 검증하지 않는다.
+도전과제 35종에 이어 나머지 게임 아트 40종도 생성·양자화·Asset Catalog 편입을 완료했다.
+홈과 진행 화면, 온보딩, 귀환, 프레스티지, Dynamic Island/StandBy fixture에서 실제로
+렌더링한다. 정적 자산 계약·컴파일·시뮬레이터 화면은 검증됐고 실제 시스템 표면은 별도다.
 
 | 항목 | 상태 | 최신 근거 |
 |---|---|---|
 | XcodeGen | 검증됨 | `xcodegen generate --spec project.yml` 성공 |
 | Core | 검증됨 | SwiftPM 101/101, 실패 0 |
 | 앱 전체 suite | 검증됨 | iPhone 17 Pro iOS 26.5에서 182/182, 실패·skip 0 |
+| 도전과제 배지 자산 | 검증됨 | 35 ID 일치, 35 imageset/105 PNG, 정확한 4색, 불투명 RGB, 48/96/144 치수 |
+| 도전과제 집중 회귀 | 검증됨 | `RetentionSurfaceTests` 7/7, 실패 0 |
+| 도전과제 배지 앱 빌드 | 검증됨 | 새 Asset Catalog를 포함한 generic iOS code-signing-disabled build 성공 |
 | 복리 장비 곡선 | 검증됨 | 레벨 1/10/25/59에서 상대 이득이 항상 1.12배임을 회귀 테스트 |
 | 심도 역전 방지 | 검증됨 | 180일 시뮬레이션에서 집중이 많은 페르소나가 더 얕지 않음 |
 | 사다리 잔존 | 검증됨 | 180일에 네 페르소나 모두 드릴 상한 미달 |
@@ -23,7 +47,7 @@
 | Swift 파일 크기 | 부분 검증 | 15개 파일 분리. `DeepMineLocalization.swift`만 309줄로 9줄 초과 — enum case는 extension으로 분리할 수 없고 두 enum으로 쪼개면 현지화 parity 계약과 모든 호출부가 깨진다. 로직 없는 키 목록이라 초과 상태로 둔다 |
 | 시계 소스 교체 | 미검증(실기기 필요) | 코드는 `CLOCK_MONOTONIC_RAW`로 교체. 실제 슬립 구간 drift는 기기에서만 확인 가능 |
 | Live Activity intent 즉시 적용 | 미검증(실기기 필요) | 앱 프로세스 등록·drain 경로는 구현. 실제 백그라운드 intent 실행은 기기 게이트 |
-| 화면 증거 19장 | 미갱신 | 홈·귀환 보고서가 바뀌어 `artifacts/ui/game-mvp-v1/`의 기존 PNG는 stale이다 |
+| 화면 증거 19장 | 검증됨 | 새 게임 아트를 포함한 19장과 contact sheet를 `artifacts/imagegen/game-assets-v1/ui-captures/`에 fresh export |
 | StoreKit/서버/소셜 | 미구현 | 현재 게임 범위에서 명시적으로 제외 |
 | 물리 기기 시스템 통합 | 미검증 | `docs/DEFECTS.md`의 GATE-001~006 |
 
@@ -31,7 +55,18 @@
 
 ```sh
 xcodegen generate --spec project.yml
+python3 scripts/process_achievement_badges.py \
+  --manifest artifacts/imagegen/achievement-badges-v1/sources.json \
+  --catalog DeepMineProbe/Shared/SharedAssets.xcassets \
+  --contact-sheet artifacts/imagegen/achievement-badges-v1/contact-sheet.png \
+  --report artifacts/imagegen/achievement-badges-v1/verification.json
+/Users/tofu/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 \
+  scripts/process_game_assets.py --validate-only
 swift test --package-path DeepMineCore
+xcodebuild test -quiet -project DeepMine.xcodeproj -scheme DeepMineApp \
+  -destination 'platform=iOS Simulator,id=64C7804C-355B-4444-90EE-C8ED0D9355CF' \
+  -derivedDataPath /tmp/DMTestAchievementBadges \
+  -only-testing:DeepMineAppTests/RetentionSurfaceTests CODE_SIGNING_ALLOWED=NO
 swift run --package-path DeepMineCore DeepMineBalanceCLI --seed 260729 --days 180 \
   --output /tmp/deepmine-balance.csv
 xcodebuild build-for-testing -quiet \
@@ -108,12 +143,11 @@ suite 부하에서 타임아웃한 것이었다. 단독 실행에서는 42초로
 - 30일 헤비/라이트 광석 격차 60.29배. 가드레일을 25배에서 80배로 재설정 (D-026)
 - 집중 크레딧 격차 10.0배, 심도 격차 14.64배 — 플레이 양 지표는 기존 기준 유지
 
-## Known stale evidence
+## Fresh visual evidence
 
-`artifacts/ui/game-mvp-v1/`의 19장 PNG는 이번 변경 이전에 캡처한 것이다. 홈 masthead,
-계획 설명, 1탭 추천 강화, 귀환 보고서의 심도·목표·연속 일수·광맥 수량, 장비 화면의 심도
-해금 표시가 반영되어 있지 않다. 화면 캡처 테스트는 suite에 포함되어 실행되지만 PNG를
-저장소로 내보내는 단계는 이번 작업에서 수행하지 않았다.
+새 19장 PNG와 contact sheet는
+`artifacts/imagegen/game-assets-v1/ui-captures/`에 있다. 기존
+`artifacts/ui/game-mvp-v1/`은 역사적 baseline으로만 유지한다.
 
 ## Physical-device release gates
 

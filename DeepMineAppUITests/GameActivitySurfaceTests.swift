@@ -32,6 +32,15 @@ final class GameActivitySurfaceTests: XCTestCase {
         assertLabel("붕괴", state: "collapsed", surface: "expanded", language: "ko")
     }
 
+    func testLockScreenPresentationStaysInsideTheSystemHeightLimit() {
+        launch(state: "mining", surface: "lock", language: "ko")
+        let root = element("activity-lock-mining")
+
+        XCTAssertTrue(root.waitForExistence(timeout: 5))
+        XCTAssertLessThanOrEqual(root.frame.height, 160.5)
+        XCTAssertFalse(element("activity-standby-mining").exists)
+    }
+
     func testEnglishSemanticsAreLocalizedForEveryTerminalState() {
         assertLabel("Mining", state: "mining", surface: "lock", language: "en")
         assertLabel("Focus promise completed", state: "completed", surface: "lock", language: "en")

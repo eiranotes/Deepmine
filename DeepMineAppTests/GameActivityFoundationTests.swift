@@ -1,3 +1,4 @@
+import AlarmKit
 import DeepMineCore
 import Foundation
 import UIKit
@@ -6,6 +7,62 @@ import XCTest
 
 @MainActor
 final class GameActivityFoundationTests: XCTestCase {
+    func testIPhoneMediumFamilyUsesLockScreenUnlessActivityIsFullscreen() {
+        XCTAssertEqual(
+            GameActivityPresentationRole.resolve(isActivityFullscreen: false),
+            .lockScreen
+        )
+        XCTAssertEqual(
+            GameActivityPresentationRole.resolve(isActivityFullscreen: true),
+            .standBy
+        )
+    }
+
+    func testAlarmCountdownProjectsSystemDatesAndAlertAsReturnReady() {
+        let snapshot = GameActivitySurfaceFixture.snapshot(named: "surface-mining")
+        let metadata = DeepMineAlarmMetadata(source: "game-session", snapshot: snapshot)
+        let startedAt = GameActivitySurfaceFixture.referenceDate
+        let endsAt = startedAt.addingTimeInterval(25 * 60)
+        let alarmID = UUID()
+        let countdown = AlarmPresentationState(
+            alarmID: alarmID,
+            mode: .countdown(.init(
+                totalCountdownDuration: 25 * 60,
+                previouslyElapsedDuration: 0,
+                startDate: startedAt,
+                fireDate: endsAt
+            ))
+        )
+
+        let active = DeepMineAlarmActivityProjection(metadata: metadata, state: countdown)
+
+        XCTAssertEqual(active.startedAt, startedAt)
+        XCTAssertEqual(active.endsAt, endsAt)
+        XCTAssertFalse(active.isStale)
+        XCTAssertEqual(active.snapshot, snapshot)
+
+        let alert = AlarmPresentationState(
+            alarmID: alarmID,
+            mode: .alert(.init(time: .init(hour: 8, minute: 30)))
+        )
+        XCTAssertTrue(
+            DeepMineAlarmActivityProjection(metadata: metadata, state: alert).isStale
+        )
+    }
+
+    func testAlarmMetadataRoundTripsBelowFourKilobytes() throws {
+        let metadata = DeepMineAlarmMetadata(
+            source: "game-session",
+            snapshot: GameActivitySurfaceFixture.snapshot(named: "surface-vein")
+        )
+
+        let encoded = try JSONEncoder().encode(metadata)
+        let decoded = try JSONDecoder().decode(DeepMineAlarmMetadata.self, from: encoded)
+
+        XCTAssertLessThan(encoded.count, Balance.activityContentMaximumBytes)
+        XCTAssertEqual(decoded, metadata)
+    }
+
     func testActivityContentStateRoundTripsBelowFourKilobytes() throws {
         let snapshot = GameActivitySurfaceFixture.snapshot(named: "surface-vein")
         let state = DeepMineActivityAttributes.ContentState(snapshot: snapshot)

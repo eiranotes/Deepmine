@@ -84,32 +84,33 @@ struct AchievementsView: View {
     }
 
     private func row(_ entry: AchievementProgress) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Image(systemName: entry.isEarned ? "checkmark.seal.fill" : "circle.dashed")
-                    .font(.caption)
-                    .foregroundStyle(
-                        entry.isEarned
-                            ? DeepMinePalette.brass.color
-                            : DeepMinePalette.limestone.color.opacity(0.5)
+        HStack(alignment: .top, spacing: 10) {
+            Image("AchievementBadge_\(entry.definition.id)")
+                .resizable()
+                .interpolation(.none)
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+                .opacity(entry.isEarned ? 1 : 0.4)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(DeepMineAchievementLabels.title(for: entry.definition))
+                        .font(.subheadline.weight(entry.isEarned ? .bold : .regular))
+                    Spacer(minLength: 8)
+                    Text(DeepMineAchievementLabels.rewardText(entry.definition.reward))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.66))
+                }
+                if !entry.isEarned {
+                    DeepMineProgressRail(
+                        value: Double(entry.current),
+                        total: Double(entry.definition.threshold),
+                        accessibilityLabel: DeepMineAchievementLabels.title(for: entry.definition)
                     )
-                    .frame(width: 18)
-                Text(DeepMineAchievementLabels.title(for: entry.definition))
-                    .font(.subheadline.weight(entry.isEarned ? .bold : .regular))
-                Spacer(minLength: 8)
-                Text(DeepMineAchievementLabels.rewardText(entry.definition.reward))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.66))
-            }
-            if !entry.isEarned {
-                DeepMineProgressRail(
-                    value: Double(entry.current),
-                    total: Double(entry.definition.threshold),
-                    accessibilityLabel: DeepMineAchievementLabels.title(for: entry.definition)
-                )
-                Text(DeepMineAchievementLabels.progressText(entry))
-                    .font(.caption2.monospacedDigit())
-                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.6))
+                    Text(DeepMineAchievementLabels.progressText(entry))
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.6))
+                }
             }
         }
         .padding(.vertical, 2)

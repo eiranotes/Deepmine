@@ -31,6 +31,7 @@ final class GameFlowUITests: XCTestCase {
         XCTAssertTrue(alert.waitForExistence(timeout: 3))
         alert.buttons["중도 귀환 확인"].tap()
         XCTAssertTrue(element("return-report").waitForExistence(timeout: 6))
+        XCTAssertTrue(element("return-ore-haul").waitForExistence(timeout: 6))
         XCTAssertTrue(element("return-beat-next").waitForExistence(timeout: 6))
 
         open("return-prepare-next")

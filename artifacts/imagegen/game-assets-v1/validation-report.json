@@ -1,0 +1,602 @@
+[
+  {
+    "id": "Vein_blue",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0312,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Vein_crystal",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0068,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Vein_vault",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.082,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Vein_resonance",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.001,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Vein_abyss",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0273,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier1",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0273,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier2",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0205,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier3",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0566,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier1",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0371,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier2",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0439,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier3",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0537,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier1",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0088,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier2",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0713,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier3",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0342,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Decoration_marker",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "brass_ratio": 0.0827,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Decoration_rail",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "brass_ratio": 0.0184,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Decoration_lamp",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "brass_ratio": 0.0828,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Decoration_cart",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "brass_ratio": 0.085,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "MinerPlan_deep",
+    "logical_size": [
+      24,
+      24
+    ],
+    "transparent": true,
+    "brass_ratio": 0.068,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "MinerPlan_survey",
+    "logical_size": [
+      24,
+      24
+    ],
+    "transparent": true,
+    "brass_ratio": 0.07,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Resource_ore",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0449,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Resource_crystal",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0273,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Resource_coreShard",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0332,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_excavationMemory",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0654,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_resonanceDetection",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0254,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_compressedTime",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "brass_ratio": 0.085,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Onboarding_blocks",
+    "logical_size": [
+      96,
+      96
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0282,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "Onboarding_sessions",
+    "logical_size": [
+      96,
+      96
+    ],
+    "transparent": false,
+    "brass_ratio": 0.014,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "ThemeScene_entry",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0621,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "DIBanner_entry",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "brass_ratio": 0.024,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "StandBy_entry",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "brass_ratio": 0.07,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "ThemeScene_crystal",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0418,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "DIBanner_crystal",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0343,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "StandBy_crystal",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0346,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "ThemeScene_ruins",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "brass_ratio": 0.085,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "DIBanner_ruins",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0634,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "StandBy_ruins",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0155,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "ThemeScene_abyss",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0118,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "DIBanner_abyss",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0072,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "StandBy_abyss",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "brass_ratio": 0.0106,
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  }
+]

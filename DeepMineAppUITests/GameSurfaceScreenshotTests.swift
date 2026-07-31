@@ -19,6 +19,8 @@ final class GameSurfaceScreenshotTests: XCTestCase {
         launch("preflight-survey")
         let start = app.buttons["mine-home-start"]
         XCTAssertTrue(start.waitForExistence(timeout: 15))
+        for _ in 0..<5 where !start.isHittable { app.swipeUp() }
+        XCTAssertTrue(start.isHittable, "mine-home-start")
         start.tap()
         captureScreen(after: "preflight-selection", named: "03-preflight")
 

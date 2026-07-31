@@ -1,4 +1,46 @@
+import DeepMineCore
 import SwiftUI
+
+enum DeepMineArt {
+    static func equipment(_ kind: EquipmentKind, level: Int) -> String {
+        let tier = equipmentTier(level: level)
+        return "Equipment_\(kind.rawValue)_tier\(tier)"
+    }
+
+    static func equipmentTier(level: Int) -> Int {
+        switch min(Balance.maximumEquipmentLevel, max(Balance.minimumEquipmentLevel, level)) {
+        case ...20: 1
+        case ...40: 2
+        default: 3
+        }
+    }
+
+    static func vein(_ kind: VeinKind) -> String { "Vein_\(kind.rawValue)" }
+    static func theme(_ theme: MineTheme) -> String { "ThemeScene_\(theme.rawValue)" }
+    static func decoration(_ decoration: MineDecoration) -> String {
+        "Decoration_\(decoration.rawValue)"
+    }
+    static func permanentUpgrade(_ kind: PermanentUpgradeKind) -> String {
+        "PermanentUpgrade_\(kind.rawValue)"
+    }
+    static let ore = "Resource_ore"
+    static let crystal = "Resource_crystal"
+    static let coreShard = "Resource_coreShard"
+}
+
+struct DeepMinePixelImage: View {
+    let name: String
+    var size: CGFloat
+
+    var body: some View {
+        Image(name)
+            .resizable()
+            .interpolation(.none)
+            .antialiased(false)
+            .scaledToFit()
+            .frame(width: size, height: size)
+    }
+}
 
 struct DeepMineProgressRail: View {
     let value: Double
@@ -49,6 +91,7 @@ struct DeepMineProgressRail: View {
 struct DeepMineEquipmentDisplay: Equatable, Sendable {
     let titleKey: DeepMineStringKey
     let symbol: String
+    var assetName: String? = nil
     let level: Int
     let detail: String
     let status: DeepMineStatus
@@ -69,14 +112,21 @@ struct DeepMineEquipmentRow: View {
 
     private var label: some View {
         HStack(spacing: 11) {
-            Image(systemName: equipment.symbol)
-                .font(.body.weight(.bold))
-                .foregroundStyle(equipment.status.pigment.color)
-                .frame(width: 44, height: 44)
-                .background(
-                    DeepMinePalette.coal.color,
-                    in: RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
-                )
+            Group {
+                if let assetName = equipment.assetName {
+                    DeepMinePixelImage(name: assetName, size: 36)
+                        .accessibilityHidden(true)
+                } else {
+                    Image(systemName: equipment.symbol)
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(equipment.status.pigment.color)
+                }
+            }
+            .frame(width: 44, height: 44)
+            .background(
+                DeepMinePalette.coal.color,
+                in: RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
+            )
             VStack(alignment: .leading, spacing: 2) {
                 Text(DeepMineStrings.text(equipment.titleKey))
                     .font(.subheadline.weight(.semibold))

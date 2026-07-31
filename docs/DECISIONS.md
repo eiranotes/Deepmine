@@ -270,3 +270,45 @@
   표시하면 지키지 못하는 약속이 된다. 수정은 실제로 1개 지급된다.
 - 이유: 90초는 제품을 아직 보지 못한 사람에게 요구하기에 긴 시간이고, 광맥을 확률에
   맡기면 대부분의 신규 플레이어가 코어 루프의 핵심 기대감을 첫 실행에서 보지 못한다.
+
+## D-033 — 활성 카운트다운 Live Activity는 AlarmKit이 단독 소유한다
+
+- 상태: 승인됨 (2026-07-31, 잠금화면·Dynamic Island 결함 수정)
+- 증거: 앱은 AlarmKit timer와 별도 `DeepMineActivityAttributes` Activity를 동시에 시작했지만,
+  Widget bundle에는 `AlarmAttributes<DeepMineAlarmMetadata>`용 `ActivityConfiguration`이
+  없었다. 시스템 countdown이 Dynamic Island에 표시될 계약이 빠진 상태였다.
+- 결정: 활성 채굴은 AlarmKit timer 하나가 Lock Screen과 Dynamic Island를 소유한다.
+  `AlarmAttributes<DeepMineAlarmMetadata>` 구성을 Widget bundle에 등록하고 게임 snapshot을
+  metadata로 전달한다. 별도 커스텀 Activity는 AlarmKit 예약 실패 시 countdown 폴백과,
+  앱 귀환 후 완료 표면에만 사용한다.
+- 레이아웃 경계: `ActivityFamily.medium`은 iPhone 잠금화면과 StandBy가 공유하므로 레이아웃
+  선택에 쓰지 않는다. `isActivityFullscreen`일 때만 StandBy, 그 외에는 160pt 잠금화면이다.
+- 이유: 두 Activity를 동시에 시작하면 시스템 표면이 경합하거나 중복될 수 있다. AlarmKit의
+  종료 신뢰성과 게임 전용 시각 표현을 유지하려면 소유권과 폴백을 분리해야 한다.
+- 검증 경계: Widget 컴파일, 상태 투영, 메타데이터 왕복과 시뮬레이터 레이아웃은 자동화한다.
+  실제 AlarmKit 표시·Dynamic Island·SpringBoard 수명주기는 실기기 릴리스 게이트다.
+
+## D-034 — 광석 보상은 귀환 순간에 물리적으로 적재한다
+
+- 상태: 승인됨 (2026-07-31, 광석 직접 재미 개선)
+- 결정: 귀환 보고서의 큰 광석 숫자 아래에 획득량을 3–9개 덩어리로 추상화한 광차 적재
+  연출을 둔다. 완료 햅틱은 작은 낙하 세 번과 무거운 광차 충돌 한 번의 리듬으로 맞춘다.
+- 경계: 세션 중 광석 드롭, 탭 수집, 중간 보상 알림은 추가하지 않는다. 광맥 판정과 보상
+  공개는 Spec §6.1대로 세션 종료 후 한 번만 수행한다. Reduce Motion은 이동 없이 최종 적재
+  상태를 즉시 보여 준다.
+- 이유: 숫자 카운트업만으로는 광석이 자산으로 들어왔다는 물리적 감각이 약했다. 광차는
+  기존 장비 성장과 직접 연결되는 은유라 새 화폐나 상태를 만들지 않고 보상의 손맛을 높인다.
+
+## D-035 — 게임 아트는 네 안료 PNG 매니페스트로 생성·검증한다
+
+- 상태: 승인됨 (2026-07-31, 사용자 전체 생성·반영 지시)
+- 결정: 도전과제 외 남은 게임 아트 40종을 각각 고유 ImageGen 원본으로 만들고, D-013의
+  석탄·셰일·석회암·브라스 네 안료로 양자화한다. Asset Catalog에는 1x/2x/3x PNG만 둔다.
+- 통합: 선택 테마와 기존 `planID`/`regionID`/`veinID`를 presentation seam으로 사용한다.
+  저장 스키마와 Activity payload 버전은 바꾸지 않으며 알 수 없는 raw ID는 안전한 기본
+  이미지로 폴백한다.
+- 시스템 표면: 채굴 중 배너는 희귀 광맥이나 완료 보상을 미리 공개하지 않는다. Dynamic
+  Island 상단 중앙과 StandBy 좌측 1/3을 UI 안전영역으로 유지한다.
+- 검증: 원본 SHA 고유성, PNG, 크기, 네 안료, 브라스 10% 미만, 알파 정책과
+  `Contents.json`을 기계 검사한다. 실제 Dynamic Island와 StandBy Night Mode는 실기기
+  확인 전까지 미검증으로 남긴다.

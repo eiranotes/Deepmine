@@ -68,6 +68,21 @@ final class GameSurfaceSnapshotTests: XCTestCase {
         }
     }
 
+    func testGameArtRawIdentifiersUseSafeFallbacks() {
+        XCTAssertEqual(GameArtName.miner(planID: "safe"), "MinerSprite")
+        XCTAssertEqual(GameArtName.miner(planID: "deep"), "MinerPlan_deep")
+        XCTAssertEqual(GameArtName.miner(planID: "survey"), "MinerPlan_survey")
+        XCTAssertEqual(GameArtName.miner(planID: "unknown-sentinel"), "MinerSprite")
+
+        XCTAssertEqual(GameArtName.region("crystal", prefix: "DIBanner"), "DIBanner_crystal")
+        XCTAssertEqual(GameArtName.region("ruins", prefix: "StandBy"), "StandBy_ruins")
+        XCTAssertEqual(GameArtName.region("unknown-sentinel", prefix: "StandBy"), "StandBy_entry")
+
+        XCTAssertEqual(GameArtName.vein("abyss"), "Vein_abyss")
+        XCTAssertEqual(GameArtName.vein("unknown-sentinel"), "VeinSprite")
+        XCTAssertEqual(GameArtName.vein(nil), "VeinSprite")
+    }
+
     private static func makeSnapshot(
         sessionID: String? = "session-1",
         generatedAt: TimeInterval = 1_000,

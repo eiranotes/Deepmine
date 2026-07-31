@@ -1,6 +1,6 @@
 # Tasks
 
-업데이트: 2026-07-30
+업데이트: 2026-07-31
 
 ## Gameplay-complete MVP — implemented
 
@@ -53,13 +53,33 @@
 - [x] 연습 채굴 10초와 수정 광맥 확정 발견 (D-032)
 - [x] 결과별 스프라이트(완료·광맥·붕괴)와 홈 갱도 장식 4종 렌더
 - [x] `docs/ACHIEVEMENT_ART_PROMPTS.md` 배지 35종 프롬프트
+- [x] 도전과제 배지 35종 생성·4색 양자화·48/96/144 PNG Asset Catalog 편입과
+      도전과제 목록 48pt 렌더
+
+## System surface and reward payoff — implemented
+
+- [x] iPhone 잠금화면의 medium Activity를 StandBy로 오인하던 레이아웃 분기 수정
+- [x] AlarmKit countdown용 Live Activity Widget 구성과 Dynamic Island compact/expanded/minimal 배선
+- [x] 활성 countdown은 AlarmKit 하나가 소유하고 커스텀 Activity는 실패/완료 경로로 제한
+- [x] 귀환 보고서에 획득량 비례 광석 광차 적재 연출과 Reduce Motion 분기
+- [x] 완료 햅틱을 광석 낙하→광차 충돌 리듬으로 변경
+
+## Complete game art — implemented
+
+- [x] 광맥 5종, 장비 9종(1–20/21–40/41–60), 테마 장면 4종
+- [x] 투명 장식 4종, 심층/탐사 광부 2종, Dynamic Island 배너 4종
+- [x] StandBy 배경 4종, 자원 3종, 영구 강화 3종, 온보딩 2종
+- [x] 40 고유 ImageGen 원본과 프롬프트 provenance 매니페스트
+- [x] PNG 120개 네 안료·브라스 비율·크기·알파·Contents.json 기계 검증
+- [x] 홈/활성/장비/테마/도감/귀환/프레스티지/온보딩/Activity 실제 렌더 연결
+- [x] 알 수 없는 plan/region/vein ID fallback과 장비 티어 경계 회귀
+- [x] fresh 19-screen 캡처와 compact/scene/safe-zone contact sheet
 
 ## Play experience — deferred
 
 - [ ] 커스텀 8-bit SFX 저작. 현재는 이벤트별 시스템 사운드 ID이며 교체 지점은
       `GameFeedbackEvent.systemSoundID`
-- [ ] 도전과제 배지 이미지 생성·양자화·Asset Catalog 편입
-- [ ] `artifacts/ui/game-mvp-v1/` 화면 재캡처
+- [x] 새 게임 아트 기준 19화면을 `artifacts/imagegen/game-assets-v1/ui-captures/`에 재캡처
 
 ## Closeout — in progress
 
@@ -75,7 +95,7 @@
 
 - [ ] 승인된 App Group/FamilyControls entitlement로 서명·설치
 - [ ] FamilyControls 선택과 ManagedSettings 차단/정상·포기·비정상 종료 해제
-- [ ] AlarmKit과 Live Activity 동시 운용, 실제 Dynamic Island
+- [ ] AlarmKit countdown Activity와 커스텀 실패/완료 Activity 전환, 실제 Dynamic Island
 - [ ] SpringBoard 잠금화면 crop/수명주기와 충전 가로 StandBy/Night Mode
 - [ ] 실제 Control Center 등록과 extension→app App Group 명령 왕복
 - [ ] 앱 종료·재부팅·시간대/자정 경계 복원

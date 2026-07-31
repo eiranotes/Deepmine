@@ -1,0 +1,27 @@
+{
+  "images": [
+    {
+      "filename": "achievement-badge-vein.all5.png",
+      "idiom": "universal",
+      "scale": "1x"
+    },
+    {
+      "filename": "achievement-badge-vein.all5@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "filename": "achievement-badge-vein.all5@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "compression-type": "lossless",
+    "template-rendering-intent": "original"
+  }
+}

@@ -124,7 +124,12 @@ struct GameHomeWidgetContent: View {
 
     private var statusRow: some View {
         HStack(spacing: 9) {
-            GameSurfaceMark(phase: phase, size: family == .small ? 28 : 36)
+            GameSurfaceMark(
+                phase: phase,
+                size: family == .small ? 28 : 36,
+                planID: snapshot?.planID ?? "safe",
+                veinID: snapshot?.veinID
+            )
             VStack(alignment: .leading, spacing: 2) {
                 Text(statusTitle)
                     .font(.subheadline.weight(.black))

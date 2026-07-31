@@ -35,6 +35,8 @@ enum LiveActivityLifecycle {
 
     static func completeSession(
         id: UUID,
+        startedAt: Date,
+        endsAt: Date,
         snapshot: GameSurfaceSnapshot,
         now: Date = Date()
     ) async throws {
@@ -42,8 +44,23 @@ enum LiveActivityLifecycle {
         defer { lock.release() }
         let dismissalDate = completionDismissalDate(snapshot: snapshot, now: now)
         let content = try activityContent(snapshot: snapshot, staleDate: dismissalDate)
-        for activity in Activity<DeepMineActivityAttributes>.activities
-        where activity.attributes.sessionID == id {
+        let matching = Activity<DeepMineActivityAttributes>.activities.filter {
+            $0.attributes.sessionID == id
+        }
+        if matching.isEmpty {
+            let activity = try Activity<DeepMineActivityAttributes>.request(
+                attributes: DeepMineActivityAttributes(
+                    sessionID: id,
+                    startedAt: startedAt,
+                    endsAt: endsAt
+                ),
+                content: content,
+                pushType: nil
+            )
+            await activity.end(content, dismissalPolicy: .after(dismissalDate))
+            return
+        }
+        for activity in matching {
             await activity.update(content)
             await activity.end(content, dismissalPolicy: .after(dismissalDate))
         }

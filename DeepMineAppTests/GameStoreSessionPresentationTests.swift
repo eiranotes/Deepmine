@@ -9,6 +9,13 @@ final class GameStoreSessionPresentationTests: XCTestCase {
         XCTAssertEqual(ReturnReportTimeline.nextRevealMilliseconds, 1_900)
     }
 
+    func testOreHaulTurnsMagnitudeIntoABoundedVisibleLoad() {
+        XCTAssertEqual(OreHaulPresentation.chunkCount(for: 0), 0)
+        XCTAssertEqual(OreHaulPresentation.chunkCount(for: 100), 4)
+        XCTAssertEqual(OreHaulPresentation.chunkCount(for: 10_000), 6)
+        XCTAssertEqual(OreHaulPresentation.chunkCount(for: .greatestFiniteMagnitude), 9)
+    }
+
     func testReturnPresentationFailureProducesRecoverableState() {
         let repository = FakeSessionRepository()
         repository.failPlayerLoad = true

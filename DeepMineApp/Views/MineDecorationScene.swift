@@ -3,15 +3,13 @@ import SwiftUI
 
 /// The decorations a player has unlocked, drawn into the shaft.
 ///
-/// `MineDecoration` already existed in player state and was awarded by vault veins and
-/// achievements, but nothing rendered it — the reward was invisible. Symbols are used
-/// rather than new art so this stays within the four pigments.
+/// `MineDecoration` is awarded by vault veins and achievements. Each unlocked reward
+/// is rendered from the shared four-pigment sprite catalog.
 struct MineDecorationScene: View {
     let decorations: Set<MineDecoration>
 
     private struct Placement {
         let decoration: MineDecoration
-        let symbol: String
         let size: CGFloat
         let x: CGFloat
         let y: CGFloat
@@ -20,19 +18,22 @@ struct MineDecorationScene: View {
 
     // Pinned to the right side of the hero so the crew on the left stays legible.
     private static let placements: [Placement] = [
-        Placement(decoration: .rail, symbol: "equal", size: 22, x: -6, y: 0, opacity: 0.5),
-        Placement(decoration: .marker, symbol: "signpost.right.fill", size: 18, x: -34, y: -14, opacity: 0.7),
-        Placement(decoration: .lamp, symbol: "lightbulb.max.fill", size: 16, x: -58, y: -34, opacity: 0.8),
-        Placement(decoration: .cart, symbol: "tram.fill", size: 20, x: -80, y: -6, opacity: 0.62)
+        Placement(decoration: .rail, size: 34, x: -4, y: 0, opacity: 0.72),
+        Placement(decoration: .marker, size: 28, x: -38, y: -16, opacity: 0.84),
+        Placement(decoration: .lamp, size: 26, x: -64, y: -38, opacity: 0.92),
+        Placement(decoration: .cart, size: 32, x: -92, y: -4, opacity: 0.78)
     ]
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             ForEach(visible, id: \.decoration) { placement in
-                Image(systemName: placement.symbol)
-                    .font(.system(size: placement.size, weight: .semibold))
-                    .foregroundStyle(DeepMinePalette.brass.color.opacity(placement.opacity))
+                DeepMinePixelImage(
+                    name: DeepMineArt.decoration(placement.decoration),
+                    size: placement.size
+                )
+                    .opacity(placement.opacity)
                     .offset(x: placement.x, y: placement.y)
+                    .accessibilityHidden(true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .bottomTrailing)

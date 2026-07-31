@@ -16,12 +16,14 @@ enum SessionAlarmDelivery: String, Codable, Equatable, Sendable {
     case localNotification
     case none
 }
+
 struct SessionSystemStartResult: Equatable, Sendable {
     let shield: SessionShieldOutcome
     let alarmDelivery: SessionAlarmDelivery
     let liveActivityID: String?
     let warnings: [String]
 }
+
 @MainActor
 protocol SessionSystemCoordinating: AnyObject {
     func start(
@@ -40,7 +42,6 @@ protocol SessionSystemCoordinating: AnyObject {
     func shieldIntegrity(for session: PersistedGameSession) -> SessionShieldIntegrity
     func forceRemoveShield(for session: PersistedGameSession) async -> Bool
 }
-
 struct AnyGameClock: DeepMineCore.ClockSource {
     private let wall: @Sendable () -> Date
     private let continuous: @Sendable () -> UInt64
@@ -49,7 +50,6 @@ struct AnyGameClock: DeepMineCore.ClockSource {
         wall = source.wallNow
         continuous = source.continuousNanoseconds
     }
-
     func wallNow() -> Date { wall() }
     func continuousNanoseconds() -> UInt64 { continuous() }
 }
@@ -64,7 +64,6 @@ struct SystemGameClock: DeepMineCore.ClockSource {
         clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)
     }
 }
-
 @MainActor
 final class SessionSystemCoordinator: SessionSystemCoordinating {
     private let screenTime: ScreenTimeProbe
@@ -80,7 +79,6 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
         self.notificationCenter = notificationCenter
         self.snapshotWriter = snapshotWriter
     }
-
     func start(
         _ session: PersistedGameSession,
         player: PlayerState,
@@ -102,11 +100,10 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
             shield = .open(reason: reason)
             warnings.append(reason)
         }
-
-        let activityID: String?
+        let snapshot: GameSurfaceSnapshot?
         do {
             let grade: VerificationGrade = shield == .sealed ? .sealed : .open
-            let snapshot = try GameSurfaceSnapshotMapper.active(
+            let mapped = try GameSurfaceSnapshotMapper.active(
                 session: session,
                 player: player,
                 grade: grade,
@@ -120,33 +117,44 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
                         ProbeConstants.appGroupIdentifier
                     )
                 }
-                try snapshotWriter.write(snapshot)
+                try snapshotWriter.write(mapped)
             } catch {
                 warnings.append("공유 진행 정보를 저장하지 못했습니다. 앱을 열어 새로고침해 주세요.")
                 ProbeDiagnostics.record(error: error, source: "GameSurfaceSnapshotStart")
             }
-            activityID = try await LiveActivityLifecycle.startSession(
-                id: session.id,
-                startedAt: session.startedAt,
-                endsAt: session.endsAt,
-                snapshot: snapshot
-            )
+            snapshot = mapped
         } catch {
-            activityID = nil
-            warnings.append("실시간 진행 표시를 시작하지 못했지만 채굴은 계속됩니다.")
-            ProbeDiagnostics.record(error: error, source: "GameLiveActivityStart")
+            snapshot = nil
+            warnings.append("공유 진행 정보를 구성하지 못했지만 채굴은 계속됩니다.")
+            ProbeDiagnostics.record(error: error, source: "GameSurfaceSnapshotMap")
         }
-
+        var activityID: String?
         let alarmDelivery: SessionAlarmDelivery
         do {
             try? AlarmProbe.cancelSessionAlarm(id: session.id)
             _ = try await AlarmProbe.scheduleSessionAlarm(
                 id: session.id,
-                duration: max(1, session.endsAt.timeIntervalSinceNow)
+                duration: max(1, session.endsAt.timeIntervalSinceNow),
+                snapshot: snapshot
             )
             alarmDelivery = .alarmKit
         } catch {
             ProbeDiagnostics.record(error: error, source: "GameAlarmKitSchedule")
+            if let snapshot {
+                do {
+                    activityID = try await LiveActivityLifecycle.startSession(
+                        id: session.id,
+                        startedAt: session.startedAt,
+                        endsAt: session.endsAt,
+                        snapshot: snapshot
+                    )
+                } catch {
+                    warnings.append(
+                        "실시간 진행 표시를 시작하지 못했습니다. 설정에서 Live Activities를 확인해 주세요."
+                    )
+                    ProbeDiagnostics.record(error: error, source: "GameLiveActivityStart")
+                }
+            }
             do {
                 try await scheduleLocalFallback(for: session)
                 alarmDelivery = .localNotification
@@ -164,12 +172,19 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
             warnings: Array(warnings.prefix(8))
         )
     }
-
     func finish(
         _ session: PersistedGameSession,
         completedSnapshot: GameSurfaceSnapshot?
     ) async -> [String] {
         var warnings: [String] = []
+        if session.alarmDelivery == .alarmKit {
+            do {
+                try AlarmProbe.cancelSessionAlarm(id: session.id)
+            } catch {
+                warnings.append("예약된 시스템 알람 해제를 확인하지 못했습니다.")
+                ProbeDiagnostics.record(error: error, source: "GameAlarmFinish")
+            }
+        }
         if let completedSnapshot {
             do {
                 guard let snapshotWriter else {
@@ -185,6 +200,8 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
             do {
                 try await LiveActivityLifecycle.completeSession(
                     id: session.id,
+                    startedAt: session.startedAt,
+                    endsAt: session.endsAt,
                     snapshot: completedSnapshot
                 )
             } catch {
@@ -199,14 +216,6 @@ final class SessionSystemCoordinator: SessionSystemCoordinating {
         } catch {
             warnings.append("차단 해제를 확인하지 못했습니다. 다음 실행에서 다시 복구합니다.")
             ProbeDiagnostics.record(error: error, source: "GameShieldFinish")
-        }
-        if session.alarmDelivery == .alarmKit {
-            do {
-                try AlarmProbe.cancelSessionAlarm(id: session.id)
-            } catch {
-                warnings.append("예약된 시스템 알람 해제를 확인하지 못했습니다.")
-                ProbeDiagnostics.record(error: error, source: "GameAlarmFinish")
-            }
         }
         notificationCenter.removePendingNotificationRequests(
             withIdentifiers: [notificationIdentifier(for: session)]

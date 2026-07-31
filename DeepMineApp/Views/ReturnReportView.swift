@@ -82,32 +82,44 @@ struct ReturnReportView: View {
                     .accessibilityIdentifier("return-beat-reward")
                 // The one moment the screen is allowed to celebrate: the haul is the
                 // largest thing on it, in brass.
-                DeepMineCountingNumber(
-                    value: countedOre,
-                    prefix: "+",
-                    font: .system(size: 46, weight: .heavy, design: .rounded)
-                )
-                .foregroundStyle(DeepMinePalette.brass.color)
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
+                HStack(spacing: 10) {
+                    DeepMinePixelImage(name: DeepMineArt.ore, size: 42)
+                        .accessibilityHidden(true)
+                    DeepMineCountingNumber(
+                        value: countedOre,
+                        prefix: "+",
+                        font: .system(size: 46, weight: .heavy, design: .rounded)
+                    )
+                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                    .countingUp(
+                        to: presentation.report.oreEarned,
+                        reduceMotion: reduceMotion,
+                        into: $countedOre
+                    )
+                }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .countingUp(
-                    to: presentation.report.oreEarned,
-                    reduceMotion: reduceMotion,
-                    into: $countedOre
-                )
+                .accessibilityElement(children: .ignore)
                 .accessibilityLabel(
                     "\(DeepMineStrings.text(.gameOre)) +\(DeepMineNumberFormatter.string(presentation.report.oreEarned))"
                 )
                 .accessibilityIdentifier("return-ore")
+                DeepMineOreHaulView(
+                    ore: presentation.report.oreEarned,
+                    reduceMotion: reduceMotion,
+                    rewardID: presentation.report.completionID
+                )
                 progressLines
                 Divider().overlay(DeepMinePalette.limestone.color.opacity(0.22))
                 if let vein = presentation.report.vein {
-                    Label(
-                        DeepMineStrings.text(veinTitleKey(vein)),
-                        systemImage: veinSymbol(vein)
-                    )
-                    .font(.headline)
+                    HStack(spacing: 8) {
+                        DeepMinePixelImage(name: DeepMineArt.vein(vein), size: 30)
+                            .accessibilityHidden(true)
+                        Text(DeepMineStrings.text(veinTitleKey(vein)))
+                            .font(.headline)
+                    }
+                    .accessibilityElement(children: .combine)
                     .accessibilityIdentifier("return-vein-\(vein.rawValue)")
                     Text(veinEffectText(vein))
                         .font(.subheadline)

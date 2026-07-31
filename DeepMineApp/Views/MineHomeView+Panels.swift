@@ -27,7 +27,7 @@ extension MineHomeView {
 
     var mineScene: some View {
         ZStack(alignment: .bottomLeading) {
-            Image("MineEntryHero")
+            Image(DeepMineArt.theme(player.selectedTheme))
                 .resizable()
                 .interpolation(.none)
                 .scaledToFill()
@@ -58,8 +58,16 @@ extension MineHomeView {
                     Text("\(player.depthMeters)m")
                         .font(.title2.monospacedDigit().weight(.heavy))
                         .foregroundStyle(DeepMinePalette.brass.color)
-                    Text(depthResources)
-                        .font(.caption.weight(.semibold))
+                    HStack(spacing: 10) {
+                        resourceAmount(
+                            name: DeepMineArt.crystal,
+                            value: player.resources.crystals
+                        )
+                        resourceAmount(
+                            name: DeepMineArt.coreShard,
+                            value: player.resources.coreShards
+                        )
+                    }
                 }
                 Spacer(minLength: 0)
             }
@@ -182,9 +190,9 @@ extension MineHomeView {
     var equipmentSummary: some View {
         VStack(spacing: 10) {
             HStack(spacing: 8) {
-                equipment(.gameDrill, symbol: "wrench.and.screwdriver.fill", level: player.equipment.drill)
-                equipment(.gameCart, symbol: "tram.fill", level: player.equipment.cart)
-                equipment(.gameLamp, symbol: "lightbulb.max.fill", level: player.equipment.lamp)
+                equipment(.gameDrill, kind: .drill, level: player.equipment.drill)
+                equipment(.gameCart, kind: .cart, level: player.equipment.cart)
+                equipment(.gameLamp, kind: .lamp, level: player.equipment.lamp)
             }
             .accessibilityElement(children: .contain)
             .accessibilityLabel(DeepMineStrings.text(.homeEquipmentSummary))
@@ -286,9 +294,10 @@ extension MineHomeView {
         .accessibilityIdentifier(identifier)
     }
 
-    func equipment(_ key: DeepMineStringKey, symbol: String, level: Int) -> some View {
+    func equipment(_ key: DeepMineStringKey, kind: EquipmentKind, level: Int) -> some View {
         VStack(spacing: 4) {
-            Image(systemName: symbol).foregroundStyle(DeepMinePalette.brass.color)
+            DeepMinePixelImage(name: DeepMineArt.equipment(kind, level: level), size: 30)
+                .accessibilityHidden(true)
             Text(DeepMineStrings.text(key)).font(.caption2.weight(.bold)).lineLimit(1)
             Text("Lv. \(level)").font(.caption.monospacedDigit())
         }
@@ -296,5 +305,14 @@ extension MineHomeView {
         .background(DeepMinePalette.shale.color, in: RoundedRectangle(cornerRadius: 6))
         .overlay { RoundedRectangle(cornerRadius: 6).stroke(DeepMinePalette.limestone.color.opacity(0.24)) }
         .accessibilityElement(children: .combine)
+    }
+
+    func resourceAmount(name: String, value: Int) -> some View {
+        HStack(spacing: 4) {
+            DeepMinePixelImage(name: name, size: 16)
+                .accessibilityHidden(true)
+            Text("\(value)")
+                .font(.caption.monospacedDigit().weight(.semibold))
+        }
     }
 }

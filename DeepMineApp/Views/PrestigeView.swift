@@ -149,8 +149,12 @@ struct PrestigeView: View {
         VStack(spacing: 17) {
             DeepMineRivetedPanel {
                 VStack(alignment: .leading, spacing: 8) {
-                    Label(DeepMineStrings.text(.prestigeAllocationTitle), systemImage: "hexagon.fill")
-                        .font(.headline)
+                    HStack(spacing: 8) {
+                        DeepMinePixelImage(name: DeepMineArt.coreShard, size: 28)
+                            .accessibilityHidden(true)
+                        Text(DeepMineStrings.text(.prestigeAllocationTitle))
+                            .font(.headline)
+                    }
                     Text(DeepMineStrings.text(.prestigeAllocationBody)).font(.subheadline)
                     Text("\(DeepMineStrings.text(.gameCoreShards)) · \(player.resources.coreShards)")
                         .font(.title3.monospacedDigit().weight(.heavy))
@@ -178,6 +182,11 @@ struct PrestigeView: View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
+                    DeepMinePixelImage(
+                        name: DeepMineArt.permanentUpgrade(option.upgrade),
+                        size: 36
+                    )
+                    .accessibilityHidden(true)
                     Text(DeepMineStrings.text(upgradeTitle(option.upgrade))).font(.headline)
                     Spacer()
                     Text("Lv. \(option.currentLevel)").font(.subheadline.monospacedDigit().weight(.bold))

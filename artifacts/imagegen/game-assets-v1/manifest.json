@@ -1,0 +1,762 @@
+[
+  {
+    "id": "Vein_blue",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a compact cluster of three angular ore crystals representing the Blue Vein. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Vein_blue.png",
+    "raw_sha256": "8485b41b40abe729b9633803c2ca947e5ff1f072798d038a78c99ce0d4a6111f",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Vein_blue.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Vein_blue.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Vein_crystal",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a single faceted crystal gemstone with two small shards. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Vein_crystal.png",
+    "raw_sha256": "0c74e80b9991af4abae64a41a0c529de3962d7b4f28e444f9c7383b3e1a7f325",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Vein_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Vein_crystal.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Vein_vault",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a compact ancient locked mine chest with brass corner fittings. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Vein_vault.png",
+    "raw_sha256": "51fe09922341a91f863ef586d497c5f6128b0f5c7d4cf1a579a81f35a1af8e35",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Vein_vault.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Vein_vault.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Vein_resonance",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting three concentric angular resonance rings around a tiny central stone. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Vein_resonance.png",
+    "raw_sha256": "56cb0678259e993ff263681742f9b231f0cd37d1f0216125f3ffc38929e8fa15",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Vein_resonance.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Vein_resonance.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Vein_abyss",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a jagged vertical abyss fissure in a rock slab. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Vein_abyss.png",
+    "raw_sha256": "80a1fd841daf793eec7680c8474dc186dcaf28da864de6c69ec329716fe649e5",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Vein_abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Vein_abyss.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier1",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a basic hand-powered mine drill with one short bit and a simple handle. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_drill_tier1.png",
+    "raw_sha256": "d8b2a2368165adeb7e14d1b60dbc6c9e5d1714c35f6a4168d532bea88f33fa78",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_drill_tier1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_drill_tier1.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier2",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an upgraded mechanical mine drill with a longer bit and one visible gear. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_drill_tier2.png",
+    "raw_sha256": "1cd873cfbaaa49a348d8a583a79cc024e3529d288db6729c07b2729fb0c6d8b3",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_drill_tier2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_drill_tier2.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_drill_tier3",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an advanced heavy mine drill with a reinforced triple-section bit and two compact gears. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_drill_tier3.png",
+    "raw_sha256": "f736f480398f587f16114d9aa7bfa3791b4d237313dd2a676cd18c866e6f2f1d",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_drill_tier3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_drill_tier3.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier1",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a basic small mine cart with one bin and two simple wheels. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_cart_tier1.png",
+    "raw_sha256": "53251ad2b8fcbb6e3568e67f3d1f11ccdea3074f3112922bf5325f9ebe1db4cd",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_cart_tier1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_cart_tier1.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier2",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an upgraded reinforced mine cart with a larger bin, metal rim, and four visible wheels. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_cart_tier2.png",
+    "raw_sha256": "c27c4871f9660bbd1bf3cb4a03c93c9d07b2dc46377d53f1656e53a674fd333d",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_cart_tier2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_cart_tier2.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_cart_tier3",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an advanced armored mine cart with a segmented bin, reinforced axle, and six compact wheels. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_cart_tier3.png",
+    "raw_sha256": "5f027d3ddb20eeadeb8241a989f52787ee4f25360e15dfa8d85984cd7df79b8d",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_cart_tier3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_cart_tier3.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier1",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a basic handheld mining lantern with one small lens and simple handle. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_lamp_tier1.png",
+    "raw_sha256": "85bee84768055ce3a239b0f423a5dcba02a2bef711f10fa702ab3f19e82f7dcb",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_lamp_tier1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_lamp_tier1.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier2",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an upgraded mining lantern with a larger lens cage and side reflector. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_lamp_tier2.png",
+    "raw_sha256": "ea3a96009a74e29f19fd1c2ef791830cce34b692f58c5c0d9b252977e48839df",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_lamp_tier2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_lamp_tier2.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Equipment_lamp_tier3",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an advanced heavy mining lantern with a triple-facet lens and reinforced cage. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Equipment_lamp_tier3.png",
+    "raw_sha256": "471467f82f32d5b3379ec04dbafce754f4cc7263bfe0b5372e4f157204e2129b",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Equipment_lamp_tier3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Equipment_lamp_tier3.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Decoration_marker",
+    "family": "decoration",
+    "prompt": "Create one finished DeepMine asset depicting a compact underground depth marker signpost made of stone and one brass nail. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Decoration_marker.png",
+    "raw_sha256": "b4e85993437ecd8226982b59e854603bc4750061cf17fa48458df6fcb04a2192",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Decoration_marker.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Decoration_marker.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Decoration_rail",
+    "family": "decoration",
+    "prompt": "Create one finished DeepMine asset depicting a short horizontal mine rail segment with two sleepers. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Decoration_rail.png",
+    "raw_sha256": "e7f978fb4f89c43c3c16d322844e1a400cee20ea770864d34eb878c915a5faed",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Decoration_rail.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Decoration_rail.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Decoration_lamp",
+    "family": "decoration",
+    "prompt": "Create one finished DeepMine asset depicting a small hanging mine lamp with a hard-edged metal shade. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Decoration_lamp.png",
+    "raw_sha256": "b1a793ff4005574e055d3a9451e312032d266f4e83f9fc5d2d9d91219e47c94d",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Decoration_lamp.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Decoration_lamp.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Decoration_cart",
+    "family": "decoration",
+    "prompt": "Create one finished DeepMine asset depicting a small empty parked mine cart in side view. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Decoration_cart.png",
+    "raw_sha256": "c3739c6668835d30acbb2283787399361e0e2465d67580de52724151e0181864",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Decoration_cart.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Decoration_cart.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "MinerPlan_deep",
+    "family": "miner",
+    "prompt": "Create one finished DeepMine asset depicting a compact crouched deep-plan miner with helmet lamp and short diagonal pickaxe. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/MinerPlan_deep.png",
+    "raw_sha256": "feff4ee71d375a545c4508e73902661f086acb873719667255ebf3366f66ad0e",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/MinerPlan_deep.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/MinerPlan_deep.imageset",
+    "logical_size": [
+      24,
+      24
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "MinerPlan_survey",
+    "family": "miner",
+    "prompt": "Create one finished DeepMine asset depicting an upright survey-plan miner holding a small lantern forward. Subject fully isolated on a perfectly flat solid #00FF00 chroma-key background, uniform green edge to edge, with no green in the subject. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/MinerPlan_survey.png",
+    "raw_sha256": "7db01adb733771122ef35d3d29c2e7cd0c49c9a4f2a0081846caf54d77e2156b",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/MinerPlan_survey.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/MinerPlan_survey.imageset",
+    "logical_size": [
+      24,
+      24
+    ],
+    "transparent": true,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Resource_ore",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a compact pile of three rough ore rocks. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Resource_ore.png",
+    "raw_sha256": "b924315bf2afc0fc3b76a2fb0be3361bef8d7e3ddeaf20ecab4961c690e2a320",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Resource_ore.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Resource_ore.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Resource_crystal",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a compact single cut crystal with two small facets. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Resource_crystal.png",
+    "raw_sha256": "bec85f4f961375fa13adebe2bb8dee4865c590a18d88e21cdf7a7989142807c7",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Resource_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Resource_crystal.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Resource_coreShard",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a rare angular core shard split by one bright central seam. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Resource_coreShard.png",
+    "raw_sha256": "03c37b6d906dbbd0104cfd312a101c3a63864c0257a70ebcea0963e4999544b8",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Resource_coreShard.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Resource_coreShard.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_excavationMemory",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting a miner helmet merged with a layered memory tablet. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/PermanentUpgrade_excavationMemory.png",
+    "raw_sha256": "df428c5ae2ee6699996aaa831384ab50572e7cf6ac335ebdc0d06300ffec42db",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/PermanentUpgrade_excavationMemory.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/PermanentUpgrade_excavationMemory.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_resonanceDetection",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an angular tuning fork over a small crystal. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/PermanentUpgrade_resonanceDetection.png",
+    "raw_sha256": "fce5b21d833b363229df22e54b4e10500cc74fbc71d4462015aa71e7341608eb",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/PermanentUpgrade_resonanceDetection.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/PermanentUpgrade_resonanceDetection.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "PermanentUpgrade_compressedTime",
+    "family": "icon",
+    "prompt": "Create one finished DeepMine asset depicting an hourglass pressed between two stone plates. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/PermanentUpgrade_compressedTime.png",
+    "raw_sha256": "c9505ace15099113e4dc63660bfbc6ecf5cf5011cdbe867168852c7d1936fb26",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/PermanentUpgrade_compressedTime.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/PermanentUpgrade_compressedTime.imageset",
+    "logical_size": [
+      32,
+      32
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Onboarding_blocks",
+    "family": "onboarding",
+    "prompt": "Create one finished DeepMine asset depicting a miniature mine wall made from four stacked focus blocks. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Onboarding_blocks.png",
+    "raw_sha256": "b0f3d067a7f40abb9b8119ab18be0582e4a9c393ec8dd62e960e81922ccf5925",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Onboarding_blocks.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Onboarding_blocks.imageset",
+    "logical_size": [
+      96,
+      96
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Onboarding_sessions",
+    "family": "onboarding",
+    "prompt": "Create one finished DeepMine asset depicting a tiny miner walking through three sequential tunnel chambers. Perfectly flat solid coal-black background #10100F. Square canvas, centered with generous padding. Chunky 16-bit pixel-art game asset, hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and a tiny lamp-brass highlight #C58C39 under 10% of pixels. Strong grayscale readability. PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/Onboarding_sessions.png",
+    "raw_sha256": "ac110f1fc9f614b92acd5ffeeac1e4944c345ffa1dc67367e492f3d631aa8c92",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/Onboarding_sessions.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Onboarding_sessions.imageset",
+    "logical_size": [
+      96,
+      96
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ThemeScene_entry",
+    "family": "theme",
+    "prompt": "Create one finished DeepMine entry theme background: plain layered rock, two timber supports, a distant dormant shaft, and one tiny lamp. Compose useful art as a wide 16:9 scene across the middle of a square source canvas for center cropping. Keep central and lower foreground quiet for UI. No miner, rare vein, treasure, or reward reveal. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/ThemeScene_entry.png",
+    "raw_sha256": "6288be5156c693a962f4cff1c9b844cd758ad45deb4bef1e3bddce8ab7c10a69",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/ThemeScene_entry.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ThemeScene_entry.imageset",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "DIBanner_entry",
+    "family": "di",
+    "prompt": "Create one finished DeepMine Dynamic Island banner: plain layered rock, two timber supports, a distant dormant shaft, and one tiny lamp. Compose useful art as an ultrawide 8:3 scene across the middle of a square source canvas. Keep the top-center 36% width and top 45% height coal-black and empty. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/DIBanner_entry.png",
+    "raw_sha256": "ff5a4ed9852607b9ef4dbf60d67bc7a225eaa67ff277e7b106a8ed1a8abb7cee",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/DIBanner_entry.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/DIBanner_entry.imageset",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "StandBy_entry",
+    "family": "standby",
+    "prompt": "Create one finished DeepMine StandBy background: plain layered rock, two timber supports, a distant dormant shaft, and one tiny lamp. Compose useful art as a wide 16:9 scene across the middle of a square source canvas. Keep the left third low-detail coal-black and the right quarter subdued for UI. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/StandBy_entry.png",
+    "raw_sha256": "9400de3f0cf39307a10417e09056432cdaca78abf918aa0901125dabc6cf1ec1",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/StandBy_entry.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/StandBy_entry.imageset",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ThemeScene_crystal",
+    "family": "theme",
+    "prompt": "Create one finished DeepMine crystal theme background: angular pale crystal geology embedded in dark shale, squared braces, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas for center cropping. Keep central and lower foreground quiet for UI. No miner, rare vein, treasure, or reward reveal. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/ThemeScene_crystal.png",
+    "raw_sha256": "e4ee483f7f2387aaf42aac1780e70bfdaf38c3a87d6e09c043abf54d69380c3d",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/ThemeScene_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ThemeScene_crystal.imageset",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "DIBanner_crystal",
+    "family": "di",
+    "prompt": "Create one finished DeepMine Dynamic Island banner: angular pale crystal geology embedded in dark shale, squared braces, and a dormant shaft. Compose useful art as an ultrawide 8:3 scene across the middle of a square source canvas. Keep the top-center 36% width and top 45% height coal-black and empty. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/DIBanner_crystal.png",
+    "raw_sha256": "ee57a1ff9847ceceec88aca8aa101a38cc4bda552b451a2d194a7e2d11892171",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/DIBanner_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/DIBanner_crystal.imageset",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "StandBy_crystal",
+    "family": "standby",
+    "prompt": "Create one finished DeepMine StandBy background: angular pale crystal geology embedded in dark shale, squared braces, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas. Keep the left third low-detail coal-black and the right quarter subdued for UI. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/StandBy_crystal.png",
+    "raw_sha256": "844d4c92ddfcf6178f958ec5079b67a1588100bd0357b07a23046f65c6f49864",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/StandBy_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/StandBy_crystal.imageset",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ThemeScene_ruins",
+    "family": "theme",
+    "prompt": "Create one finished DeepMine ruins theme background: buried stone machinery, broken gear silhouettes, ancient pillars, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas for center cropping. Keep central and lower foreground quiet for UI. No miner, rare vein, treasure, or reward reveal. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/ThemeScene_ruins.png",
+    "raw_sha256": "389b81f0ce7d033c7a069c9c32654c04608cfc4e4842449c7d94cce4f6e5ca77",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/ThemeScene_ruins.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ThemeScene_ruins.imageset",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "DIBanner_ruins",
+    "family": "di",
+    "prompt": "Create one finished DeepMine Dynamic Island banner: buried stone machinery, broken gear silhouettes, ancient pillars, and a dormant shaft. Compose useful art as an ultrawide 8:3 scene across the middle of a square source canvas. Keep the top-center 36% width and top 45% height coal-black and empty. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/DIBanner_ruins.png",
+    "raw_sha256": "855d5ca3959dfc429367793c21593c9eb5b608faa93221bcbf02a58b9add168f",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/DIBanner_ruins.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/DIBanner_ruins.imageset",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "StandBy_ruins",
+    "family": "standby",
+    "prompt": "Create one finished DeepMine StandBy background: buried stone machinery, broken gear silhouettes, ancient pillars, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas. Keep the left third low-detail coal-black and the right quarter subdued for UI. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/StandBy_ruins.png",
+    "raw_sha256": "883e85b301a2a7e8f0ecccb8b11f51311e24552c0db4c03304954b16ed5fdb8a",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/StandBy_ruins.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/StandBy_ruins.imageset",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ThemeScene_abyss",
+    "family": "theme",
+    "prompt": "Create one finished DeepMine abyss theme background: an immense near-black void, sparse pale cliff edges, tiny depth markers, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas for center cropping. Keep central and lower foreground quiet for UI. No miner, rare vein, treasure, or reward reveal. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/ThemeScene_abyss.png",
+    "raw_sha256": "acd72e250d5cf680880426427f244850cc739d850887e2797fa95cbed31e58b2",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/ThemeScene_abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ThemeScene_abyss.imageset",
+    "logical_size": [
+      192,
+      108
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "DIBanner_abyss",
+    "family": "di",
+    "prompt": "Create one finished DeepMine Dynamic Island banner: an immense near-black void, sparse pale cliff edges, tiny depth markers, and a dormant shaft. Compose useful art as an ultrawide 8:3 scene across the middle of a square source canvas. Keep the top-center 36% width and top 45% height coal-black and empty. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/DIBanner_abyss.png",
+    "raw_sha256": "56e83faca5a412d399067c7e261a951073c9e532f078a85728fb5dfeeec98cd4",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/DIBanner_abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/DIBanner_abyss.imageset",
+    "logical_size": [
+      192,
+      72
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "StandBy_abyss",
+    "family": "standby",
+    "prompt": "Create one finished DeepMine StandBy background: an immense near-black void, sparse pale cliff edges, tiny depth markers, and a dormant shaft. Compose useful art as a wide 16:9 scene across the middle of a square source canvas. Keep the left third low-detail coal-black and the right quarter subdued for UI. No miner, active vein, treasure, or reward. Chunky 16-bit pixel-art environment, strict hard stair-step edges, no antialiasing, no gradients, no glow, no soft shadow, no text, no letters, no numbers, no border, no UI frame. Use only the visual roles of coal black #10100F, shale gray #373630, limestone #E7E0CF, and sparse lamp-brass #C58C39 under 10% of scene pixels. Strong grayscale and red-monochrome readability. Opaque PNG output.",
+    "raw_source": "artifacts/imagegen/game-assets-v1/raw/StandBy_abyss.png",
+    "raw_sha256": "4c2e8a3d474b79eca872988e3a2a93308ddbb5d73268c34b2b7f22aed1c67e0c",
+    "processed_source": "artifacts/imagegen/game-assets-v1/processed/StandBy_abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/StandBy_abyss.imageset",
+    "logical_size": [
+      256,
+      144
+    ],
+    "transparent": false,
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  }
+]

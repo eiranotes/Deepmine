@@ -89,15 +89,11 @@ extension StatisticsView {
     }
 
     private func codexRow(_ entry: VeinCodexEntry) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Image(systemName: entry.isDiscovered ? "diamond.fill" : "diamond")
-                .font(.caption)
-                .foregroundStyle(
-                    entry.isDiscovered
-                        ? DeepMinePalette.brass.color
-                        : DeepMinePalette.limestone.color.opacity(0.4)
-                )
+        HStack(alignment: .center, spacing: 8) {
+            DeepMinePixelImage(name: DeepMineArt.vein(entry.kind), size: 24)
+                .opacity(entry.isDiscovered ? 1 : 0.24)
                 .frame(width: 18)
+                .accessibilityHidden(true)
             Text(
                 entry.isDiscovered
                     ? DeepMineStrings.text(DeepMineProgressLabels.veinKey(entry.kind))

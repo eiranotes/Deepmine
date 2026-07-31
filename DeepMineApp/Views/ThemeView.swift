@@ -78,21 +78,13 @@ struct ThemeView: View {
     }
 
     private func themePattern(_ theme: MineTheme) -> some View {
-        let symbols: [String] = switch theme {
-        case .entry: ["circle", "line.diagonal"]
-        case .crystal: ["diamond.fill", "sparkle"]
-        case .ruins: ["square.split.diagonal.2x2", "building.columns.fill"]
-        case .abyss: ["circle.hexagongrid.fill", "arrow.down"]
-        }
-        return HStack(spacing: 18) {
-            ForEach(0..<6, id: \.self) { index in
-                Image(systemName: symbols[index % symbols.count])
-                    .foregroundStyle(index.isMultiple(of: 2)
-                        ? DeepMinePalette.brass.color
-                        : DeepMinePalette.limestone.color)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 68)
+        Image(DeepMineArt.theme(theme))
+        .resizable()
+        .interpolation(.none)
+        .antialiased(false)
+        .scaledToFill()
+        .frame(maxWidth: .infinity, minHeight: 82, maxHeight: 82)
+        .clipped()
         .background(DeepMinePalette.coal.color)
         .accessibilityHidden(true)
     }

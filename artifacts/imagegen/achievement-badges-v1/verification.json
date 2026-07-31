@@ -1,0 +1,877 @@
+[
+  {
+    "id": "first.return",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/first.return.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_first.return.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "first.deep",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/first.deep.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_first.deep.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "first.survey",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/first.survey.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_first.survey.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "first.prestige",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/first.prestige.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_first.prestige.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "focus.10h",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/focus.10h.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_focus.10h.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "focus.50h",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/focus.50h.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_focus.50h.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "focus.100h",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/focus.100h.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_focus.100h.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "focus.250h",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/focus.250h.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_focus.250h.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "focus.500h",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/focus.500h.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_focus.500h.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sessions.25",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sessions.25.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sessions.25.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sessions.100",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sessions.100.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sessions.100.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sessions.500",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sessions.500.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sessions.500.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "depth.crystal",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/depth.crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_depth.crystal.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "depth.ruins",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/depth.ruins.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_depth.ruins.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "depth.abyss",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/depth.abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_depth.abyss.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "depth.5000",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/depth.5000.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_depth.5000.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "depth.20000",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/depth.20000.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_depth.20000.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "streak.3",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/streak.3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_streak.3.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "streak.7",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/streak.7.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_streak.7.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "streak.14",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/streak.14.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_streak.14.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "streak.30",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/streak.30.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_streak.30.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "goal.30days",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/goal.30days.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_goal.30days.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "goal.100days",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/goal.100days.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_goal.100days.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "vein.first",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/vein.first.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_vein.first.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "vein.all5",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/vein.all5.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_vein.all5.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "vein.25",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/vein.25.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_vein.25.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "vein.100",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/vein.100.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_vein.100.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "drill.10",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/drill.10.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_drill.10.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "drill.20",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/drill.20.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_drill.20.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "drill.40",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/drill.40.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_drill.40.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "drill.60",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/drill.60.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_drill.60.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "crew.balanced20",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/crew.balanced20.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_crew.balanced20.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sealed.25",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sealed.25.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sealed.25.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sealed.100",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sealed.100.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sealed.100.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  },
+  {
+    "id": "sealed.300",
+    "source": "artifacts/imagegen/achievement-badges-v1/sources/sealed.300.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/AchievementBadge_sealed.300.imageset",
+    "sizes": [
+      [
+        48,
+        48
+      ],
+      [
+        96,
+        96
+      ],
+      [
+        144,
+        144
+      ]
+    ],
+    "colors": [
+      "#10100F",
+      "#373630",
+      "#C58C39",
+      "#E7E0CF"
+    ]
+  }
+]

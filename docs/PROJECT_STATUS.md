@@ -1,6 +1,6 @@
 # Project Status
 
-업데이트: 2026-07-30 (경제·리텐션 리뷰 반영)
+업데이트: 2026-07-31 (게임 아트 40종 생성·통합 완료)
 
 ## Current state
 
@@ -18,8 +18,17 @@
 - 제품 흐름: 2장 설명, 90초 연습, 단계별 권한, 홈, 출정 약속, 활성 채굴, 명시적 포기, 3박자 귀환 보고서
 - 진행 화면: 장비, 주간 일지, 무료 기본 기록, 광산 꾸미기, 설정, 손실 우선 심층 진입 확인
 - 시스템 표면: Live Activity compact/minimal/expanded, 잠금화면/StandBy-shaped content, small/medium widget, 25분 안전 채굴 Control Widget
+- iPhone 잠금화면은 Activity 크기가 아니라 `isActivityFullscreen`으로 StandBy와 구분해
+  160pt 잠금화면 콘텐츠가 좌우 균형을 유지
+- AlarmKit countdown용 `AlarmAttributes<DeepMineAlarmMetadata>` Widget 구성을 등록하고,
+  활성 채굴은 AlarmKit Activity 하나가 소유. 커스텀 Activity는 예약 실패와 귀환 완료 표면에 사용
 - 단일 writer 계약: extension은 snapshot을 읽고 명령만 enqueue하며 앱이 제품 SwiftData를 갱신
 - 4색 픽셀 광부·완료·광맥·붕괴 스프라이트와 리벳 금속판 UI
+- 귀환 보상에 획득량 비례 광석 3–9개가 광차에 적재되는 연출과 낙하→충돌 햅틱 추가.
+  Reduce Motion에서는 이동 없이 최종 적재 상태를 즉시 표시
+- 도전과제 35종 전용 4색 픽셀 배지와 48/96/144 PNG Asset Catalog, 48pt 목록 렌더링
+- 나머지 게임 아트 40종: 광맥·장비 3티어·테마·장식·계획 광부·DI·StandBy·자원·영구
+  강화·온보딩. 4색/PNG/브라스 비율/알파 검증과 화면별 실제 소비 경로 포함
 - 한국어·영어 현지화와 default-medium 의미 접근성 fixture
 - 결정적 화면 19장 및 contact sheet: `artifacts/ui/game-mvp-v1/`
 - 복리 장비(드릴 1.12 / 광차 1.05·1.07, 비용 1.34, 상한 60을 심도로 해금)
@@ -28,7 +37,7 @@
 
 ## Retention systems
 
-- 도전과제 30종 7계열. 보상은 수정·장식·테마·배지뿐이고 생산력은 지급하지 않는다 (D-028).
+- 도전과제 35종 7계열. 보상은 수정·장식·테마·배지뿐이고 생산력은 지급하지 않는다 (D-028).
   기한·갱신·미달성 벌칙이 없어 퀘스트가 아니다 (D-029)
 - 미달성 항목의 조건과 진행률을 보여 몇 주~몇 달 거리의 목표를 가시화
 - 홈의 다음 세 걸음(장비·지역·연속 일수)으로 1~3세션 거리의 목표를 채움
@@ -47,20 +56,28 @@
 
 ## Verification state
 
-- Core 자동 테스트: 73/73 통과
+- Core 자동 테스트: 101/101 통과
 - 핵심 실제 흐름: 연습 보상→권한 3단계→홈→출정→활성→포기→귀환→장비 handoff 통과
 - 화면 캡처: 19/19 생성·육안 확인
 - Activity/Widget 독립 검토: 구현·fixture 계약 통과
-- 전체 시뮬레이터 suite: 175/175 통과, 실패·skip 0
+- 전체 시뮬레이터 suite: 182/182 통과, 실패·skip 0
 - generic iOS unsigned build: 통과
-- 총 자동 검사: Core 73 + Xcode 175 = 248 통과
+- 총 자동 검사: Core 101 + Xcode 182 = 283 통과
 - 기계 검사: Swift≤300줄, xcstrings JSON, 네 안료 hex, 19개 PNG, diff whitespace 통과
+- 배지 검사: 카탈로그 35 ID와 imageset 35 ID 일치, 불투명 4색 PNG 105개와
+  48/96/144 치수 통과. `artifacts/imagegen/achievement-badges-v1/contact-sheet.png`
+- 이번 시스템 표면 변경 focused 회귀: 잠금화면 역할·AlarmKit 상태 투영·메타데이터 왕복,
+  광석 적재량·완료 햅틱·귀환 UI 흐름 통과
+- 게임 아트 검사: 40 고유 ImageGen 원본, imageset 40개/PNG 120개, exact 4 pigments,
+  브라스 10% 미만, binary alpha/opaque 정책과 1x/2x/3x 크기 통과
+- 게임 아트 focused Xcode 12/12, generic iOS build 통과, fresh 19-screen suite 5/5와
+  `artifacts/imagegen/game-assets-v1/ui-captures/final-19-contact-sheet.png`
 
 ## Physical-device release gates
 
 1. 승인된 FamilyControls/App Group entitlement와 실제 방해 앱 선택·차단·해제
 2. DeviceActivityMonitor 종료/stale callback과 앱 종료·재부팅 복원
-3. AlarmKit과 커스텀 Live Activity의 실제 동시 운용
+3. AlarmKit 소유 countdown Activity와 커스텀 실패/완료 Activity의 실제 전환
 4. 실제 Dynamic Island, SpringBoard 잠금화면, StandBy, Control Center 등록·크롭·수명주기
 5. 실제 extension→app App Group 명령 왕복과 crash window
 6. VoiceOver 초점, Increase Contrast, Reduce Motion, 햅틱·사운드 체감

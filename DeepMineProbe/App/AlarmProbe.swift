@@ -2,10 +2,6 @@ import AlarmKit
 import Foundation
 import SwiftUI
 
-struct ProbeAlarmMetadata: AlarmMetadata {
-    let source: String
-}
-
 enum AlarmProbeError: LocalizedError {
     case authorizationDenied
 
@@ -30,7 +26,8 @@ enum AlarmProbe {
         duration: TimeInterval,
         title: String = "채굴 완료",
         countdownTitle: String = "DeepMine 집중 채굴",
-        source: String = "game-session"
+        source: String = "game-session",
+        snapshot: GameSurfaceSnapshot? = nil
     ) async throws -> Alarm {
         let manager = AlarmManager.shared
         let authorization: AlarmManager.AuthorizationState
@@ -67,10 +64,10 @@ enum AlarmProbe {
         )
         let attributes = AlarmAttributes(
             presentation: presentation,
-            metadata: ProbeAlarmMetadata(source: source),
+            metadata: DeepMineAlarmMetadata(source: source, snapshot: snapshot),
             tintColor: ProbePalette.brass
         )
-        let configuration: AlarmManager.AlarmConfiguration<ProbeAlarmMetadata> = .timer(
+        let configuration: AlarmManager.AlarmConfiguration<DeepMineAlarmMetadata> = .timer(
             duration: duration,
             attributes: attributes
         )

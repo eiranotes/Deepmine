@@ -31,6 +31,14 @@ struct ActiveMineView: View {
     var body: some View {
         ZStack {
             DeepMinePalette.coal.color.ignoresSafeArea()
+            Image(DeepMineArt.theme(activeTheme))
+                .resizable()
+                .interpolation(.none)
+                .antialiased(false)
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(0.18)
+                .accessibilityHidden(true)
             ScrollView {
                 VStack(spacing: 17) {
                     mineHeader
@@ -208,6 +216,10 @@ struct ActiveMineView: View {
         case .abyss: .regionAbyss
         }
         return DeepMineStrings.text(key)
+    }
+
+    private var activeTheme: MineTheme {
+        (try? gameStore.playerState().selectedTheme) ?? .entry
     }
 
     private func monitor() async {
