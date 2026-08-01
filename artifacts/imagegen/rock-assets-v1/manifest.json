@@ -1,0 +1,458 @@
+[
+  {
+    "id": "RockFace_entry_stage1",
+    "prompt_id": "rockface-entry-1",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: an intact massive round layered sedimentary boulder with horizontal shale strata and a few limestone flecks",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_entry_stage1.png",
+    "raw_sha256": "9eb732c17affa2687726be12bdde9a859eddfad357ded30607829d6c155d2d7c",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_entry_stage1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_entry_stage1.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_entry_stage2",
+    "prompt_id": "rockface-entry-2",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same layered boulder with thin upper cracks and one chipped corner exposing a small limestone patch",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_entry_stage2.png",
+    "raw_sha256": "2627be75403c6d75a9db7accb03bd998fcc8a8b7a4ef0639aced6bf5d8305c88",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_entry_stage2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_entry_stage2.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_entry_stage3",
+    "prompt_id": "rockface-entry-3",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same layered boulder split by one deep crack with two large edge chunks missing and broad limestone fracture faces",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_entry_stage3.png",
+    "raw_sha256": "0a4d8f758433a87fc01864a2d288cbd2ca148027e1e3f490ff1d75366aaf420e",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_entry_stage3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_entry_stage3.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_entry_stage4",
+    "prompt_id": "rockface-entry-4",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same boulder collapsed into a low separated heap with wide limestone fracture faces and coal-black gaps",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_entry_stage4.png",
+    "raw_sha256": "70f0a1746d87c7631cdc342739bb31e961a9a4cfac1264e50081964220231a33",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_entry_stage4.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_entry_stage4.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_crystal_stage1",
+    "prompt_id": "rockface-crystal-1",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: an intact shale boulder with angular limestone crystals embedded and protruding, one crystal tipped with brass",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_crystal_stage1.png",
+    "raw_sha256": "3f36f4db3939ddfd42d459fc8376737c41ed6f9cf10900fa7c5ddcdfcb02a3af",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_crystal_stage1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_crystal_stage1.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_crystal_stage2",
+    "prompt_id": "rockface-crystal-2",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same crystal boulder with cracks radiating from clusters and one chipped corner exposing crystal cross-sections",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_crystal_stage2.png",
+    "raw_sha256": "f3493ed1ef437e8e290c0a94c735373e4347230b4b40dd86019b4fe8188df49d",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_crystal_stage2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_crystal_stage2.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_crystal_stage3",
+    "prompt_id": "rockface-crystal-3",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same crystal boulder split through a cluster with two large chunks missing and dense crystal fracture faces",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_crystal_stage3.png",
+    "raw_sha256": "5b399263fea3814679c70feb40578df52853c5709fce78c9f480275c2e4db5e7",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_crystal_stage3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_crystal_stage3.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_crystal_stage4",
+    "prompt_id": "rockface-crystal-4",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same boulder collapsed into separated fragments and loose angular crystals, one crystal brass-tipped",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_crystal_stage4.png",
+    "raw_sha256": "3aad25bc280de50b3b85f3c6e1ca4ec1d824f19bc98c67d1218703fcbd27cbf5",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_crystal_stage4.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_crystal_stage4.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_ruins_stage1",
+    "prompt_id": "rockface-ruins-1",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: an intact worked masonry block with straight edges, a flat shale face, faint tool marks, and four brass rivets",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_ruins_stage1.png",
+    "raw_sha256": "1ec8eb63151f3293e4e14f83fe7a6c2a58e9f3165bcf4449183e09542e88dc5b",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_ruins_stage1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_ruins_stage1.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_ruins_stage2",
+    "prompt_id": "rockface-ruins-2",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same block cracked along a mortar line with one squared corner missing and one loose brass rivet",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_ruins_stage2.png",
+    "raw_sha256": "1b8da093125c16dc83aaff0cc8556180b5a50c5af93d694e6cc36c6e1d097d96",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_ruins_stage2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_ruins_stage2.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_ruins_stage3",
+    "prompt_id": "rockface-ruins-3",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same block deeply fractured with two squared chunks missing, broad limestone faces, and two empty rivet holes",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_ruins_stage3.png",
+    "raw_sha256": "9fa24877ffda54b9f817be610666711a77b40835a47740fc8d5b0923442a70f4",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_ruins_stage3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_ruins_stage3.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_ruins_stage4",
+    "prompt_id": "rockface-ruins-4",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same block collapsed into squared rubble with limestone faces and one bent brass rivet on top",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_ruins_stage4.png",
+    "raw_sha256": "baee4f24b853eafd894524240b20a03c65f2522f57c020da8d780a5e68fb8edb",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_ruins_stage4.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_ruins_stage4.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_abyss_stage1",
+    "prompt_id": "rockface-abyss-1",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: an intact utterly smooth near-black boulder defined only by a thin limestone upper rim",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_abyss_stage1.png",
+    "raw_sha256": "6792fd4d5b5dd2f1cc80e51950c6614734abd4086d4df1dc71aa0be1c8af1478",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_abyss_stage1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_abyss_stage1.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_abyss_stage2",
+    "prompt_id": "rockface-abyss-2",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same near-black boulder with thin void-black cracks and one missing corner exposing pale limestone",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_abyss_stage2.png",
+    "raw_sha256": "533879a1676e670586b3ee236c7c89f4dc4f4d146da530cb5918af2674d8d9fc",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_abyss_stage2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_abyss_stage2.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_abyss_stage3",
+    "prompt_id": "rockface-abyss-3",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same near-black boulder split by a deep void with two chunks missing and bright limestone fracture faces",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_abyss_stage3.png",
+    "raw_sha256": "369b326dad0a04e55ff6f1896a4dbcf2b4a83665cee5432a444b15c97c3a3ee2",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_abyss_stage3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_abyss_stage3.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RockFace_abyss_stage4",
+    "prompt_id": "rockface-abyss-4",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: the same boulder collapsed into separated near-black fragments with wide limestone faces and bottomless gaps",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/RockFace_abyss_stage4.png",
+    "raw_sha256": "a12fcbee1153404d771d6775b9f5a0d90f08c78be05fdbd90bb740b8270d5f8a",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/RockFace_abyss_stage4.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RockFace_abyss_stage4.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Fracture_light",
+    "prompt_id": "fracture-light",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a uniform #00FF00 chroma-key background removed to binary transparency. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: one thin vertical jagged crack branching once, coal core with a one-pixel limestone edge",
+    "transparent": true,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/Fracture_light.png",
+    "raw_sha256": "b8eb906bdf35bbf90cca063bd35308df1d427f2eb374fd04756ac4e101bb500c",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/Fracture_light.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Fracture_light.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Fracture_medium",
+    "prompt_id": "fracture-medium",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a uniform #00FF00 chroma-key background removed to binary transparency. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: three jagged cracks radiating from one point and branching once, coal cores with one-pixel limestone edges",
+    "transparent": true,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/Fracture_medium.png",
+    "raw_sha256": "9dc77ae6b60e1ae36d937ec02e0b014017a8da1f48a0cc3b7b66b90ec2ca5127",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/Fracture_medium.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Fracture_medium.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Fracture_heavy",
+    "prompt_id": "fracture-heavy",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a uniform #00FF00 chroma-key background removed to binary transparency. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: five heavily branched cracks radiating from a shattered center with a small coal-black hole",
+    "transparent": true,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/Fracture_heavy.png",
+    "raw_sha256": "cba906e582c173f4290c113b3f0e676eb83d3b8384c9ad247839bb49082fec0f",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/Fracture_heavy.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Fracture_heavy.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "WeakPoint_idle",
+    "prompt_id": "weakpoint-idle",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: a thick brass targeting ring with four compass ticks and one small central brass dot",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/WeakPoint_idle.png",
+    "raw_sha256": "c126b43438f2d018a86e277c3af2a3d95ec444752500b50bd44d81de07484895",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/WeakPoint_idle.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/WeakPoint_idle.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "WeakPoint_hit",
+    "prompt_id": "weakpoint-hit",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: a brass targeting ring broken outward into four arcs around a brass burst and limestone impact spikes",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/WeakPoint_hit.png",
+    "raw_sha256": "ecfb1f79be9690f217a76e241adeaa034a853a132c8afd56fecf52c0a8ca9c82",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/WeakPoint_hit.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/WeakPoint_hit.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Debris_small",
+    "prompt_id": "debris-small",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: three separated small angular shale chips with pale limestone fracture faces",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/Debris_small.png",
+    "raw_sha256": "f2d9545eeb05fed9550b987a7673a71adfe73f7c5144ed4dcc717a080b0641f7",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/Debris_small.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Debris_small.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "Debris_large",
+    "prompt_id": "debris-large",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: two separated large angular shale chunks and two small chips with broad limestone fracture faces",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/Debris_large.png",
+    "raw_sha256": "c27c69382c28eca3d85cda6a8100f79b346688e1be68ba69ecad04aab88bb697",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/Debris_large.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/Debris_large.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ResonanceNode",
+    "prompt_id": "resonance-node",
+    "prompt": "A single DeepMine game art sprite, square, centered with generous padding, on a perfectly flat coal-black #10100F background. Chunky hand-placed pixel art with hard stair-step edges, flat 2D straight-on view, readable at 64x64. Use only coal black #10100F, shale grey #373630, limestone #E7E0CF, and sparse lamp brass #C58C39. No antialiasing, gradients, glow, soft shadows, text, watermark, UI chrome, perspective, border, or other colors. Subject: a faceted brass geode above a shale plinth with limestone highlights and three brass orbit rings",
+    "transparent": false,
+    "raw_source": "artifacts/imagegen/rock-assets-v1/raw/ResonanceNode.png",
+    "raw_sha256": "6355c803d81f3c889013918cd8405b8e3b70f14744c619b70067d32373c8f0ce",
+    "processed_source": "artifacts/imagegen/rock-assets-v1/processed/ResonanceNode.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ResonanceNode.imageset",
+    "logical_size": [
+      64,
+      64
+    ],
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  }
+]

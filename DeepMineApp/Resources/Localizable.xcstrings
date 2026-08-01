@@ -2050,6 +2050,38 @@
         }
       }
     },
+    "home.focusAmplifier.detail": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional. Block distractions for a set time and the shift pays a bonus haul."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택 사항. 정한 시간 동안 방해 앱을 잠그면 그만큼 광석을 더 받는다."
+          }
+        }
+      }
+    },
+    "home.focusAmplifier.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus expedition"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "집중 출정"
+          }
+        }
+      }
+    },
     "home.mineScene": {
       "extractionState": "stale",
       "localizations": {
@@ -3673,6 +3705,22 @@
         }
       }
     },
+    "prestige.depthReset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to the surface"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지표로 복귀"
+          }
+        }
+      }
+    },
     "prestige.effect.memory": {
       "extractionState": "stale",
       "localizations": {
@@ -3890,6 +3938,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "갱도는 이미 파낸 깊이를 기억합니다. 예전에 올렸던 레벨까지는 강화 비용이 절반입니다."
+          }
+        }
+      }
+    },
+    "prestige.segments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "segments"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "층"
           }
         }
       }
@@ -5046,6 +5110,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "버전"
+          }
+        }
+      }
+    },
+    "shaft.recordDepth": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deepest"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최고 심도"
+          }
+        }
+      }
+    },
+    "shaft.impact": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impact"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "충격"
+          }
+        }
+      }
+    },
+    "shaft.nextSeam": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next ore seam in %lld layers"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음 광맥층 %lld층"
+          }
+        }
+      }
+    },
+    "shaft.tapDamage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "타격 %@"
+          }
+        }
+      }
+    },
+    "shaft.automationDamage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto %@/s"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 %@/초"
+          }
+        }
+      }
+    },
+    "shaft.weakPoint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weak point"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "약점"
           }
         }
       }

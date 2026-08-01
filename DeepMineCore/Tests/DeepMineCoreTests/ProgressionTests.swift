@@ -88,7 +88,9 @@ final class ProgressionTests: XCTestCase {
     func testUpgradePricesUseCeilingAndStopAtMaximumLevel() {
         XCTAssertEqual(EquipmentEngine.upgradeCost(for: .drill, currentLevel: 2), 134)
         XCTAssertEqual(EquipmentEngine.upgradeCost(for: .drill, currentLevel: 3), 180)
-        XCTAssertNil(EquipmentEngine.upgradeCost(for: .drill, currentLevel: 60))
+        XCTAssertNil(
+            EquipmentEngine.upgradeCost(for: .drill, currentLevel: Balance.maximumEquipmentLevel)
+        )
     }
 
     func testRememberedLevelsCostHalfSoPrestigeRebuildsFast() {
@@ -107,12 +109,19 @@ final class ProgressionTests: XCTestCase {
     }
 
     func testDepthUnlocksTheEquipmentCeiling() {
-        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 0), 5)
-        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 599), 14)
-        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 3_300), 60)
-        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 1_000_000), 60)
-        XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 6), 60)
-        XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 14), 540)
+        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 0), Balance.equipmentLevelUnlockBase)
+        XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 600), 45)
+        XCTAssertEqual(
+            Balance.maximumEquipmentLevel(forDepth: 1_000_000),
+            Balance.maximumEquipmentLevel
+        )
+        XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 6), 15)
+        XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 45), 600)
+        // The rail must not bind on ore the player dug out of the rock itself: a segment
+        // pays for more ceiling than it consumes.
+        let levelsPerSegment = Double(Balance.metersPerSegment) / Double(Balance.equipmentLevelUnlockDepthStep)
+        let levelsOreBuysPerSegment = log(Balance.segmentOreGrowthRate) / log(Balance.equipmentPriceGrowthRate)
+        XCTAssertGreaterThan(levelsPerSegment, levelsOreBuysPerSegment)
     }
 
     func testPurchaseChecksAffordabilityMaximumAndReplay() {
@@ -138,10 +147,16 @@ final class ProgressionTests: XCTestCase {
         XCTAssertEqual(state.equipment.drill, 2)
 
         for equipment in EquipmentKind.allCases {
+            let ceiling = Balance.maximumEquipmentLevel
             var capped = PlayerState(
                 resources: Resources(ore: .greatestFiniteMagnitude),
-                equipment: EquipmentLevels(drill: 60, cart: 60, lamp: 60),
-                lifetimeFocusCredits: 200
+                equipment: EquipmentLevels(drill: ceiling, cart: ceiling, lamp: ceiling),
+                lifetimeFocusCredits: 200,
+                // Deep enough that the depth rail is not what stops the purchase.
+                mineFace: MineFaceState(
+                    segmentIndex: EquipmentEngine.requiredDepth(forLevel: ceiling)
+                        / Balance.metersPerSegment
+                )
             )
             XCTAssertEqual(
                 EquipmentEngine.purchase(
@@ -161,7 +176,10 @@ final class ProgressionTests: XCTestCase {
             EquipmentEngine.purchase(
                 UpgradePurchaseCommand(id: UUID(), equipment: .drill), in: &shallow
             ),
-            .depthLocked(unlockedLevel: 5, requiredDepthMeters: 60)
+            .depthLocked(
+                unlockedLevel: Balance.equipmentLevelUnlockBase,
+                requiredDepthMeters: Balance.equipmentLevelUnlockDepthStep
+            )
         )
         XCTAssertEqual(shallow.resources.ore, 1_000_000)
         XCTAssertEqual(shallow.equipment.drill, 5)

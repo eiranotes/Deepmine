@@ -88,11 +88,14 @@ final class VeinWorldTests: XCTestCase {
     }
 
     func testRegionThresholdsAndIndices() {
+        let crystal = Balance.crystalRegionDepth
+        let ruins = Balance.ruinsRegionDepth
+        let abyss = Balance.abyssRegionDepth
         let examples: [(Int, MineRegion, Int)] = [
-            (0, .entry, 0), (119, .entry, 0),
-            (120, .crystal, 1), (479, .crystal, 1),
-            (480, .ruins, 2), (1_199, .ruins, 2),
-            (1_200, .abyss, 3)
+            (0, .entry, 0), (crystal - 1, .entry, 0),
+            (crystal, .crystal, 1), (ruins - 1, .crystal, 1),
+            (ruins, .ruins, 2), (abyss - 1, .ruins, 2),
+            (abyss, .abyss, 3)
         ]
         for (depth, region, index) in examples {
             XCTAssertEqual(WorldProgression.region(forDepth: depth), region)
@@ -101,13 +104,16 @@ final class VeinWorldTests: XCTestCase {
     }
 
     func testDepthReconciliationUnlocksEveryReachedRegionAndIsIdempotent() {
+        let crystal = Balance.crystalRegionDepth
+        let ruins = Balance.ruinsRegionDepth
+        let abyss = Balance.abyssRegionDepth
         let examples: [(Int, Set<MineTheme>)] = [
-            (119, [.entry]),
-            (120, [.entry, .crystal]),
-            (479, [.entry, .crystal]),
-            (480, [.entry, .crystal, .ruins]),
-            (1_199, [.entry, .crystal, .ruins]),
-            (1_200, Set(MineTheme.allCases))
+            (crystal - 1, [.entry]),
+            (crystal, [.entry, .crystal]),
+            (ruins - 1, [.entry, .crystal]),
+            (ruins, [.entry, .crystal, .ruins]),
+            (abyss - 1, [.entry, .crystal, .ruins]),
+            (abyss, Set(MineTheme.allCases))
         ]
         for (depth, expected) in examples {
             var state = PlayerState(bonusDepthMeters: depth)
@@ -116,7 +122,7 @@ final class VeinWorldTests: XCTestCase {
             XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &state).isEmpty)
         }
 
-        var earlyVault = PlayerState(bonusDepthMeters: 119)
+        var earlyVault = PlayerState(bonusDepthMeters: crystal - 1)
         XCTAssertEqual(
             WorldProgression.apply(vein: .vault, effectID: UUID(), regionIndex: 0, to: &earlyVault),
             .themeUnlocked(.crystal)
@@ -124,14 +130,13 @@ final class VeinWorldTests: XCTestCase {
         XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &earlyVault).isEmpty)
         XCTAssertTrue(earlyVault.unlockedThemes.contains(.crystal))
 
-        var abyssCrossing = PlayerState(bonusDepthMeters: 119)
+        var abyssCrossing = PlayerState(bonusDepthMeters: crystal - 1)
         _ = WorldProgression.unlockThemesForCurrentDepth(in: &abyssCrossing)
         _ = WorldProgression.apply(
             vein: .abyss, effectID: UUID(), regionIndex: 0, to: &abyssCrossing
         )
-        XCTAssertEqual(
-            WorldProgression.unlockThemesForCurrentDepth(in: &abyssCrossing), [.crystal]
-        )
+        XCTAssertTrue(abyssCrossing.unlockedThemes.contains(.crystal))
+        XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &abyssCrossing).isEmpty)
     }
 
     func testBlueCrystalAndAbyssEffects() {
@@ -149,7 +154,10 @@ final class VeinWorldTests: XCTestCase {
             WorldProgression.apply(vein: .abyss, effectID: UUID(), regionIndex: 0, to: &state),
             .bonusDepth(60)
         )
-        XCTAssertEqual(state.bonusDepthMeters, 60)
+        XCTAssertEqual(state.bonusDepthMeters, 0)
+        XCTAssertEqual(state.mineFace.segmentIndex, 15)
+        XCTAssertEqual(state.depthMeters, 60)
+        XCTAssertEqual(state.mineFace.region, WorldProgression.region(forDepth: state.depthMeters))
     }
 
     func testVaultUnlockOrderConversionAndReplay() {

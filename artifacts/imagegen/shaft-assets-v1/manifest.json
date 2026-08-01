@@ -1,0 +1,152 @@
+[
+  {
+    "id": "ShaftGantry",
+    "prompt_id": "shaft-gantry",
+    "prompt": "A panoramic 5:2 DeepMine mine-shaft gantry overlay on a perfectly flat #00FF00 chroma-key background. Thick worked-stone and iron supports only at the far sides, a compact crossbeam, one brass lamp, a pulley and short cable, and a narrow rail along the bottom. Keep at least 70% of the centre empty. Chunky straight-on pixel art using only #10100F, #373630, #E7E0CF, and sparse #C58C39. No text, glow, gradients, shadow, perspective, or UI frame.",
+    "transparent": true,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.1,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftGantry.png",
+    "raw_sha256": "ee140ffd821e35a046a386c9e808f788e784f261e6343de3e4e9a93045ff7b61",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftGantry.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftGantry.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftGantry.png"
+  },
+  {
+    "id": "SeamVein",
+    "prompt_id": "seam-vein",
+    "prompt": "A panoramic 5:2 DeepMine rich ore seam overlay on a perfectly flat #00FF00 chroma-key background. One irregular horizontal limestone seam spanning the frame, two or three branches, and sparse brass ore pockets. Keep the rock beneath visible. Chunky straight-on pixel art using only #10100F, #373630, #E7E0CF, and #C58C39. No boulder, frame, text, glow, gradients, shadow, perspective, or extra props.",
+    "transparent": true,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.2,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/SeamVein.png",
+    "raw_sha256": "163f6b0dd07166e77d11458f217b1a3847bc51c9020a1769c21e3c3644c64166",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/SeamVein.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/SeamVein.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/SeamVein.png"
+  },
+  {
+    "id": "ShaftRock_entry",
+    "prompt_id": "shaft-rock-entry",
+    "prompt": "Panoramic continuous entry-region sedimentary rock wall with broad connected horizontal shale strata, coal fissures and sparse limestone chips; no separate boulders, rubble, props, frame or focal object.",
+    "transparent": false,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.01,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftRock_entry.png",
+    "raw_sha256": "578baecd2eaa513d06faac512b283228988f0a3e97de03e5042438fb053a506a",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftRock_entry.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_entry.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ShaftRock_crystal",
+    "prompt_id": "shaft-rock-crystal",
+    "prompt": "Panoramic continuous crystal-region angular shale wall with embedded small limestone crystal clusters and sparse brass tips; no separate boulders or props.",
+    "transparent": false,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.04,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftRock_crystal.png",
+    "raw_sha256": "17bc70eaacc918cdb642255a2aa2005a8eb6b5e480504fe071525e6994fef924",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftRock_crystal.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_crystal.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ShaftRock_ruins",
+    "prompt_id": "shaft-rock-ruins",
+    "prompt": "Panoramic continuous ruins-region worked masonry fused into shale, with broad courses, worn mortar lines and embedded lintel fragments; no door or text.",
+    "transparent": false,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.04,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftRock_ruins.png",
+    "raw_sha256": "b40ce53fd19e0959f449f54da1952f71efb0f8cfff65a2ab8c9fa96b641bdfc4",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftRock_ruins.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_ruins.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ShaftRock_abyss",
+    "prompt_id": "shaft-rock-abyss",
+    "prompt": "Panoramic continuous abyss-region near-black rock wall with broad planes, deep void fissures and sparse thin limestone rims; no creature, symbol or props.",
+    "transparent": false,
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.01,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftRock_abyss.png",
+    "raw_sha256": "042afd2716338e4c52e9635890b934543ed11e98559a6267c8be54578a6a5377",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftRock_abyss.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_abyss.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "ShaftSurface",
+    "prompt_id": "shaft-surface",
+    "prompt": "A wide surface mine entrance overlay on flat #00FF00 chroma key: thin earth lip at the top, compact side supports and one small brass marker lamp, with at least 75% of the centre and lower centre empty.",
+    "transparent": true,
+    "logical_size": [
+      320,
+      90
+    ],
+    "crop_anchor": "top",
+    "maximum_brass_ratio": 0.1,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftSurface.png",
+    "raw_sha256": "00a093a8286acfb1da9326cd966a47fa42fa23c5a003cee99dbff5113817b707",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftSurface.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftSurface.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftSurface.png"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "ShaftGantry",
+    "valid": true,
+    "brass_ratio": 0.041648922578996675
+  },
+  {
+    "id": "SeamVein",
+    "valid": true,
+    "brass_ratio": 0.12948133546876925
+  },
+  {
+    "id": "ShaftRock_entry",
+    "valid": true,
+    "brass_ratio": 0.003759765625
+  },
+  {
+    "id": "ShaftRock_crystal",
+    "valid": true,
+    "brass_ratio": 0.0316162109375
+  },
+  {
+    "id": "ShaftRock_ruins",
+    "valid": true,
+    "brass_ratio": 0.03798828125
+  },
+  {
+    "id": "ShaftRock_abyss",
+    "valid": true,
+    "brass_ratio": 0.0094970703125
+  },
+  {
+    "id": "ShaftSurface",
+    "valid": true,
+    "brass_ratio": 0.07854406130268199
+  }
+]

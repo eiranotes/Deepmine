@@ -35,12 +35,15 @@ final class MiningLoopTests: XCTestCase {
         XCTAssertEqual(deep.depthMeters, 30 * Balance.metersPerSegment)
     }
 
-    func testBonusDepthStillAddsOnTop() {
+    func testLegacyBonusDepthMovesTheRealFaceInsteadOfSplittingTheDepthSource() {
         let state = PlayerState(
             bonusDepthMeters: 60,
             mineFace: MineFaceState(segmentIndex: 10)
         )
         XCTAssertEqual(state.depthMeters, 10 * Balance.metersPerSegment + 60)
+        XCTAssertEqual(state.mineFace.segmentIndex, 25)
+        XCTAssertEqual(state.bonusDepthMeters, 0)
+        XCTAssertEqual(state.mineFace.segment, RockGenerator.segment(at: 25))
     }
 
     // MARK: Striking
@@ -115,6 +118,44 @@ final class MiningLoopTests: XCTestCase {
         XCTAssertFalse(update.brokeSomething)
         XCTAssertEqual(state.resources.ore, 0)
         XCTAssertEqual(state.depthMeters, 0)
+    }
+
+    /// Time watched on screen must not also be billed as time away. The on-screen tick
+    /// moves the settlement mark; without that, returning from the background pays for
+    /// the minutes the player just spent watching the mine run.
+    func testOnScreenTicksAreNotPaidAgainAsOfflineTime() {
+        let start = Date(timeIntervalSince1970: 1_000_000)
+        var state = player(cart: 18)
+        MiningLoop.settleOffline(since: start, now: start, in: &state)
+
+        var watched = start
+        for _ in 0..<120 {
+            watched += 60
+            MiningLoop.advance(seconds: 60, at: watched, in: &state)
+        }
+        let afterWatching = state.resources.ore
+
+        // Returning immediately, with no time away, owes nothing.
+        let settlement = MiningLoop.settleOffline(since: state.lastSettledAt, now: watched, in: &state)
+        XCTAssertEqual(state.resources.ore, afterWatching)
+        XCTAssertEqual(settlement.segmentsBroken, 0)
+        XCTAssertTrue(settlement.oreGained.isZero)
+    }
+
+    func testVisibleTimerUsesOfflineSettlementWhenItsLocalTickIsStale() {
+        let backgrounded = Date(timeIntervalSince1970: 2_000_000)
+        let returned = backgrounded.addingTimeInterval(3_600)
+        let firstVisibleTick = returned.addingTimeInterval(Balance.automationStepSeconds)
+
+        XCTAssertEqual(
+            MiningLoop.unsettledVisibleSeconds(
+                lastTick: backgrounded,
+                lastSettledAt: returned,
+                now: firstVisibleTick
+            ),
+            Balance.automationStepSeconds,
+            accuracy: 1e-9
+        )
     }
 
     /// One long catch-up must land in the same place as many short ticks, or the offline

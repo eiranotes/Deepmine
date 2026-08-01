@@ -7,7 +7,7 @@ extension Balance {
 
     public static let metersPerSegment = 4
     /// Region gates in `Balance` are expressed in metres, so at four metres per segment
-    /// crystal begins at segment 30, ruins at 120, abyss at 300.
+    /// crystal begins at segment 60, ruins at 200, abyss at 400.
     public static let rockDamageStageCount = 4
     public static let rockSeedSalt: UInt64 = 0x5DEE_9111_4E00_0001
 
@@ -15,10 +15,16 @@ extension Balance {
 
     public static let baseSegmentIntegrity = 10.0
     public static let baseSegmentOre = 4.0
-    /// Integrity outruns ore by ~1.4% per segment. That widening gap is the entire reason
-    /// upgrades exist: without it, the first drill would carry a player to the abyss and
-    /// the economy would have nothing left to sell.
-    public static let segmentIntegrityGrowthRate = 1.085
+    /// Integrity has to outrun the damage the ore it pays for can buy, or upgrades would
+    /// have nothing to fix — but only just. Ore compounds at 1.07 per segment and a level
+    /// costs 1.34, which buys ~0.23 levels of 1.12 damage, so purchased damage compounds
+    /// at ~1.026545. At 1.058 integrity each segment takes 3.064% longer than the one above it:
+    /// a descent that slows enough to feel deep and never enough to stop.
+    ///
+    /// The previous 1.085 outran purchased damage by 5.7% per segment, which compounds to
+    /// a factor of 16.4 million across 300 segments. The replacement is still a factor of
+    /// about 8,556, but upgrades continuously fund it instead of falling behind (D-044).
+    public static let segmentIntegrityGrowthRate = 1.058
     public static let segmentOreGrowthRate = 1.07
 
     public static let seamSegmentInterval = 25
@@ -69,6 +75,18 @@ extension Balance {
     /// Seconds of automation folded into one simulation step. Long enough that a step is
     /// cheap, short enough that the ore counter still moves visibly.
     public static let automationStepSeconds: TimeInterval = 0.25
+
+    // MARK: Shaft
+
+    /// How much of the shaft the player can see at once. Depth is the number the whole
+    /// game is about, so it is shown as a place rather than a label: broken rock above,
+    /// the face being worked in the middle, unbroken rock fading into the dark below.
+    public static let visibleLayersAbove = 3
+    /// Rock below the face is only visible where the lamp reaches. Buying light is the
+    /// most literal upgrade a mine can sell — the shaft opens up as it gets brighter.
+    public static let baseVisibleLayersBelow = 2.0
+    public static let visibleLayersPerLampLevel = 0.15
+    public static let maximumVisibleLayersBelow = 8.0
 
     // MARK: Offline
 

@@ -57,6 +57,22 @@ final class PlayerStateEntity {
     var returnReminderPermissionRawValue: String = "notAsked"
     var lastSelectedPlanRawValue: String = "safe"
     var lastSelectedDurationRawValue: String = "minutes25"
+    // The clicker's position in the rock. Without these the mine face was rebuilt at the
+    // surface on every launch: every tap between one segment break and the next relaunch
+    // was lost, and so was the depth those breaks had earned.
+    //
+    // Defaults are supplied on every property so an existing v1 store migrates in place
+    // rather than failing closed on an unknown schema.
+    var mineFaceSegmentIndex: Int = 0
+    /// `BigNumber` as its own JSON. Integrity outgrows `Double` in the deep regions, so
+    /// storing a plain number here would silently round the face away.
+    var mineFaceRemainingIntegrityData: Data = Data()
+    var mineFaceImpact: Double = 0
+    var mineFaceLifetimeSegmentsBroken: Int = 0
+    var mineFaceLifetimeSeamsBroken: Int = 0
+    var deepestSegmentIndex: Int = 0
+    var runSegmentsBroken: Int = 0
+    var lastSettledAt: Date?
 
     init(schemaVersion: Int = GameSchemaV1.version) {
         id = GameSchemaV1.singletonID
@@ -186,99 +202,5 @@ final class PurchaseStateEntity {
         appliedPurchaseIDsData = Data()
         appliedPermanentUpgradeCommandIDsData = Data()
         appliedGameCommandIDsData = Data()
-    }
-}
-
-extension PlayerStateEntity {
-    func apply(_ state: PlayerState) {
-        ore = state.resources.ore
-        crystals = state.resources.crystals
-        coreShards = state.resources.coreShards
-        runFocusCredits = state.runFocusCredits
-        lifetimeFocusCredits = state.lifetimeFocusCredits
-        completedSessionCount = state.completedSessionCount
-        bonusDepthMeters = state.bonusDepthMeters
-        dailyGoalMinutes = state.dailyGoalMinutes
-        streakDays = state.streakDays
-        latestDayYear = state.latestDayKey?.year
-        latestDayMonth = state.latestDayKey?.month
-        latestDayDay = state.latestDayKey?.day
-        consecutiveVeinMisses = state.consecutiveVeinMisses
-        permanentResonanceLevel = state.permanentResonanceLevel
-        selectedThemeRawValue = state.selectedTheme.rawValue
-        resonanceBoostPending = state.resonanceBoostPending
-        excavationMemoryLevel = state.excavationMemoryLevel
-        compressedTimeLevel = state.compressedTimeLevel
-        prestigeIndex = state.prestigeIndex
-        onboardingStageRawValue = state.onboardingStage.rawValue
-        demoStartedAt = state.demoStartedAt
-        demoCompletedAt = state.demoCompletedAt
-        demoRewardReceiptID = state.demoRewardReceiptID
-        demoUpgradePurchaseID = state.demoUpgradePurchaseID
-        focusProtectionPermissionRawValue = state.focusProtectionPermission.rawValue
-        endAlertPermissionRawValue = state.endAlertPermission.rawValue
-        returnReminderPermissionRawValue = state.returnReminderPermission.rawValue
-        lastSelectedPlanRawValue = state.lastSelectedPlan.rawValue
-        lastSelectedDurationRawValue = state.lastSelectedDuration.rawValue
-    }
-
-    func latestDayKey() throws -> DayKey? {
-        let parts = [latestDayYear, latestDayMonth, latestDayDay]
-        guard parts.contains(where: { $0 != nil }) else { return nil }
-        guard let year = latestDayYear, let month = latestDayMonth, let day = latestDayDay else {
-            throw GamePersistenceError.invalidStoredValue(
-                field: "latestDayKey",
-                value: "incomplete"
-            )
-        }
-        return DayKey(year: year, month: month, day: day)
-    }
-}
-
-extension SessionRecordEntity {
-    func apply(_ record: SessionHistoryEntry, sortIndex: Int) {
-        endedAt = record.endedAt
-        focusedMinutes = record.focusedMinutes
-        focusCredits = record.focusCredits
-        planRawValue = record.plan.rawValue
-        verificationGradeRawValue = record.verificationGrade.rawValue
-        oreEarned = record.oreEarned
-        veinRawValue = record.vein?.rawValue
-        depthAfter = record.depthAfter
-        completed = record.completed
-        self.sortIndex = sortIndex
-    }
-
-    func coreRecord() throws -> SessionHistoryEntry {
-        guard let plan = MinePlan(rawValue: planRawValue) else {
-            throw GamePersistenceError.invalidStoredValue(field: "plan", value: planRawValue)
-        }
-        guard let grade = VerificationGrade(rawValue: verificationGradeRawValue) else {
-            throw GamePersistenceError.invalidStoredValue(
-                field: "verificationGrade",
-                value: verificationGradeRawValue
-            )
-        }
-        let vein: VeinKind?
-        if let veinRawValue {
-            guard let parsed = VeinKind(rawValue: veinRawValue) else {
-                throw GamePersistenceError.invalidStoredValue(field: "vein", value: veinRawValue)
-            }
-            vein = parsed
-        } else {
-            vein = nil
-        }
-        return SessionHistoryEntry(
-            completionID: completionID,
-            endedAt: endedAt,
-            focusedMinutes: focusedMinutes,
-            focusCredits: focusCredits,
-            plan: plan,
-            verificationGrade: grade,
-            oreEarned: oreEarned,
-            vein: vein,
-            depthAfter: depthAfter,
-            completed: completed
-        )
     }
 }

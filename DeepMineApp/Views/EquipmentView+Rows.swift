@@ -150,7 +150,7 @@ extension EquipmentView {
     /// number is comparable to what they just earned. Nil once the milestone is behind
     /// them or a projection cannot be made.
     func drillPreview(currentLevel: Int) -> String? {
-        let milestones = [10, 20, 30, 40, Balance.maximumEquipmentLevel]
+        let milestones = [10, 20, 30, 40, 60, 100, 150, Balance.maximumEquipmentLevel]
         guard let milestone = milestones.first(where: { $0 > currentLevel + 1 }) else {
             return nil
         }

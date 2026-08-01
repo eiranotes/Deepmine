@@ -58,7 +58,12 @@ public enum MineLedgerEngine {
         return MineLedger(
             recordedRuns: entries.count,
             completedRuns: entries.count(where: \.completed),
-            deepestReturnMeters: max(state.depthMeters, entries.map(\.depthAfter).max() ?? 0),
+            // The record, not the current position: prestige sends the player back to the
+            // surface and a statistics page must not forget where they have been (D-046).
+            deepestReturnMeters: max(
+                state.recordDepthMeters,
+                entries.map(\.depthAfter).max() ?? 0
+            ),
             oreEarned: entries.reduce(0) { $0 + $1.oreEarned },
             planMix: planMix,
             entries: entries,

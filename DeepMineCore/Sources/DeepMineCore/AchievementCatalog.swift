@@ -153,8 +153,11 @@ public enum AchievementCatalog {
             threshold: 40, reward: .crystals(8)
         ),
         AchievementDefinition(
+            // The threshold is written out rather than read from the ceiling: the id and
+            // the badge art both say sixty, and raising the ceiling must not silently
+            // move a milestone the player can already see.
             id: "drill.60", family: .craft, metric: .drillLevel,
-            threshold: Balance.maximumEquipmentLevel, reward: .badge
+            threshold: 60, reward: .badge
         ),
         AchievementDefinition(
             id: "crew.balanced20", family: .craft, metric: .lowestEquipmentLevel,

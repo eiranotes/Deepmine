@@ -24,7 +24,13 @@ struct GameRootView: View {
     @State var homeRecommendation: UpgradeRecommendation?
     @State var homeProjectedOre: Double?
     @State var offlineSettlement: OfflineSettlement?
+    @State var lastPersistedSegment = -1
+    @State var lastPersistedAt = Date.distantPast
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Long enough that tapping does not become a write loop, short enough that what a
+    /// crash costs is a few seconds of play rather than a whole segment.
+    static let persistInterval: TimeInterval = 5
 
     init(
         repository: GameRepository,
@@ -110,7 +116,14 @@ struct GameRootView: View {
         .onChange(of: scenePhase) { _, phase in
             // Returning from the background is the same event as launching, as far as
             // the mine is concerned: time passed and it was working.
-            if phase == .active { settleOfflineProduction() }
+            if phase == .active {
+                settleOfflineProduction()
+            } else {
+                // Leaving may be the last thing that happens before the app is killed,
+                // so the throttle does not get to hold anything back here.
+                lastPersistedAt = .distantPast
+                persistMineFace(player)
+            }
         }
         .onChange(of: player) { _, _ in refreshRecommendation() }
     }
@@ -145,21 +158,33 @@ struct GameRootView: View {
 
     @ViewBuilder
     var clickerSectionView: some View {
-        MineFaceView(
+        ShaftView(
             player: $player,
             feedback: feedback,
-            onPersist: persistMineFace
+            onPersist: persistMineFace,
+            isLive: showsClickerRoot
         )
     }
 
+    /// The shaft is on every home screen, fixture or not. Leaving it out of fixtures
+    /// meant the one screen the game is built around was the one screen no capture test
+    /// ever looked at; `isLive` holds the clock instead.
     var clickerSection: AnyView? {
-        showsClickerRoot ? AnyView(clickerSectionView) : nil
+        AnyView(clickerSectionView)
     }
 
-    /// The clicker mutates the player on a timer, and writing every tick would be a
-    /// write per quarter second. Persisting only when a segment actually breaks keeps
-    /// the cost proportional to progress rather than to time.
+    /// The clicker mutates the player on a timer, and writing every tick would be a write
+    /// per quarter second. Writing only on a break was the other extreme: a face that
+    /// takes thousands of taps loses all of them if the app dies mid-segment. Breaking
+    /// through commits immediately; everything else is capped to one write per interval.
     func persistMineFace(_ updated: PlayerState) {
+        let segment = updated.mineFace.segmentIndex
+        let now = Date()
+        let brokeThrough = segment != lastPersistedSegment
+        guard brokeThrough
+            || now.timeIntervalSince(lastPersistedAt) >= Self.persistInterval else { return }
+        lastPersistedSegment = segment
+        lastPersistedAt = now
         try? repository?.save(updated)
     }
 

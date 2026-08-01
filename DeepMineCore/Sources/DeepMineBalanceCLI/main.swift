@@ -1,86 +1,19 @@
 import Foundation
 import DeepMineCore
-enum PersonaID: String, CaseIterable, Sendable {
-    case light
-    case standard
-    case heavy
-    case irregular
 
-    var koreanName: String {
-        switch self {
-        case .light: "라이트"
-        case .standard: "스탠다드"
-        case .heavy: "헤비"
-        case .irregular: "불규칙"
-        }
-    }
-}
-struct PersonaDefinition: Sendable {
-    let id: PersonaID
-    let lengths: [SessionLength]
-    let abandonRate: Double
-    let activeEveryDays: Int
-    let dailyGoalMinutes: Int
-    let plan: MinePlan
-}
-struct BalanceDayRow: Equatable, Sendable {
-    let persona: PersonaID
-    let day, sessions, completed, abandoned, focusedMinutes: Int
-    let oreEarned, oreBalance: Double
-    let depth, drill, cart, lamp, prestige, fatiguedMinutes: Int
-
-    var csv: String {
-        [persona.rawValue, "\(day)", "\(sessions)", "\(completed)", "\(abandoned)",
-         "\(focusedMinutes)", decimal(oreEarned), decimal(oreBalance), "\(depth)",
-         "\(drill)", "\(cart)", "\(lamp)", "\(prestige)", "\(fatiguedMinutes)"].joined(separator: ",")
-    }
-}
-struct PersonaSummary: Equatable, Sendable {
-    let persona: PersonaID
-    let totalSessions: Int
-    let firstUpgradeSession, firstPrestigeDay: Int?
-    let totalOreEarned, lifetimeFocusCredits, finalOre: Double
-    let finalDepth: Int
-    let equipment: EquipmentLevels
-    let prestigeIndex, fatiguedMinutes: Int
-}
-struct EqualTimeRow: Equatable, Sendable {
-    let length: SessionLength
-    let sessions: Int
-    let minutes: Int
-    let ore: Double
-}
-struct BalanceSimulationResult: Equatable, Sendable {
-    let rows: [BalanceDayRow]
-    let summaries: [PersonaSummary]
-    let equalTime: [EqualTimeRow]
-
-    var csv: String {
-        let header = "persona,day,sessions,completed,abandoned,focused_minutes,ore_earned,ore_balance,depth,drill,cart,lamp,prestige,fatigued_minutes"
-        return ([header] + rows.map(\.csv)).joined(separator: "\n") + "\n"
-    }
-
-    var heavyLightOreGap: Double {
-        guard let heavy = summaries.first(where: { $0.persona == .heavy })?.totalOreEarned,
-              let light = summaries.first(where: { $0.persona == .light })?.totalOreEarned,
-              light > 0 else { return .infinity }
-        return heavy / light
-    }
-
-    var heavyLightFocusGap: Double {
-        guard let heavy = summaries.first(where: { $0.persona == .heavy })?.lifetimeFocusCredits,
-              let light = summaries.first(where: { $0.persona == .light })?.lifetimeFocusCredits,
-              light > 0 else { return .infinity }
-        return heavy / light
-    }
-}
 enum BalanceSimulator {
     static let personas: [PersonaDefinition] = [
-        PersonaDefinition(id: .light, lengths: [.minutes25], abandonRate: 0.20, activeEveryDays: 1, dailyGoalMinutes: 25, plan: .safe),
-        PersonaDefinition(id: .standard, lengths: [.minutes25, .minutes25, .minutes50], abandonRate: 0.10, activeEveryDays: 1, dailyGoalMinutes: 100, plan: .safe),
-        PersonaDefinition(id: .heavy, lengths: [.minutes25, .minutes25, .minutes50, .minutes50, .minutes50, .minutes50], abandonRate: 0.05, activeEveryDays: 1, dailyGoalMinutes: 100, plan: .safe),
-        PersonaDefinition(id: .irregular, lengths: [.minutes50], abandonRate: 0.20, activeEveryDays: 2, dailyGoalMinutes: 50, plan: .survey)
+        PersonaDefinition(id: .light, lengths: [.minutes25], abandonRate: 0.20, activeEveryDays: 1, dailyGoalMinutes: 25, plan: .safe, dailyTapMinutes: 5, dailyOpenHours: 0.5),
+        PersonaDefinition(id: .standard, lengths: [.minutes25, .minutes25, .minutes50], abandonRate: 0.10, activeEveryDays: 1, dailyGoalMinutes: 100, plan: .safe, dailyTapMinutes: 15, dailyOpenHours: 1),
+        PersonaDefinition(id: .heavy, lengths: [.minutes25, .minutes25, .minutes50, .minutes50, .minutes50, .minutes50], abandonRate: 0.05, activeEveryDays: 1, dailyGoalMinutes: 100, plan: .safe, dailyTapMinutes: 40, dailyOpenHours: 3),
+        PersonaDefinition(id: .irregular, lengths: [.minutes50], abandonRate: 0.20, activeEveryDays: 2, dailyGoalMinutes: 50, plan: .survey, dailyTapMinutes: 10, dailyOpenHours: 0.75)
     ]
+    /// A sustained tapping rate. Faster is possible in bursts; this is what an hour of
+    /// play actually averages.
+    static let tapsPerSecond = 5.0
+    /// Share of taps that land on the segment's weak point when one exists. A player
+    /// aiming for it hits often, not always.
+    static let weakPointHitRate = 0.6
     static func run(seed: UInt64, days: Int) throws -> BalanceSimulationResult {
         var rows: [BalanceDayRow] = []
         var summaries: [PersonaSummary] = []
@@ -107,11 +40,11 @@ enum BalanceSimulator {
         var firstUpgrade: Int?
         var firstPrestige: Int?
         var totalOre = 0.0
-        var totalFatigued = 0
+        let totalFatigued = 0
         for day in 1...max(0, days) {
             var dailyOre = 0.0
             var dailyFocused = 0
-            var dailyFatigued = 0
+            let dailyFatigued = 0
             var completed = 0
             var abandoned = 0
             let isActive = (day - 1).isMultiple(of: persona.activeEveryDays)
@@ -178,20 +111,58 @@ enum BalanceSimulator {
                     }
                 }
             }
-            // The mine runs whether or not the player opened the app. Idle production is
-            // the baseline economy now, and it is what actually moves depth — without
-            // this the simulated ceiling never rises and the model describes a game the
-            // player cannot be in.
-            let idleUpdate = MiningLoop.advance(seconds: 86_400, in: &state)
-            dailyOre += idleUpdate.oreGained.doubleValue
-            totalOre += idleUpdate.oreGained.doubleValue
+            // A day of play, in the order it happens: the player opens the app and taps,
+            // the mine keeps running while it is open, and the rest of the day settles
+            // through the offline path where the cap and the efficiency penalty apply.
+            //
+            // Paying a flat 86,400 seconds of uncapped automation, as this once did,
+            // models a game that does not exist and hides both the cap and the hand.
+            let handUpdate = tapForADay(persona: persona, state: &state, generator: &generator)
+            dailyOre += handUpdate
+            totalOre += handUpdate
+
+            let openUpdate = MiningLoop.advance(
+                seconds: persona.dailyOpenHours * 3_600,
+                in: &state
+            )
+            dailyOre += openUpdate.oreGained.doubleValue
+            totalOre += openUpdate.oreGained.doubleValue
+
+            let closedStart = simulationDate(day: day, minute: 0)
+            let settlement = MiningLoop.settleOffline(
+                since: closedStart,
+                now: closedStart.addingTimeInterval((24 - persona.dailyOpenHours) * 3_600),
+                in: &state
+            )
+            dailyOre += settlement.oreGained.doubleValue
+            totalOre += settlement.oreGained.doubleValue
+
+            buyEverythingAffordable(
+                persona: persona, day: day, state: &state, firstUpgrade: &firstUpgrade,
+                totalSessions: totalSessions
+            )
+
+            // A reset is now earned by breaking rock, so it can come due on a day with no
+            // session at all. Checking only after a session would model a game where
+            // prestige still belongs to focus (D-045).
+            if PrestigeEngine.preview(for: state).isEligible {
+                let prestige = PrestigeEngine.prestige(
+                    PrestigeCommand(id: stableID(
+                        persona: offsetID(persona.id), day: day, event: 900
+                    )),
+                    in: &state
+                )
+                if case .prestiged = prestige, firstPrestige == nil { firstPrestige = day }
+            }
 
             rows.append(BalanceDayRow(
                 persona: persona.id, day: day,
                 sessions: isActive ? persona.lengths.count : 0,
                 completed: completed, abandoned: abandoned,
                 focusedMinutes: dailyFocused, oreEarned: dailyOre,
-                oreBalance: state.resources.ore, depth: state.depthMeters,
+                oreBalance: state.resources.ore,
+                currentDepth: state.depthMeters,
+                recordDepth: state.recordDepthMeters,
                 drill: state.equipment.drill, cart: state.equipment.cart,
                 lamp: state.equipment.lamp, prestige: state.prestigeIndex,
                 fatiguedMinutes: dailyFatigued
@@ -201,75 +172,15 @@ enum BalanceSimulator {
             persona: persona.id, totalSessions: totalSessions,
             firstUpgradeSession: firstUpgrade, firstPrestigeDay: firstPrestige,
             totalOreEarned: totalOre, lifetimeFocusCredits: state.lifetimeFocusCredits,
-            finalOre: state.resources.ore, finalDepth: state.depthMeters,
+            finalOre: state.resources.ore,
+            finalCurrentDepth: state.depthMeters,
+            finalRecordDepth: state.recordDepthMeters,
             equipment: state.equipment, prestigeIndex: state.prestigeIndex,
             fatiguedMinutes: totalFatigued
         ))
     }
-    private static func nextRecommendation(
-        persona: PersonaDefinition,
-        after index: Int,
-        dailyMinutes: Int,
-        state: PlayerState
-    ) throws -> UpgradeRecommendation? {
-        let length = persona.lengths[(index + 1) % persona.lengths.count]
-        let input = makeInput(
-            id: stableID(persona: offsetID(persona.id), day: 0, event: index),
-            outcome: .completed, length: length, plan: persona.plan,
-            dailySession: index + 2, dailyMinutes: dailyMinutes,
-            resonance: state.resonanceBoostPending, vein: nil, state: state
-        )
-        return try UpgradeAdvisor.recommend(for: state, nextSession: input)
-    }
-    private static func makeInput(
-        id: UUID, outcome: SessionOutcome, length: SessionLength, plan: MinePlan,
-        dailySession: Int, dailyMinutes: Int, resonance: Bool, vein: VeinKind?,
-        state: PlayerState
-    ) -> RewardInput {
-        RewardInput(
-            completionID: id, outcome: outcome, sessionLength: length,
-            plan: plan, verificationGrade: .sealed,
-            growthFocusCredits: state.lifetimeFocusCredits,
-            streakDays: state.streakDays, dailySessionNumber: dailySession,
-            equipment: state.equipment, vein: vein,
-            resonanceBoostActive: resonance,
-            permanentUpgrades: state.permanentUpgrades
-        )
-    }
-    private static func equalTimeComparison() throws -> [EqualTimeRow] {
-        let examples: [(SessionLength, Int)] = [(.minutes15, 10), (.minutes25, 6), (.minutes50, 3)]
-        return try examples.map { length, sessions in
-            var lifetime = 0.0
-            var ore = 0.0
-            for index in 0..<sessions {
-                let input = RewardInput(
-                    completionID: stableID(persona: 9, day: length.minutes, event: index),
-                    outcome: .completed, sessionLength: length, plan: .safe,
-                    verificationGrade: .sealed, growthFocusCredits: lifetime,
-                    streakDays: 1, dailySessionNumber: 1, equipment: EquipmentLevels(),
-                    vein: nil, resonanceBoostActive: false
-                )
-                let reward = try RewardCalculator.calculate(input)
-                ore += reward.ore
-                lifetime += reward.focusCredits
-            }
-            return EqualTimeRow(length: length, sessions: sessions, minutes: 150, ore: ore)
-        }
-    }
-    private static func randomUnit(_ generator: inout SeededGenerator) -> Double {
-        Double(generator.next() >> 11) / 9_007_199_254_740_992
-    }
-    private static func stableID(persona: Int, day: Int, event: Int) -> UUID {
-        UUID(uuidString: String(format: "00000000-0000-%04X-%04X-%012X", persona, day, event))!
-    }
-    private static func offsetID(_ persona: PersonaID) -> Int {
-        PersonaID.allCases.firstIndex(of: persona)! + 1
-    }
-    private static func simulationDate(day: Int, minute: Int) -> Date {
-        Date(timeIntervalSince1970: TimeInterval((day - 1) * 86_400 + minute * 60))
-    }
 }
-private func decimal(_ value: Double) -> String { String(format: "%.6f", value) }
+func decimal(_ value: Double) -> String { String(format: "%.6f", value) }
 private func cliValue(_ name: String, arguments: [String]) -> String? {
     guard let index = arguments.firstIndex(of: name), arguments.indices.contains(index + 1) else { return nil }
     return arguments[index + 1]
@@ -282,7 +193,7 @@ do {
     let result = try BalanceSimulator.run(seed: seed, days: days)
     try result.csv.write(toFile: output, atomically: true, encoding: .utf8)
     for summary in result.summaries {
-        print("\(summary.persona.koreanName): firstUpgrade=\(summary.firstUpgradeSession.map(String.init) ?? "-") firstPrestigeDay=\(summary.firstPrestigeDay.map(String.init) ?? "-") ore=\(decimal(summary.totalOreEarned)) fatigue=\(summary.fatiguedMinutes)")
+        print("\(summary.persona.koreanName): firstUpgrade=\(summary.firstUpgradeSession.map(String.init) ?? "-") firstPrestigeDay=\(summary.firstPrestigeDay.map(String.init) ?? "-") currentDepth=\(summary.finalCurrentDepth) recordDepth=\(summary.finalRecordDepth) ore=\(decimal(summary.totalOreEarned)) fatigue=\(summary.fatiguedMinutes)")
     }
     print("heavy/light ore gap: \(decimal(result.heavyLightOreGap))x")
     print("heavy/light focus gap: \(decimal(result.heavyLightFocusGap))x")

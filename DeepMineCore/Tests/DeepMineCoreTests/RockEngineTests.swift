@@ -23,14 +23,23 @@ final class RockEngineTests: XCTestCase {
         XCTAssertGreaterThan(deep, shallow)
     }
 
-    /// Integrity must outrun ore, otherwise upgrades have nothing to fix and the game
-    /// flattens out. This is the balance invariant, not an incidental property.
-    func testIntegrityOutrunsOreYield() {
-        let near = RockGenerator.segment(at: 20)
-        let far = RockGenerator.segment(at: 220)
-        let integrityRatio = (far.maximumIntegrity / near.maximumIntegrity).doubleValue
-        let oreRatio = (far.oreYield / near.oreYield).doubleValue
-        XCTAssertGreaterThan(integrityRatio, oreRatio)
+    /// Integrity must outrun the damage a segment's own ore can buy — otherwise upgrades
+    /// have nothing to fix — but only by a little, or the descent walls off (D-044).
+    ///
+    /// Comparing integrity against raw ore, as this once did, compares a resistance to a
+    /// currency. What matters is resistance against the damage that currency purchases:
+    /// ore compounds at 1.07 a segment and a level costs 1.34, so a segment funds
+    /// log(1.07)/log(1.34) levels of 1.12 damage.
+    func testIntegrityOutrunsThePurchasedDamageItFunds() {
+        let levelsPerSegment = log(Balance.segmentOreGrowthRate)
+            / log(Balance.equipmentPriceGrowthRate)
+        let damageGrowth = pow(Balance.drillRewardGrowthRate, levelsPerSegment)
+        let slowdown = Balance.segmentIntegrityGrowthRate / damageGrowth
+
+        XCTAssertGreaterThan(slowdown, 1, "A descent that speeds up forever has no goal")
+        // Above ~3% a segment the gap compounds into a wall: 1.057 was a factor of three
+        // million across a 300-segment run, and the abyss became unreachable.
+        XCTAssertLessThan(slowdown, 1.05, "The descent must slow, not stop")
     }
 
     func testSeamsLandOnTheInterval() {

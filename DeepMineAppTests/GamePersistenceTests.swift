@@ -20,6 +20,7 @@ final class GamePersistenceTests: XCTestCase {
             equipment: EquipmentLevels(drill: 8, cart: 6, lamp: 5),
             runFocusCredits: 31.5,
             lifetimeFocusCredits: 94.25,
+            runSegmentsBroken: 88,
             completedSessionCount: 18,
             bonusDepthMeters: 240,
             history: [
@@ -75,7 +76,19 @@ final class GamePersistenceTests: XCTestCase {
             endAlertPermission: .deferred,
             returnReminderPermission: .granted,
             lastSelectedPlan: .survey,
-            lastSelectedDuration: .minutes50
+            lastSelectedDuration: .minutes50,
+            // The clicker's position. It was absent from the store entirely, so every
+            // tap between one break and the next launch was silently dropped and the
+            // player restarted at the surface.
+            mineFace: MineFaceState(
+                segmentIndex: 412,
+                remainingIntegrity: RockGenerator.segment(at: 412).maximumIntegrity / 3,
+                impact: ImpactMeter(value: 42),
+                lifetimeSegmentsBroken: 1_902,
+                lifetimeSeamsBroken: 74
+            ),
+            deepestSegmentIndex: 690,
+            lastSettledAt: Date(timeIntervalSince1970: 1_750_000_500)
         )
 
         var repository: GameRepository? = try GameRepository.open(storeURL: storeURL)

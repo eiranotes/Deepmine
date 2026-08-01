@@ -37,8 +37,10 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
         let player = PlayerState(
             resources: Resources(ore: 700, crystals: 4, coreShards: 2),
             equipment: EquipmentLevels(drill: 5, cart: 4, lamp: 3),
-            runFocusCredits: Balance.initialPrestigeTarget,
+            runFocusCredits: 12,
             lifetimeFocusCredits: 64,
+            // A reset is earned by breaking rock now, not by focusing (D-045).
+            runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0),
             bonusDepthMeters: 60,
             dailyGoalMinutes: 100,
             streakDays: 7,
@@ -62,8 +64,8 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
         XCTAssertEqual(newIndex, 1)
         XCTAssertEqual(replay, .duplicate)
         XCTAssertEqual(fixture.repository.player.resources.ore, 0)
-        // 2 existing + floor(40 run credits / 10)
-        XCTAssertEqual(fixture.repository.player.resources.coreShards, 6)
+        // 2 existing + floor(120 broken segments / 40)
+        XCTAssertEqual(fixture.repository.player.resources.coreShards, 5)
         // Prestige now evaluates achievements, and this fixture already satisfies
         // several of them, so the first evaluation pays them out retroactively.
         XCTAssertEqual(fixture.repository.player.resources.crystals, 16)
@@ -72,8 +74,10 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
         )
         XCTAssertEqual(fixture.repository.player.equipment, EquipmentLevels())
         XCTAssertEqual(fixture.repository.player.runFocusCredits, 0)
-        // Depth is lifetime now, so the abyss bonus survives prestige.
-        XCTAssertEqual(fixture.repository.player.bonusDepthMeters, 60)
+        // Legacy abyss depth is migrated into the record; the reset itself is surface.
+        XCTAssertEqual(fixture.repository.player.bonusDepthMeters, 0)
+        XCTAssertEqual(fixture.repository.player.depthMeters, 0)
+        XCTAssertGreaterThan(fixture.repository.player.recordDepthMeters, 0)
         XCTAssertEqual(fixture.repository.player.lifetimeFocusCredits, 64)
         XCTAssertEqual(fixture.repository.player.streakDays, 7)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
@@ -115,7 +119,7 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
     func testStorageFailureLeavesPrestigeUnpersisted() throws {
         let player = PlayerState(
             resources: Resources(ore: 700),
-            runFocusCredits: Balance.initialPrestigeTarget
+            runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0)
         )
         let fixture = makeFixture(player: player)
         fixture.repository.failPlayerSave = true
@@ -134,7 +138,12 @@ final class GameStoreSettingsPrestigeTests: XCTestCase {
         let options = try fixture.store.themePresentations()
 
         XCTAssertEqual(options.map(\.theme), MineTheme.allCases)
-        XCTAssertEqual(options.map(\.unlockDepthMeters), [0, 120, 480, 1_200])
+        XCTAssertEqual(options.map(\.unlockDepthMeters), [
+            0,
+            Balance.crystalRegionDepth,
+            Balance.ruinsRegionDepth,
+            Balance.abyssRegionDepth
+        ])
         XCTAssertEqual(options.map(\.isUnlocked), [true, true, false, false])
         XCTAssertEqual(options.map(\.isSelected), [false, true, false, false])
     }

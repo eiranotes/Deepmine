@@ -61,11 +61,11 @@ struct PrestigeView: View {
                         .font(.headline)
                         .accessibilityIdentifier("prestige-preview")
                     DeepMineProgressRail(
-                        value: preview.currentRunFocusCredits,
-                        total: preview.targetRunFocusCredits,
+                        value: Double(preview.currentRunSegments),
+                        total: Double(preview.targetRunSegments),
                         accessibilityLabel: DeepMineStrings.text(.prestigeProgress)
                     )
-                    Text("\(DeepMineNumberFormatter.string(preview.currentRunFocusCredits)) / \(DeepMineNumberFormatter.string(preview.targetRunFocusCredits))")
+                    Text("\(preview.currentRunSegments) / \(preview.targetRunSegments) \(DeepMineStrings.text(.prestigeSegments))")
                         .font(.subheadline.monospacedDigit().weight(.heavy))
                     Text(DeepMineStrings.text(preview.isEligible ? .prestigeEligible : .prestigeIneligible))
                         .font(.subheadline)
@@ -94,7 +94,10 @@ struct PrestigeView: View {
                         .foregroundStyle(DeepMinePalette.brass.color)
                     Text(DeepMineStrings.text(.prestigeLossBody)).font(.subheadline)
                     lossRow(.gameOre, value: DeepMineNumberFormatter.string(preview.losses.ore))
-                    lossRow(.gameFocus, value: DeepMineNumberFormatter.string(preview.losses.runFocusCredits))
+                    // The position goes back to the surface too, which is the loss a
+                    // player most needs to see before confirming (D-046).
+                    lossRow(.prestigeSegments, value: "\(preview.losses.runSegmentsBroken)")
+                    lossRow(.gameDepth, value: DeepMineStrings.text(.prestigeDepthReset))
                     lossRow(.gameDrill, value: "Lv. \(preview.losses.equipment.drill)")
                     lossRow(.gameCart, value: "Lv. \(preview.losses.equipment.cart)")
                     lossRow(.gameLamp, value: "Lv. \(preview.losses.equipment.lamp)")
@@ -187,11 +190,11 @@ struct PrestigeView: View {
                         size: 36
                     )
                     .accessibilityHidden(true)
-                    Text(DeepMineStrings.text(upgradeTitle(option.upgrade))).font(.headline)
+                    Text(DeepMineStrings.text(DeepMinePrestigeLabels.title(option.upgrade))).font(.headline)
                     Spacer()
                     Text("Lv. \(option.currentLevel)").font(.subheadline.monospacedDigit().weight(.bold))
                 }
-                Text(DeepMineStrings.text(upgradeEffect(option.upgrade))).font(.subheadline)
+                Text(DeepMineStrings.text(DeepMinePrestigeLabels.effect(option.upgrade))).font(.subheadline)
                 Button { purchase(option.upgrade) } label: {
                     HStack {
                         Text(DeepMineStrings.text(option.isMaximum ? .equipmentMaximum : .actionBuy))
@@ -293,12 +296,5 @@ struct PrestigeView: View {
     private func presentations() -> [PermanentUpgradePresentation] {
         (try? gameStore?.permanentUpgradePresentations())
             ?? GameStore.permanentUpgradePresentations(for: player)
-    }
-
-    private func upgradeTitle(_ kind: PermanentUpgradeKind) -> DeepMineStringKey {
-        switch kind { case .excavationMemory: .prestigeUpgradeMemory; case .resonanceDetection: .prestigeUpgradeResonance; case .compressedTime: .prestigeUpgradeTime }
-    }
-    private func upgradeEffect(_ kind: PermanentUpgradeKind) -> DeepMineStringKey {
-        switch kind { case .excavationMemory: .prestigeEffectMemory; case .resonanceDetection: .prestigeEffectResonance; case .compressedTime: .prestigeEffectTime }
     }
 }

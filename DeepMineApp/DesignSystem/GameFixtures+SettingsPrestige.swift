@@ -3,21 +3,22 @@ import DeepMineCore
 extension GameFixtures {
     static func settingsPlayer(named name: String?) -> PlayerState? {
         switch name {
-        // Depth is lifetime based, so a locked theme needs a shallow lifetime.
+        // Themes unlock on depth, and depth is broken rock, so a locked theme needs a
+        // shallow face rather than a small credit balance.
         case "theme-locked":
-            settingsBase(runFocusCredits: 1, lifetimeFocusCredits: 1, unlockedThemes: [.entry])
+            settingsBase(unlockedThemes: [.entry], segmentIndex: 0)
         case "theme-unlocked":
             settingsBase(unlockedThemes: Set(MineTheme.allCases), selectedTheme: .crystal)
         case "settings-ready", "settings-denied", "settings-needs-list",
              "settings-recovery", "settings-feedback-off":
             settingsBase()
         case "prestige-ineligible":
-            settingsBase(runFocusCredits: Balance.initialPrestigeTarget - 1)
+            settingsBase(runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0) - 1)
         case "prestige-ready":
             settingsBase(
                 resources: Resources(ore: 24_800, crystals: 8, coreShards: 2),
                 equipment: EquipmentLevels(drill: 9, cart: 7, lamp: 6),
-                runFocusCredits: Balance.initialPrestigeTarget
+                runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0)
             )
         case "prestige-shards":
             settingsBase(resources: Resources(coreShards: 6), prestigeIndex: 1)
@@ -62,15 +63,18 @@ extension GameFixtures {
         equipment: EquipmentLevels = EquipmentLevels(drill: 4, cart: 3, lamp: 2),
         runFocusCredits: Double = 12,
         lifetimeFocusCredits: Double = 64,
+        runSegmentsBroken: Int = 12,
         unlockedThemes: Set<MineTheme> = [.entry, .crystal],
         selectedTheme: MineTheme = .entry,
-        prestigeIndex: Int = 0
+        prestigeIndex: Int = 0,
+        segmentIndex: Int = 400
     ) -> PlayerState {
         PlayerState(
             resources: resources,
             equipment: equipment,
             runFocusCredits: runFocusCredits,
             lifetimeFocusCredits: lifetimeFocusCredits,
+            runSegmentsBroken: runSegmentsBroken,
             completedSessionCount: 12,
             dailyGoalMinutes: Balance.defaultDailyGoalMinutes,
             streakDays: 7,
@@ -80,7 +84,7 @@ extension GameFixtures {
             onboardingStage: .complete,
             // Themes unlock on depth, and depth is broken rock now (D-040). A settings
             // fixture with no mine face has every depth-gated row locked.
-            mineFace: MineFaceState(segmentIndex: 400)
+            mineFace: MineFaceState(segmentIndex: segmentIndex)
         )
     }
 }

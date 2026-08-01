@@ -2,7 +2,7 @@ import Foundation
 
 public struct PrestigeLossPreview: Codable, Equatable, Sendable {
     public let ore: Double
-    public let runFocusCredits: Double
+    public let runSegmentsBroken: Int
     public let equipment: EquipmentLevels
 }
 
@@ -16,8 +16,8 @@ public struct PrestigeGainPreview: Codable, Equatable, Sendable {
 public struct PrestigePreview: Codable, Equatable, Sendable {
     public let losses: PrestigeLossPreview
     public let gains: PrestigeGainPreview
-    public let currentRunFocusCredits: Double
-    public let targetRunFocusCredits: Double
+    public let currentRunSegments: Int
+    public let targetRunSegments: Int
     public let isEligible: Bool
 }
 
@@ -60,10 +60,12 @@ public enum PermanentUpgradePurchaseResult: Codable, Equatable, Sendable {
 }
 
 public enum PrestigeEngine {
-    public static func target(prestigeIndex: Int) -> Double {
+    /// Segments the current run must break before a reset is offered.
+    public static func target(prestigeIndex: Int) -> Int {
         let value = Balance.initialPrestigeTarget
             * pow(Balance.prestigeTargetGrowthRate, Double(max(0, prestigeIndex)))
-        return value.isFinite ? value : Double.greatestFiniteMagnitude
+        guard value.isFinite, value < Double(Int.max) else { return Int.max }
+        return max(1, Int(value.rounded()))
     }
 
     public static func preview(for state: PlayerState) -> PrestigePreview {
@@ -71,17 +73,17 @@ public enum PrestigeEngine {
         return PrestigePreview(
             losses: PrestigeLossPreview(
                 ore: state.resources.ore,
-                runFocusCredits: state.runFocusCredits,
+                runSegmentsBroken: state.runSegmentsBroken,
                 equipment: state.equipment
             ),
             gains: PrestigeGainPreview(
-                coreShards: shardGrant(runFocusCredits: state.runFocusCredits),
-                keptDepthMeters: state.depthMeters,
+                coreShards: shardGrant(runSegmentsBroken: state.runSegmentsBroken),
+                keptDepthMeters: state.recordDepthMeters,
                 rebuyDiscount: Balance.rememberedRebuyDiscount
             ),
-            currentRunFocusCredits: state.runFocusCredits,
-            targetRunFocusCredits: target,
-            isEligible: state.runFocusCredits.isFinite && state.runFocusCredits >= target
+            currentRunSegments: state.runSegmentsBroken,
+            targetRunSegments: target,
+            isEligible: state.runSegmentsBroken >= target
         )
     }
 
@@ -101,6 +103,15 @@ public enum PrestigeEngine {
         )
         state.equipment = EquipmentLevels()
         state.runFocusCredits = 0
+        state.runSegmentsBroken = 0
+        // Back to the surface with the tools gone. Keeping the position while resetting
+        // the equipment left the player facing rock they could no longer break, which is
+        // a reset that costs everything and returns nothing (D-046). The ceiling, the
+        // regions and the depth achievements all read `recordDepthMeters` and stay.
+        state.mineFace = MineFaceState(
+            lifetimeSegmentsBroken: state.mineFace.lifetimeSegmentsBroken,
+            lifetimeSeamsBroken: state.mineFace.lifetimeSeamsBroken
+        )
         if state.prestigeIndex < Int.max { state.prestigeIndex += 1 }
         state.appliedPrestigeCommandIDs.insert(command.id)
         return .prestiged(preview: preview, newPrestigeIndex: state.prestigeIndex)
@@ -161,9 +172,9 @@ public enum PrestigeEngine {
 
     /// Scales with the run that was actually dug, so overshooting the target is never
     /// wasted and a later prestige is never worth less than an earlier one.
-    static func shardGrant(runFocusCredits: Double) -> Int {
-        guard runFocusCredits.isFinite, runFocusCredits > 0 else { return 1 }
-        let scaled = floor(runFocusCredits / Balance.prestigeShardCreditDivisor)
+    static func shardGrant(runSegmentsBroken: Int) -> Int {
+        guard runSegmentsBroken > 0 else { return 1 }
+        let scaled = floor(Double(runSegmentsBroken) / Balance.prestigeShardSegmentDivisor)
         guard scaled.isFinite, scaled < Double(Int.max) else { return Int.max }
         return max(1, Int(scaled))
     }

@@ -4,22 +4,26 @@ import XCTest
 
 final class PrestigeTests: XCTestCase {
     func testEligibilityTargetBoundariesAndLossFirstPreview() {
-        let below = PlayerState(resources: Resources(ore: 999), runFocusCredits: 39.999)
+        let target = PrestigeEngine.target(prestigeIndex: 0)
+        let below = PlayerState(resources: Resources(ore: 999), runSegmentsBroken: target - 1)
         let belowPreview = PrestigeEngine.preview(for: below)
-        XCTAssertEqual(belowPreview.targetRunFocusCredits, 40)
+        XCTAssertEqual(belowPreview.targetRunSegments, 120)
         XCTAssertFalse(belowPreview.isEligible)
         XCTAssertEqual(belowPreview.losses.ore, 999)
-        XCTAssertEqual(belowPreview.losses.runFocusCredits, 39.999)
-        XCTAssertEqual(belowPreview.gains.coreShards, 3)
+        XCTAssertEqual(belowPreview.losses.runSegmentsBroken, target - 1)
+        XCTAssertEqual(belowPreview.gains.coreShards, 2)
         XCTAssertEqual(belowPreview.gains.rebuyDiscount, Balance.rememberedRebuyDiscount)
 
-        let exact = PlayerState(runFocusCredits: 40)
+        let exact = PlayerState(runSegmentsBroken: target)
         XCTAssertTrue(PrestigeEngine.preview(for: exact).isEligible)
-        XCTAssertEqual(PrestigeEngine.target(prestigeIndex: 1), 64, accuracy: 1e-12)
+        XCTAssertEqual(PrestigeEngine.target(prestigeIndex: 1), 180)
     }
 
     func testPrestigeBeforeTargetDoesNotMutate() {
-        var state = PlayerState(resources: Resources(ore: 500), runFocusCredits: 39.9)
+        var state = PlayerState(
+            resources: Resources(ore: 500),
+            runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0) - 1
+        )
         let snapshot = state
         let result = PrestigeEngine.prestige(PrestigeCommand(id: UUID()), in: &state)
         guard case .ineligible(let preview) = result else {
@@ -39,7 +43,7 @@ final class PrestigeTests: XCTestCase {
         var state = PlayerState(
             resources: Resources(ore: 1_000, crystals: 7, coreShards: 2),
             equipment: EquipmentLevels(drill: 5, cart: 4, lamp: 3),
-            runFocusCredits: 40, lifetimeFocusCredits: 80,
+            runFocusCredits: 40, lifetimeFocusCredits: 80, runSegmentsBroken: 240,
             completedSessionCount: 60, bonusDepthMeters: 60,
             history: history, dailyGoalMinutes: 100, streakDays: 7,
             dailyRecords: daily, consecutiveVeinMisses: 4,
@@ -58,11 +62,15 @@ final class PrestigeTests: XCTestCase {
         XCTAssertEqual(state.prestigeIndex, 1)
         XCTAssertEqual(state.resources.ore, 0)
         XCTAssertEqual(state.resources.crystals, 7)
-        XCTAssertEqual(state.resources.coreShards, 6)
+        XCTAssertEqual(state.resources.coreShards, 8)
         XCTAssertEqual(state.equipment, EquipmentLevels())
         XCTAssertEqual(state.runFocusCredits, 0)
-        // Depth is lifetime now, so its abyss bonus survives prestige too.
-        XCTAssertEqual(state.bonusDepthMeters, 60)
+        XCTAssertEqual(state.runSegmentsBroken, 0)
+        // The legacy abyss offset was migrated into the durable depth record. The reset
+        // position itself is genuinely the surface.
+        XCTAssertEqual(state.bonusDepthMeters, 0)
+        XCTAssertEqual(state.depthMeters, 0)
+        XCTAssertGreaterThanOrEqual(state.recordDepthMeters, 60)
         XCTAssertEqual(state.rememberedEquipment, EquipmentLevels(drill: 5, cart: 4, lamp: 3))
         XCTAssertEqual(state.lifetimeFocusCredits, 80)
         XCTAssertEqual(state.completedSessionCount, 60)
@@ -80,18 +88,21 @@ final class PrestigeTests: XCTestCase {
     }
 
     func testShardGrantScalesWithTheRunThatWasActuallyDug() {
-        var state = PlayerState(runFocusCredits: 64, prestigeIndex: 1)
+        var state = PlayerState(runSegmentsBroken: 240, prestigeIndex: 1)
         let result = PrestigeEngine.prestige(PrestigeCommand(id: UUID()), in: &state)
         guard case .prestiged(_, let newIndex) = result else {
             return XCTFail("Expected prestige")
         }
         XCTAssertEqual(newIndex, 2)
         XCTAssertEqual(state.resources.coreShards, 6)
-        XCTAssertEqual(PrestigeEngine.target(prestigeIndex: 2), 102.4, accuracy: 1e-12)
+        XCTAssertEqual(PrestigeEngine.target(prestigeIndex: 2), 270)
         // Overshooting the target is never wasted.
-        XCTAssertEqual(PrestigeEngine.shardGrant(runFocusCredits: 40), 4)
-        XCTAssertEqual(PrestigeEngine.shardGrant(runFocusCredits: 120), 12)
-        XCTAssertEqual(PrestigeEngine.shardGrant(runFocusCredits: 0), 1)
+        XCTAssertEqual(PrestigeEngine.shardGrant(runSegmentsBroken: 120), 3)
+        XCTAssertEqual(PrestigeEngine.shardGrant(runSegmentsBroken: 400), 10)
+        XCTAssertEqual(PrestigeEngine.shardGrant(runSegmentsBroken: 0), 1)
+        // Focus alone never opens a reset — the run is measured in rock (D-045).
+        let focusOnly = PlayerState(runFocusCredits: 10_000, lifetimeFocusCredits: 10_000)
+        XCTAssertFalse(PrestigeEngine.preview(for: focusOnly).isEligible)
     }
 
     func testPrestigeDoesNotReduceCappedGrowthMultiplier() throws {
@@ -108,9 +119,42 @@ final class PrestigeTests: XCTestCase {
         XCTAssertEqual(after.ore, before.ore, accuracy: 1e-12)
     }
 
+    /// A reset that keeps the position leaves level-one equipment facing rock it cannot
+    /// break. Going back to the surface is what makes the second descent possible, and
+    /// the record is what keeps it from being a demotion (D-046).
+    func testPrestigeReturnsToTheSurfaceButKeepsWhatWasOpened() {
+        let deep = ProgressionEngine.segmentIndex(forDepth: Balance.ruinsRegionDepth)
+        var state = PlayerState(
+            equipment: EquipmentLevels(drill: 40, cart: 38, lamp: 36),
+            runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0),
+            mineFace: MineFaceState(segmentIndex: deep, lifetimeSegmentsBroken: deep)
+        )
+        let ceilingBefore = state.unlockedEquipmentLevel
+        WorldProgression.unlockThemesForCurrentDepth(in: &state)
+        let themesBefore = state.unlockedThemes
+
+        guard case .prestiged = PrestigeEngine.prestige(
+            PrestigeCommand(id: UUID()), in: &state
+        ) else {
+            return XCTFail("Expected prestige")
+        }
+
+        XCTAssertEqual(state.mineFace.segmentIndex, 0)
+        XCTAssertEqual(state.depthMeters, 0)
+        XCTAssertEqual(state.recordDepthMeters, Balance.ruinsRegionDepth)
+        XCTAssertEqual(state.unlockedEquipmentLevel, ceilingBefore)
+        XCTAssertEqual(state.unlockedThemes, themesBefore)
+        XCTAssertEqual(state.mineFace.lifetimeSegmentsBroken, deep)
+        // The surface is breakable with the equipment a reset leaves behind.
+        XCTAssertLessThan(
+            state.mineFace.segment.maximumIntegrity.doubleValue,
+            RockGenerator.segment(at: deep).maximumIntegrity.doubleValue
+        )
+    }
+
     func testPrestigeCommandReplayDoesNotApplyTwice() {
         let command = PrestigeCommand(id: UUID())
-        var state = PlayerState(runFocusCredits: 40)
+        var state = PlayerState(runSegmentsBroken: PrestigeEngine.target(prestigeIndex: 0))
         PrestigeEngine.prestige(command, in: &state)
         let snapshot = state
         XCTAssertEqual(PrestigeEngine.prestige(command, in: &state), .duplicate)

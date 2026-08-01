@@ -23,15 +23,23 @@ struct MineHomeView: View {
         ScrollView {
             VStack(spacing: 17) {
                 masthead
+                // The shaft is the game, so it sits directly under the ore counter and
+                // above everything else. What used to lead this screen — a plan, a
+                // duration and a promise to focus — is one optional route among the rest
+                // now that the mine runs without it (D-047).
                 if let mineFace {
                     mineFace
-                        .frame(height: 300)
                         .accessibilityIdentifier("mine-home-rock")
                 }
-                mineControlScene
                 equipmentSummary
-                startButton
+                DeepMineRivetedPanel {
+                    VStack(spacing: 15) {
+                        nextPromise
+                        mineScene
+                    }
+                }
                 ProgressNavigationPanel(context: progressContext)
+                focusAmplifier
             }
             .padding(17)
         }
@@ -71,16 +79,33 @@ struct MineHomeView: View {
         }
     }
 
-    private var mineControlScene: some View {
+    /// Focus, as it stands after the pivot: an optional multiplier with its own panel,
+    /// not the thing the screen is built around. Collapsed to a single control until the
+    /// player opens it, so a mine that never focuses never has to look at a timer.
+    private var focusAmplifier: some View {
         DeepMineRivetedPanel {
-            VStack(spacing: 17) {
-                mineScene
-                Divider().overlay(DeepMinePalette.limestone.color.opacity(0.22))
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 10) {
+                    Image(systemName: "target")
+                        .foregroundStyle(DeepMinePalette.brass.color)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(DeepMineStrings.text(.homeFocusAmplifierTitle))
+                            .font(.subheadline.weight(.bold))
+                        Text(DeepMineStrings.text(.homeFocusAmplifierDetail))
+                            .font(.caption2)
+                            .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("mine-home-focus-amplifier")
                 todayProgress
                 planSelector
                 durationSelector
-                nextPromise
+                startButton
             }
         }
     }
+
 }

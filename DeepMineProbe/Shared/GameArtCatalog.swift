@@ -12,6 +12,7 @@ import Foundation
 /// fills it, which is why it lives in code instead of only in the document.
 enum GameArtCatalog {
     static let promptDocumentPath = "docs/ROCK_ART_PROMPTS.md"
+    static let shaftPromptDocumentPath = "docs/SHAFT_ART_PROMPTS.md"
 
     static func rockFace(region: String, stage: Int) -> GameArtEntry {
         let safeRegion = normalizedRegion(region)
@@ -55,6 +56,33 @@ enum GameArtCatalog {
         placeholder: .resonanceNode
     )
 
+    static let shaftGantry = GameArtEntry(
+        name: "ShaftGantry",
+        promptID: "shaft-gantry",
+        placeholder: .shaftGantry
+    )
+
+    static let seamVein = GameArtEntry(
+        name: "SeamVein",
+        promptID: "seam-vein",
+        placeholder: .seamVein
+    )
+
+    static func shaftRock(region: String) -> GameArtEntry {
+        let safeRegion = normalizedRegion(region)
+        return GameArtEntry(
+            name: "ShaftRock_\(safeRegion)",
+            promptID: "shaft-rock-\(safeRegion)",
+            placeholder: .shaftRock(region: safeRegion)
+        )
+    }
+
+    static let shaftSurface = GameArtEntry(
+        name: "ShaftSurface",
+        promptID: "shaft-surface",
+        placeholder: .shaftSurface
+    )
+
     /// The full slot list, used by the audit test that keeps this registry and the prompt
     /// document from drifting apart.
     static var allEntries: [GameArtEntry] {
@@ -71,6 +99,20 @@ enum GameArtCatalog {
         entries.append(debris(isLarge: true))
         entries.append(resonanceNode)
         return entries
+    }
+
+    static let shaftEntries = [
+        shaftGantry,
+        seamVein,
+        shaftRock(region: "entry"),
+        shaftRock(region: "crystal"),
+        shaftRock(region: "ruins"),
+        shaftRock(region: "abyss"),
+        shaftSurface,
+    ]
+
+    static var installedEntries: [GameArtEntry] {
+        allEntries + shaftEntries
     }
 
     private static func normalizedRegion(_ region: String) -> String {
@@ -102,4 +144,8 @@ enum GameArtPlaceholder: Equatable, Sendable {
     case weakPoint(isStruck: Bool)
     case debris(isLarge: Bool)
     case resonanceNode
+    case shaftGantry
+    case seamVein
+    case shaftRock(region: String)
+    case shaftSurface
 }

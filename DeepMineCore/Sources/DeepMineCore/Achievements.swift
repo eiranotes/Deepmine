@@ -101,7 +101,9 @@ public enum AchievementEngine {
             values[.lifetimeFocusMinutes] = Self.saturating(
                 state.lifetimeFocusCredits * Balance.minutesPerFocusCredit
             )
-            values[.depthMeters] = state.depthMeters
+            // Depth achievements mark the deepest point ever reached; a prestige is not
+            // a reason to take a badge back.
+            values[.depthMeters] = state.recordDepthMeters
             values[.streakDays] = state.streakDays
             values[.miningDays] = state.dailyRecords.count
             values[.distinctVeinKinds] = Set(state.history.compactMap(\.vein)).count

@@ -11,8 +11,7 @@ final class ActiveMineUITests: XCTestCase {
 
     func testHomeSelectionFlowsIntoPreflightTruthfully() {
         launch(fixture: "preflight-survey", readiness: "sealed")
-        XCTAssertTrue(app.buttons["mine-home-start"].waitForExistence(timeout: 5))
-        app.buttons["mine-home-start"].tap()
+        tapHomeStart()
         XCTAssertTrue(element("preflight-selection").waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["탐사 갱도"].exists)
         XCTAssertTrue(app.staticTexts["50 분"].exists)
@@ -21,7 +20,7 @@ final class ActiveMineUITests: XCTestCase {
 
     func testOpenPreflightExplainsMultiplierAndRemainsPlayable() {
         launch(fixture: "preflight-open", readiness: "open")
-        app.buttons["mine-home-start"].tap()
+        tapHomeStart()
         XCTAssertTrue(element("preflight-readiness-open").waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts.matching(
             NSPredicate(format: "label CONTAINS %@", "×0.75")
@@ -32,7 +31,7 @@ final class ActiveMineUITests: XCTestCase {
 
     func testConfirmStartTransitionsToQuietActiveMine() {
         launch(fixture: "preflight-sealed", readiness: "sealed")
-        app.buttons["mine-home-start"].tap()
+        tapHomeStart()
         XCTAssertTrue(app.buttons["preflight-confirm-start"].waitForExistence(timeout: 3))
         app.buttons["preflight-confirm-start"].tap()
         XCTAssertTrue(element("preflight-preparing").waitForExistence(timeout: 2))
@@ -101,7 +100,7 @@ final class ActiveMineUITests: XCTestCase {
 
     private func assertReadiness(fixture: String, readiness: String) {
         launch(fixture: fixture, readiness: readiness)
-        app.buttons["mine-home-start"].tap()
+        tapHomeStart()
         XCTAssertTrue(element("preflight-readiness-\(readiness)").waitForExistence(timeout: 3))
     }
 
@@ -156,5 +155,13 @@ final class ActiveMineUITests: XCTestCase {
 
     private func element(_ identifier: String) -> XCUIElement {
         app.descendants(matching: .any)[identifier]
+    }
+
+    private func tapHomeStart() {
+        let start = app.buttons["mine-home-start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5), "mine-home-start")
+        for _ in 0..<5 where !start.isHittable { app.swipeUp() }
+        XCTAssertTrue(start.isHittable, "mine-home-start")
+        start.tap()
     }
 }

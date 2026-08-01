@@ -13,6 +13,10 @@ struct GameArtView: View {
     let entry: GameArtEntry
     var size: CGFloat = 96
     var tint: Color?
+    /// Fill a non-square frame instead of fitting inside it, cropping the overflow. The
+    /// rock art is square and a shaft band is wide; laying squares side by side reads as
+    /// a row of boulders rather than a rock face.
+    var fill: CGSize?
 
     var body: some View {
         Group {
@@ -21,12 +25,13 @@ struct GameArtView: View {
                     .resizable()
                     .interpolation(.none)
                     .antialiased(false)
-                    .scaledToFit()
+                    .aspectRatio(contentMode: fill == nil ? .fit : .fill)
             } else {
                 GameArtPlaceholderView(placeholder: entry.placeholder)
             }
         }
-        .frame(width: size, height: size)
+        .frame(width: fill?.width ?? size, height: fill?.height ?? size)
+        .clipped()
         .foregroundStyle(tint ?? ProbePalette.limestone)
         .accessibilityHidden(true)
     }
@@ -77,6 +82,6 @@ enum GameArtAvailability {
     /// yet, so during development this is a debugger or test-log query rather than
     /// something visible while playing.
     static var missingEntries: [GameArtEntry] {
-        GameArtCatalog.allEntries.filter { !isInstalled($0.name) }
+        GameArtCatalog.installedEntries.filter { !isInstalled($0.name) }
     }
 }

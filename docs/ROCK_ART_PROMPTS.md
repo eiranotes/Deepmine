@@ -160,9 +160,11 @@ seen the sun.
 
 `docs/ACHIEVEMENT_ART_PROMPTS.md` §4와 동일하다.
 
-1. 생성된 PNG를 `artifacts/art/raw/`에 원본 그대로 보관
-2. `scripts/process_game_assets.py`로 네 안료 양자화 → 64×64 최근접 축소 → `@2x`, `@3x` 생성
-3. 팔레트 검증이 위반 0을 보고해야 편입한다. 237장이 이 관문을 통과했고 예외는 없었다
+1. 생성된 PNG를 `artifacts/imagegen/rock-assets-v1/raw/`에 원본 그대로 보관
+2. 균열 3종은 공식 크로마 제거 도구의 결과를 `extracted/`에 보관
+3. `scripts/process_rock_assets.py`로 네 안료 양자화 → 64×64 최근접 축소 → `@2x`, `@3x` 생성
+4. `scripts/process_rock_assets.py --validate-only`가 24 고유 원본, 팔레트, 알파, 치수,
+   `Contents.json`, 원본 SHA를 모두 통과해야 편입한다
 
 균열 오버레이 3종은 알파를 보존해야 하므로 양자화 시 투명 채널을 별도 처리한다.
 
@@ -172,6 +174,6 @@ seen the sun.
 
 설치되지 않은 슬롯은 `GameArtAvailability.missingEntries`가 돌려준다.
 
-**아직 이것을 보여주는 화면은 없다.** 디버거나 테스트 로그에서 확인하는 API이고, 진단
-화면에 노출하는 것은 별도 작업이다. 24장이 전부 비어 있는 동안에는 화면 자체가 플레이스홀더
-투성이라 목록이 필요 없고, 절반쯤 채워졌을 때 넣는 것이 맞다.
+24장이 모두 설치됐으므로 현재 `missingEntries`는 비어 있어야 하며
+`GameArtCatalogTests.testEveryClickerSlotHasInstalledArt`가 이를 회귀 검사한다. 진단 화면은
+여전히 없고, 향후 부분 교체나 손상 진단이 필요할 때 별도 작업으로 노출한다.

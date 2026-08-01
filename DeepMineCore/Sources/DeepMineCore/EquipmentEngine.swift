@@ -114,7 +114,7 @@ public enum EquipmentEngine {
     }
 
     public static func unlockedMaximumLevel(in state: PlayerState) -> Int {
-        Balance.maximumEquipmentLevel(forDepth: state.depthMeters)
+        state.unlockedEquipmentLevel
     }
 
     /// Depth required before `level` becomes purchasable, for the locked-state copy.

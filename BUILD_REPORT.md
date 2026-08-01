@@ -1,6 +1,122 @@
 # Build Report
 
-업데이트: 2026-07-31 (클리커 피벗 P2-1: 플레이 가능한 수직 슬라이스)
+업데이트: 2026-07-31 (갱도 에셋·진행 계약 마감)
+
+## 2026-07-31 clicker audit and shaft visual payoff
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 클리커 코어 루프 | 검증됨 | 탭→4단계 파괴→광석→장비→8시간 오프라인→프레스티지가 Core·SwiftData·홈에 연결. `swift test --package-path DeepMineCore` 188/188 |
+| 권한 없는 완결성 | 검증됨(코드·30일 시뮬레이션) | 심도·장비 해금·프레스티지 자격은 암반 파괴를 읽고 집중은 선택 배율. 30일 heavy/light 광석 3.462배 |
+| 피벗 잔여 흔적 | 미구현 | 온보딩 첫 화면은 차단 설명/대기 데모, 다음 걸음·스트릭은 세션 단위, 공명 결절·지역 전환·8-bit SFX는 아직 없음 |
+| 장기 수치 모델 | 위험 기록 | 데미지/암반은 `BigNumber`지만 `Resources.ore`는 `Double`. `RockEngine` 512층 절단 시 남은 데미지를 호출부가 재정산하지 않음. 180일 모델의 장기 위험 |
+| 생성 갱도 아트 | 검증됨(정적) | 내장 ImageGen 7종. `scripts/process_shaft_assets.py --validate-only`가 7 imageset/21 PNG의 해시·1x/2x/3x·네 안료·역할별 알파를 검증 |
+| 갱도 아트 소비 경로 | 검증됨(단위·빌드·화면) | 지역 벽면 4, 지표 1, 구조·광맥 2를 배경/구조/상태로 분리. `GameArtCatalogTests`와 generic build, 홈 캡처 통과 |
+| 타격 피드백 | 검증됨(시뮬레이터) | 일반 탭은 데미지, 파괴는 광석+파편, 충격 배율/다음 광맥 HUD. 약점 48pt target과 관련 UI 14/14 통과 |
+| 심도 계약 | 검증됨(단위) | 장비 상한은 최고 기록, 심연 보너스는 실제 막장 이동, foreground 틱은 최신 정산 시각을 읽는다 |
+| 장기 밸런스 | 위험 기록 | 30일 heavy/light 광석 3.462배는 대역 안. 180일은 0.406배로 역전되어 P4 재튜닝 대상 |
+| `DeepMineAppTests` | 검증됨 | 132/132, 저장·프레스티지·심도 계약 포함 |
+| generic iOS build | 검증됨 | `xcodebuild build -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO` 성공 |
+| 최종 화면 증거 | 검증됨(시뮬레이터) | `artifacts/imagegen/shaft-assets-v1/ui-captures/mine-home-final.png`, 한국어·다크·medium |
+| 관련 UI suite | 검증됨 | `ActiveMineUITests` 13건 + 코어 루프 캡처 1건 = 14/14. 새 홈 시작 스크롤 경로 포함 |
+| 전체 UI suite | 미실행 | 관련 14건 결과를 전체 60건 통과로 확대하지 않는다 |
+| 실기기 타격감 | 미검증(실기기 필요) | 햅틱 강도, 연속 탭 체감, Reduce Motion·VoiceOver·Increase Contrast는 릴리스 게이트 |
+
+### ImageGen provenance
+
+- 모드: 내장 ImageGen. 입구 벽면 초안은 둥근 암석 반복이 강해 이미지 편집으로 연속 지층으로
+  다시 만들었고, 투명 자산은 후처리에서 크로마를 제거했다
+- 원본: `artifacts/imagegen/shaft-assets-v1/raw/`의 `ShaftRock_*` 4종,
+  `ShaftSurface`, `ShaftGantry`, `SeamVein`
+- 최종 프롬프트: `docs/SHAFT_ART_PROMPTS.md`
+- 검증/해시: `artifacts/imagegen/shaft-assets-v1/manifest.json`, `validation-report.json`
+- 비교판: `artifacts/imagegen/shaft-assets-v1/contact-sheet.png`
+
+### Fresh verification commands and artifacts
+
+```sh
+/Users/tofu/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 \
+  scripts/process_shaft_assets.py --validate-only
+swift test --package-path DeepMineCore
+swift run --package-path DeepMineCore -c release DeepMineBalanceCLI \
+  --seed 260729 --days 180 --output /tmp/deepmine-codex-balance-180.csv
+xcodebuild -project DeepMine.xcodeproj -scheme DeepMineApp \
+  -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineCodexDerivedFinal \
+  CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project DeepMine.xcodeproj -scheme DeepMineApp \
+  -destination 'platform=iOS Simulator,id=64C7804C-355B-4444-90EE-C8ED0D9355CF' \
+  -derivedDataPath /tmp/DeepMineCodexAppFinal \
+  -only-testing:DeepMineAppTests test
+```
+
+- 앱 단위 결과: `/tmp/DeepMineCodexAppTestsPass.xcresult` — 132/132, 실패·skip 0
+- 관련 UI 결과: `/tmp/DeepMineCodexFocusedUI.xcresult` — 14/14
+- 최종 홈 캡처: `artifacts/imagegen/shaft-assets-v1/ui-captures/mine-home-final.png`
+
+마감 분리 뒤 첫 자산 검증은 계약 모듈의 `ROOT` import 누락으로 실행 전에 실패했고 바로
+보완했다. 첫 앱 단위 재실행은 묶은 enum case 하나의 raw key가
+`statistics.growth.notEnough` 대신 `statistics.growthNotEnough`여서 130/132였으며, 원래 키로
+복구한 focused 7/7과 최종 132/132가 통과했다. 중간 실패를 최종 통과로 덮어쓰지 않는다.
+
+## 2026-07-31 progression rebuild and shaft screen (P3 intermediate snapshot)
+
+> 아래는 진행 중 실행 이력이다. 최종 판정과 최신 테스트 수는 위 표를 따른다.
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 진행 벽 진단 | 검증됨 | `DeepMineBalanceCLI` 실측 CSV. 수정 전 30일차 라이트가 광석 222만을 쥐고 장비는 심도 상한에 붙어 정지. 세그먼트 150에 927,813탭 필요 |
+| 성장률 재설계 (D-044) | 검증됨 | `swift test --package-path DeepMineCore` 185/185. `testIntegrityOutrunsThePurchasedDamageItFunds`가 감속률 1.00~1.05 대역을 고정 |
+| 새 진행 곡선 | 검증됨 | `swift run -c release DeepMineBalanceCLI --days 90`. 1일 208–428m, 7일 852–1,060m, 90일 1,640–4,332m |
+| 증폭기 대역 (D-041) | 검증됨 | heavy/light 광석 격차 4.03배. 대역 1.5~20배 |
+| 밸런스 시뮬레이터 정직화 | 검증됨 | 하루 86,400초 무제한 자동화 → 실제 8시간 캡×0.75 + 페르소나별 탭 단위 손 채굴. 탭은 `MiningLoop.strike`를 그대로 호출한다 |
+| 프레스티지 자격 전환 (D-045) | 검증됨(단위) | `PrestigeTests` 10/10. 집중 크레딧 10,000인 상태가 자격 미달임을 단정 |
+| 프레스티지 위치 리셋 (D-046) | 검증됨(단위) | `testPrestigeReturnsToTheSurfaceButKeepsWhatWasOpened`가 위치 0·기록 유지·상한 유지·테마 유지를 확인 |
+| 세로 갱도 시야 계산 (D-047) | 검증됨(단위) | `ShaftVisionTests` 5/5. 막장 1개, 지표에서 음수 인덱스 없음, 램프가 시야를 넓히고 상한에서 멈춤, 조도 단조 감소, 지역 진입 표시 |
+| 도전과제 클리커 경로 연결 | 검증됨(단위) | `MiningLoop.commit`이 파괴 시 평가·테마 해금. 멱등이므로 중복 지급 없음 |
+| iOS 빌드 | 검증됨 | `xcodebuild build -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO` → BUILD SUCCEEDED |
+| 오프라인 이중 지급 | 검증됨(단위) | `testOnScreenTicksAreNotPaidAgainAsOfflineTime`. 화면 틱이 정산 시각을 옮기지 않아 화면에서 본 시간이 복귀 시 다시 지급되던 문제 |
+| **클리커 진행이 저장되지 않던 문제** | 수정함, 검증 진행 중 | `mineFace`·`deepestSegmentIndex`·`runSegmentsBroken`·`lastSettledAt`이 SwiftData 스키마에 아예 없었다. 앱을 껐다 켜면 지표에서 다시 시작했다. 전체 왕복 테스트가 이 필드들을 기본값으로 두고 있어 잡히지 않았고, 실제 값을 넣도록 고쳤다 |
+| `DeepMineAppTests` (단위) | 검증됨 | 131/131. 갱신된 저장 왕복 테스트가 새 클리커 필드를 실제 값으로 비교한다 |
+| `DeepMineAppUITests` (UI) | **미검증** | 아래 참조. 사용자 지시로 중단했다 |
+| 갱도 화면의 실제 조작 감각 | 미검증(실기기 필요) | 탭 반응성, 층 전환 애니메이션의 체감, 햅틱은 시뮬레이터로 판정 불가 |
+| 온보딩 클리커 재작성 | 미구현 | 차단 설명 2장과 대기 데모가 아직 첫 화면이다. `docs/TASKS.md` P3에 남겼다 |
+| 다음 걸음·스트릭의 층 단위 표기 | 미구현 | 여전히 "남은 출정 N회"와 세션 기반 스트릭이다 |
+
+### 당시 UI 스위트를 미검증으로 남긴 이유
+
+`CLAUDE.md`가 요구하는 검증은 `swift test`와 generic iOS 빌드 둘이며 **둘 다 통과했다.**
+UI 스위트는 그 위에 얹은 자체 판단이었고, 시간이 과해져 사용자 지시로 중단했다.
+
+중단 시점까지 확인된 것:
+
+| 실행 | 결과 |
+|---|---|
+| 1차 (갱도 도입 직후, 전체) | 186 통과 / 7 실패 — 전부 프레스티지·테마 픽스처가 자격을 집중 크레딧으로 표현 |
+| 2차 (픽스처 층 기준 전환 후, 실패 스위트만) | 14 통과 / 5 실패 — 단정 값 3건과 홈 라우팅 2건 |
+| 3차 (스크린샷 스위트) | 4 통과 / 1 실패 — `prestige-losses` 미도달 |
+| 4차 (`DeepMineAppTests`만) | **131 통과 / 0 실패** |
+| 5차 (`DeepMineAppUITests`) | 중단 |
+
+3차의 실패를 추적한 것이 이번 작업에서 가장 값진 수확이었다. UI 계층 덤프에
+`prestige-ineligible`이 찍혀 있었고, 픽스처는 자격을 채우고 있었다. 원인은 픽스처가 아니라
+**저장소가 클리커 상태를 아예 저장하지 않는 것**이었다.
+
+이 중간 위험은 후속 마감에서 해소했다. `mine-home-start`를 최대 5회 스크롤한 뒤 hittable을
+단정하는 helper로 바꾸고 `ActiveMineUITests` 13건과 홈 캡처 1건을 14/14로 재검증했다.
+
+### 이번에 바꾼 수치
+
+| 상수 | 이전 | 이후 |
+|---|---|---|
+| `segmentIntegrityGrowthRate` | 1.085 | 1.058 |
+| `equipmentLevelUnlockDepthStep` | 60m | 15m |
+| `maximumEquipmentLevel` | 60 | 200 |
+| `crystalRegionDepth` / `ruinsRegionDepth` / `abyssRegionDepth` | 120 / 480 / 1,200 | 240 / 800 / 1,600 |
+| `initialPrestigeTarget` | 집중 크레딧 40 | 부순 암반 120층 |
+| `prestigeTargetGrowthRate` | 1.6 | 1.5 |
+| `prestigeShardCreditDivisor` → `prestigeShardSegmentDivisor` | 10 | 40 |
+
+## 2026-07-31 playable vertical slice (P2-1)
 
 ## 2026-07-31 playable vertical slice (P2-1)
 
@@ -15,7 +131,7 @@
 | iOS 빌드 | 검증됨 | `generic/platform=iOS`, `CODE_SIGNING_ALLOWED=NO` |
 | 시뮬레이터 전체 스위트 | **미검증** | 아래 사유 참조 |
 | 화면 실제 조작 감각 | 미검증(실기기 필요) | 탭 반응성과 햅틱은 시뮬레이터로 판정 불가 |
-| 암반 아트 24장 | 미구현 | 플레이스홀더가 그려진다 |
+| 암반 아트 24장 | 검증됨 | ImageGen 원본 24개, 4색 64/128/192 PNG 72개와 imageset 24개. validator, `GameArtCatalogTests` 11/11, generic iOS build 통과 |
 
 ### 시뮬레이터 스위트를 검증됨으로 적지 않는 이유
 
@@ -48,8 +164,8 @@
 | `RockEngine` 넘침 이월 | 검증됨 | 큰 데미지가 여러 세그먼트를 연속 파괴하고 광석 합계가 실제 파괴 세그먼트와 일치. 상한 초과 시 `wasTruncated` 보고 |
 | `StrikeEngine` 탭·크리티컬 | 검증됨 | StrikeEngineTests 23/23. 크리티컬 발생률을 20,000회 시뮬레이션으로 설정값과 대조(오차 2% 이내), 동일 시드 결정성 50회 |
 | 자동화 데미지 | 검증됨 | 수레 기본 레벨 0 산출, 첫 업그레이드에서 켜짐, 경과 시간 비례. 수레 15레벨 8시간이 실제로 세그먼트 10개 이상 파괴 |
-| 아트 교체 레이어 | 검증됨 | `GameArtCatalogTests`. 24 슬롯 이름·프롬프트 ID 고유성, 슬롯↔`docs/ROCK_ART_PROMPTS.md` 양방향 대조, 미설치 슬롯이 플레이스홀더로 해소 |
-| 암반 아트 24장 | 미구현 | 프롬프트와 플레이스홀더만 있다. 실제 이미지 생성은 P1-4 |
+| 아트 교체 레이어 | 검증됨 | `GameArtCatalogTests`. 24 슬롯 이름·프롬프트 ID 고유성, 슬롯↔`docs/ROCK_ART_PROMPTS.md` 양방향 대조, 설치 자산 우선·미설치 이름의 플레이스홀더 폴백 |
+| 암반 아트 24장 | 검증됨 | `scripts/process_rock_assets.py --validate-only`: 24 고유 원본, 24 imageset/72 PNG, 네 안료, 이진 알파·불투명 정책, 64/128/192 치수 통과. `GameArtCatalogTests` 11/11과 generic iOS build 통과 |
 | 클리커 플레이 가능 여부 | 미구현 | P1은 엔진뿐이고 UI에 연결되지 않았다. 탭할 수 있게 되는 것은 P2-1 |
 | 밸런스 CLI 재조준 | 미구현 | 기존 CLI는 집중 세션 기준으로 시뮬레이션한다. 데미지 입력이 UI에 연결된 뒤 재조준 |
 

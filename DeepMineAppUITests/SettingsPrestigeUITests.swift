@@ -13,7 +13,7 @@ final class SettingsPrestigeUITests: XCTestCase {
         launch("theme-locked")
         openSettings()
         open("settings-open-themes")
-        XCTAssertTrue(element("theme-locked-crystal").label.contains("120m"))
+        XCTAssertTrue(element("theme-locked-crystal").label.contains("240m"))
         XCTAssertFalse(element("theme-select-crystal").isEnabled)
         app.terminate()
 

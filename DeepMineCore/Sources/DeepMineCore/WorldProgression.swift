@@ -73,9 +73,12 @@ public enum WorldProgression {
     @discardableResult
     public static func unlockThemesForCurrentDepth(in state: inout PlayerState) -> Set<MineTheme> {
         let before = state.unlockedThemes
-        if state.depthMeters >= Balance.crystalRegionDepth { state.unlockedThemes.insert(.crystal) }
-        if state.depthMeters >= Balance.ruinsRegionDepth { state.unlockedThemes.insert(.ruins) }
-        if state.depthMeters >= Balance.abyssRegionDepth { state.unlockedThemes.insert(.abyss) }
+        // The record, not the current position: a region opened before a prestige stays
+        // open after it (D-046).
+        let depth = state.recordDepthMeters
+        if depth >= Balance.crystalRegionDepth { state.unlockedThemes.insert(.crystal) }
+        if depth >= Balance.ruinsRegionDepth { state.unlockedThemes.insert(.ruins) }
+        if depth >= Balance.abyssRegionDepth { state.unlockedThemes.insert(.abyss) }
         return state.unlockedThemes.subtracting(before)
     }
 
@@ -100,10 +103,9 @@ public enum WorldProgression {
             state.resonanceBoostPending = true
             return .resonanceArmed
         case .abyss:
-            state.bonusDepthMeters = saturatingAdd(
-                state.bonusDepthMeters,
-                Balance.abyssBonusDepthMeters
-            )
+            state.skipUnbrokenDepth(meters: Balance.abyssBonusDepthMeters)
+            unlockThemesForCurrentDepth(in: &state)
+            AchievementEngine.evaluate(in: &state)
             return .bonusDepth(Balance.abyssBonusDepthMeters)
         }
     }

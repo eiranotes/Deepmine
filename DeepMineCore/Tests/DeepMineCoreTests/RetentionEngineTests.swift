@@ -88,9 +88,17 @@ final class RetentionEngineTests: XCTestCase {
 
     func testRegionThresholdsAdvanceWithDepth() {
         XCTAssertEqual(WorldProgression.nextRegionThreshold(afterDepth: 0)?.region, .crystal)
-        XCTAssertEqual(WorldProgression.nextRegionThreshold(afterDepth: 200)?.region, .ruins)
-        XCTAssertEqual(WorldProgression.nextRegionThreshold(afterDepth: 600)?.region, .abyss)
-        XCTAssertNil(WorldProgression.nextRegionThreshold(afterDepth: 5_000))
+        XCTAssertEqual(
+            WorldProgression.nextRegionThreshold(afterDepth: Balance.crystalRegionDepth)?.region,
+            .ruins
+        )
+        XCTAssertEqual(
+            WorldProgression.nextRegionThreshold(afterDepth: Balance.ruinsRegionDepth)?.region,
+            .abyss
+        )
+        XCTAssertNil(
+            WorldProgression.nextRegionThreshold(afterDepth: Balance.abyssRegionDepth)
+        )
     }
 
     // MARK: - Growth ledger

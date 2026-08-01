@@ -7,8 +7,9 @@ public struct MineFaceState: Codable, Equatable, Sendable {
     public private(set) var segmentIndex: Int
     public private(set) var remainingIntegrity: BigNumber
     public private(set) var impact: ImpactMeter
-    /// Lifetime count, used by achievements and the growth ledger. Segment index alone
-    /// cannot serve: prestige may reset position but must not erase history.
+    /// Lifetime count. Segment index alone cannot serve: prestige resets the position but
+    /// must not erase the history. No achievement watches this yet — the depth family
+    /// covers the same ground and already has its badge art.
     public private(set) var lifetimeSegmentsBroken: Int
     public private(set) var lifetimeSeamsBroken: Int
 

@@ -56,7 +56,10 @@ public enum Balance {
     public static let laterDailySessionMultiplier = 1.10
 
     public static let minimumEquipmentLevel = 1
-    public static let maximumEquipmentLevel = 60
+    // A clicker's ladder has to outlast the rock. At 60 the ceiling bound before the
+    // abyss and froze both tap and automation damage while the rock kept hardening,
+    // which is what stalled the descent (D-044).
+    public static let maximumEquipmentLevel = 200
     // Compounding effects keep every level worth the same relative gain. Linear
     // per-level bonuses decayed to +3.6% at the top while price kept multiplying,
     // which stalled the economy well before the level cap.
@@ -71,8 +74,13 @@ public enum Balance {
     // Spec §4.5: depth unlocks the equipment level ceiling. The rail only binds
     // during the first weeks, where ore alone would let a heavy schedule sprint
     // through the whole ladder.
+    //
+    // The step is set so the rail never binds on ore the player dug themselves: ore
+    // compounds at 1.07 per segment and a level costs 1.34, which buys ~0.23 levels
+    // per segment, while 15m per level grants ~0.27. Focus ore arrives from outside
+    // the rock, so the rail still catches a session-fuelled sprint (D-044).
     public static let equipmentLevelUnlockBase = 5
-    public static let equipmentLevelUnlockDepthStep = 60
+    public static let equipmentLevelUnlockDepthStep = 15
     // Prestige remembers the shaft it already dug: levels at or below the previous
     // peak cost half, so a reset costs days instead of weeks.
     public static let rememberedRebuyDiscount = 0.5
@@ -110,17 +118,22 @@ public enum Balance {
     public static let crystalRegionBaseQuantity = 1
     public static let vaultCrystalConversionQuantity = 2
     public static let abyssBonusDepthMeters = 60
-    public static let crystalRegionDepth = 120
-    public static let ruinsRegionDepth = 480
-    public static let abyssRegionDepth = 1_200
-    public static let initialPrestigeTarget = 40.0
-    public static let prestigeTargetGrowthRate = 1.6
+    // Region gates are set against how fast the rock is actually broken, not against the
+    // old focus-derived depth. Entry lasts a first sitting, the crystal seam a few days,
+    // and the abyss stays a month or two out for a player who mostly idles (D-044).
+    public static let crystalRegionDepth = 240
+    public static let ruinsRegionDepth = 800
+    public static let abyssRegionDepth = 1_600
+    /// Segments broken in the current run. Focus credits cannot gate a reset in a game
+    /// that is playable without focus at all (D-045).
+    public static let initialPrestigeTarget = 120.0
+    public static let prestigeTargetGrowthRate = 1.5
     public static let maximumPermanentUpgradeLevel = 10
     public static let excavationMemoryGrowthRate = 1.08
     public static let compressedTimeLongSessionIncreasePerLevel = 0.05
     // A run that overshoots its target is worth more shards than one that barely
     // reached it, so a long run is never wasted by prestiging late.
-    public static let prestigeShardCreditDivisor = 10.0
+    public static let prestigeShardSegmentDivisor = 40.0
     public static let clockTamperThreshold: TimeInterval = 30
     public static let nanosecondsPerSecond = 1_000_000_000.0
     public static let passiveSnapshotFreshnessSeconds: TimeInterval = 15 * 60

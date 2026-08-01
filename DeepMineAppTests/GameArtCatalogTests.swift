@@ -16,8 +16,21 @@ final class GameArtCatalogTests: XCTestCase {
         }
     }
 
+    private var shaftPromptDocument: String {
+        get throws {
+            let root = URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+            return try String(
+                contentsOf: root.appending(path: GameArtCatalog.shaftPromptDocumentPath),
+                encoding: .utf8
+            )
+        }
+    }
+
     func testCatalogCoversTheFullPlannedSlotCount() {
         XCTAssertEqual(GameArtCatalog.allEntries.count, 24)
+        XCTAssertEqual(GameArtCatalog.shaftEntries.count, 7)
     }
 
     func testSlotNamesAreUnique() {
@@ -90,9 +103,17 @@ final class GameArtCatalogTests: XCTestCase {
     /// Placeholders exist precisely so an absent asset is not a crash. Asking for a slot
     /// that nobody has drawn must still yield something renderable.
     func testEverySlotHasAPlaceholderAndResolvesWithoutTheAsset() {
-        for entry in GameArtCatalog.allEntries {
+        for entry in GameArtCatalog.installedEntries {
             XCTAssertNotNil(entry.placeholder)
             _ = GameArtView(entry: entry)
+        }
+    }
+
+    func testEveryShaftSlotHasAPromptInItsDocument() throws {
+        let document = try shaftPromptDocument
+        for entry in GameArtCatalog.shaftEntries {
+            XCTAssertTrue(document.contains("`\(entry.promptID)`"))
+            XCTAssertTrue(document.contains("`\(entry.name)`"))
         }
     }
 
@@ -105,11 +126,11 @@ final class GameArtCatalogTests: XCTestCase {
         XCTAssertFalse(GameArtAvailability.isInstalled("NotAnAsset_\(UUID().uuidString)"))
     }
 
-    /// Until the 24 images are generated, every clicker slot is expected to be missing.
-    /// When that stops being true this test should be updated, not deleted — it is the
-    /// record of how much art still stands between here and a finished rock face.
-    func testEveryClickerSlotIsStillAwaitingArt() {
+    /// The generated set is only complete when every declared clicker slot resolves to
+    /// a real catalog image. The placeholder path remains covered by the random-name
+    /// availability assertion above.
+    func testEveryClickerSlotHasInstalledArt() {
         GameArtAvailability.resetCache()
-        XCTAssertEqual(GameArtAvailability.missingEntries.count, GameArtCatalog.allEntries.count)
+        XCTAssertTrue(GameArtAvailability.missingEntries.isEmpty)
     }
 }

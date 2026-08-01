@@ -109,30 +109,50 @@
 - [x] `StrikeEngine` 탭 데미지·크리티컬·임팩트 미터
 - [x] 자동화 데미지와 장비 3종 역할 재조준 (D-039)
 - [x] 교체 가능한 아트 레이어, 플레이스홀더 24종, `docs/ROCK_ART_PROMPTS.md`
-- [ ] 암반 아트 24장 실제 생성과 팔레트 검증
-- [ ] 밸런스 CLI를 데미지/내구도 기준으로 재조준
+- [x] 암반 아트 24장 실제 생성과 팔레트 검증
+- [x] 밸런스 CLI에 탭 입력과 실제 오프라인 캡 반영 (D-044)
 
 ### P2 — 실제로 플레이 가능하게
 
-- [ ] 탭→파괴→광석→구매 수직 슬라이스를 새 루트 화면에
-- [ ] 고정 스텝 시뮬레이션 루프
-- [ ] 오프라인 계산기와 수령 시트
-- [ ] 집중 증폭기 재진입 경로 (기존 preflight/active/Live Activity 재사용)
+- [x] 탭→파괴→광석→구매 수직 슬라이스를 새 루트 화면에
+- [x] 고정 스텝 시뮬레이션 루프
+- [x] 오프라인 계산기와 수령 시트
+- [x] 집중 증폭기 재진입 경로 (기존 preflight/active/Live Activity 재사용)
 
 ### P3 — 장기 성장과 리텐션
 
-- [ ] 성장 천장 3종 제거와 재튜닝 (`docs/arc/plans/2026-07-31-long-run-progression.md`)
-- [ ] 공명 결절(golden cookie), 지역 전환 규칙
-- [ ] 도전과제 지표를 클리커 지표로 재조준
+- [x] 성장 천장 3종 제거와 재튜닝: 내구 성장률 1.058, 심도 해금 15m당, 상한 200 (D-044)
+- [x] 프레스티지를 부순 암반 기준으로 전환하고 위치를 지표로 되돌린다 (D-045, D-046)
+- [x] 세로 갱도 단면 UI와 램프 기반 시야, 홈 재배치 (D-047)
+- [x] 도전과제를 암반 파괴 경로에서 평가 (D-047)
+- [x] 지역 벽면 4종·지표·구조물·광맥 생성 에셋 7종과 독립 후처리/검증 파이프라인 (D-048)
+- [x] 탭 데미지·충격 배율·다음 광맥·파괴 광석/파편을 실제 작업면에 표시
+- [x] 홈 시작 UI 테스트를 스크롤 안전 경로로 바꾸고 관련 UI 14/14 재검증
+- [ ] 전체 `DeepMineAppUITests` 완주. 이번 변경 관련 14건은 통과했으며 전체 60건은 미실행
+- [x] 갱도 텍스처 마감. 정사각 타일 반복을 지역별 320×128 와이드 벽면으로 교체하고
+      지표 캐노피·구조물·광맥을 배경/구조/상태 역할로 분리
+- [x] 약점 48×48pt 조작 영역, 네이티브 spring, Reduce Motion 제자리 대체
+- [x] 장비 상한을 최고 심도에 통일하고 심연 보너스를 실제 막장 이동으로 정규화 (D-049)
+- [x] 오프라인 정산 뒤 stale foreground 틱이 배경 구간을 재생하지 않게 정산 시각 통일
+- [ ] 공명 결절(golden cookie), 지역 전환 연출
+- [ ] 도전과제 카탈로그에 부순 암반 계열 추가 (배지 아트 35종 계약 확장이 선행 조건)
+- [ ] 온보딩을 클리커 우선으로 재작성 — 현재도 차단 설명 2장과 대기 데모가 첫 화면이다
+- [ ] 다음 걸음·스트릭 표기를 세션 단위에서 층 단위로
 - [ ] 8비트 SFX 실제 제작 (`GameFeedbackEvent.systemSoundID`가 교체 지점)
+- [ ] `RockEngine`이 한 번에 512층을 넘겨 `wasTruncated`가 되면 남은 데미지를 재정산한다.
+      현재 호출부는 절단 여부를 전달하지만 남은 데미지를 보존하지 않아 극단적 오프라인 성장에서 손실 가능
+- [ ] 장기 클리커 통화를 `Resources.ore: Double`에서 `BigNumber` 또는 별도 저장 표현으로
+      마이그레이션한다. 데미지·암반은 큰 수를 지원하지만 실제 지갑은 `Double` 포화에 머문다
+- [ ] 180일 heavy/light 누적 광석 역전(0.406배)의 최초 시점을 프레스티지·장비 구매별로
+      분해하고, 즉시 프레스티지/지연 프레스티지 시나리오를 비교한다
 
 ## Physical-device release gate — pending
 
 - [ ] 승인된 App Group/FamilyControls entitlement로 서명·설치
 - [ ] FamilyControls 선택과 ManagedSettings 차단/정상·포기·비정상 종료 해제
 - [ ] AlarmKit countdown Activity와 커스텀 실패/완료 Activity 전환, 실제 Dynamic Island
-- [ ] SpringBoard 잠금화면 crop/수명주기와 충전 가로 StandBy/Night Mode
-- [ ] 실제 Control Center 등록과 extension→app App Group 명령 왕복
+- [ ] SpringBoard 잠금화면 Live Activity crop/수명주기
+- [ ] 실제 Widget/Live Activity intent→app App Group 명령 왕복
 - [ ] 앱 종료·재부팅·시간대/자정 경계 복원
 - [ ] VoiceOver, Increase Contrast, Reduce Motion, 햅틱과 사운드
 

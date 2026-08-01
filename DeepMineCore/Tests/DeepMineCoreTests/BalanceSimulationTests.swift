@@ -15,7 +15,7 @@ final class BalanceSimulationTests: XCTestCase {
         let lines = result.csv.split(separator: "\n")
         XCTAssertEqual(
             lines.first,
-            "persona,day,sessions,completed,abandoned,focused_minutes,ore_earned,ore_balance,depth,drill,cart,lamp,prestige,fatigued_minutes"
+            "persona,day,sessions,completed,abandoned,focused_minutes,ore_earned,ore_balance,current_depth,record_depth,drill,cart,lamp,prestige,fatigued_minutes"
         )
         XCTAssertEqual(lines.count, 1 + PersonaID.allCases.count * 30)
     }
@@ -63,13 +63,14 @@ final class BalanceSimulationTests: XCTestCase {
 
         // Prestige must be survivable: the player who reset still ends up deeper.
         XCTAssertGreaterThan(standard.prestigeIndex, 0)
-        XCTAssertGreaterThanOrEqual(standard.finalDepth, light.finalDepth)
-        XCTAssertGreaterThanOrEqual(heavy.finalDepth, standard.finalDepth)
+        XCTAssertGreaterThanOrEqual(standard.finalRecordDepth, light.finalRecordDepth)
+        XCTAssertGreaterThanOrEqual(heavy.finalRecordDepth, standard.finalRecordDepth)
 
         // Depth is a count of rock, so it can only ever be non-negative and finite.
         for summary in result.summaries {
-            XCTAssertGreaterThanOrEqual(summary.finalDepth, 0)
-            XCTAssertLessThan(summary.finalDepth, Int.max)
+            XCTAssertGreaterThanOrEqual(summary.finalCurrentDepth, 0)
+            XCTAssertGreaterThanOrEqual(summary.finalRecordDepth, summary.finalCurrentDepth)
+            XCTAssertLessThan(summary.finalRecordDepth, Int.max)
         }
     }
 

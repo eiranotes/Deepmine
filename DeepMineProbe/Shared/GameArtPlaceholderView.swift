@@ -20,6 +20,14 @@ struct GameArtPlaceholderView: View {
             DebrisPlaceholder(isLarge: isLarge)
         case .resonanceNode:
             ResonanceNodePlaceholder()
+        case .shaftGantry:
+            ShaftGantryPlaceholder()
+        case .seamVein:
+            SeamVeinPlaceholder()
+        case let .shaftRock(region):
+            ShaftRockPlaceholder(region: region)
+        case .shaftSurface:
+            ShaftSurfacePlaceholder()
         }
     }
 }
@@ -166,6 +174,87 @@ private struct ResonanceNodePlaceholder: View {
             }
             .frame(width: side, height: side)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+private struct ShaftGantryPlaceholder: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                HStack {
+                    Rectangle().fill(ProbePalette.shale).frame(width: proxy.size.width * 0.08)
+                    Spacer()
+                    Rectangle().fill(ProbePalette.shale).frame(width: proxy.size.width * 0.08)
+                }
+                VStack {
+                    Rectangle().fill(ProbePalette.shale).frame(height: proxy.size.height * 0.12)
+                    Spacer()
+                    Rectangle().fill(ProbePalette.brass).frame(height: proxy.size.height * 0.04)
+                }
+            }
+        }
+    }
+}
+
+private struct SeamVeinPlaceholder: View {
+    var body: some View {
+        GeometryReader { proxy in
+            Path { path in
+                path.move(to: CGPoint(x: 0, y: proxy.size.height * 0.55))
+                path.addLine(to: CGPoint(x: proxy.size.width * 0.28, y: proxy.size.height * 0.42))
+                path.addLine(to: CGPoint(x: proxy.size.width * 0.56, y: proxy.size.height * 0.60))
+                path.addLine(to: CGPoint(x: proxy.size.width, y: proxy.size.height * 0.44))
+            }
+            .stroke(ProbePalette.limestone, lineWidth: max(2, proxy.size.height * 0.08))
+        }
+    }
+}
+
+private struct ShaftRockPlaceholder: View {
+    let region: String
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                ProbePalette.shale
+                ForEach(0..<5, id: \.self) { row in
+                    Path { path in
+                        let y = proxy.size.height * (0.12 + Double(row) * 0.2)
+                        path.move(to: CGPoint(x: 0, y: y))
+                        path.addLine(to: CGPoint(x: proxy.size.width * 0.32, y: y - 3))
+                        path.addLine(to: CGPoint(x: proxy.size.width * 0.66, y: y + 2))
+                        path.addLine(to: CGPoint(x: proxy.size.width, y: y - 1))
+                    }
+                    .stroke(row.isMultiple(of: 2) ? ProbePalette.coal : accent, lineWidth: 2)
+                }
+            }
+        }
+    }
+
+    private var accent: Color {
+        switch region {
+        case "crystal": ProbePalette.limestone
+        case "ruins": ProbePalette.brass.opacity(0.55)
+        case "abyss": ProbePalette.coal
+        default: ProbePalette.limestone.opacity(0.35)
+        }
+    }
+}
+
+private struct ShaftSurfacePlaceholder: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .top) {
+                Rectangle()
+                    .fill(ProbePalette.shale)
+                    .frame(height: max(5, proxy.size.height * 0.14))
+                HStack {
+                    Rectangle().fill(ProbePalette.shale).frame(width: 8)
+                    Spacer()
+                    Rectangle().fill(ProbePalette.shale).frame(width: 8)
+                }
+            }
         }
     }
 }
