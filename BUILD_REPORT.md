@@ -13,10 +13,10 @@
 | 파괴 연속성 | 구현·정적 검증됨 | 4m 돌파 전후 `headDepth`가 동일 좌표를 유지하고, 좌우 암반 붕괴 뒤 같은 `rock-phase`에서 다음 굴착을 계속함 |
 | 첫 화면 | 검증됨(390×844) | 상단 설명·외부 상태줄을 줄이고 제목 다음에 즉시 갱도 배치. 과거 구간은 빈 여백이 아니라 지지대·레일·광차가 있는 열린 통로로 표시 |
 | 웹 검사 | 검증됨 | `npm run lint`, `npm test` 4/4, vinext production build 통과. 브라우저 console warning/error 0 |
-| 배포 | 미수행 | 이번 기준안은 로컬 웹 검증만 수행. 기존 비공개 version 2 배포에는 반영하지 않았고 iOS 포팅도 시작하지 않음 |
+| 배포 | 배포됨(소유자 전용) | Sites version 3, source `b2499fe`, `https://deepmine-shaft-prototype.eiraworks-9813.chatgpt.site`. 배포 상태 `succeeded`; 비로그인 브라우저에서 ChatGPT 로그인 게이트 확인 |
 
 이 기준안은 D-054의 앱 포팅 전 승인 대상으로 둔다. 실제 앱의 지반 버튼과 D-053 모션은
-이번 웹 변경으로 교체하지 않았으며, 웹 체감 확정 뒤 같은 좌표·자동화 계약으로 옮긴다.
+이번 웹 변경으로 교체하지 않았으며, 배포본 체감 확정 뒤 같은 좌표·자동화 계약으로 옮긴다.
 
 ## 2026-08-01 breakable ground and visible pickaxe strike
 

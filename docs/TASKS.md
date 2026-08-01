@@ -173,7 +173,7 @@
       Events 탭을 가속 입력으로 연결. 스크롤 이동은 취소
 - [x] 웹 lint, 4/4 계약 테스트, production build, 데스크톱·390×844 브라우저 검증
 - [ ] D-054 웹 기준의 단일 암반 좌표·고정 막장·상시 자동 하강을 SwiftUI 홈 갱도에 포팅
-- [ ] 새 웹 기준안을 비공개 Sites에 재배포. 현재 version 2는 이전 헤드 이동 방식
+- [x] 새 웹 기준안을 소유자 전용 Sites version 3으로 재배포하고 production 상태 `succeeded` 확인
 - [ ] 첫 암반을 실제로 끝까지 탭해 보상→강화→홈으로 가는 전체 XCUITest
 - [ ] 전체 `DeepMineAppUITests` 완주
 
