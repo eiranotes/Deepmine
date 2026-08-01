@@ -1141,6 +1141,52 @@
   outline-offset: 2px;
 }
 
+.soundToggle {
+  display: grid;
+  min-width: 48px;
+  min-height: 44px;
+  place-content: center;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--coal);
+  color: var(--limestone);
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, transform 80ms ease;
+}
+
+.soundToggle small {
+  margin-top: 1px;
+  color: var(--brass-bright);
+  font-size: 0.5rem;
+}
+
+.soundToggle[aria-pressed="false"] {
+  color: var(--limestone-muted);
+}
+
+.soundToggle[aria-pressed="false"] small {
+  color: var(--limestone-muted);
+}
+
+.soundToggle:active {
+  transform: translateY(2px);
+}
+
+.soundToggle:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .soundToggle:hover {
+    border-color: var(--brass);
+  }
+}
+
 .shaftSection {
   padding: 8px;
 }
@@ -1175,6 +1221,8 @@
   --rock-phase: 0px;
   --surface-y: 0px;
   --fracture-reveal: 24px;
+  --strike-duration: 560ms;
+  --strike-contact-delay: 202ms;
   position: relative;
   height: clamp(520px, calc(100svh - 176px), 680px);
   min-height: 520px;
@@ -1184,6 +1232,16 @@
   transition: filter 80ms ease, transform 80ms ease;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.heavyStrike {
+  --strike-duration: 690ms;
+  --strike-contact-delay: 249ms;
+}
+
+.criticalStrike {
+  --strike-duration: 760ms;
+  --strike-contact-delay: 274ms;
 }
 
 .shaftPressed {
@@ -1404,7 +1462,12 @@
   object-fit: fill;
   filter: drop-shadow(0 6px 0 rgb(0 0 0 / 0.26));
   image-rendering: pixelated;
-  animation: frontier-impact 620ms cubic-bezier(0.2, 0.72, 0.22, 1) both;
+  animation: frontier-impact var(--strike-duration) cubic-bezier(0.2, 0.72, 0.22, 1) both;
+}
+
+.heavyStrike .frontierLip,
+.criticalStrike .frontierLip {
+  animation-name: frontier-heavy-impact;
 }
 
 .excavationKerf {
@@ -1442,7 +1505,7 @@
   opacity: var(--fracture-opacity);
   filter: drop-shadow(0 0 3px rgb(240 189 93 / 0.28));
   image-rendering: pixelated;
-  animation: vertical-crack-hit 260ms ease-out 220ms both;
+  animation: vertical-crack-hit 260ms ease-out var(--strike-contact-delay) both;
 }
 
 .miningActor {
@@ -1458,7 +1521,16 @@
   background-size: 512px 128px;
   filter: drop-shadow(3px 4px 0 rgb(0 0 0 / 0.72));
   image-rendering: pixelated;
-  animation: miner-full-body-strike 620ms linear both;
+  transform-origin: 56% 92%;
+  animation: miner-quick-strike var(--strike-duration) linear both;
+}
+
+.heavyStrike .miningActor {
+  animation-name: miner-heavy-strike;
+}
+
+.criticalStrike .miningActor {
+  animation-name: miner-critical-strike;
 }
 
 .continuousDrill {
@@ -1488,7 +1560,19 @@
     linear-gradient(var(--brass-bright), var(--brass-bright));
   clip-path: polygon(0 42%, 34% 42%, 22% 0, 48% 34%, 50% 0, 58% 34%, 84% 4%, 68% 44%, 100% 44%, 70% 62%, 82% 100%, 56% 70%, 50% 100%, 44% 70%, 18% 100%, 30% 62%);
   opacity: 0;
-  animation: contact-flash 260ms ease-out 220ms both;
+  animation: contact-flash 260ms ease-out var(--strike-contact-delay) both;
+}
+
+.heavyStrike .contactFlash {
+  width: 29px;
+  height: 16px;
+  filter: drop-shadow(0 0 4px rgb(240 189 93 / 0.62));
+}
+
+.criticalStrike .contactFlash {
+  width: 38px;
+  height: 21px;
+  filter: drop-shadow(0 0 8px var(--brass-bright));
 }
 
 .continuousDebris {
@@ -1510,7 +1594,19 @@
   border: 1px solid rgb(10 10 9 / 0.72);
   background: #716753;
   box-shadow: 2px 2px 0 rgb(0 0 0 / 0.34);
-  animation: debris-flight 460ms cubic-bezier(0.12, 0.75, 0.26, 1) calc(220ms + var(--chip-delay)) both;
+  animation: debris-flight 460ms cubic-bezier(0.12, 0.75, 0.26, 1) calc(var(--strike-contact-delay) + var(--chip-delay)) both;
+}
+
+.heavyStrike .continuousDebris span {
+  width: 6px;
+  height: 6px;
+}
+
+.criticalStrike .continuousDebris span {
+  width: 7px;
+  height: 7px;
+  background: #948567;
+  filter: brightness(1.18);
 }
 
 .continuousWeakPoint {
@@ -1544,7 +1640,7 @@
 
 .continuousHitLabel {
   opacity: 0;
-  animation-delay: 220ms;
+  animation-delay: var(--strike-contact-delay);
 }
 
 .workRewardPromise {
@@ -1619,6 +1715,14 @@
   transform: translateX(-50%);
   background: #080807;
   animation: collapse-gap 520ms ease-out both;
+}
+
+.collapseAlternate .collapseLeft {
+  animation-name: collapse-left-alternate;
+}
+
+.collapseAlternate .collapseRight {
+  animation-name: collapse-right-alternate;
 }
 
 .continuousDarkness {
@@ -2013,17 +2117,37 @@
   to { transform: translateY(-240px); }
 }
 
-@keyframes miner-full-body-strike {
-  0%, 15% { background-position: 0 0; transform: translate(0, 0); }
-  15.1%, 36% { background-position: -128px 0; transform: translate(-2px, -3px); }
-  36.1%, 55% { background-position: -256px 0; transform: translate(1px, 7px); }
-  55.1%, 100% { background-position: -384px 0; transform: translate(0, 1px); }
+@keyframes miner-quick-strike {
+  0%, 14% { background-position: 0 0; transform: translate(0, 0) rotate(0); }
+  14.1%, 36% { background-position: -128px 0; transform: translate(-3px, -4px) rotate(-1deg); }
+  36.1%, 54% { background-position: -256px 0; transform: translate(2px, 7px) rotate(1deg); }
+  54.1%, 100% { background-position: -384px 0; transform: translate(0, 1px) rotate(0); }
+}
+
+@keyframes miner-heavy-strike {
+  0%, 11% { background-position: 0 0; transform: translate(2px, 1px) rotate(0); }
+  11.1%, 36% { background-position: -128px 0; transform: translate(-7px, -8px) rotate(-3deg) scale(1.02); }
+  36.1%, 58% { background-position: -256px 0; transform: translate(4px, 11px) rotate(2deg) scale(1.035); }
+  58.1%, 100% { background-position: -384px 0; transform: translate(1px, 2px) rotate(0); }
+}
+
+@keyframes miner-critical-strike {
+  0%, 9% { background-position: 0 0; transform: translate(3px, 2px) rotate(1deg) scale(1.02); }
+  9.1%, 36% { background-position: -128px 0; transform: translate(-10px, -10px) rotate(-5deg) scale(1.06); }
+  36.1%, 62% { background-position: -256px 0; transform: translate(6px, 14px) rotate(3deg) scale(1.08); filter: brightness(1.32); }
+  62.1%, 100% { background-position: -384px 0; transform: translate(1px, 2px) rotate(0) scale(1); filter: brightness(1); }
 }
 
 @keyframes frontier-impact {
   0%, 35% { filter: brightness(1) drop-shadow(0 6px 0 rgb(0 0 0 / 0.26)); transform: translateX(-50%) translateY(0) scaleY(1); }
   36%, 45% { filter: brightness(1.22) drop-shadow(0 3px 0 rgb(0 0 0 / 0.32)); transform: translateX(-50%) translateY(3px) scaleY(0.965); }
   68%, 100% { filter: brightness(1) drop-shadow(0 6px 0 rgb(0 0 0 / 0.26)); transform: translateX(-50%) translateY(0) scaleY(1); }
+}
+
+@keyframes frontier-heavy-impact {
+  0%, 35% { filter: brightness(1) drop-shadow(0 6px 0 rgb(0 0 0 / 0.26)); transform: translateX(-50%) translateY(0) scaleY(1); }
+  36%, 49% { filter: brightness(1.38) drop-shadow(0 2px 0 rgb(0 0 0 / 0.38)); transform: translateX(-50%) translateY(6px) scaleY(0.925) scaleX(1.025); }
+  72%, 100% { filter: brightness(1) drop-shadow(0 6px 0 rgb(0 0 0 / 0.26)); transform: translateX(-50%) translateY(0) scaleY(1) scaleX(1); }
 }
 
 @keyframes contact-flash {
@@ -2045,6 +2169,16 @@
 @keyframes collapse-right {
   0% { opacity: 1; transform: translate(0, 0) rotate(0); }
   100% { opacity: 0; transform: translate(42px, 58px) rotate(10deg); }
+}
+
+@keyframes collapse-left-alternate {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(-30px, 68px) rotate(13deg); }
+}
+
+@keyframes collapse-right-alternate {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(35px, 50px) rotate(-12deg); }
 }
 
 @keyframes collapse-gap {
@@ -2094,6 +2228,7 @@
   .headerActions { gap: 4px; }
   .oreCounter { min-width: 94px; padding-inline: 7px; }
   .strikeAssist { min-width: 76px; padding-inline: 6px; }
+  .soundToggle { min-width: 44px; padding-inline: 4px; }
   .shaftSection { padding: 5px; }
   .shaftHeading { padding-bottom: 5px; }
   .shaftHeading .sectionLabel { display: none; }
@@ -2144,6 +2279,7 @@
   .oreCounter { min-width: 86px; }
   .strikeAssist { min-width: 68px; font-size: 0.64rem; }
   .strikeAssist small { font-size: 0.5rem; }
+  .soundToggle { font-size: 0.56rem; }
   .shaftHeading h2 { font-size: 1rem; }
   .shaft { --workline: 34%; }
   .quickLoop {
@@ -2170,16 +2306,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .miningActor {
-    animation-duration: 180ms !important;
+  .shaft {
+    --strike-duration: 160ms;
+    --strike-contact-delay: 80ms;
   }
 
   .frontierLip,
+  .miningActor {
+    animation-duration: var(--strike-duration) !important;
+  }
+
   .contactFlash,
   .verticalFracture,
   .continuousDebris span,
   .continuousHitLabel {
-    animation-delay: 0ms !important;
+    animation-delay: var(--strike-contact-delay) !important;
     animation-duration: 120ms !important;
   }
 

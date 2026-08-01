@@ -8,6 +8,8 @@ const prototype = readFileSync(join(projectRoot, "app/MinePrototype.tsx"), "utf8
 const styles = readFileSync(join(projectRoot, "app/mine.module.css"), "utf8");
 const resonance = readFileSync(join(projectRoot, "app/useResonanceEvent.ts"), "utf8");
 const resonanceView = readFileSync(join(projectRoot, "app/ResonanceEvent.tsx"), "utf8");
+const strikeFeedback = readFileSync(join(projectRoot, "app/strikeFeedback.ts"), "utf8");
+const miningAudio = readFileSync(join(projectRoot, "app/useMiningAudio.ts"), "utf8");
 
 test("continuous shaft contract remains explicit", () => {
   assert.match(prototype, /boreHistory/);
@@ -25,13 +27,32 @@ test("continuous shaft contract remains explicit", () => {
 
 test("automatic descent and page-wide tap acceleration stay explicit", () => {
   assert.match(prototype, /AUTO_STRIKE_MS/);
-  assert.match(prototype, /STRIKE_CONTACT_MS/);
+  assert.match(prototype, /strikeTiming/);
   assert.match(prototype, /automation \* \(AUTO_STRIKE_MS \/ 1000\)/);
   assert.match(prototype, /queueStrike/);
   assert.match(prototype, /onPointerDown=\{handleMinePointerDown\}/);
   assert.match(prototype, /onPointerUp=\{handleMinePointerUp\}/);
   assert.match(prototype, /isSecondaryControl/);
   assert.match(prototype, /자동 굴착 중/);
+});
+
+test("strike poses, contact feedback, and damage share one timing contract", () => {
+  assert.match(strikeFeedback, /quick: \{ durationMs: 560, contactMs: 202 \}/);
+  assert.match(strikeFeedback, /heavy: \{ durationMs: 690, contactMs: 249 \}/);
+  assert.match(strikeFeedback, /critical: \{ durationMs: 760, contactMs: 274 \}/);
+  assert.match(strikeFeedback, /REDUCED_STRIKE_TIMING/);
+  assert.match(prototype, /manualStrikeGuardUntilRef/);
+  assert.match(prototype, /pendingAutomaticDamageRef\.current \+= automaticDamage/);
+  assert.match(prototype, /rawDamage \+ pendingAutomaticDamage/);
+  assert.match(prototype, /data-strike-variant=\{strikeVariant\}/);
+  assert.match(prototype, /playStrikeSound\(variant\)/);
+  assert.match(prototype, /playCollapseSound\(\)/);
+  assert.match(prototype, /aria-pressed=\{soundEnabled\}/);
+  assert.match(styles, /--strike-contact-delay/);
+  assert.match(styles, /miner-heavy-strike/);
+  assert.match(styles, /miner-critical-strike/);
+  assert.match(miningAudio, /AudioContext/);
+  assert.match(miningAudio, /oscillator\.type = "square"/);
 });
 
 test("the first viewport closes the rock reward to equipment loop", () => {

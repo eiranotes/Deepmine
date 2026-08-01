@@ -12,6 +12,9 @@ import {
 } from "react";
 import { ResonanceEvent } from "./ResonanceEvent";
 import styles from "./mine.module.css";
+import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
+import { useMiningAudio } from "./useMiningAudio";
+import { useReducedMotionPreference } from "./useReducedMotionPreference";
 import { RESONANCE_MULTIPLIER, useResonanceEvent } from "./useResonanceEvent";
 
 type EquipmentKind = "drill" | "cart" | "lamp";
@@ -35,7 +38,6 @@ type Specializations = {
 const METERS_PER_LAYER = 4;
 const PIXELS_PER_METER = 28;
 const AUTO_STRIKE_MS = 820;
-const STRIKE_CONTACT_MS = 230;
 
 const equipmentCopy: Record<
   EquipmentKind,
@@ -153,12 +155,20 @@ export function MinePrototype() {
   const [hitPulse, setHitPulse] = useState(0);
   const [collapsePulse, setCollapsePulse] = useState(0);
   const [lastGain, setLastGain] = useState<number | null>(null);
-  const [isCritical, setIsCritical] = useState(false);
+  const [strikeVariant, setStrikeVariant] = useState<StrikeVariant>("quick");
   const [isBreaking, setIsBreaking] = useState(false);
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
   const [upgradeNotice, setUpgradeNotice] = useState<string | null>(null);
   const resonance = useResonanceEvent();
+  const reducedMotion = useReducedMotionPreference();
+  const {
+    soundEnabled,
+    prime: primeMiningAudio,
+    playStrike: playStrikeSound,
+    playCollapse: playCollapseSound,
+    toggle: toggleMiningAudio,
+  } = useMiningAudio();
   const pointerRef = useRef<{
     id: number;
     x: number;
@@ -169,7 +179,9 @@ export function MinePrototype() {
   const upgradeTimerRef = useRef<number | null>(null);
   const strikeTimersRef = useRef<Set<number>>(new Set());
   const manualStrikeCountRef = useRef(0);
-  const lastManualStrikeAtRef = useRef(0);
+  const autoStrikeCountRef = useRef(0);
+  const manualStrikeGuardUntilRef = useRef(0);
+  const pendingAutomaticDamageRef = useRef(0);
   const previousBrokenLayersRef = useRef(mine.brokenLayers);
 
   const integrity = integrityAt(mine.depth);
@@ -277,30 +289,40 @@ export function MinePrototype() {
   const queueStrike = useCallback(
     (
       rawDamage: number,
-      critical: boolean,
+      variant: StrikeVariant,
       source: "manual" | "auto",
       drillLevel: number,
       payoutMultiplier: number,
     ) => {
+      const timing = strikeTiming(variant, reducedMotion);
       setLastStrikeSource(source);
-      setIsCritical(critical);
+      setStrikeVariant(variant);
       setHitPulse((value) => value + 1);
       const timer = window.setTimeout(() => {
         strikeTimersRef.current.delete(timer);
-        applyDamage(rawDamage, drillLevel, payoutMultiplier);
-      }, STRIKE_CONTACT_MS);
+        const pendingAutomaticDamage = pendingAutomaticDamageRef.current;
+        pendingAutomaticDamageRef.current = 0;
+        playStrikeSound(variant);
+        applyDamage(rawDamage + pendingAutomaticDamage, drillLevel, payoutMultiplier);
+      }, timing.contactMs);
       strikeTimersRef.current.add(timer);
     },
-    [applyDamage],
+    [applyDamage, playStrikeSound, reducedMotion],
   );
 
   useEffect(() => {
     if (automation <= 0) return;
     const swing = () => {
-      if (performance.now() - lastManualStrikeAtRef.current < 640) return;
+      const automaticDamage = automation * (AUTO_STRIKE_MS / 1000);
+      if (performance.now() < manualStrikeGuardUntilRef.current) {
+        pendingAutomaticDamageRef.current += automaticDamage;
+        return;
+      }
+      autoStrikeCountRef.current += 1;
+      const variant: StrikeVariant = autoStrikeCountRef.current % 3 === 0 ? "heavy" : "quick";
       queueStrike(
-        automation * (AUTO_STRIKE_MS / 1000),
-        false,
+        automaticDamage,
+        variant,
         "auto",
         equipment.drill,
         oreMultiplier,
@@ -309,16 +331,17 @@ export function MinePrototype() {
     swing();
     const swingTimer = window.setInterval(swing, AUTO_STRIKE_MS);
     return () => window.clearInterval(swingTimer);
-  }, [automation, equipment.drill, oreMultiplier, queueStrike]);
+  }, [applyDamage, automation, equipment.drill, oreMultiplier, queueStrike]);
 
   useEffect(() => {
     if (mine.brokenLayers <= previousBrokenLayersRef.current) return;
     previousBrokenLayersRef.current = mine.brokenLayers;
     setCollapsePulse((value) => value + 1);
     setIsBreaking(true);
+    playCollapseSound();
     if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
     breakTimerRef.current = window.setTimeout(() => setIsBreaking(false), 560);
-  }, [mine.brokenLayers]);
+  }, [mine.brokenLayers, playCollapseSound]);
 
   useEffect(
     () => () => {
@@ -333,11 +356,18 @@ export function MinePrototype() {
   const strike = () => {
     const criticalEvery = Math.max(2, Math.round(1 / chance));
     manualStrikeCountRef.current += 1;
-    lastManualStrikeAtRef.current = performance.now();
     const critical = manualStrikeCountRef.current % criticalEvery === 0;
+    const variant: StrikeVariant = critical
+      ? "critical"
+      : manualStrikeCountRef.current % 3 === 0
+        ? "heavy"
+        : "quick";
+    const timing = strikeTiming(variant, reducedMotion);
+    manualStrikeGuardUntilRef.current = performance.now() + timing.durationMs + 80;
+    primeMiningAudio();
     queueStrike(
       critical ? tap * 3 : tap,
-      critical,
+      variant,
       "manual",
       equipment.drill,
       oreMultiplier,
@@ -439,6 +469,17 @@ export function MinePrototype() {
         ? "/assets/shaft/ShaftFractureVertical_medium.png"
         : "/assets/shaft/ShaftFractureVertical_light.png";
 
+  const strikeClass = {
+    quick: styles.quickStrike,
+    heavy: styles.heavyStrike,
+    critical: styles.criticalStrike,
+  }[strikeVariant];
+  const hitLabel = lastStrikeSource === "auto"
+    ? strikeVariant === "heavy" ? "자동 강타" : "자동 굴착"
+    : strikeVariant === "critical"
+      ? `급소 −${tap * 3}`
+      : strikeVariant === "heavy" ? `강타 −${tap}` : `−${tap}`;
+
   const depthMarks = useMemo(() => {
     const first = Math.max(0, Math.floor(headDepth / METERS_PER_LAYER) * METERS_PER_LAYER - 16);
     return Array.from({ length: 10 }, (_, index) => first + index * METERS_PER_LAYER);
@@ -477,6 +518,17 @@ export function MinePrototype() {
               탭 가속
               <small>자동 굴착 중</small>
             </button>
+            <button
+              className={styles.soundToggle}
+              type="button"
+              data-no-mine
+              aria-label={`타격 효과음 ${soundEnabled ? "켜짐" : "꺼짐"}`}
+              aria-pressed={soundEnabled}
+              onClick={toggleMiningAudio}
+            >
+              SFX
+              <small>{soundEnabled ? "켜짐" : "꺼짐"}</small>
+            </button>
           </div>
         </header>
 
@@ -498,8 +550,12 @@ export function MinePrototype() {
 
           <div className={styles.shaftStage}>
             <div
-              className={`${styles.shaft} ${isCritical ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+              className={`${styles.shaft} ${strikeClass} ${strikeVariant === "critical" ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
               style={sceneStyle}
+              data-strike-variant={strikeVariant}
+              data-strike-source={lastStrikeSource}
+              data-hit-pulse={hitPulse}
+              data-sound-enabled={soundEnabled}
               role="img"
               aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${expectedLayerOre}`}
             >
@@ -615,17 +671,13 @@ export function MinePrototype() {
               </div>
               <img
                 className={styles.continuousWeakPoint}
-                src={isCritical ? "/assets/effects/WeakPoint_hit.png" : "/assets/effects/WeakPoint_idle.png"}
+                src={strikeVariant === "critical" ? "/assets/effects/WeakPoint_hit.png" : "/assets/effects/WeakPoint_idle.png"}
                 width={64}
                 height={64}
                 alt=""
               />
               <span className={styles.continuousHitLabel} key={`continuous-hit-${hitPulse}`}>
-                {lastStrikeSource === "auto"
-                  ? "자동 굴착"
-                  : isCritical
-                    ? `급소 −${tap * 3}`
-                    : `−${tap}`}
+                {hitLabel}
               </span>
               <div className={styles.workRewardPromise}>
                 <span>{remainingPercent}% 남음</span>
@@ -635,7 +687,11 @@ export function MinePrototype() {
             </div>
 
             {isBreaking && (
-              <div className={styles.collapseBand} aria-hidden="true" key={`collapse-${collapsePulse}`}>
+              <div
+                className={`${styles.collapseBand} ${mine.brokenLayers % 2 === 0 ? styles.collapseAlternate : ""}`}
+                aria-hidden="true"
+                key={`collapse-${collapsePulse}`}
+              >
                 <span className={styles.collapseLeft} />
                 <span className={styles.collapseRight} />
                 <span className={styles.collapseGap} />

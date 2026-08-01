@@ -1,6 +1,24 @@
 # Build Report
 
-업데이트: 2026-08-01 (D-057 웹 공명 결절 사건)
+업데이트: 2026-08-01 (D-058 웹 타격 리듬·접촉 SFX)
+
+## 2026-08-01 web strike rhythm and contact SFX
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 전신 타격 변주 | 검증됨(브라우저·코드) | 실제 화면 탭에서 quick/heavy/critical이 각각 `miner-quick-strike`, `miner-heavy-strike`, `miner-critical-strike`로 전환. 크리티컬은 전신 확대·하강과 `급소 −57`, 38px 접촉 섬광 확인 |
+| 접촉 동기화 | 검증됨(코드·계약) | 560/202ms, 690/249ms, 760/274ms의 동작/접촉 정의를 전신 포즈·막장 반동·균열·섬광·파편·수치·데미지·SFX가 공동 사용. Reduce Motion은 160/80ms |
+| 자동 생산 보존 | 검증됨(브라우저·코드) | 무입력 1.8초 동안 16.6m→17.2m, hit pulse 32→35. 수동 포즈 보호 구간에 걸린 자동 틱은 보류 후 다음 가시 접촉에 합산해 누락·비접촉 붕괴를 방지 |
+| 웹 8-bit SFX | 검증됨(코드·DOM) | 새 의존성 없이 Web Audio square-wave로 quick/heavy/critical/collapse를 저음량 합성. 첫 제스처 뒤에만 컨텍스트를 열고 SFX 토글로 상태 제어 |
+| 데스크톱 | 검증됨(1280×720) | scrollY 0, documentWidth 1280, 갱도 bottom 708.6px, 행동대 bottom 698.6px. SFX 버튼 48×55.6px, 실제 포인터 타격과 변주 확인 |
+| 모바일 | 검증됨(390×844) | documentWidth 390, scrollY 0, 갱도 bottom 797.6px, 행동대 bottom 791.6px. SFX 버튼 44×55.6px, 제목 영역 포인터가 `manual/quick` 타격으로 기록 |
+| 입력 분리 | 검증됨(실제 포인터) | SFX 버튼을 눌러 `aria-pressed true→false`가 바뀌는 동안 타격 source는 `auto`로 유지. 다시 켜기와 화면 전체 수동 탭 정상 |
+| 브라우저 콘솔 | 부분 검증 | 데스크톱·모바일·SFX 토글·8회 타격·크리티컬·무입력 하강 뒤 warning/error 0. 이후 자동 데미지 접촉 합산과 AudioContext 실패 폴백을 정적 보강했으며 final production build는 통과했지만 브라우저 세션을 다시 열지는 않음 |
+| 웹 검사 | 검증됨 | lint, vinext production build, 계약 테스트 7/7, `git diff --check` 통과 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD058Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
+| 앱 포팅 | 미구현 | D-058은 웹 체감 기준. iOS 저작 8-bit 자산과 `GameFeedbackEvent.systemSoundID` 교체, SwiftUI 전신 포즈 포팅은 별도 |
+| 배포 | 미배포 | 현재 로컬 작업트리에서 검증. 사용자 요청 전이므로 Sites version 4와 원격 저장소는 변경하지 않음 |
 
 ## 2026-08-01 web resonance event
 
@@ -14,7 +32,7 @@
 | 모바일 배치 | 검증됨(390×844) | 결절 실제 버튼 104×126px, scrollY 0, scrollWidth 390px, 가로 overflow 없음. 상태판 bottom 213.0px와 과충전 top 213.6px가 겹치지 않음 |
 | 접근성·모션 | 검증됨(DOM·코드) | 고정 접근성 이름의 독립 버튼, `aria-live=assertive`, 회수/놓침/종료 텍스트 상태. Reduce Motion은 사건 의미를 남기고 5개 애니메이션 제거 |
 | 웹 검사 | 검증됨 | lint, vinext production build, 계약 테스트 6/6, `git diff --check` 통과 |
-| 최종 클린 콘솔 | 미검증(클린 재실행 필요) | 실제 등장·수령·놓침·종료 QA 시 warning/error 0을 확인했으나, 마지막 visibility Hook을 개발 서버 HMR로 추가할 때 Hook-order 경고가 기록됨. production build는 통과했지만 브라우저 종료 뒤 새 페이지 콘솔 0은 재확보하지 않음 |
+| 최종 클린 콘솔 | 해소됨(D-058 재검증) | 새 개발 서버와 전체 reload에서 D-057을 포함한 페이지를 다시 열고 데스크톱·모바일 상호작용 뒤 브라우저 warning/error 0 확인 |
 | Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
 | generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD057Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
 | 앱 포팅 | 미구현 | D-057 공명 사건은 웹 체감 승인 전이며 SwiftUI 홈과 Core 경제에는 아직 연결하지 않음 |
