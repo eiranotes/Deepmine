@@ -6,6 +6,8 @@ import test from "node:test";
 const projectRoot = new URL("../", import.meta.url).pathname;
 const prototype = readFileSync(join(projectRoot, "app/MinePrototype.tsx"), "utf8");
 const styles = readFileSync(join(projectRoot, "app/mine.module.css"), "utf8");
+const resonance = readFileSync(join(projectRoot, "app/useResonanceEvent.ts"), "utf8");
+const resonanceView = readFileSync(join(projectRoot, "app/ResonanceEvent.tsx"), "utf8");
 
 test("continuous shaft contract remains explicit", () => {
   assert.match(prototype, /boreHistory/);
@@ -44,6 +46,23 @@ test("the first viewport closes the rock reward to equipment loop", () => {
   assert.match(styles, /\.quickUpgrade:focus-visible/);
 });
 
+test("resonance is a rare explicit reward event, not automatic income", () => {
+  assert.match(resonance, /RESONANCE_MIN_DELAY_MS = 120_000/);
+  assert.match(resonance, /RESONANCE_MAX_DELAY_MS = 300_000/);
+  assert.match(resonance, /RESONANCE_ACTIVE_MS = 12_000/);
+  assert.match(resonance, /RESONANCE_BOOST_MS = 18_000/);
+  assert.match(resonance, /visibilitychange/);
+  assert.match(resonance, /phase !== "waiting" \|\| !pageVisible/);
+  assert.match(resonance, /setPhase\("missed"\)/);
+  assert.match(resonance, /const claim = useCallback/);
+  assert.match(prototype, /resonance\.boostActive \? RESONANCE_MULTIPLIER : 1/);
+  assert.match(resonanceView, /공명 결절 회수/);
+  assert.match(resonanceView, /data-no-mine/);
+  assert.match(resonanceView, /aria-live="assertive"/);
+  assert.match(styles, /\.resonanceNode:focus-visible/);
+  assert.match(styles, /\.resonanceMissed/);
+});
+
 test("each equipment owns a visible scene effect and a branch choice", () => {
   for (const kind of ["drill", "cart", "lamp"]) {
     assert.match(prototype, new RegExp(`${kind}: \\[`, "m"));
@@ -76,6 +95,7 @@ test("all prototype art is project-local and deployable", () => {
     "public/assets/shaft/ShaftFractureVertical_heavy.png",
     "public/assets/shaft/MinerMiningStrip.png",
     "public/assets/shaft/ShaftFrontierLip.png",
+    "public/assets/events/ResonanceNode.png",
     "public/og/deepmine-shaft-social.png",
   ];
 

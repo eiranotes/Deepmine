@@ -10,7 +10,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { ResonanceEvent } from "./ResonanceEvent";
 import styles from "./mine.module.css";
+import { RESONANCE_MULTIPLIER, useResonanceEvent } from "./useResonanceEvent";
 
 type EquipmentKind = "drill" | "cart" | "lamp";
 
@@ -156,6 +158,7 @@ export function MinePrototype() {
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
   const [upgradeNotice, setUpgradeNotice] = useState<string | null>(null);
+  const resonance = useResonanceEvent();
   const pointerRef = useRef<{
     id: number;
     x: number;
@@ -171,11 +174,16 @@ export function MinePrototype() {
 
   const integrity = integrityAt(mine.depth);
   const progress = Math.min(1, mine.damage / integrity);
+  const resonanceMultiplier = resonance.boostActive ? RESONANCE_MULTIPLIER : 1;
   const tap = Math.round(
-    tapPower(equipment.drill) * (specializations.drill === "impact" ? 1.35 : 1),
+    tapPower(equipment.drill)
+      * (specializations.drill === "impact" ? 1.35 : 1)
+      * resonanceMultiplier,
   );
   const automation = Math.round(
-    automationPower(equipment.cart) * (specializations.cart === "fleet" ? 1.25 : 1),
+    automationPower(equipment.cart)
+      * (specializations.cart === "fleet" ? 1.25 : 1)
+      * resonanceMultiplier,
   );
   const chance = Math.min(
     0.5,
@@ -655,6 +663,16 @@ export function MinePrototype() {
             </div>
 
             </div>
+
+            <ResonanceEvent
+              phase={resonance.phase}
+              position={resonance.position}
+              secondsRemaining={resonance.secondsRemaining}
+              boostActive={resonance.boostActive}
+              boostSecondsRemaining={resonance.boostSecondsRemaining}
+              announcement={resonance.announcement}
+              onClaim={resonance.claim}
+            />
 
             <aside
               className={styles.quickLoop}

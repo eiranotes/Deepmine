@@ -1,6 +1,23 @@
 # Build Report
 
-업데이트: 2026-08-01 (D-056 첫 뷰포트 경제 폐루프)
+업데이트: 2026-08-01 (D-057 웹 공명 결절 사건)
+
+## 2026-08-01 web resonance event
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 기존 생성 에셋 재사용 | 검증됨 | `ResonanceNode.imageset/resonancenode@3x.png`와 `web/public/assets/events/ResonanceNode.png`가 192×192 RGB, SHA-256 `b2d2f971…ca98e25a`로 동일 |
+| 등장·놓침 | 검증됨(브라우저·코드) | 첫 체험 5.2초, 이후 보이는 화면에서 120~300초 간격, 활성 12초. 미수령 시 `공명 결절을 놓쳤습니다. 보상 없이 신호가 사라졌습니다.` 확인 |
+| 실제 수령·배율 | 검증됨(실제 좌표 포인터) | 데스크톱과 모바일에서 결절 중심을 실제 좌표로 눌러 `공명 회수`·18초 과충전 확인. 탭 19→38, 자동 9→18/초, 종료 후 19·9/초 복귀 |
+| 채굴 루프 보존 | 검증됨(브라우저) | 과충전 중 제목 영역 탭 뒤 접촉 프레임에서 헤드 22.9m→23.8m 진행. 자동 굴착은 계속되며 개별 광석 지급이나 자동 결절 수령 없음 |
+| 데스크톱 배치 | 검증됨(1280×720) | scrollY 0, 가로 overflow 없음. 상태판 rect 279~799px와 과충전 rect 851~999px가 겹치지 않음 |
+| 모바일 배치 | 검증됨(390×844) | 결절 실제 버튼 104×126px, scrollY 0, scrollWidth 390px, 가로 overflow 없음. 상태판 bottom 213.0px와 과충전 top 213.6px가 겹치지 않음 |
+| 접근성·모션 | 검증됨(DOM·코드) | 고정 접근성 이름의 독립 버튼, `aria-live=assertive`, 회수/놓침/종료 텍스트 상태. Reduce Motion은 사건 의미를 남기고 5개 애니메이션 제거 |
+| 웹 검사 | 검증됨 | lint, vinext production build, 계약 테스트 6/6, `git diff --check` 통과 |
+| 최종 클린 콘솔 | 미검증(클린 재실행 필요) | 실제 등장·수령·놓침·종료 QA 시 warning/error 0을 확인했으나, 마지막 visibility Hook을 개발 서버 HMR로 추가할 때 Hook-order 경고가 기록됨. production build는 통과했지만 브라우저 종료 뒤 새 페이지 콘솔 0은 재확보하지 않음 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD057Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
+| 앱 포팅 | 미구현 | D-057 공명 사건은 웹 체감 승인 전이며 SwiftUI 홈과 Core 경제에는 아직 연결하지 않음 |
 
 ## 2026-08-01 first-viewport reward and upgrade loop
 

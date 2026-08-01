@@ -1157,6 +1157,18 @@
   position: relative;
 }
 
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .shaft {
   --workline: 36%;
   --rock-image: url("/assets/shaft/ShaftRock_entry.png");
@@ -1685,6 +1697,200 @@
   animation: descent-arrow 720ms ease-in-out infinite;
 }
 
+.resonanceLayer {
+  position: absolute;
+  z-index: 24;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.resonanceNode,
+.resonanceOutcome {
+  position: absolute;
+  top: 43%;
+}
+
+.resonanceLeft {
+  left: clamp(58px, 18%, 180px);
+}
+
+.resonanceRight {
+  right: clamp(58px, 18%, 180px);
+}
+
+.resonanceNode {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  min-height: 138px;
+  padding: 0 8px 8px;
+  border: 0;
+  border-bottom: 2px solid var(--brass);
+  border-radius: 0;
+  background: rgb(10 10 9 / 0.86);
+  color: var(--limestone);
+  font: inherit;
+  cursor: pointer;
+  image-rendering: pixelated;
+  pointer-events: auto;
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.48);
+  animation: resonance-arrival 240ms steps(3, end) both;
+}
+
+.resonanceNode::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 74px;
+  height: 74px;
+  transform: translateX(-50%) rotate(12deg);
+  border: 2px dashed var(--brass-bright);
+  pointer-events: none;
+  animation: resonance-ring 1.2s steps(8, end) infinite;
+}
+
+.resonanceNode img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.resonanceNode strong,
+.resonanceNode small,
+.resonanceUrgency {
+  position: relative;
+  z-index: 3;
+}
+
+.resonanceNode strong {
+  color: var(--brass-bright);
+  font-size: 0.72rem;
+}
+
+.resonanceNode small {
+  color: var(--limestone);
+  font-size: 0.56rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.resonanceUrgency {
+  position: absolute;
+  top: -15px;
+  left: 0;
+  padding: 3px 6px;
+  border-left: 2px solid var(--brass-bright);
+  background: var(--coal);
+  color: var(--brass-bright);
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.resonanceOrbit {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 86px;
+  height: 86px;
+  transform: translateX(-50%);
+  border: 1px solid var(--limestone);
+  opacity: 0.56;
+  animation: resonance-breath 720ms steps(2, end) infinite;
+}
+
+.resonanceNode:hover {
+  background: var(--coal);
+  box-shadow: 0 0 0 2px var(--brass), 5px 5px 0 rgb(0 0 0 / 0.55);
+}
+
+.resonanceNode:active {
+  transform: translateY(3px);
+}
+
+.resonanceNode:focus-visible {
+  outline: 3px solid var(--limestone);
+  outline-offset: 3px;
+}
+
+.resonanceOutcome {
+  display: grid;
+  width: 116px;
+  min-height: 64px;
+  align-content: center;
+  padding: 8px 10px;
+  border-left: 3px solid var(--brass);
+  background: rgb(10 10 9 / 0.92);
+  color: var(--limestone);
+  pointer-events: none;
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.48);
+}
+
+.resonanceOutcome strong {
+  color: var(--brass-bright);
+  font-size: 0.72rem;
+}
+
+.resonanceOutcome small {
+  margin-top: 2px;
+  color: var(--limestone-muted);
+  font-size: 0.56rem;
+  font-weight: 750;
+}
+
+.resonanceClaimed {
+  animation: resonance-claimed 320ms steps(4, end) both;
+}
+
+.resonanceMissed {
+  border-color: var(--shale-light);
+  animation: resonance-missed 1.2s steps(5, end) both;
+}
+
+.resonanceMissed strong {
+  color: var(--limestone-muted);
+}
+
+.resonanceBoost {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 7px;
+  align-items: baseline;
+  min-width: 148px;
+  padding: 6px 9px;
+  border: 1px solid var(--brass);
+  border-top-width: 3px;
+  background: rgb(10 10 9 / 0.94);
+  color: var(--limestone);
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.48);
+}
+
+.resonanceBoost span {
+  font-size: 0.58rem;
+  font-weight: 850;
+}
+
+.resonanceBoost strong {
+  color: var(--brass-bright);
+  font-size: 0.92rem;
+}
+
+.resonanceBoost small {
+  grid-column: 1 / -1;
+  color: var(--limestone-muted);
+  font-size: 0.54rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .quickLoop {
   position: absolute;
   z-index: 25;
@@ -1852,6 +2058,31 @@
   50% { transform: translateY(4px); opacity: 1; }
 }
 
+@keyframes resonance-arrival {
+  from { opacity: 0; transform: translateY(10px) scale(0.82); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes resonance-ring {
+  from { transform: translateX(-50%) rotate(12deg); }
+  to { transform: translateX(-50%) rotate(372deg); }
+}
+
+@keyframes resonance-breath {
+  0%, 100% { opacity: 0.24; transform: translateX(-50%) scale(0.88); }
+  50% { opacity: 0.68; transform: translateX(-50%) scale(1); }
+}
+
+@keyframes resonance-claimed {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes resonance-missed {
+  0%, 72% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(9px); }
+}
+
 @keyframes upgrade-toast-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1889,6 +2120,14 @@
     padding-inline: 5px;
   }
   .descentIndicator { right: 7px; }
+  .resonanceNode,
+  .resonanceOutcome { top: 46%; }
+  .resonanceLeft { left: 18px; }
+  .resonanceRight { right: 18px; }
+  .resonanceBoost {
+    top: 96px;
+    right: 7px;
+  }
   .quickLoop {
     bottom: 6px;
     grid-template-columns: minmax(0, 0.8fr) 18px minmax(0, 1.4fr);
@@ -1915,6 +2154,19 @@
   .quickUpgrade > span,
   .quickUpgrade > small { font-size: 0.5rem; }
   .quickUpgrade > strong { font-size: 0.7rem; }
+  .resonanceNode {
+    width: 104px;
+    min-height: 126px;
+  }
+  .resonanceNode img {
+    width: 84px;
+    height: 84px;
+  }
+  .resonanceNode::after {
+    width: 66px;
+    height: 66px;
+  }
+  .resonanceOutcome { width: 104px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1932,6 +2184,14 @@
   }
 
   .upgradeToast {
+    animation: none;
+  }
+
+  .resonanceNode,
+  .resonanceNode::after,
+  .resonanceOrbit,
+  .resonanceClaimed,
+  .resonanceMissed {
     animation: none;
   }
 }
