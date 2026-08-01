@@ -129,6 +129,21 @@ extension Balance {
     public static let freightModificationOreMultiplier = 1.25
     public static let fortuneModificationCriticalChance = 0.08
 
+    // MARK: Infrastructure
+
+    /// Equipment levels become visible plant in the passage, not just larger numbers
+    /// (D-059). Counts are deliberately small: four carts on a rail read as an operation,
+    /// twelve read as clutter.
+    public static let maximumSupportCrew = 4
+    /// Total equipment level at which the first extra crew member appears. Below it the
+    /// mine is one miner, which is what the opening minutes should look like.
+    public static let supportCrewLevelOffset = 10
+    public static let maximumCarts = 4
+    public static let maximumCargoSlots = 3
+    public static let maximumServiceLamps = 5
+    /// Levels between each additional cart or cargo slot.
+    public static let cartGrowthLevelStep = 2
+
     // MARK: Resonance node
 
     /// A rare, explicit reward the player has to notice and press — distinct from the

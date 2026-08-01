@@ -47,6 +47,12 @@ struct ShaftView: View {
 
     private var power: StrikePower { MiningLoop.power(for: player) }
     var scene: ShaftScene { ShaftSceneEngine.scene(for: player) }
+    private var plant: MineInfrastructure {
+        MineInfrastructureEngine.infrastructure(
+            equipment: player.equipment,
+            modifications: player.equipmentModifications
+        )
+    }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -122,6 +128,13 @@ struct ShaftView: View {
         // by a ruler column.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mine-shaft")
+        // Structural growth is readable in the scene; this is the same state in words, so
+        // VoiceOver hears the rig the sighted player can count (D-060).
+        .accessibilityLabel(
+            "\(DeepMineStrings.text(.homeCrewLabel)) \(plant.crew), "
+                + "\(DeepMineStrings.text(.gameCart)) \(plant.carts), "
+                + "\(DeepMineStrings.text(.gameLamp)) \(plant.serviceLamps)"
+        )
         .animation(
             reduceMotion
                 ? nil

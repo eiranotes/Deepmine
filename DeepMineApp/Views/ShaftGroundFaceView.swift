@@ -81,6 +81,16 @@ struct ShaftWorkFaceView: View {
         }
     }
 
+    /// How much of the rock's width the contact disturbs. A 22pt spark under a 92pt actor
+    /// made every hit look like a pinprick; the impact is a face-wide event (D-060).
+    private var impactCoverage: CGFloat {
+        switch strikeVariant {
+        case .quick: 0.76
+        case .heavy: 0.84
+        case .critical: 0.92
+        }
+    }
+
     /// A heavier swing displaces the face further. Same damage, different read (D-058).
     private var recoil: CGFloat {
         switch strikeVariant {
@@ -111,7 +121,11 @@ struct ShaftWorkFaceView: View {
 
     private var groundButton: some View {
         Button { onStrike(false) } label: {
-            ShaftBreakableGroundView(player: player, impactFlash: impactFlash)
+            ShaftBreakableGroundView(
+                player: player,
+                impactFlash: impactFlash,
+                impactCoverage: impactFlash ? impactCoverage : 0
+            )
                 .frame(width: groundWidth, height: groundHeight)
                 .contentShape(Rectangle())
         }
@@ -151,6 +165,8 @@ struct ShaftWorkFaceView: View {
 private struct ShaftBreakableGroundView: View {
     let player: PlayerState
     let impactFlash: Bool
+    /// Fraction of the rock's width the current contact covers. Zero between strikes.
+    var impactCoverage: CGFloat = 0
 
     private var fractureIntensity: FractureIntensity {
         switch player.mineFace.damageStage {
@@ -208,9 +224,41 @@ private struct ShaftBreakableGroundView: View {
                     .fill(DeepMinePalette.limestone.color.opacity(impactFlash ? 0.9 : 0.42))
                     .frame(height: impactFlash ? 4 : 2)
                     .shadow(color: DeepMinePalette.coal.color.opacity(0.8), radius: 0, y: 3)
+
+                if impactCoverage > 0 {
+                    impactField(width: proxy.size.width, height: proxy.size.height)
+                }
             }
         }
         .clipped()
+    }
+
+    /// The compression band and its shock edges. Drawn inside the rock's own bounds so a
+    /// wide hit reads as the face absorbing force rather than as an effect laid over it.
+    private func impactField(width: CGFloat, height: CGFloat) -> some View {
+        let band = width * impactCoverage
+        return ZStack {
+            Ellipse()
+                .fill(DeepMinePalette.limestone.color.opacity(0.16))
+                .frame(width: band, height: height * 0.26)
+            Ellipse()
+                .stroke(DeepMinePalette.limestone.color.opacity(0.5), lineWidth: 2)
+                .frame(width: band * 0.82, height: height * 0.2)
+            HStack(spacing: band * 0.52) {
+                branchCrack
+                branchCrack.scaleEffect(x: -1, y: 1)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.top, height * 0.12)
+        .allowsHitTesting(false)
+    }
+
+    private var branchCrack: some View {
+        Rectangle()
+            .fill(DeepMinePalette.coal.color.opacity(0.72))
+            .frame(width: 2, height: 16)
+            .rotationEffect(.degrees(18))
     }
 }
 

@@ -1,6 +1,22 @@
 # Build Report
 
-업데이트: 2026-08-02 (D-063 행동대·공명 결절·타격 변주 앱 포팅)
+업데이트: 2026-08-02 (D-064 설비 누적·면 단위 충격 앱 포팅)
+
+## 2026-08-02 porting D-059 and D-060 into the app
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 설비 파생의 단일화 | 검증됨 | `MineInfrastructureEngine`이 작업조 1~4, 광차 0~4, 적재 0~3, 작업등 1~5를 장비 레벨·분기에서 파생한다. 7건으로 상한, 분기 가산, 레벨 상승 시 축소 없음, 광차 레벨 1에서 0대를 고정 |
+| 광차 가시성 결함 수정 | 검증됨(코드) | 앱 광차 수가 `visualTier` 기반이라 5·15레벨에서만 늘었다. 그 사이의 모든 광차 구매가 갱도에서 보이지 않았다. Core 파생으로 교체해 레벨 두 칸마다 한 대씩 는다 |
+| 작업조 데크 | 검증됨(시뮬레이터) | 통로에 떠 있던 작업조에 발밑 데크를 붙였다. 조정 전/후 캡처로 확인 |
+| 면 단위 충격 | 검증됨(코드·빌드) | 접촉 시 암반 폭 76/84/92%(quick/heavy/critical)의 압축대·타원 충격파·좌우 분기 균열을 `StrikeTimeline`의 같은 접촉 시점에 그린다. 72ms 창이라 정지 캡처로는 잡히지 않았다 |
+| 내실 판독 | 검증됨(코드) | 갱도 접근성 이름이 작업조·광차·작업등 수를 말한다 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → **232/232**, 실패 0 (225 + 설비 7) |
+| 앱 회귀 | 검증됨 | `xcodebuild test -only-testing:DeepMineAppTests -only-testing:DeepMineAppUITests/OnboardingHomeUITests` → **142/142**, 실패·skip 0 |
+| generic iOS build | 검증됨 | `CODE_SIGNING_ALLOWED=NO build` → exit 0, error 0 |
+| 파일 크기 | 검증됨 | 300줄 초과는 기존 `GameActivitySurfaceContent.swift`(302줄) 1건뿐이며 이번 변경과 무관하다 |
+| 웹 정렬 | 미완 | 웹의 설비 파생 함수는 값이 Core와 같지만 아직 `coreBalance.ts`에 없다. 패리티 계약이 없으므로 드리프트가 다시 열릴 수 있다 (D-065) |
+
 
 ## 2026-08-02 porting D-056, D-057 and D-058 into the app
 

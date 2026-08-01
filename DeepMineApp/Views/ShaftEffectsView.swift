@@ -188,9 +188,11 @@ struct ShaftCartTrafficView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var travelling = false
 
+    /// Cart count is derived once, in Core, so the app and the web reference show the same
+    /// rig for the same levels (D-059). It used to step only at the sprite tier boundaries,
+    /// which made most cart purchases invisible in the passage.
     private var count: Int {
-        let tier = EquipmentEngine.visualTier(level: level)
-        return min(4, max(1, tier) + (modification == .cartFleet ? 1 : 0))
+        MineInfrastructureEngine.carts(level: level, modification: modification)
     }
 
     private var duration: Double {

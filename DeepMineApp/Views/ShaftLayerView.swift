@@ -123,8 +123,60 @@ struct ShaftGeologyView: View {
             .frame(width: 2)
     }
 
+    /// Plant installed by the equipment the player owns right now, as opposed to the bore
+    /// history above, which is the record of what was owned on the way down (D-059).
+    private var plant: MineInfrastructure {
+        MineInfrastructureEngine.infrastructure(
+            equipment: player.equipment,
+            modifications: player.equipmentModifications
+        )
+    }
+
+    /// Crew work the deck just above the face, so growth reads as a busier work site
+    /// rather than as figures scattered down the shaft.
+    private func workCrew(width: CGFloat) -> some View {
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        return ForEach(1..<max(2, plant.crew), id: \.self) { index in
+            let x = width / 2 + (index.isMultiple(of: 2) ? 54 : -58) + CGFloat(index) * 4
+            let y = max(30, headY - 26 - CGFloat(index % 2) * 34)
+            // A miner standing on nothing reads as a sprite pasted over the passage. The
+            // deck is what makes the same figure read as someone working in it.
+            ZStack(alignment: .bottom) {
+                Rectangle()
+                    .fill(DeepMinePalette.brass.color.opacity(0.42))
+                    .frame(width: 34, height: 2)
+                DeepMinePixelImage(name: "MinerSprite", size: 24)
+                    .opacity(0.88)
+                    .offset(y: -2)
+            }
+            .frame(width: 34, height: 26, alignment: .bottom)
+            .position(x: x, y: y)
+        }
+    }
+
+    /// Fixed lighting along the open passage. Count comes from the lamp level, so buying a
+    /// lamp lights more of the shaft instead of only widening an invisible survey radius.
+    private func serviceLamps(width: CGFloat) -> some View {
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let span = max(40, headY - 30)
+        return ForEach(0..<plant.serviceLamps, id: \.self) { index in
+            let ratio = CGFloat(index + 1) / CGFloat(plant.serviceLamps + 1)
+            DeepMinePixelImage(
+                name: DeepMineArt.equipment(.lamp, level: player.equipment.lamp),
+                size: 18
+            )
+            .opacity(0.86)
+            .position(
+                x: width / 2 + (index.isMultiple(of: 2) ? -1 : 1) * min(width * 0.32, 74),
+                y: 24 + span * ratio
+            )
+        }
+    }
+
     private func installations(width: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
+            serviceLamps(width: width)
+            workCrew(width: width)
             if player.equipment.cart > Balance.minimumEquipmentLevel {
                 rail(width: width)
                 ShaftCartTrafficView(
