@@ -11,13 +11,24 @@ import {
   useState,
 } from "react";
 import { ResonanceEvent } from "./ResonanceEvent";
+import {
+  METERS_PER_SEGMENT,
+  criticalChance,
+  automationDamagePerSecond,
+  type EquipmentKind,
+  equipmentTier,
+  freightOreMultiplier,
+  segmentIndexForDepth,
+  segmentIntegrity,
+  segmentOre,
+  tapDamage,
+  upgradeCost as coreUpgradeCost,
+} from "./coreBalance";
 import styles from "./mine.module.css";
 import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
 import { useMiningAudio } from "./useMiningAudio";
 import { useReducedMotionPreference } from "./useReducedMotionPreference";
 import { RESONANCE_MULTIPLIER, useResonanceEvent } from "./useResonanceEvent";
-
-type EquipmentKind = "drill" | "cart" | "lamp";
 
 type MineState = {
   depth: number;
@@ -34,8 +45,14 @@ type Specializations = {
   cart: "fleet" | "freight" | null;
   lamp: "reach" | "fortune" | null;
 };
+type UpgradeEvent = {
+  id: string;
+  kind: EquipmentKind;
+  level: number;
+  detail: string;
+};
 
-const METERS_PER_LAYER = 4;
+const METERS_PER_LAYER = METERS_PER_SEGMENT;
 const PIXELS_PER_METER = 28;
 const AUTO_STRIKE_MS = 820;
 
@@ -60,7 +77,11 @@ const equipmentCopy: Record<
   },
 };
 
-const initialEquipment: EquipmentState = { drill: 4, cart: 5, lamp: 2 };
+/// Core starts every player at level 1 across the board, where a cart hauls nothing at all.
+/// The prototype opens one cart level up instead: the first purchase is the beat that turns
+/// automation on, and a reference build that has to be clicked before anything moves cannot
+/// show the idle scene it exists to show. Every other level matches a fresh Core save.
+const initialEquipment: EquipmentState = { drill: 1, cart: 2, lamp: 1 };
 const initialSpecializations: Specializations = { drill: null, cart: null, lamp: null };
 const equipmentKinds: EquipmentKind[] = ["drill", "cart", "lamp"];
 
@@ -79,35 +100,83 @@ const specializationOptions = {
   ],
 } as const;
 
+/// Core rock is addressed by segment index; the prototype tracks metres because the scene
+/// scrolls in metres. Both agree because the conversion is Core's own.
 function integrityAt(depth: number) {
-  return Math.round(104 * Math.pow(1.018, depth / METERS_PER_LAYER));
+  return segmentIntegrity(segmentIndexForDepth(depth));
 }
 
-function tapPower(level: number) {
-  return Math.round(12 * Math.pow(1.16, level - 1));
+function layerOreAt(depth: number, payoutMultiplier: number) {
+  return segmentOre(segmentIndexForDepth(depth)) * payoutMultiplier;
 }
 
-function automationPower(level: number) {
-  return level <= 1 ? 0 : Math.round(5 * Math.pow(1.22, level - 2));
-}
-
-function criticalChance(level: number) {
-  return Math.min(0.42, 0.08 + level * 0.025);
-}
-
+/// Core damage starts at 1.0 and a first cart hauls 0.56/s. Rounding those to integers —
+/// which the demo numbers were large enough to survive — would erase the early game
+/// entirely, so damage stays fractional and only the readout is rounded.
 function upgradeCost(kind: EquipmentKind, level: number) {
-  const base = { drill: 190, cart: 270, lamp: 340 }[kind];
-  return Math.ceil(base * Math.pow(1.31, level - 1));
+  // Core returns nil at the level ceiling. Unreachable in a reference build, but an
+  // unaffordable price keeps the buy path closed without a second branch everywhere.
+  return coreUpgradeCost(kind, level) ?? Number.POSITIVE_INFINITY;
 }
 
-function equipmentTier(level: number) {
-  if (level >= 9) return 3;
-  if (level >= 5) return 2;
-  return 1;
+function cartFleetSize(level: number, fleetSpecialization: boolean) {
+  if (level <= 1) return 0;
+  return Math.min(4, 1 + Math.floor((level - 2) / 2) + (fleetSpecialization ? 1 : 0));
 }
 
+function cartCargoSlots(level: number, freightSpecialization: boolean) {
+  if (level <= 1) return 0;
+  return Math.min(3, 1 + Math.floor((level - 2) / 2) + (freightSpecialization ? 1 : 0));
+}
+
+function serviceLampCount(level: number, reachSpecialization: boolean) {
+  return Math.min(5, Math.max(1, level) + (reachSpecialization ? 1 : 0));
+}
+
+function supportCrewSize(equipment: EquipmentState) {
+  const totalLevel = equipment.drill + equipment.cart + equipment.lamp;
+  return Math.min(4, Math.max(1, totalLevel - 10));
+}
+
+function installationDetail(
+  kind: EquipmentKind,
+  equipment: EquipmentState,
+  specializations: Specializations,
+) {
+  if (kind === "drill") {
+    return `작업조 ${supportCrewSize(equipment)}명 · 비트 티어 ${equipmentTier(equipment.drill)}`;
+  }
+  if (kind === "cart") {
+    return `운행 ${cartFleetSize(equipment.cart, specializations.cart === "fleet")}대 · 적재 ${cartCargoSlots(equipment.cart, specializations.cart === "freight")}칸`;
+  }
+  return `작업등 ${serviceLampCount(equipment.lamp, specializations.lamp === "reach")}기 · 급소 ${Math.round(criticalChance(equipment.lamp) * 100)}%`;
+}
+
+function specializationInstallationDetail(
+  kind: EquipmentKind,
+  option: string,
+  equipment: EquipmentState,
+) {
+  if (kind === "drill") {
+    return option === "wide" ? "확폭 비트 · 통로 폭 증설" : "충격 비트 · 타격 출력 증폭";
+  }
+  if (kind === "cart") {
+    return option === "fleet"
+      ? `쌍선 레일 · 운행 ${cartFleetSize(equipment.cart, true)}대`
+      : `대형 호퍼 · 적재 ${cartCargoSlots(equipment.cart, true)}칸`;
+  }
+  return option === "reach"
+    ? `장거리 반사경 · 작업등 ${serviceLampCount(equipment.lamp, true)}기`
+    : `광맥 렌즈 · 급소 ${Math.round(criticalChance(equipment.lamp, true) * 100)}%`;
+}
+
+/// Core's early numbers live below 10, where rounding to whole ore would print a tap of
+/// 1.0 and a first cart of 0.56 as the same "1". Small values keep one decimal; once the
+/// curve compounds past 100 the decimal stops carrying information and is dropped.
 function formatNumber(value: number) {
-  return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
+  if (!Number.isFinite(value)) return "—";
+  const digits = Math.abs(value) < 100 && !Number.isInteger(value) ? 1 : 0;
+  return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: digits }).format(value);
 }
 
 function formatSeconds(value: number) {
@@ -118,10 +187,10 @@ function formatSeconds(value: number) {
 
 function upgradeEffect(kind: EquipmentKind, level: number) {
   if (kind === "drill") {
-    return `탭 ${formatNumber(tapPower(level))} → ${formatNumber(tapPower(level + 1))}`;
+    return `탭 ${formatNumber(tapDamage(level))} → ${formatNumber(tapDamage(level + 1))}`;
   }
   if (kind === "cart") {
-    return `자동 ${formatNumber(automationPower(level))} → ${formatNumber(automationPower(level + 1))}/초`;
+    return `자동 ${formatNumber(automationDamagePerSecond(level))} → ${formatNumber(automationDamagePerSecond(level + 1))}/초`;
   }
   return `급소 ${Math.round(criticalChance(level) * 100)} → ${Math.round(criticalChance(level + 1) * 100)}%`;
 }
@@ -141,13 +210,16 @@ function rockAssetAt(depth: number) {
 }
 
 export function MinePrototype() {
+  /// Two segments in with `Balance.demoOreGrant` in the wallet: the state a Core save is
+  /// actually in when onboarding hands over the first rock's ore and the drill becomes
+  /// affordable. The old 1,840 opened on a wallet no real player has at 8m.
   const [mine, setMine] = useState<MineState>({
     depth: 8,
     recordDepth: 8,
-    ore: 1840,
+    ore: 100,
     damage: 0,
     brokenLayers: 2,
-    boreHistory: [3, 4],
+    boreHistory: [1, 1],
   });
   const [equipment, setEquipment] = useState<EquipmentState>(initialEquipment);
   const [specializations, setSpecializations] =
@@ -159,7 +231,7 @@ export function MinePrototype() {
   const [isBreaking, setIsBreaking] = useState(false);
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
-  const [upgradeNotice, setUpgradeNotice] = useState<string | null>(null);
+  const [upgradeEvent, setUpgradeEvent] = useState<UpgradeEvent | null>(null);
   const resonance = useResonanceEvent();
   const reducedMotion = useReducedMotionPreference();
   const {
@@ -187,25 +259,16 @@ export function MinePrototype() {
   const integrity = integrityAt(mine.depth);
   const progress = Math.min(1, mine.damage / integrity);
   const resonanceMultiplier = resonance.boostActive ? RESONANCE_MULTIPLIER : 1;
-  const tap = Math.round(
-    tapPower(equipment.drill)
-      * (specializations.drill === "impact" ? 1.35 : 1)
-      * resonanceMultiplier,
-  );
-  const automation = Math.round(
-    automationPower(equipment.cart)
-      * (specializations.cart === "fleet" ? 1.25 : 1)
-      * resonanceMultiplier,
-  );
-  const chance = Math.min(
-    0.5,
-    criticalChance(equipment.lamp) + (specializations.lamp === "fortune" ? 0.08 : 0),
-  );
-  const oreMultiplier = specializations.cart === "freight" ? 1.25 : 1;
+  const tap = tapDamage(equipment.drill, specializations.drill === "impact")
+    * resonanceMultiplier;
+  const automation = automationDamagePerSecond(
+    equipment.cart,
+    specializations.cart === "fleet",
+  ) * resonanceMultiplier;
+  const chance = criticalChance(equipment.lamp, specializations.lamp === "fortune");
+  const oreMultiplier = freightOreMultiplier(specializations.cart === "freight");
   const headDepth = mine.depth + progress * METERS_PER_LAYER;
-  const expectedLayerOre = Math.round(
-    (28 + mine.depth * 0.12 + (mine.brokenLayers % 7 === 6 ? 38 : 0)) * oreMultiplier,
-  );
+  const expectedLayerOre = layerOreAt(mine.depth, oreMultiplier);
   const remainingIntegrity = Math.max(0, integrity - mine.damage);
   const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
   const remainingPercent = Math.max(0, Math.round((1 - progress) * 100));
@@ -221,14 +284,13 @@ export function MinePrototype() {
       if (leftAffordable !== rightAffordable) return leftAffordable ? -1 : 1;
       return left.cost - right.cost;
     })[0];
-  const cartCount =
-    equipment.cart <= 1
-      ? 0
-      : Math.min(
-          4,
-          Math.max(1, equipmentTier(equipment.cart))
-            + (specializations.cart === "fleet" ? 1 : 0),
-        );
+  const cartCount = cartFleetSize(equipment.cart, specializations.cart === "fleet");
+  const cartLoad = cartCargoSlots(equipment.cart, specializations.cart === "freight");
+  const serviceLights = serviceLampCount(
+    equipment.lamp,
+    specializations.lamp === "reach",
+  );
+  const crewCount = supportCrewSize(equipment);
   const installedLampCount = Math.min(
     7,
     Math.max(1, equipmentTier(equipment.lamp) + 1)
@@ -257,9 +319,7 @@ export function MinePrototype() {
 
         while (damage >= faceIntegrity) {
           damage -= faceIntegrity;
-          const layerOre = Math.round(
-            (28 + depth * 0.12 + (broken % 7 === 6 ? 38 : 0)) * payoutMultiplier,
-          );
+          const layerOre = layerOreAt(depth, payoutMultiplier);
           gained += layerOre;
           ore += layerOre;
           depth += METERS_PER_LAYER;
@@ -411,25 +471,44 @@ export function MinePrototype() {
     setIsPressing(false);
   };
 
+  const presentInstallation = (event: UpgradeEvent) => {
+    setUpgradeEvent(event);
+    if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
+    upgradeTimerRef.current = window.setTimeout(() => setUpgradeEvent(null), 1800);
+  };
+
   const upgrade = (kind: EquipmentKind) => {
     const currentLevel = equipment[kind];
     const cost = upgradeCost(kind, currentLevel);
     if (mine.ore < cost) return;
+    const nextEquipment = { ...equipment, [kind]: currentLevel + 1 };
     setMine((current) => ({ ...current, ore: current.ore - cost }));
-    setEquipment((current) => ({ ...current, [kind]: current[kind] + 1 }));
-    setUpgradeNotice(
-      `${equipmentCopy[kind].name} Lv.${currentLevel + 1} 설치 · ${upgradeEffect(kind, currentLevel)}`,
-    );
-    if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
-    upgradeTimerRef.current = window.setTimeout(() => setUpgradeNotice(null), 1800);
+    setEquipment(nextEquipment);
+    presentInstallation({
+      id: `${kind}-${currentLevel + 1}`,
+      kind,
+      level: currentLevel + 1,
+      detail: installationDetail(kind, nextEquipment, specializations),
+    });
   };
 
   const specialize = (kind: EquipmentKind, option: string) => {
     if (specializations[kind] !== null) return;
     const cost = { drill: 460, cart: 560, lamp: 660 }[kind];
     if (mine.ore < cost) return;
+    const nextSpecializations = { ...specializations, [kind]: option } as Specializations;
     setMine((current) => ({ ...current, ore: current.ore - cost }));
-    setSpecializations((current) => ({ ...current, [kind]: option } as Specializations));
+    setSpecializations(nextSpecializations);
+    presentInstallation({
+      id: `${kind}-${option}`,
+      kind,
+      level: equipment[kind],
+      detail: specializationInstallationDetail(
+        kind,
+        option,
+        equipment,
+      ),
+    });
   };
 
   const sceneStyle = useMemo(
@@ -474,6 +553,20 @@ export function MinePrototype() {
     heavy: styles.heavyStrike,
     critical: styles.criticalStrike,
   }[strikeVariant];
+  const commissioningClass = upgradeEvent === null
+    ? ""
+    : {
+        drill: styles.commissioningDrill,
+        cart: styles.commissioningCart,
+        lamp: styles.commissioningLamp,
+      }[upgradeEvent.kind];
+  const installationClass = upgradeEvent === null
+    ? ""
+    : {
+        drill: styles.installationDrill,
+        cart: styles.installationCart,
+        lamp: styles.installationLamp,
+      }[upgradeEvent.kind];
   const hitLabel = lastStrikeSource === "auto"
     ? strikeVariant === "heavy" ? "자동 강타" : "자동 굴착"
     : strikeVariant === "critical"
@@ -550,14 +643,20 @@ export function MinePrototype() {
 
           <div className={styles.shaftStage}>
             <div
-              className={`${styles.shaft} ${strikeClass} ${strikeVariant === "critical" ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+              className={`${styles.shaft} ${strikeClass} ${commissioningClass} ${strikeVariant === "critical" ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
               style={sceneStyle}
               data-strike-variant={strikeVariant}
               data-strike-source={lastStrikeSource}
               data-hit-pulse={hitPulse}
               data-sound-enabled={soundEnabled}
+              data-cart-count={cartCount}
+              data-cart-load={cartLoad}
+              data-crew-count={crewCount}
+              data-service-light-count={serviceLights}
+              data-infrastructure-tier={crewCount}
+              data-impact-coverage="wide"
               role="img"
-              aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${expectedLayerOre}`}
+              aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}, 내실 ${crewCount}단계, 작업조 ${crewCount}명, 광차 ${cartCount}대, 작업등 ${serviceLights}기`}
             >
             <div className={styles.rockWorld} aria-hidden="true" />
 
@@ -574,18 +673,68 @@ export function MinePrototype() {
               <span className={styles.tunnelVoid} />
               <span className={styles.tunnelLeftEdge} />
               <span className={styles.tunnelRightEdge} />
-              {equipment.cart > 1 && <span className={styles.continuousRail} />}
+              {equipment.cart > 1 && (
+                <span className={`${styles.continuousRail} ${cartCount >= 3 ? styles.expandedRail : ""}`} />
+              )}
               {Array.from({ length: cartCount }, (_, index) => (
-                <img
-                  className={`${styles.continuousCart} ${specializations.cart === "freight" ? styles.freightCart : ""}`}
-                  style={{ animationDelay: `${index * -1.3}s` }}
-                  src={`/assets/equipment/Equipment_cart_tier${equipmentTier(equipment.cart)}.png`}
-                  width={32}
-                  height={32}
-                  alt=""
+                <span
+                  className={styles.cartRun}
+                  style={{
+                    animationDelay: `${index * -1.3}s`,
+                    "--cart-rest": `${-24 - index * 49}px`,
+                    "--cart-lane": `${cartCount >= 3 ? (index % 2 === 0 ? -18 : 18) : 0}px`,
+                  } as CSSProperties}
                   key={index}
-                />
+                >
+                  <img
+                    className={`${styles.continuousCart} ${specializations.cart === "freight" ? styles.freightCart : ""} ${upgradeEvent?.kind === "cart" && index === cartCount - 1 ? styles.newestCart : ""}`}
+                    src={`/assets/equipment/Equipment_cart_tier${equipmentTier(equipment.cart)}.png`}
+                    width={32}
+                    height={32}
+                    alt=""
+                  />
+                  <span className={styles.cartCargo}>
+                    {Array.from({ length: cartLoad }, (_, cargoIndex) => (
+                      <i key={cargoIndex} />
+                    ))}
+                  </span>
+                </span>
               ))}
+              <span className={styles.serviceCrew}>
+                {Array.from({ length: crewCount }, (_, index) => (
+                  <span
+                    className={`${styles.crewStation} ${index % 2 === 0 ? styles.crewLeft : styles.crewRight} ${upgradeEvent !== null && index === crewCount - 1 ? styles.newestCrew : ""}`}
+                    style={{ "--crew-y": `${26 + index * 48}px` } as CSSProperties}
+                    key={index}
+                  >
+                    <i className={styles.crewDeck} />
+                    <img
+                      src="/assets/miner.png"
+                      width={72}
+                      height={72}
+                      alt=""
+                    />
+                    <b className={styles.supplyCrate} />
+                  </span>
+                ))}
+              </span>
+              <span className={styles.serviceLights}>
+                {Array.from({ length: serviceLights }, (_, index) => (
+                  <span
+                    className={`${styles.serviceLamp} ${index % 2 === 0 ? styles.serviceLampLeft : styles.serviceLampRight} ${upgradeEvent?.kind === "lamp" && index === serviceLights - 1 ? styles.newestLamp : ""}`}
+                    style={{ top: `${14 + index * 39}px` }}
+                    key={index}
+                  >
+                    <i />
+                    <img
+                      src={`/assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`}
+                      width={32}
+                      height={32}
+                      alt=""
+                    />
+                  </span>
+                ))}
+              </span>
             </div>
 
             <div className={styles.passageHistory} aria-hidden="true">
@@ -628,7 +777,21 @@ export function MinePrototype() {
               <div><span>자동 굴착</span><strong>{formatNumber(automation)}/초</strong></div>
             </div>
 
+            <div className={styles.operationsReadout} aria-hidden="true">
+              <span>갱도 내실</span>
+              <strong>{crewCount}단계</strong>
+              <small>작업조 {crewCount} · 광차 {cartCount} · 조명 {serviceLights}</small>
+            </div>
+
             <div className={styles.workLine} aria-hidden="true">
+              <span className={styles.strikeArc} key={`strike-arc-${hitPulse}`} />
+              <div className={styles.impactField} key={`impact-field-${hitPulse}`}>
+                <span className={styles.impactWave} />
+                <span className={styles.impactCrackLeft} />
+                <span className={styles.impactCrackRight} />
+                <i className={styles.impactDustLeft} />
+                <i className={styles.impactDustRight} />
+              </div>
               <img
                 className={styles.frontierLip}
                 src="/assets/shaft/ShaftFrontierLip.png"
@@ -718,7 +881,38 @@ export function MinePrototype() {
               <i>↓</i>
             </div>
 
+            {upgradeEvent !== null && (
+              <span
+                className={styles.constructionPulse}
+                aria-hidden="true"
+                key={`construction-${upgradeEvent.id}`}
+              >
+                <i />
+                <b />
+              </span>
+            )}
+
             </div>
+
+            {upgradeEvent !== null && (
+              <div
+                className={`${styles.installationToast} ${installationClass}`}
+                role="status"
+                aria-live="polite"
+                data-no-mine
+                key={upgradeEvent.id}
+              >
+                <img
+                  src={`/assets/equipment/Equipment_${upgradeEvent.kind}_tier${equipmentTier(upgradeEvent.level)}.png`}
+                  width={32}
+                  height={32}
+                  alt=""
+                />
+                <span>설비 증설 완료</span>
+                <strong>{equipmentCopy[upgradeEvent.kind].name} Lv.{upgradeEvent.level}</strong>
+                <small>{upgradeEvent.detail}</small>
+              </div>
+            )}
 
             <ResonanceEvent
               phase={resonance.phase}
@@ -764,11 +958,6 @@ export function MinePrototype() {
                   {upgradeEffect(recommendedUpgrade.kind, recommendedUpgrade.level)} · ◆{formatNumber(recommendedUpgrade.cost)}
                 </small>
               </button>
-              {upgradeNotice !== null && (
-                <p className={styles.upgradeToast} role="status" aria-live="polite">
-                  {upgradeNotice}
-                </p>
-              )}
             </aside>
           </div>
         </section>

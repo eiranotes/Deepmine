@@ -51,6 +51,12 @@ test("strike poses, contact feedback, and damage share one timing contract", () 
   assert.match(styles, /--strike-contact-delay/);
   assert.match(styles, /miner-heavy-strike/);
   assert.match(styles, /miner-critical-strike/);
+  assert.match(prototype, /data-impact-coverage="wide"/);
+  assert.match(prototype, /styles\.strikeArc/);
+  assert.match(prototype, /styles\.impactField/);
+  assert.match(styles, /width: min\(76%, 570px\)/);
+  assert.match(styles, /impact-wave/);
+  assert.match(styles, /impact-branch/);
   assert.match(miningAudio, /AudioContext/);
   assert.match(miningAudio, /oscillator\.type = "square"/);
 });
@@ -98,6 +104,36 @@ test("each equipment owns a visible scene effect and a branch choice", () => {
   assert.doesNotMatch(prototype, /styles\.miningPickaxe/);
   assert.match(styles, /--cart-duration/);
   assert.match(styles, /fortuneBuild/);
+});
+
+test("equipment upgrades accumulate visible production infrastructure", () => {
+  assert.match(prototype, /function cartFleetSize/);
+  assert.match(prototype, /function cartCargoSlots/);
+  assert.match(prototype, /function serviceLampCount/);
+  assert.match(prototype, /function supportCrewSize/);
+  assert.match(prototype, /data-cart-count=\{cartCount\}/);
+  assert.match(prototype, /data-cart-load=\{cartLoad\}/);
+  assert.match(prototype, /data-crew-count=\{crewCount\}/);
+  assert.match(prototype, /data-service-light-count=\{serviceLights\}/);
+  assert.match(prototype, /data-infrastructure-tier=\{crewCount\}/);
+  assert.match(prototype, /설비 증설 완료/);
+  assert.match(prototype, /specializationInstallationDetail/);
+  assert.match(prototype, /presentInstallation/);
+  assert.match(prototype, /styles\.cartRun/);
+  assert.match(prototype, /styles\.serviceCrew/);
+  assert.match(prototype, /styles\.serviceLights/);
+  assert.match(prototype, /styles\.crewStation/);
+  assert.match(prototype, /styles\.crewDeck/);
+  assert.match(prototype, /styles\.operationsReadout/);
+  assert.match(prototype, /styles\.constructionPulse/);
+  assert.match(styles, /\.installationToast/);
+  assert.match(styles, /\.newestCart/);
+  assert.match(styles, /\.newestCrew/);
+  assert.match(styles, /\.newestLamp/);
+  assert.match(styles, /\.expandedRail/);
+  assert.match(styles, /\.operationsReadout/);
+  assert.match(styles, /\.constructionPulse/);
+  assert.match(styles, /transform: translateY\(var\(--cart-rest\)\)/);
 });
 
 test("all prototype art is project-local and deployable", () => {

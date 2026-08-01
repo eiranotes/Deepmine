@@ -1333,22 +1333,187 @@
   z-index: 2;
   inset-block: 0;
   left: 50%;
-  width: 21px;
+  width: 28px;
   transform: translateX(-50%);
   border-inline: 2px solid rgb(210 147 49 / 0.64);
   background: repeating-linear-gradient(to bottom, transparent 0 15px, rgb(210 147 49 / 0.52) 15px 18px);
+  box-shadow: inset 0 0 0 1px rgb(233 227 210 / 0.09);
+  transition: width 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.expandedRail {
+  width: 66px;
+  background:
+    linear-gradient(90deg, transparent 47%, rgb(233 227 210 / 0.28) 47% 53%, transparent 53%),
+    repeating-linear-gradient(to bottom, transparent 0 15px, rgb(210 147 49 / 0.52) 15px 18px);
+}
+
+.cartRun {
+  position: absolute;
+  z-index: 3;
+  bottom: -48px;
+  left: calc(50% - 23px + var(--cart-lane));
+  width: 46px;
+  height: 46px;
+  pointer-events: none;
+  animation: continuous-cart-travel var(--cart-duration) linear infinite;
+  transition: left 220ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .continuousCart {
   position: absolute;
-  z-index: 3;
-  bottom: -34px;
-  left: calc(50% - 16px);
-  width: 32px;
-  height: 32px;
+  bottom: 0;
+  left: 3px;
+  width: 40px;
+  height: 40px;
   filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.76));
   image-rendering: pixelated;
-  animation: continuous-cart-travel var(--cart-duration) linear infinite;
+}
+
+.cartRun .freightCart {
+  left: 0;
+}
+
+.cartCargo {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  left: 50%;
+  display: flex;
+  gap: 2px;
+  transform: translateX(-50%);
+}
+
+.cartCargo i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  border: 1px solid #14130f;
+  background: var(--brass-bright);
+  box-shadow: 0 0 3px rgb(240 189 93 / 0.55);
+}
+
+.serviceCrew,
+.serviceLights {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+}
+
+.crewStation {
+  position: absolute;
+  top: var(--crew-y);
+  right: 8px;
+  left: 8px;
+  height: 46px;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.62));
+}
+
+.crewStation::before,
+.crewStation::after {
+  position: absolute;
+  bottom: 0;
+  width: 4px;
+  height: 19px;
+  border-inline: 1px solid rgb(233 227 210 / 0.22);
+  background: #4a4436;
+  content: "";
+}
+
+.crewStation::before { left: 2px; }
+.crewStation::after { right: 2px; }
+
+.crewDeck {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 7px;
+  border-block: 1px solid rgb(233 227 210 / 0.24);
+  background: repeating-linear-gradient(90deg, #6a614d 0 18px, #39352b 18px 22px);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.52);
+}
+
+.crewStation img {
+  position: absolute;
+  bottom: 7px;
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.72));
+  image-rendering: pixelated;
+}
+
+.crewLeft img { left: 8px; }
+.crewRight img { right: 8px; transform: scaleX(-1); }
+
+.supplyCrate {
+  position: absolute;
+  right: 13px;
+  bottom: 7px;
+  width: 19px;
+  height: 17px;
+  border: 2px solid #171612;
+  background:
+    linear-gradient(45deg, transparent 43%, #d29331 44% 56%, transparent 57%),
+    #514936;
+  box-shadow: 2px 2px 0 rgb(0 0 0 / 0.52);
+}
+
+.crewRight .supplyCrate { right: auto; left: 13px; }
+
+.serviceLamp {
+  position: absolute;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+}
+
+.serviceLamp i {
+  position: absolute;
+  top: -12px;
+  width: 92px;
+  height: 58px;
+  background: radial-gradient(ellipse at left center, rgb(240 189 93 / 0.3), rgb(240 189 93 / 0.08) 44%, transparent 72%);
+  opacity: 0.9;
+}
+
+.serviceLamp img {
+  position: absolute;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 9px rgb(240 189 93 / 0.88));
+  image-rendering: pixelated;
+}
+
+.serviceLampLeft {
+  left: -6px;
+}
+
+.serviceLampRight {
+  right: -6px;
+}
+
+.serviceLampLeft i { left: 14px; }
+.serviceLampRight i { right: 14px; transform: scaleX(-1); }
+.serviceLampRight img { right: 0; transform: scaleX(-1); }
+
+.newestCart {
+  animation: cart-commission 520ms steps(4, end) both;
+}
+
+.newestCrew {
+  animation: crew-commission 420ms steps(3, end) both;
+}
+
+.newestLamp {
+  animation: lamp-commission 620ms steps(4, end) both;
+}
+
+.commissioningDrill .continuousDrill {
+  animation: drill-commission 560ms steps(4, end) both;
 }
 
 .passageHistory {
@@ -1440,6 +1605,38 @@
   white-space: nowrap;
 }
 
+.operationsReadout {
+  position: absolute;
+  z-index: 18;
+  top: 62px;
+  right: 9px;
+  display: grid;
+  width: 166px;
+  padding: 7px 9px;
+  border: 1px solid rgb(210 147 49 / 0.46);
+  border-left: 3px solid var(--brass);
+  background: rgb(10 10 9 / 0.82);
+  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.42);
+}
+
+.operationsReadout span {
+  color: var(--limestone-muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+}
+
+.operationsReadout strong {
+  color: var(--brass-bright);
+  font-size: 0.82rem;
+}
+
+.operationsReadout small {
+  margin-top: 2px;
+  color: var(--limestone);
+  font-size: 0.5rem;
+  font-weight: 760;
+}
+
 .workLine {
   position: absolute;
   z-index: 10;
@@ -1450,6 +1647,96 @@
   transform: translate(-50%, -18px);
   pointer-events: none;
 }
+
+.strikeArc {
+  --arc-scale: 1;
+  position: absolute;
+  z-index: 7;
+  top: -119px;
+  left: calc(50% - 126px);
+  width: 190px;
+  height: 162px;
+  background: conic-gradient(from 202deg at 74% 90%, transparent 0 17%, rgb(233 227 210 / 0.88) 17.5% 19%, rgb(210 147 49 / 0.94) 19.5% 22%, transparent 22.5% 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 38% 100%, 52% 78%, 60% 56%, 48% 28%, 18% 12%);
+  opacity: 0;
+  transform-origin: 74% 90%;
+  animation: strike-arc var(--strike-duration) steps(4, end) both;
+}
+
+.impactField {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  left: 50%;
+  width: min(76%, 570px);
+  height: 136px;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: impact-field 360ms steps(4, end) var(--strike-contact-delay) both;
+}
+
+.impactField::before {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 88%;
+  height: 42px;
+  transform: translateX(-50%);
+  border-top: 3px solid rgb(233 227 210 / 0.62);
+  border-bottom: 5px solid rgb(210 147 49 / 0.28);
+  background: repeating-linear-gradient(90deg, transparent 0 19px, rgb(233 227 210 / 0.12) 19px 23px);
+  clip-path: polygon(0 35%, 12% 9%, 26% 28%, 42% 0, 51% 24%, 64% 6%, 77% 30%, 100% 12%, 96% 78%, 81% 61%, 68% 96%, 51% 69%, 35% 100%, 19% 66%, 3% 88%);
+  content: "";
+}
+
+.impactWave {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 72%;
+  height: 72px;
+  transform: translateX(-50%) scale(0.72);
+  border: 3px solid rgb(240 189 93 / 0.82);
+  border-block-width: 5px 2px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: impact-wave 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.impactCrackLeft,
+.impactCrackRight {
+  position: absolute;
+  top: 31px;
+  width: 46%;
+  height: 78px;
+  background:
+    linear-gradient(14deg, transparent 47%, rgb(233 227 210 / 0.66) 48% 51%, transparent 52%),
+    linear-gradient(-18deg, transparent 58%, rgb(210 147 49 / 0.52) 59% 62%, transparent 63%);
+  clip-path: inset(0 100% 0 0);
+  animation: impact-branch 280ms steps(4, end) 38ms both;
+}
+
+.impactCrackLeft { right: 50%; transform: scaleX(-1) rotate(-5deg); }
+.impactCrackRight { left: 50%; transform: rotate(-5deg); }
+
+.impactDustLeft,
+.impactDustRight {
+  position: absolute;
+  top: 24px;
+  width: 40%;
+  height: 54px;
+  background: repeating-linear-gradient(135deg, transparent 0 12px, rgb(148 133 103 / 0.36) 12px 18px, transparent 18px 27px);
+  opacity: 0;
+  animation: impact-dust 360ms steps(4, end) both;
+}
+
+.impactDustLeft { right: 53%; transform: translateX(0); }
+.impactDustRight { left: 53%; transform: scaleX(-1); }
+
+.heavyStrike .impactField { width: min(84%, 630px); }
+.criticalStrike .impactField { width: min(92%, 690px); }
+.heavyStrike .strikeArc { --arc-scale: 1.06; filter: brightness(1.24); }
+.criticalStrike .strikeArc { --arc-scale: 1.12; filter: brightness(1.5) drop-shadow(0 0 8px var(--brass-bright)); }
 
 .frontierLip {
   position: absolute;
@@ -1490,7 +1777,7 @@
   z-index: 5;
   top: 28px;
   left: 50%;
-  width: 92px;
+  width: 124px;
   height: var(--fracture-reveal);
   transform: translateX(-50%);
   overflow: hidden;
@@ -1498,9 +1785,9 @@
 }
 
 .verticalFracture {
-  width: 72px;
+  width: 96px;
   height: 160px;
-  margin-left: 10px;
+  margin-left: 14px;
   object-fit: fill;
   opacity: var(--fracture-opacity);
   filter: drop-shadow(0 0 3px rgb(240 189 93 / 0.28));
@@ -1511,14 +1798,14 @@
 .miningActor {
   position: absolute;
   z-index: 8;
-  top: -99px;
-  left: calc(50% - 110px);
-  width: 128px;
-  height: 128px;
+  top: -123px;
+  left: calc(50% - 128px);
+  width: 152px;
+  height: 152px;
   background-image: url("/assets/shaft/MinerMiningStrip.png");
   background-position: 0 0;
   background-repeat: no-repeat;
-  background-size: 512px 128px;
+  background-size: 608px 152px;
   filter: drop-shadow(3px 4px 0 rgb(0 0 0 / 0.72));
   image-rendering: pixelated;
   transform-origin: 56% 92%;
@@ -1552,8 +1839,8 @@
   z-index: 9;
   top: 24px;
   left: 50%;
-  width: 22px;
-  height: 12px;
+  width: 36px;
+  height: 20px;
   transform: translateX(-50%);
   background:
     linear-gradient(90deg, transparent 0 18%, var(--brass-bright) 18% 28%, transparent 28% 72%, var(--brass-bright) 72% 82%, transparent 82%),
@@ -1564,14 +1851,14 @@
 }
 
 .heavyStrike .contactFlash {
-  width: 29px;
-  height: 16px;
+  width: 54px;
+  height: 28px;
   filter: drop-shadow(0 0 4px rgb(240 189 93 / 0.62));
 }
 
 .criticalStrike .contactFlash {
-  width: 38px;
-  height: 21px;
+  width: 76px;
+  height: 38px;
   filter: drop-shadow(0 0 8px var(--brass-bright));
 }
 
@@ -1780,6 +2067,37 @@
   background: rgb(10 10 9 / 0.68);
   pointer-events: none;
 }
+
+.constructionPulse {
+  position: absolute;
+  z-index: 17;
+  top: 52px;
+  left: 50%;
+  width: calc(var(--cut-width) + 96px);
+  height: calc(var(--workline) - 22px);
+  transform: translateX(-50%);
+  border-inline: 3px solid rgb(210 147 49 / 0.72);
+  background: linear-gradient(90deg, transparent, rgb(210 147 49 / 0.08) 22% 78%, transparent);
+  pointer-events: none;
+  animation: construction-pulse 680ms steps(5, end) both;
+}
+
+.constructionPulse i,
+.constructionPulse b {
+  position: absolute;
+  left: 50%;
+  width: 112%;
+  height: 3px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(90deg, transparent 0 12px, var(--brass-bright) 12px 20px);
+  box-shadow: 0 0 12px rgb(240 189 93 / 0.54);
+}
+
+.constructionPulse i { top: 31%; }
+.constructionPulse b { top: 68%; }
+
+.commissioningCart .constructionPulse { border-inline-color: rgb(233 227 210 / 0.74); }
+.commissioningLamp .constructionPulse { box-shadow: inset 0 0 50px rgb(240 189 93 / 0.18); }
 
 .descentIndicator span {
   color: var(--limestone-muted);
@@ -2096,20 +2414,71 @@
   cursor: not-allowed;
 }
 
-.upgradeToast {
+.installationToast {
   position: absolute;
-  right: 0;
-  bottom: calc(100% + 7px);
-  max-width: min(360px, calc(100vw - 36px));
-  margin: 0;
-  padding: 7px 10px;
-  border: 1px solid var(--brass);
-  background: var(--coal);
+  z-index: 28;
+  right: 14px;
+  bottom: 84px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  width: min(216px, calc(100% - 28px));
+  min-height: 58px;
+  align-items: center;
+  column-gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brass);
+  background: rgb(10 10 9 / 0.94);
+  color: var(--limestone);
+  pointer-events: none;
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.5);
+  animation: installation-arrive 240ms steps(3, end) both;
+}
+
+.installationToast img {
+  grid-row: 1 / 4;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.installationToast span,
+.installationToast strong,
+.installationToast small {
+  display: block;
+  min-width: 0;
+}
+
+.installationToast span {
+  color: var(--limestone-muted);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+}
+
+.installationToast strong {
   color: var(--brass-bright);
-  font-size: 0.68rem;
-  font-weight: 850;
-  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.46);
-  animation: upgrade-toast-in 180ms ease-out both;
+  font-size: 0.72rem;
+}
+
+.installationToast small {
+  overflow: hidden;
+  color: var(--limestone);
+  font-size: 0.54rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.installationCart {
+  border-left-color: var(--limestone);
+}
+
+.installationDrill {
+  border-left-color: var(--brass);
+}
+
+.installationLamp {
+  box-shadow: 0 0 10px rgb(240 189 93 / 0.2), 4px 4px 0 rgb(0 0 0 / 0.5);
 }
 
 @keyframes continuous-cart-travel {
@@ -2117,25 +2486,88 @@
   to { transform: translateY(-240px); }
 }
 
+@keyframes cart-commission {
+  0% { opacity: 0.3; filter: brightness(0.8); transform: translateY(6px); }
+  45% { opacity: 1; filter: brightness(1.65); transform: translateY(-2px); }
+  100% { opacity: 1; filter: brightness(1); transform: translateY(0); }
+}
+
+@keyframes crew-commission {
+  0% { opacity: 0; filter: brightness(0.7); }
+  52% { opacity: 1; filter: brightness(1.45); }
+  100% { opacity: 0.82; filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.72)); }
+}
+
+@keyframes lamp-commission {
+  0% { opacity: 0.2; filter: brightness(0.6); }
+  38%, 68% { opacity: 1; filter: brightness(2) drop-shadow(0 0 12px var(--brass-bright)); }
+  52% { opacity: 0.45; filter: brightness(0.8); }
+  100% { opacity: 1; filter: drop-shadow(0 0 7px rgb(240 189 93 / 0.78)); }
+}
+
+@keyframes drill-commission {
+  0% { filter: brightness(0.75); transform: rotate(18deg) scale(var(--rig-scale)); }
+  42% { filter: brightness(1.7) drop-shadow(0 0 7px var(--brass-bright)); transform: rotate(14deg) scale(calc(var(--rig-scale) * 1.18)); }
+  100% { filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75)); transform: rotate(18deg) scale(var(--rig-scale)); }
+}
+
+@keyframes strike-arc {
+  0%, 13% { opacity: 0; transform: rotate(-15deg) scale(var(--arc-scale)); }
+  14%, 35% { opacity: 0.62; transform: rotate(-5deg) scale(var(--arc-scale)); }
+  36%, 49% { opacity: 1; transform: rotate(8deg) scale(var(--arc-scale)); }
+  50%, 100% { opacity: 0; transform: rotate(13deg) scale(var(--arc-scale)); }
+}
+
+@keyframes impact-field {
+  0% { opacity: 0; transform: translateX(-50%) scaleX(0.58) scaleY(0.82); filter: brightness(1.7); }
+  18%, 42% { opacity: 1; transform: translateX(-50%) scaleX(1.03) scaleY(0.94); filter: brightness(1.35); }
+  68% { opacity: 0.56; transform: translateX(-50%) scaleX(1) scaleY(1); filter: brightness(1); }
+  100% { opacity: 0; transform: translateX(-50%) scaleX(1.02) scaleY(1.02); filter: brightness(0.9); }
+}
+
+@keyframes impact-wave {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.72); }
+  24% { opacity: 0.9; transform: translateX(-50%) scale(0.9); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.28); }
+}
+
+@keyframes impact-branch {
+  from { clip-path: inset(0 100% 0 0); opacity: 0.25; }
+  to { clip-path: inset(0 0 0 0); opacity: 0.78; }
+}
+
+@keyframes impact-dust {
+  0% { opacity: 0; translate: 0 0; }
+  28% { opacity: 0.72; }
+  100% { opacity: 0; translate: 0 28px; }
+}
+
+@keyframes construction-pulse {
+  0% { opacity: 0; transform: translateX(-50%) scaleX(0.72); filter: brightness(0.8); }
+  22%, 48% { opacity: 1; transform: translateX(-50%) scaleX(1); filter: brightness(1.7); }
+  68% { opacity: 0.54; filter: brightness(1.05); }
+  100% { opacity: 0; transform: translateX(-50%) scaleX(1.04); filter: brightness(1); }
+}
+
 @keyframes miner-quick-strike {
   0%, 14% { background-position: 0 0; transform: translate(0, 0) rotate(0); }
-  14.1%, 36% { background-position: -128px 0; transform: translate(-3px, -4px) rotate(-1deg); }
-  36.1%, 54% { background-position: -256px 0; transform: translate(2px, 7px) rotate(1deg); }
-  54.1%, 100% { background-position: -384px 0; transform: translate(0, 1px) rotate(0); }
+  14.1%, 36% { background-position: -152px 0; transform: translate(-7px, -9px) rotate(-2deg); }
+  36.1%, 54% { background-position: -304px 0; transform: translate(6px, 16px) rotate(2deg) scale(1.025); }
+  54.1%, 100% { background-position: -456px 0; transform: translate(1px, 2px) rotate(0); }
 }
 
 @keyframes miner-heavy-strike {
   0%, 11% { background-position: 0 0; transform: translate(2px, 1px) rotate(0); }
-  11.1%, 36% { background-position: -128px 0; transform: translate(-7px, -8px) rotate(-3deg) scale(1.02); }
-  36.1%, 58% { background-position: -256px 0; transform: translate(4px, 11px) rotate(2deg) scale(1.035); }
-  58.1%, 100% { background-position: -384px 0; transform: translate(1px, 2px) rotate(0); }
+  11.1%, 36% { background-position: -152px 0; transform: translate(-14px, -15px) rotate(-5deg) scale(1.035); }
+  36.1%, 58% { background-position: -304px 0; transform: translate(10px, 23px) rotate(4deg) scale(1.07); }
+  58.1%, 100% { background-position: -456px 0; transform: translate(2px, 3px) rotate(0); }
 }
 
 @keyframes miner-critical-strike {
   0%, 9% { background-position: 0 0; transform: translate(3px, 2px) rotate(1deg) scale(1.02); }
-  9.1%, 36% { background-position: -128px 0; transform: translate(-10px, -10px) rotate(-5deg) scale(1.06); }
-  36.1%, 62% { background-position: -256px 0; transform: translate(6px, 14px) rotate(3deg) scale(1.08); filter: brightness(1.32); }
-  62.1%, 100% { background-position: -384px 0; transform: translate(1px, 2px) rotate(0) scale(1); filter: brightness(1); }
+  9.1%, 36% { background-position: -152px 0; transform: translate(-19px, -18px) rotate(-7deg) scale(1.08); }
+  36.1%, 62% { background-position: -304px 0; transform: translate(14px, 28px) rotate(5deg) scale(1.12); filter: brightness(1.4); }
+  62.1%, 100% { background-position: -456px 0; transform: translate(2px, 3px) rotate(0) scale(1); filter: brightness(1); }
 }
 
 @keyframes frontier-impact {
@@ -2217,8 +2649,8 @@
   100% { opacity: 0; transform: translateY(9px); }
 }
 
-@keyframes upgrade-toast-in {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes installation-arrive {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -2247,7 +2679,14 @@
   .shaftStatus > div { padding: 5px 6px; }
   .shaftStatus > div:nth-child(2) { border-right: 0; }
   .shaftStatus > div:nth-child(-n + 2) { border-bottom: 1px solid rgb(233 227 210 / 0.16); }
-  .miningActor { left: calc(50% - 108px); }
+  .operationsReadout {
+    top: 98px;
+    right: 6px;
+    width: 124px;
+    padding: 5px 7px;
+  }
+  .operationsReadout small { font-size: 0.46rem; }
+  .miningActor { left: calc(50% - 122px); }
   .continuousDrill { left: calc(50% + 33px); }
   .workRewardPromise {
     left: calc(50% + 48px);
@@ -2271,6 +2710,11 @@
   }
   .quickReward { padding-inline: 7px; }
   .quickUpgrade { padding-inline: 7px; }
+  .installationToast {
+    right: 12px;
+    bottom: 76px;
+    width: min(204px, calc(100% - 24px));
+  }
 }
 
 @media (max-width: 390px) {
@@ -2316,6 +2760,11 @@
     animation-duration: var(--strike-duration) !important;
   }
 
+  .strikeArc,
+  .impactField {
+    display: none;
+  }
+
   .contactFlash,
   .verticalFracture,
   .continuousDebris span,
@@ -2324,8 +2773,22 @@
     animation-duration: 120ms !important;
   }
 
-  .upgradeToast {
+  .cartRun {
     animation: none;
+    transform: translateY(var(--cart-rest));
+  }
+
+  .newestCart,
+  .newestCrew,
+  .newestLamp,
+  .commissioningDrill .continuousDrill,
+  .installationToast {
+    animation: none;
+  }
+
+  .constructionPulse {
+    animation: none;
+    opacity: 0.4;
   }
 
   .resonanceNode,
