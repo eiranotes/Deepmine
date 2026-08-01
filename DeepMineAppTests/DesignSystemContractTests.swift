@@ -116,17 +116,20 @@ final class DesignSystemContractTests: XCTestCase {
         XCTAssertNotNil(DeepMineMotion.pressAnimation(reduceMotion: false))
     }
 
+    /// The clicker pivot moved the sprite boundaries from 20/40 to 4/14 so an upgrade is
+    /// seen within the first minutes of play. The art itself is still three tiers, so the
+    /// contract this test guards is the clamp, not the old session-era thresholds.
     func testEquipmentArtTierBoundariesClampToShippedRange() {
         XCTAssertEqual(DeepMineArt.equipmentTier(level: -4), 1)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 1), 1)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 20), 1)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 21), 2)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 40), 2)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 41), 3)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 60), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 4), 1)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 5), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 14), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 15), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: Balance.maximumEquipmentLevel), 3)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 600), 3)
         XCTAssertEqual(
-            DeepMineArt.equipment(.drill, level: 21),
+            DeepMineArt.equipment(.drill, level: 5),
             "Equipment_drill_tier2"
         )
     }
