@@ -8,6 +8,7 @@ struct ShaftWorkFaceView: View {
     let player: PlayerState
     let isStruck: Bool
     let strikeSignal: Int
+    let strikeVariant: StrikeVariant
     let onStrike: (Bool) -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -17,36 +18,38 @@ struct ShaftWorkFaceView: View {
 
     private var groundWidth: CGFloat { max(180, width - 18) }
     private let groundHeight: CGFloat = 134
-    private let groundTop: CGFloat = 52
+    private let groundTop: CGFloat = 100
+    /// The lip is drawn at its own aspect and then cropped from the top: the shoulders and
+    /// the throat live in its lower half, and that is the part that has to meet the rock.
+    private var lipHeight: CGFloat { 66 }
+    /// D-055 overlaps the lip's underside with the cutting notch so the passage and the
+    /// face read as one body rather than two stacked objects.
+    private let lipOverlap: CGFloat = 3
 
     var body: some View {
         ZStack(alignment: .topLeading) {
+            // The gantry is overhead support for the passage, not a thing the miner stands
+            // in. At its old size it ran straight through the actor's head.
             GameArtView(
                 entry: GameArtCatalog.shaftGantry,
-                fill: CGSize(width: min(width - 30, 280), height: 124)
+                fill: CGSize(width: min(width - 30, 280), height: 44)
             )
-            .position(x: width / 2, y: 62)
+            .position(x: width / 2, y: 24)
 
             groundButton
                 .position(x: width / 2, y: groundTop + groundHeight / 2)
 
-            WorkingMinerView(
-                isWorking: true,
-                intensity: min(
-                    1,
-                    player.mineFace.impact.fraction
-                        + (player.equipmentModifications.drill == .drillImpact ? 0.28 : 0)
-                ),
-                strikeSignal: strikeSignal,
-                repeatsWhenIdle: false
-            )
-            .position(x: width / 2 - 30, y: 43)
+            frontierLip
+                .position(x: width / 2, y: groundTop - lipHeight / 2 + lipOverlap)
 
-            DeepMinePixelImage(
-                name: DeepMineArt.equipment(.drill, level: player.equipment.drill),
-                size: 39
+            // One actor: the drill sprite is no longer a separate image beside the miner,
+            // because two objects on two timelines is exactly what D-055 removed.
+            ShaftMiningActorView(
+                strikeSignal: strikeSignal,
+                variant: strikeVariant,
+                height: 92
             )
-            .position(x: width / 2 + 46, y: 40)
+                .position(x: width / 2 - 18, y: groundTop - 46)
 
             DeepMinePixelImage(
                 name: DeepMineArt.equipment(.lamp, level: player.equipment.lamp),
@@ -58,11 +61,16 @@ struct ShaftWorkFaceView: View {
                 weakPoint(point)
             }
         }
-        .frame(width: width, height: 188)
+        .frame(width: width, height: 236)
+        // The face reacts when the pickaxe arrives, not when the input happens. Reduce
+        // Motion shortens the whole timeline rather than removing the beat, so the hit is
+        // still legible without the travel.
         .task(id: strikeSignal) {
             guard strikeSignal > 0 else { return }
-            impactOffset = strikeSignal.isMultiple(of: 2) ? -3 : 3
-            impactCompression = reduceMotion ? 1 : 0.965
+            let timeline = StrikeTimeline.timeline(for: strikeVariant, reduceMotion: reduceMotion)
+            try? await Task.sleep(for: .seconds(timeline.contact))
+            impactOffset = (strikeSignal.isMultiple(of: 2) ? -1 : 1) * recoil
+            impactCompression = reduceMotion ? 1 : compression
             impactFlash = true
             try? await Task.sleep(for: .milliseconds(72))
             withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.76)) {
@@ -71,6 +79,34 @@ struct ShaftWorkFaceView: View {
                 impactFlash = false
             }
         }
+    }
+
+    /// A heavier swing displaces the face further. Same damage, different read (D-058).
+    private var recoil: CGFloat {
+        switch strikeVariant {
+        case .quick: 3
+        case .heavy: 5
+        case .critical: 7
+        }
+    }
+
+    private var compression: CGFloat {
+        switch strikeVariant {
+        case .quick: 0.965
+        case .heavy: 0.948
+        case .critical: 0.93
+        }
+    }
+
+    private var frontierLip: some View {
+        GameArtView(
+            entry: GameArtCatalog.shaftFrontierLip,
+            fit: CGSize(width: groundWidth, height: groundWidth * 0.4)
+        )
+        .frame(width: groundWidth, height: lipHeight, alignment: .bottom)
+        .clipped()
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private var groundButton: some View {

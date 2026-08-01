@@ -8,7 +8,8 @@
       2032,
       1997,
       1935
-    ]
+    ],
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/MinerMiningStrip.imageset"
   },
   {
     "id": "ShaftFrontierLip",
@@ -16,6 +17,7 @@
     "brass_ratio": 0.004400700326503573,
     "frame_coverage": [
       21133
-    ]
+    ],
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftFrontierLip.imageset"
   }
 ]

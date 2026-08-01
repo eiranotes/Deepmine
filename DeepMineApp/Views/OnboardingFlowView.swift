@@ -14,6 +14,8 @@ struct OnboardingFlowView: View {
     @State var isRequesting = false
     @State var struckWeakPoint = false
     @State var strikeSignal = 0
+    @State var strikeVariant: StrikeVariant = .quick
+    @State var swingSequence = 0
     @State var lastStrikeText: String?
 
     init(
@@ -107,9 +109,18 @@ struct OnboardingFlowView: View {
         }
     }
 
+    /// Tall enough that the work face and the actor above it both fit inside the card.
+    private static let demoShaftHeight: CGFloat = 250
+
     private var demoShaft: some View {
         let scene = ShaftSceneEngine.scene(for: player)
         let sceneHeight = ShaftGeometry.columnHeight(for: scene)
+        // At 0m the head sits below the 24m of surface inset, so a fixed offset pushed the
+        // work face past the bottom of the card: the rock was clipped to a sliver and the
+        // centre of the tap target — which is what a tap on this card actually hits — was
+        // empty shaft. Follow the head instead of the top of the scene.
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let sceneOffset = min(48, Self.demoShaftHeight * 0.42 - headY)
         return ZStack(alignment: .top) {
             DeepMinePalette.coal.color
             ShaftGeologyView(
@@ -117,10 +128,11 @@ struct OnboardingFlowView: View {
                 player: player,
                 isStruck: struckWeakPoint,
                 strikeSignal: strikeSignal,
+                strikeVariant: strikeVariant,
                 onStrike: strike(onWeakPoint:)
             )
             .frame(height: sceneHeight)
-            .offset(y: 48)
+            .offset(y: sceneOffset)
             GeometryReader { proxy in
                 GameArtView(
                     entry: GameArtCatalog.shaftSurface,
@@ -130,7 +142,7 @@ struct OnboardingFlowView: View {
             .frame(height: 48)
             .allowsHitTesting(false)
         }
-        .frame(height: min(210, sceneHeight + 48))
+        .frame(height: min(Self.demoShaftHeight, sceneHeight + 48))
         .clipShape(RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius))
         .overlay {
             RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)

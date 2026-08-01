@@ -93,13 +93,23 @@ extension OnboardingFlowView {
     }
 
     func strike(onWeakPoint: Bool) {
-        strikeSignal &+= 1
         struckWeakPoint = onWeakPoint
         guard let result = try? gameStore.strikeOnboardingRock(hitWeakPoint: onWeakPoint) else {
+            swingSequence &+= 1
+            strikeVariant = StrikeTimeline.Cadence.variant(
+                sequence: swingSequence,
+                wasCritical: false
+            )
+            strikeSignal &+= 1
             return
         }
         switch result {
         case let .struck(update), let .rewarded(update, _, _):
+            swingSequence &+= 1
+            strikeVariant = StrikeTimeline.Cadence.variant(
+                sequence: swingSequence,
+                wasCritical: update.wasCritical
+            )
             feedback.play(update.wasCritical ? .criticalStrike : .strike)
             if update.brokeSomething { feedback.play(.segmentBroken) }
             lastStrikeText = "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))"

@@ -19,12 +19,13 @@ public enum MiningLoop {
     @discardableResult
     public static func strike<R: RandomNumberGenerator>(
         hitWeakPoint: Bool = false,
+        outputMultiplier: Double = 1,
         using generator: inout R,
         in state: inout PlayerState
     ) -> MineFaceUpdate {
         let update = MineFaceEngine.strike(
             face: state.mineFace,
-            power: power(for: state),
+            power: power(for: state).scaled(by: outputMultiplier),
             hitWeakPoint: hitWeakPoint,
             equipment: state.equipment,
             modifications: state.equipmentModifications,
@@ -45,11 +46,12 @@ public enum MiningLoop {
     public static func advance(
         seconds: TimeInterval,
         at now: Date? = nil,
+        outputMultiplier: Double = 1,
         in state: inout PlayerState
     ) -> MineFaceUpdate {
         let update = MineFaceEngine.advance(
             face: state.mineFace,
-            power: power(for: state),
+            power: power(for: state).scaled(by: outputMultiplier),
             seconds: seconds,
             equipment: state.equipment,
             modifications: state.equipmentModifications

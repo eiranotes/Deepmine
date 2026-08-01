@@ -24,6 +24,21 @@ public struct StrikePower: Equatable, Sendable {
     }
 
     public var isAutomated: Bool { !damagePerSecond.isZero }
+
+    /// Temporary output multipliers — a claimed resonance node, for one — scale what the
+    /// equipment already produces rather than adding a flat amount, so the reward keeps
+    /// its meaning at every depth (D-057). Critical odds are untouched: doubling luck as
+    /// well would make the boost read as a different game rather than a faster one.
+    public func scaled(by multiplier: Double) -> StrikePower {
+        guard multiplier.isFinite, multiplier > 1 else { return self }
+        return StrikePower(
+            tapDamage: tapDamage * multiplier,
+            damagePerSecond: damagePerSecond * multiplier,
+            criticalChance: criticalChance,
+            criticalMultiplier: criticalMultiplier,
+            oreMultiplier: oreMultiplier
+        )
+    }
 }
 
 public struct TapOutcome: Equatable, Sendable {

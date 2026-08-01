@@ -97,6 +97,25 @@ enum GameArtCatalog {
         )
     }
 
+    /// The U-shaped shoulders that join the open passage to the rock being dug, so the two
+    /// read as one body instead of two stacked objects (D-055).
+    static let shaftFrontierLip = GameArtEntry(
+        name: "ShaftFrontierLip",
+        promptID: "shaft-frontier-lip",
+        placeholder: .shaftFrontierLip
+    )
+
+    /// Miner, hands and pickaxe in one four-frame actor. Separate loops let the tool land
+    /// while the body was elsewhere, which is what broke the sense of force transfer.
+    static let minerMiningStrip = GameArtEntry(
+        name: "MinerMiningStrip",
+        promptID: "miner-mining-strip",
+        placeholder: .minerMiningStrip
+    )
+
+    /// Frame count of `MinerMiningStrip`: ready, anticipation, contact, recoil.
+    static let minerMiningFrameCount = 4
+
     /// The full slot list, used by the audit test that keeps this registry and the prompt
     /// document from drifting apart.
     static var allEntries: [GameArtEntry] {
@@ -127,6 +146,8 @@ enum GameArtCatalog {
         shaftFracture(intensity: .light),
         shaftFracture(intensity: .medium),
         shaftFracture(intensity: .heavy),
+        shaftFrontierLip,
+        minerMiningStrip,
     ]
 
     static var installedEntries: [GameArtEntry] {
@@ -168,4 +189,6 @@ enum GameArtPlaceholder: Equatable, Sendable {
     case shaftSurface
     case miningPickaxe
     case shaftFracture(intensity: FractureIntensity)
+    case shaftFrontierLip
+    case minerMiningStrip
 }

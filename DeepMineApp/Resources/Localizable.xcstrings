@@ -1186,113 +1186,273 @@
     "equipment.modification.cart.fleet": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Twin Rail" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "쌍선 레일" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twin Rail"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "쌍선 레일"
+          }
+        }
       }
     },
     "equipment.modification.cart.fleet.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Automation damage ×1.25 and another visible cart." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "자동 굴착 ×1.25, 갱도에 광차가 한 대 더 보입니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automation damage ×1.25 and another visible cart."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 굴착 ×1.25, 갱도에 광차가 한 대 더 보입니다."
+          }
+        }
       }
     },
     "equipment.modification.cart.freight": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Large Hopper" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "대형 호퍼" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Large Hopper"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "대형 호퍼"
+          }
+        }
       }
     },
     "equipment.modification.cart.freight.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Each opened stratum yields ×1.25 ore." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "뚫은 지층마다 얻는 광석이 ×1.25가 됩니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each opened stratum yields ×1.25 ore."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "뚫은 지층마다 얻는 광석이 ×1.25가 됩니다."
+          }
+        }
       }
     },
     "equipment.modification.drill.impact": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Impact Bit" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "충격 비트" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impact Bit"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "충격 비트"
+          }
+        }
       }
     },
     "equipment.modification.drill.impact.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Keep a narrow bore and raise tap damage ×1.35." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "좁은 통로를 유지하고 탭 위력을 ×1.35 높입니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep a narrow bore and raise tap damage ×1.35."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "좁은 통로를 유지하고 탭 위력을 ×1.35 높입니다."
+          }
+        }
       }
     },
     "equipment.modification.drill.wide": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Wide Bit" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "확폭 비트" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wide Bit"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확폭 비트"
+          }
+        }
       }
     },
     "equipment.modification.drill.wide.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Cut a visibly wider passage and larger debris field." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "눈에 보이는 통로 폭과 파편 범위를 넓힙니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cut a visibly wider passage and larger debris field."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "눈에 보이는 통로 폭과 파편 범위를 넓힙니다."
+          }
+        }
       }
     },
     "equipment.modification.intro": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Choose one branch per tool for this descent. Prestige resets the choice." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "이번 하강에서 장비마다 한 갈래를 고릅니다. 프레스티지하면 다시 선택할 수 있습니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose one branch per tool for this descent. Prestige resets the choice."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이번 하강에서 장비마다 한 갈래를 고릅니다. 프레스티지하면 다시 선택할 수 있습니다."
+          }
+        }
       }
     },
     "equipment.modification.lamp.fortune": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Vein Lens" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "광맥 렌즈" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vein Lens"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광맥 렌즈"
+          }
+        }
       }
     },
     "equipment.modification.lamp.fortune.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Critical chance +8 percentage points." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "치명타 확률이 8%p 증가합니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical chance +8 percentage points."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "치명타 확률이 8%p 증가합니다."
+          }
+        }
       }
     },
     "equipment.modification.lamp.reach": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Long Reflector" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "장거리 반사경" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long Reflector"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "장거리 반사경"
+          }
+        }
       }
     },
     "equipment.modification.lamp.reach.effect": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Reveal 8m more of the uncut geology below." } },
-        "ko": { "stringUnit": { "state": "translated", "value": "아래 미개척 지층을 8m 더 비춥니다." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reveal 8m more of the uncut geology below."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아래 미개척 지층을 8m 더 비춥니다."
+          }
+        }
       }
     },
     "equipment.modification.locked": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Opens at Lv.%lld" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "Lv.%lld에서 개방" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens at Lv.%lld"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lv.%lld에서 개방"
+          }
+        }
       }
     },
     "equipment.modification.selected": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Installed" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "장착됨" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "장착됨"
+          }
+        }
       }
     },
     "equipment.modification.title": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Tool Branches" } },
-        "ko": { "stringUnit": { "state": "translated", "value": "장비 분기" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tool Branches"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "장비 분기"
+          }
+        }
       }
     },
     "equipment.preview": {
@@ -4257,6 +4417,40 @@
         }
       }
     },
+    "resonance.node.boost": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surge ×2 · %@s"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "과충전 ×2 · %@초"
+          }
+        }
+      }
+    },
+    "resonance.node.claim": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claim resonance node"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공명 결절 회수"
+          }
+        }
+      }
+    },
     "return.achievements.earned": {
       "extractionState": "manual",
       "localizations": {
@@ -5209,18 +5403,103 @@
         }
       }
     },
-    "shaft.recordDepth": {
+    "shaft.automationDamage": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deepest"
+            "value": "Auto %@/s"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "최고 심도"
+            "value": "자동 %@/초"
+          }
+        }
+      }
+    },
+    "shaft.forecast.automatic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동"
+          }
+        }
+      }
+    },
+    "shaft.forecast.manualOnly": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy a cart to dig without tapping"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광차를 사면 탭 없이 굴착합니다"
+          }
+        }
+      }
+    },
+    "shaft.forecast.reward": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Breaks for"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파쇄 시"
+          }
+        }
+      }
+    },
+    "shaft.forecast.taps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ taps left"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@탭 남음"
+          }
+        }
+      }
+    },
+    "shaft.forecast.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This rock"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 암반"
           }
         }
       }
@@ -5257,6 +5536,22 @@
         }
       }
     },
+    "shaft.recordDepth": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deepest"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최고 심도"
+          }
+        }
+      }
+    },
     "shaft.tapDamage": {
       "localizations": {
         "en": {
@@ -5269,22 +5564,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "타격 %@"
-          }
-        }
-      }
-    },
-    "shaft.automationDamage": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auto %@/s"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "자동 %@/초"
           }
         }
       }

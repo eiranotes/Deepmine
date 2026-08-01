@@ -32,6 +32,10 @@ struct GameArtPlaceholderView: View {
             MiningPickaxePlaceholder()
         case let .shaftFracture(intensity):
             FracturePlaceholder(intensity: intensity)
+        case .shaftFrontierLip:
+            ShaftFrontierLipPlaceholder()
+        case .minerMiningStrip:
+            MinerMiningStripPlaceholder()
         }
     }
 }

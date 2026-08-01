@@ -14,7 +14,13 @@
     "raw_sha256": "b282b2528e68bd7e654e9bc4e1846e75d569c8e17adb235eab18527f5cd5a0a2",
     "extracted_source": "artifacts/imagegen/web-gamefeel-v1/extracted/MinerMiningStrip.png",
     "processed_source": "artifacts/imagegen/web-gamefeel-v1/processed/MinerMiningStrip.png",
-    "web_source": "web/public/assets/shaft/MinerMiningStrip.png"
+    "web_source": "web/public/assets/shaft/MinerMiningStrip.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/MinerMiningStrip.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
   },
   {
     "id": "ShaftFrontierLip",
@@ -31,6 +37,12 @@
     "raw_sha256": "3ace3f8a602b97485fb5be4f57aefb989d4b45f34e4d4a45b6f3ee47f2d15b11",
     "extracted_source": "artifacts/imagegen/web-gamefeel-v1/extracted/ShaftFrontierLip.png",
     "processed_source": "artifacts/imagegen/web-gamefeel-v1/processed/ShaftFrontierLip.png",
-    "web_source": "web/public/assets/shaft/ShaftFrontierLip.png"
+    "web_source": "web/public/assets/shaft/ShaftFrontierLip.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftFrontierLip.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
   }
 ]

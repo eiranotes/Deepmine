@@ -31,6 +31,9 @@ struct MineHomeView: View {
                 if let mineFace {
                     mineFace
                         .accessibilityIdentifier("mine-home-rock")
+                    // Reward and ETA sit between the rock and the upgrade button so the
+                    // three parts of the loop are one glance apart (D-056).
+                    WorkFaceForecastBar(forecast: MiningLoop.forecast(for: player))
                 }
                 equipmentSummary
                 ProgressNavigationPanel(context: progressContext)

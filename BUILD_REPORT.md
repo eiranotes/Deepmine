@@ -1,6 +1,90 @@
 # Build Report
 
-업데이트: 2026-08-01 (D-058 웹 타격 리듬·접촉 SFX)
+업데이트: 2026-08-02 (D-063 행동대·공명 결절·타격 변주 앱 포팅)
+
+## 2026-08-02 porting D-056, D-057 and D-058 into the app
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → **225/225**, 실패 0. 이번 단계에서 30건 추가(`StrikeTimelineTests` 10, `WorkFaceForecastTests` 7, `ResonanceNodeTests` 13) |
+| D-056 예보 계산 | 검증됨 | `MiningLoop.forecast(for:)`가 예상 광석·남은 내구·자동 ETA·남은 탭 수를 만든다. 광차 1레벨에서 ETA가 `nil`이고, 첫 암반이 정확히 10탭임을 테스트로 고정 |
+| D-056 앱 화면 | 검증됨(시뮬레이터) | 신규 홈에서 `현재 암반 / 파쇄 시 ◆4`와 `광차를 사면 탭 없이 굴착합니다 / 9탭 남음`을 확인. 갱도와 강화 버튼 사이에 위치 |
+| D-057 상태 기계 | 검증됨 | 첫 출현 5.2초, 이후 120~300초 무작위, 12초 창, 놓침 무보상, 백그라운드 미출현·미기록·부스트 유지, 창 밖 수령 무효를 13건으로 검사 |
+| D-057 부스트 적용 | 검증됨 | `StrikePower.scaled(by:)`가 탭·자동 데미지만 2배로 하고 크리티컬 확률·배율은 그대로 둔다. 부스트된 자동화가 실제로 암반을 더 깎는지 테스트로 확인 |
+| D-057 앱 동작 | 검증됨(시뮬레이터) | 실행 9초 뒤 갱도 우측에 결절이 출현하고, 실제 포인터 탭으로 수령한 뒤 심도가 0m→28m로 급증했다. 부스트가 자동 굴착에 실제로 반영된다 |
+| D-058 스윙 시계 분리 | 검증됨 | 자동화의 0.25초 스텝 3주기 동안 스윙이 정확히 3회만 시작됨을 테스트로 고정. 이전에는 스텝마다 재시작돼 광부가 예비동작 프레임에 얼어붙었다 |
+| D-058 앱 동작 | 검증됨(시뮬레이터) | 자동 굴착 중 연속 캡처 6장에서 ready → anticipation → **contact** → 복귀가 실제로 재생됨을 확인 |
+| 앱 회귀 | 검증됨 | `xcodebuild test -only-testing:DeepMineAppTests -only-testing:DeepMineAppUITests/OnboardingHomeUITests` → **142/142**(유닛 134 + UI 8), 실패·skip 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build` → exit 0, error 0 |
+| 웹 회귀 | 검증됨 | `npm test` → **11/11**. `Balance`에 타격 타임라인·공명 결절 상수를 추가했지만 웹이 쓰는 상수는 그대로여서 패리티가 유지된다 |
+| 파일 크기 | 검증됨 | `ShaftView.swift` 308줄 초과분을 `ShaftView+Overlays.swift`로 분리해 전 파일 300줄 이하 유지 |
+| D-059·D-060 | 미구현 | 설비 누적과 면 단위 충격은 여전히 웹에만 있다. 앱에는 D-051의 장비→장면 연결이 있어 두 단계는 그 위의 체급·수량 강화다 |
+| 실기기 | 미검증(실기기 필요) | 햅틱, VoiceOver, Reduce Motion 실제 감각 |
+
+## 2026-08-01 core balance parity and the D-055 app port
+
+## 2026-08-01 core balance parity and the D-055 app port
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 스테일 테스트 수정 | 검증됨 | `DesignSystemContractTests.testEquipmentArtTierBoundariesClampToShippedRange`가 피벗 이전 경계(20/40)를 기대해 실패하던 것을 `EquipmentEngine.visualTier`의 4/14로 교체. 수정 전 133/1 실패 → 수정 후 **134/134** |
+| 전체 `DeepMineAppTests` | 검증됨 | `xcodebuild test -only-testing:DeepMineAppTests -destination 'platform=iOS Simulator,id=64C7804C…'` → **134 통과 / 0 실패 / 0 skip**. 이 변경 전체를 포함한 최종 코드로 재실행한 결과다. 이전 문서의 "미검증(`Mach error -308`)" 기록은 실측으로 대체했다. 스위트는 정상 완주하며, 환경 문제로 분류된 구간이 스테일 테스트 1건을 가리고 있었다 |
+| 웹 경제의 Core 정렬 | 검증됨(브라우저·코드) | `web/app/coreBalance.ts`가 Swift `Balance` 상수를 그대로 담고, 프로토타입이 자체 수치를 쓰지 않는다. 브라우저 첫 화면에서 탭 1, 자동 0.6/초(0.56), 드릴 강화 ◆100, 광차 ◆242, 램프 ◆200, 급소 5%, 파쇄 보상 ◆4.6을 확인 |
+| 패리티 테스트 실효성 | 검증됨 | `SEGMENT_INTEGRITY_GROWTH_RATE`를 1.058→1.06으로 변조하자 `must equal Balance.segmentIntegrityGrowthRate`로 실패하고, 복구 후 3/3 통과. 상수를 문자열이 아니라 Swift 소스에서 파싱해 대조한다 |
+| 웹 검사 | 검증됨 | `npm run lint`, `npm test` → **11/11**(패리티 3 + 기존 계약 8), vinext production build 통과 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → **201/201**, 실패 0 (기존 195 + `StrikeTimelineTests` 6) |
+| 타격 타임라인 계약 | 검증됨 | quick/heavy/critical의 duration·contact를 `Balance`로 옮기고 `StrikeTimeline`이 소비. 접촉 순간의 프레임이 반드시 접촉 프레임(index 2)임을 세 변주 모두에서 검사 |
+| 에셋 편입 | 검증됨 | `scripts/process_web_gamefeel_assets.py` → `Validated 2 web game-feel assets`. `MinerMiningStrip`·`ShaftFrontierLip`의 1x/2x/3x imageset 생성, 네 안료·이진 알파·1x SHA 일치 검사 포함 |
+| 아트 카탈로그 계약 | 검증됨 | `GameArtCatalogTests` **12/12**. 갱도 슬롯 11→13, 프롬프트 문서 대응, `missingEntries.isEmpty`(실제 설치 확인) 포함 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build` → exit 0, error 0 |
+| 앱 갱도 육안 | 검증됨(시뮬레이터) | iPhone 17 Pro / iOS 26.5 한국어 다크에서 `ShaftFrontierLip`의 좌우 어깨가 통로와 암반을 잇고, 광부·양손·곡괭이가 한 액터로 지반 위에 선다. `artifacts/imagegen/web-gamefeel-v1/ui-captures/` |
+| 간트리 간섭 수정 | 검증됨(시뮬레이터) | 124pt 간트리가 액터의 머리를 가로지르던 것을 44pt 상부 지지대로 축소. 조정 전/후 캡처로 확인 |
+| 액터 탭 표적 제외 | 검증됨(코드) | 92pt 액터는 지반 버튼 위를 덮으므로 `allowsHitTesting(false)`로 뺐다. 광부에 떨어진 탭은 플레이어가 암반을 노린 탭이다. 아래 온보딩 실패의 원인은 아니었다 |
+| 온보딩 데모 갱도 클리핑 | 검증됨(시뮬레이터) | `testFreshLaunchStartsOnTheBreakableRockAndPersistsTheReward` 실패를 추적한 결과, 온보딩 카드가 씬을 고정 오프셋 48로 그려 0m의 24m 지표 inset 아래에 있는 작업면이 카드 밖으로 밀려 있었다. 암반은 바닥에 잘린 조각으로만 보이고, 카드 중심(= XCUITest가 실제로 탭하는 지점)은 빈 갱도였다. 헤드를 따라가도록 오프셋을 계산하고 카드를 250pt로 키워 해소. 조정 전/후 캡처 보존 |
+| PIL 호환 | 참고 | 에셋 스크립트가 이 머신에 없는 `get_flattened_data()`를 쓰고 있어 실행 중이던 `process_web_gamefeel_assets.py`만 표준 `getdata()`로 교체했다. `process_shaft_assets.py`·`process_rock_assets.py`는 같은 문제가 남아 있고 이번 변경 범위 밖이다 |
+| `OnboardingHomeUITests` | 검증됨 | 클리핑 수정 전 7/8(같은 케이스가 두 번 실패) → 수정 후 **8/8**, 실패·skip 0. `TASKS.md`에 미완으로 남아 있던 "첫 암반을 실제로 끝까지 탭해 보상까지" 경로가 이제 실제로 통과한다 |
+| D-056~D-060 앱 포팅 | 미구현 | 첫 뷰포트 행동대, 공명 결절, 타격 변주, 설비 누적, 면 단위 충격은 여전히 웹에만 있다. 공명 결절은 Core에 대응 개념이 없어 엔진 확장이 선행 조건 |
+| 실기기 | 미검증(실기기 필요) | 햅틱 체감, VoiceOver 초점, Reduce Motion 실제 감각 |
+
+## 2026-08-01 web full-face strike and structural infrastructure
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 전신 공격 체급 | 검증됨(브라우저·코드) | 주 광부를 128→152px로 확대하고 quick/heavy/critical 접촉 변위를 강화. 준비→접촉 프레임에서 몸통·무릎·양손과 곡괭이가 함께 내려옴 |
+| 암반 면 반응 | 검증됨(브라우저·DOM) | 접촉 섬광 22→36px, 충격 압축대·타원파·좌우 분기 균열·분진을 quick 76%, heavy 84%, critical 92% 폭으로 확장. `data-impact-coverage=wide` 확인 |
+| 내실 단계 | 검증됨(브라우저·DOM) | 새 로드 `내실 1단계 · 작업조1 · 광차2 · 조명2`. 드릴 또는 광차 강화 뒤 내실 2단계·작업 데크 1→2층과 지지대·보급 상자가 함께 증가 |
+| 운송 구조 증설 | 검증됨(브라우저·DOM) | 광차 Lv.6 구매 뒤 광차 2→3대, 적재 2→3칸, 레일 28→66px 복선, 광차 x좌표 599/635px 좌우 차선 분리 확인 |
+| 광원·작업조 체급 | 검증됨(코드·브라우저) | 작업조 29→42px 전신과 통로 폭 188~195px 데크, 램프 19→28px 설치물과 92px 광원 구역으로 확대 |
+| 데스크톱 | 검증됨(1280×720) | 초기·내실 2단계·광차 3대 장면에서 scrollY 0, documentWidth 1280, 첫 화면 행동대 유지·가로 넘침 없음 |
+| 모바일 | 검증됨(390×844) | 광부 152px, 충격 면 276.6px/갱도 366px. documentWidth 390, scrollY 0, 갱도 bottom 797.6px, 행동대 bottom 791.6px |
+| 접근성·Reduce Motion | 검증됨(코드·계약) | 갱도 이름에 내실 단계·작업조·광차·조명 수를 포함하고 `data-infrastructure-tier` 노출. Reduce Motion은 넓은 이동 충격파를 숨기고 포즈·균열·데크·복선·광원 최종 구조 유지 |
+| 브라우저 로그 | 검증됨 | 데스크톱·모바일 reload, 타격, 드릴/광차 구매 뒤 warning/error 0. Vite debug와 React 개발 안내 info만 존재 |
+| 개발 HMR | 참고 | 소스 편집 중 여러 테스트 탭을 동시에 reload할 때 vinext 서버가 React `multiple renderers` 경고를 출력. 최종 새 탭 warning/error 0과 production build 통과로 제품 런타임 회귀는 재현되지 않음 |
+| 웹 검사 | 검증됨 | `git diff --check`, lint, vinext production build, 계약 테스트 8/8 통과 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD060Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
+| 새 자산·의존성 | 추가 없음 | 기존 `MinerMiningStrip`·광부·장비 PNG를 같은 네 안료 체계에서 확대·구조화. 새 화풍 에셋·런타임 의존성 없음 |
+| 앱 포팅 | 미구현 | D-060 면 단위 충격과 구조적 내실은 웹 기준이며 SwiftUI 홈 갱도에는 아직 연결하지 않음 |
+| 배포 | 미배포 | 로컬 웹에서 검증. 사용자 요청 전이므로 Sites와 원격 저장소는 변경하지 않음 |
+
+## 2026-08-01 web equipment infrastructure accumulation
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 초기 생산 설비 | 검증됨(브라우저·DOM) | 1280×720 새 로드에서 광차 2대·대당 적재 2칸·작업조 1명·작업등 2기이며 `data-cart-count/load`, `data-crew-count`, `data-service-light-count`와 실제 렌더 수가 일치 |
+| 드릴 증설 | 검증됨(실제 포인터·DOM) | 드릴 Lv.5 구매 뒤 작업조 1→2명·비트 tier 2, 드릴/신규 작업조 commissioning과 `설비 증설 완료 · 드릴 Lv.5 · 작업조 2명 · 비트 티어 2` 확인 |
+| 광차 증설·분기 | 검증됨(브라우저·DOM) | 광차 Lv.6 구매 시 운행 2→3대·적재 2→3칸·화물 표식 9개. 새 로드의 쌍선 레일 분기에서도 2→3대와 광차 commissioning 확인 |
+| 램프 증설 | 검증됨(실제 포인터·DOM) | 램프 Lv.3 구매 뒤 작업등 2→3기, 작업조 2→3명, 신규 램프 점등과 `작업등 3기 · 급소 16%` 설치 상태 확인 |
+| 데스크톱 | 검증됨(1280×720) | 실제 포인터 램프 구매 전후 `scrollY == 0`, documentWidth 1280. 설치 패널은 갱도 오른쪽·행동대 위에 있고 첫 화면 가로 넘침 없음 |
+| 모바일 | 검증됨(390×844) | 새 로드의 실제 포인터 드릴 구매로 작업조 1→2명. documentWidth 390, scrollY 0, 갱도 bottom 797.6px, 행동대 bottom 791.6px이며 설치 패널이 행동대를 가리지 않음 |
+| 접근성·Reduce Motion | 검증됨(코드·계약) | 갱도 접근성 이름에 작업조·광차·작업등 수, 설치 패널은 `role=status`/`aria-live=polite`. Reduce Motion은 광차를 `--cart-rest`의 서로 다른 정적 위치에 두고 commissioning 이동 제거 |
+| 브라우저 콘솔 | 검증됨 | 최종 소스의 새 데스크톱·모바일 탭에서 구매·분기 상호작용 뒤 warning/error 0 |
+| 웹 검사 | 검증됨 | `git diff --check`, lint, vinext production build, 계약 테스트 8/8 통과 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD059Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
+| 새 자산·의존성 | 추가 없음 | 기존 프로젝트 광부·장비 PNG와 네 안료 CSS를 재사용. 새 런타임 의존성·다른 화풍 에셋 없음 |
+| 앱 포팅 | 미구현 | D-059 설비 수량·commissioning·설치 패널은 웹 체감 기준이며 SwiftUI 홈 갱도에는 아직 연결하지 않음 |
+| 배포 | 미배포 | 로컬 웹에서 검증. 사용자 요청 전이므로 Sites version 4와 원격 저장소는 변경하지 않음 |
 
 ## 2026-08-01 web strike rhythm and contact SFX
 

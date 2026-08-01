@@ -22,10 +22,21 @@ struct ShaftView: View {
     @State private var generator = SeededGenerator(seed: UInt64.random(in: .min ... .max))
     @State private var struckWeakPoint = false
     @State private var strikeSignal = 0
+    /// Swing bookkeeping. Damage runs on the simulation step; the visible swing runs on its
+    /// own readable period so automation cannot restart the actor mid-stroke (D-058).
+    @State private var strikeVariant: StrikeVariant = .quick
+    @State private var swingSequence = 0
+    @State private var lastSwingAt: TimeInterval?
+    @State private var lastManualStrikeAt: TimeInterval?
     @State var floatingGains: [FloatingGain] = []
     @State var debrisBursts: [DebrisBurst] = []
     @State var groundCollapses: [GroundCollapseBurst] = []
     @State private var lastTick = Date()
+    /// Foreground-only intermittent reward. Kept in the view because it is a moment, not
+    /// a saved fact: a node that expired while the app was closed was never offered.
+    @State private var resonance = ResonanceNodeState()
+    @State private var resonanceNow = Date()
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     private let tick = Timer.publish(
@@ -35,7 +46,7 @@ struct ShaftView: View {
     ).autoconnect()
 
     private var power: StrikePower { MiningLoop.power(for: player) }
-    private var scene: ShaftScene { ShaftSceneEngine.scene(for: player) }
+    var scene: ShaftScene { ShaftSceneEngine.scene(for: player) }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -51,6 +62,13 @@ struct ShaftView: View {
                 now: now
             )
             lastTick = now
+            resonanceNow = now
+            resonance = ResonanceNodeEngine.advance(
+                resonance,
+                now: now,
+                isForeground: scenePhase == .active,
+                using: &generator
+            )
             advance(by: elapsed, at: now)
         }
     }
@@ -66,9 +84,20 @@ struct ShaftView: View {
                     player: player,
                     isStruck: struckWeakPoint,
                     strikeSignal: strikeSignal,
+                    strikeVariant: strikeVariant,
                     onStrike: strike(onWeakPoint:)
                 )
                 if player.mineFace.segmentIndex == 0 { surfaceCanopy }
+                ResonanceNodeView(state: resonance, now: resonanceNow) {
+                    resonance = ResonanceNodeEngine.claim(resonance, now: Date())
+                    feedback.play(.veinFound)
+                }
+                .position(
+                    x: resonance.prefersTrailingEdge
+                        ? proxy.size.width - 52
+                        : 52,
+                    y: max(46, ShaftGeometry.y(for: scene.headDepthMeters, in: scene) - 74)
+                )
                 depthRuler(width: proxy.size.width)
                 regionPlates(width: proxy.size.width)
                 ShaftEffectsView(
@@ -109,84 +138,21 @@ struct ShaftView: View {
         )
     }
 
-    private var surfaceCanopy: some View {
-        GeometryReader { proxy in
-            GameArtView(entry: GameArtCatalog.shaftSurface, fill: proxy.size)
-        }
-        .frame(height: 54)
-        .opacity(0.88)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    private func depthRuler(width: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(ShaftGeometry.depthMarks(in: scene), id: \.self) { depth in
-                HStack(spacing: 3) {
-                    Rectangle()
-                        .fill(DeepMinePalette.limestone.color.opacity(0.45))
-                        .frame(width: 8, height: 1)
-                    Text("\(depth)m")
-                        .font(.caption2.monospacedDigit())
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.62))
-                }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 2)
-                .background(DeepMinePalette.coal.color.opacity(0.68), in: Capsule())
-                .position(
-                    x: 30,
-                    y: ShaftGeometry.y(for: Double(depth), in: scene)
-                )
-            }
-            Text("\(Int(scene.headDepthMeters.rounded()))m")
-                .font(.caption2.monospacedDigit().weight(.black))
-                .foregroundStyle(DeepMinePalette.coal.color)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(DeepMinePalette.brass.color, in: Capsule())
-                .position(
-                    x: 31,
-                    y: ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
-                )
-        }
-        .frame(width: width)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    private func regionPlates(width: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(scene.strata.filter(\.isRegionEntrance)) { stratum in
-                if stratum.startDepthMeters > 0 {
-                    Text(DeepMineStrings.text(DeepMineProgressLabels.regionKey(stratum.region)))
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(DeepMinePalette.coal.color)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 2)
-                        .background(DeepMinePalette.brass.color, in: Capsule())
-                        .position(
-                            x: width - 46,
-                            y: ShaftGeometry.y(for: stratum.startDepthMeters, in: scene) + 12
-                        )
-                        .accessibilityIdentifier("shaft-region-\(stratum.region.rawValue)")
-                }
-            }
-        }
-        .frame(width: width)
-        .allowsHitTesting(false)
-    }
-
     // MARK: Actions
 
     private func strike(onWeakPoint: Bool) {
         let struckRegion = player.mineFace.region.rawValue
-        strikeSignal &+= 1
         struckWeakPoint = onWeakPoint
         let update = MiningLoop.strike(
             hitWeakPoint: onWeakPoint,
+            outputMultiplier: ResonanceNodeEngine.outputMultiplier(resonance, at: Date()),
             using: &generator,
             in: &player
         )
+        // The variant is chosen from the resolved hit, so a critical reads as the heaviest
+        // swing rather than as an ordinary one with a different number over it.
+        beginSwing(at: Date().timeIntervalSinceReferenceDate, wasCritical: update.wasCritical)
+        lastManualStrikeAt = lastSwingAt
         announce(update, isTap: true, struckRegion: struckRegion)
         guard onWeakPoint else { return }
         Task {
@@ -204,14 +170,36 @@ struct ShaftView: View {
     private func advance(by elapsed: TimeInterval, at now: Date) {
         guard elapsed > 0 else { return }
         let struckRegion = player.mineFace.region.rawValue
-        let update = MiningLoop.advance(seconds: elapsed, at: now, in: &player)
-        if !update.damage.isZero {
-            strikeSignal &+= 1
+        let update = MiningLoop.advance(
+            seconds: elapsed,
+            at: now,
+            outputMultiplier: ResonanceNodeEngine.outputMultiplier(resonance, at: now),
+            in: &player
+        )
+        // Damage from every step lands on the rock; only some of those steps are allowed to
+        // start a swing. Debris follows the swing, not the step, or the face would shed
+        // chips continuously while the pickaxe was nowhere near it.
+        if !update.damage.isZero, StrikeTimeline.Cadence.shouldStartAutomaticSwing(
+            now: now.timeIntervalSinceReferenceDate,
+            lastSwingAt: lastSwingAt,
+            lastManualStrikeAt: lastManualStrikeAt
+        ) {
+            beginSwing(at: now.timeIntervalSinceReferenceDate, wasCritical: false)
             if !update.brokeSomething { showDebris(isLarge: false, densityOverride: 2) }
         }
         if update.brokeSomething {
             announce(update, isTap: false, struckRegion: struckRegion)
         }
+    }
+
+    private func beginSwing(at now: TimeInterval, wasCritical: Bool) {
+        swingSequence &+= 1
+        strikeVariant = StrikeTimeline.Cadence.variant(
+            sequence: swingSequence,
+            wasCritical: wasCritical
+        )
+        lastSwingAt = now
+        strikeSignal &+= 1
     }
 
     private func announce(

@@ -18,6 +18,9 @@ RAW = ARTIFACTS / "raw"
 EXTRACTED = ARTIFACTS / "extracted"
 PROCESSED = ARTIFACTS / "processed"
 WEB = ROOT / "web/public/assets/shaft"
+# D-055 held these two out of the app catalog until the web feel was approved. The port
+# is now underway, so the same processed pixels ship to both surfaces from one source.
+CATALOG = ROOT / "DeepMineProbe/Shared/SharedAssets.xcassets"
 MANIFEST = ARTIFACTS / "manifest.json"
 REPORT = ARTIFACTS / "validation-report.json"
 CONTACT_SHEET = ARTIFACTS / "contact-sheet.png"
@@ -76,7 +79,7 @@ def crop_to_ratio(image: Image.Image, target_ratio: float) -> Image.Image:
 def quantize(source: Image.Image) -> Image.Image:
     output = Image.new("RGBA", source.size)
     pixels: list[tuple[int, int, int, int]] = []
-    for red, green, blue, alpha in source.get_flattened_data():
+    for red, green, blue, alpha in source.getdata():
         if alpha < 128:
             pixels.append((*PALETTE[0], 0))
             continue
@@ -110,6 +113,34 @@ def process(entry: dict[str, object]) -> dict[str, object]:
     web = WEB / f"{asset_id}.png"
     logical.save(processed, format="PNG", optimize=True)
     shutil.copy2(processed, web)
+
+    imageset = CATALOG / f"{asset_id}.imageset"
+    imageset.mkdir(parents=True, exist_ok=True)
+    stem = asset_id.replace("_", "-").lower()
+    filenames = {scale: f"{stem}{'' if scale == 1 else f'@{scale}x'}.png" for scale in (1, 2, 3)}
+    for scale, filename in filenames.items():
+        logical.resize(
+            (size[0] * scale, size[1] * scale),
+            Image.Resampling.NEAREST,
+        ).save(imageset / filename, format="PNG", optimize=True)
+    (imageset / "Contents.json").write_text(
+        json.dumps(
+            {
+                "images": [
+                    {"filename": filenames[scale], "idiom": "universal", "scale": f"{scale}x"}
+                    for scale in (1, 2, 3)
+                ],
+                "info": {"author": "xcode", "version": 1},
+                "properties": {
+                    "compression-type": "lossless",
+                    "template-rendering-intent": "original",
+                },
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+
     return {
         **entry,
         "logical_size": list(size),
@@ -118,6 +149,8 @@ def process(entry: dict[str, object]) -> dict[str, object]:
         "extracted_source": str(extracted.relative_to(ROOT)),
         "processed_source": str(processed.relative_to(ROOT)),
         "web_source": str(web.relative_to(ROOT)),
+        "imageset": str(imageset.relative_to(ROOT)),
+        "scales": [1, 2, 3],
     }
 
 
@@ -136,7 +169,7 @@ def validate(entry: dict[str, object]) -> dict[str, object]:
     if sha256(processed) != sha256(web):
         raise ValueError(f"{asset_id}: web copy differs from processed source")
 
-    pixels = list(rgba.get_flattened_data())
+    pixels = list(rgba.getdata())
     if any(pixel[3] not in (0, 255) for pixel in pixels):
         raise ValueError(f"{asset_id}: partial alpha is not allowed")
     if not any(pixel[3] == 0 for pixel in pixels):
@@ -153,15 +186,38 @@ def validate(entry: dict[str, object]) -> dict[str, object]:
     frame_coverage = []
     for frame in range(frame_count):
         alpha = rgba.getchannel("A").crop((frame * frame_width, 0, (frame + 1) * frame_width, rgba.height))
-        coverage = sum(value == 255 for value in alpha.get_flattened_data())
+        coverage = sum(value == 255 for value in alpha.getdata())
         if coverage == 0:
             raise ValueError(f"{asset_id}: frame {frame + 1} is empty")
         frame_coverage.append(coverage)
+
+    # The app catalog copy has to be the same pixels at every scale, or the two surfaces
+    # would drift apart exactly where the port is supposed to make them agree.
+    imageset = ROOT / str(entry["imageset"])
+    contents = json.loads((imageset / "Contents.json").read_text())
+    logical_size = tuple(entry["logical_size"])
+    for scale, item in zip((1, 2, 3), contents["images"]):
+        path = imageset / item["filename"]
+        with Image.open(path) as opened:
+            expected = (logical_size[0] * scale, logical_size[1] * scale)
+            if opened.format != "PNG" or opened.size != expected:
+                raise ValueError(f"{asset_id}: invalid imageset PNG size at {scale}x")
+            scaled = opened.convert("RGBA")
+        scaled_pixels = list(scaled.getdata())
+        if any(pixel[3] not in (0, 255) for pixel in scaled_pixels):
+            raise ValueError(f"{asset_id}: imageset {scale}x has partial alpha")
+        scaled_opaque = [pixel for pixel in scaled_pixels if pixel[3] == 255]
+        if {pixel[:3] for pixel in scaled_opaque} - set(PALETTE):
+            raise ValueError(f"{asset_id}: imageset {scale}x leaves the four-pigment palette")
+    if sha256(imageset / contents["images"][0]["filename"]) != sha256(processed):
+        raise ValueError(f"{asset_id}: imageset 1x differs from the processed source")
+
     return {
         "id": asset_id,
         "valid": True,
         "brass_ratio": brass_ratio,
         "frame_coverage": frame_coverage,
+        "imageset": str(imageset.relative_to(ROOT)),
     }
 
 

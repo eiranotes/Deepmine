@@ -9,6 +9,7 @@ struct ShaftGeologyView: View {
     let player: PlayerState
     let isStruck: Bool
     let strikeSignal: Int
+    let strikeVariant: StrikeVariant
     let onStrike: (Bool) -> Void
 
     var body: some View {
@@ -210,9 +211,12 @@ struct ShaftGeologyView: View {
             player: player,
             isStruck: isStruck,
             strikeSignal: strikeSignal,
+            strikeVariant: strikeVariant,
             onStrike: onStrike
         )
-        .position(x: width / 2, y: headY + 50)
+        // Keeps the rock's top edge at the head depth after the face grew taller to make
+        // room for the frontier lip: centre = headY + (frameHeight / 2 - groundTop) + 8.
+        .position(x: width / 2, y: headY + 26)
     }
 
     private func depthRecordPlate(width: CGFloat) -> some View {

@@ -65,6 +65,27 @@ extension Balance {
     public static let impactDecayPerSecond = 9.0
     public static let impactFullDamageMultiplier = 2.0
 
+    // MARK: Strike timeline
+
+    /// One strike is a single timeline shared by the body, both hands and the tool, and the
+    /// damage lands on the contact frame rather than on the input event (D-055). A quick
+    /// swing reads as acceleration, a heavy one as weight; without the split every strike
+    /// at 820ms felt mechanical (D-058).
+    public static let quickStrikeDuration: TimeInterval = 0.560
+    public static let quickStrikeContact: TimeInterval = 0.202
+    public static let heavyStrikeDuration: TimeInterval = 0.690
+    public static let heavyStrikeContact: TimeInterval = 0.249
+    public static let criticalStrikeDuration: TimeInterval = 0.760
+    public static let criticalStrikeContact: TimeInterval = 0.274
+    /// Reduce Motion keeps the pose change and the reward, and drops the travel time.
+    public static let reducedStrikeDuration: TimeInterval = 0.160
+    public static let reducedStrikeContact: TimeInterval = 0.080
+    /// A manual strike owns the actor for this long, so an automation tick cannot overwrite
+    /// the pose mid-swing. Overlapped automatic damage is carried to the next contact.
+    public static let manualStrikeActorGuard: TimeInterval = 0.640
+    /// Automatic swing period when nothing is tapped.
+    public static let automaticStrikeInterval: TimeInterval = 0.820
+
     // MARK: Automation
 
     /// A cart at base level hauls nothing on its own. The first cart upgrade is the
@@ -107,6 +128,25 @@ extension Balance {
     public static let fleetModificationAutomationMultiplier = 1.25
     public static let freightModificationOreMultiplier = 1.25
     public static let fortuneModificationCriticalChance = 0.08
+
+    // MARK: Resonance node
+
+    /// A rare, explicit reward the player has to notice and press — distinct from the
+    /// resonance *vein*, which is a session payout the mine hands over on its own (D-057).
+    /// Naming them apart matters: one is a thing you catch, the other is a thing you receive.
+    ///
+    /// The first one arrives early so the mechanic is taught while the player is still
+    /// watching; after that the gap is long enough that the shaft is not a whack-a-mole.
+    public static let resonanceNodeFirstDelay: TimeInterval = 5.2
+    public static let resonanceNodeMinimumDelay: TimeInterval = 120
+    public static let resonanceNodeMaximumDelay: TimeInterval = 300
+    /// Long enough to notice and reach, short enough that ignoring it is a real loss.
+    public static let resonanceNodeActiveWindow: TimeInterval = 12
+    public static let resonanceNodeBoostDuration: TimeInterval = 18
+    public static let resonanceNodeSettleDelay: TimeInterval = 1.5
+    /// Doubles what the player is already producing rather than paying a flat sum, so the
+    /// reward grows with the mine instead of becoming irrelevant.
+    public static let resonanceNodeMultiplier = 2.0
 
     // MARK: Offline
 
