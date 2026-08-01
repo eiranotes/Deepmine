@@ -22,8 +22,10 @@ test("continuous shaft contract remains explicit", () => {
 });
 
 test("automatic descent and page-wide tap acceleration stay explicit", () => {
-  assert.match(prototype, /AUTO_DAMAGE_STEP_MS/);
-  assert.match(prototype, /automation \* \(AUTO_DAMAGE_STEP_MS \/ 1000\)/);
+  assert.match(prototype, /AUTO_STRIKE_MS/);
+  assert.match(prototype, /STRIKE_CONTACT_MS/);
+  assert.match(prototype, /automation \* \(AUTO_STRIKE_MS \/ 1000\)/);
+  assert.match(prototype, /queueStrike/);
   assert.match(prototype, /onPointerDown=\{handleMinePointerDown\}/);
   assert.match(prototype, /onPointerUp=\{handleMinePointerUp\}/);
   assert.match(prototype, /isSecondaryControl/);
@@ -39,7 +41,9 @@ test("each equipment owns a visible scene effect and a branch choice", () => {
   assert.match(prototype, /continuousCart/);
   assert.match(prototype, /continuousDrill/);
   assert.match(prototype, /continuousDebris/);
-  assert.match(prototype, /miningPickaxe/);
+  assert.match(prototype, /miningActor/);
+  assert.match(prototype, /frontierLip/);
+  assert.doesNotMatch(prototype, /styles\.miningPickaxe/);
   assert.match(styles, /--cart-duration/);
   assert.match(styles, /fortuneBuild/);
 });
@@ -58,6 +62,8 @@ test("all prototype art is project-local and deployable", () => {
     "public/assets/shaft/ShaftFractureVertical_light.png",
     "public/assets/shaft/ShaftFractureVertical_medium.png",
     "public/assets/shaft/ShaftFractureVertical_heavy.png",
+    "public/assets/shaft/MinerMiningStrip.png",
+    "public/assets/shaft/ShaftFrontierLip.png",
     "public/og/deepmine-shaft-social.png",
   ];
 

@@ -1,0 +1,18 @@
+[
+  {
+    "asset": "MinerMiningStrip",
+    "generator": "OpenAI built-in ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-538ad719-c884-42a2-bfe0-a3fb29d187f6.png",
+    "project_raw_copy": "artifacts/imagegen/web-gamefeel-v1/raw/MinerMiningStrip.png",
+    "derivation": "identity-preserving generation from web/public/assets/miner.png"
+  },
+  {
+    "asset": "ShaftFrontierLip",
+    "generator": "OpenAI built-in ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-7d9750dc-be00-4345-aa34-ec9d119be29b.png",
+    "project_raw_copy": "artifacts/imagegen/web-gamefeel-v1/raw/ShaftFrontierLip.png",
+    "derivation": "style-guided generation from web/public/assets/shaft/ShaftRock_entry.png"
+  }
+]

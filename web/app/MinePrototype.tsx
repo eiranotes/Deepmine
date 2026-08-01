@@ -32,7 +32,8 @@ type Specializations = {
 
 const METERS_PER_LAYER = 4;
 const PIXELS_PER_METER = 28;
-const AUTO_DAMAGE_STEP_MS = 120;
+const AUTO_STRIKE_MS = 820;
+const STRIKE_CONTACT_MS = 230;
 
 const equipmentCopy: Record<
   EquipmentKind,
@@ -144,6 +145,9 @@ export function MinePrototype() {
     cancelled: boolean;
   } | null>(null);
   const breakTimerRef = useRef<number | null>(null);
+  const strikeTimersRef = useRef<Set<number>>(new Set());
+  const manualStrikeCountRef = useRef(0);
+  const lastManualStrikeAtRef = useRef(0);
   const previousBrokenLayersRef = useRef(mine.brokenLayers);
 
   const integrity = integrityAt(mine.depth);
@@ -182,10 +186,8 @@ export function MinePrototype() {
   const applyDamage = useCallback(
     (
       rawDamage: number,
-      critical = false,
       drillLevel = 1,
       payoutMultiplier = 1,
-      showsImpact = true,
     ) => {
       setMine((current) => {
         let damage = current.damage + rawDamage;
@@ -223,37 +225,46 @@ export function MinePrototype() {
           boreHistory,
         };
       });
-      if (showsImpact) {
-        setIsCritical(critical);
-        setHitPulse((value) => value + 1);
-      }
     },
     [],
   );
 
+  const queueStrike = useCallback(
+    (
+      rawDamage: number,
+      critical: boolean,
+      source: "manual" | "auto",
+      drillLevel: number,
+      payoutMultiplier: number,
+    ) => {
+      setLastStrikeSource(source);
+      setIsCritical(critical);
+      setHitPulse((value) => value + 1);
+      const timer = window.setTimeout(() => {
+        strikeTimersRef.current.delete(timer);
+        applyDamage(rawDamage, drillLevel, payoutMultiplier);
+      }, STRIKE_CONTACT_MS);
+      strikeTimersRef.current.add(timer);
+    },
+    [applyDamage],
+  );
+
   useEffect(() => {
     if (automation <= 0) return;
-    const damageTimer = window.setInterval(
-      () =>
-        applyDamage(
-          automation * (AUTO_DAMAGE_STEP_MS / 1000),
-          false,
-          equipment.drill,
-          oreMultiplier,
-          false,
-        ),
-      AUTO_DAMAGE_STEP_MS,
-    );
-    const swingTimer = window.setInterval(() => {
-      setLastStrikeSource("auto");
-      setIsCritical(false);
-      setHitPulse((value) => value + 1);
-    }, 820);
-    return () => {
-      window.clearInterval(damageTimer);
-      window.clearInterval(swingTimer);
+    const swing = () => {
+      if (performance.now() - lastManualStrikeAtRef.current < 640) return;
+      queueStrike(
+        automation * (AUTO_STRIKE_MS / 1000),
+        false,
+        "auto",
+        equipment.drill,
+        oreMultiplier,
+      );
     };
-  }, [applyDamage, automation, equipment.drill, oreMultiplier]);
+    swing();
+    const swingTimer = window.setInterval(swing, AUTO_STRIKE_MS);
+    return () => window.clearInterval(swingTimer);
+  }, [automation, equipment.drill, oreMultiplier, queueStrike]);
 
   useEffect(() => {
     if (mine.brokenLayers <= previousBrokenLayersRef.current) return;
@@ -267,15 +278,24 @@ export function MinePrototype() {
   useEffect(
     () => () => {
       if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
+      for (const timer of strikeTimersRef.current) window.clearTimeout(timer);
+      strikeTimersRef.current.clear();
     },
     [],
   );
 
   const strike = () => {
     const criticalEvery = Math.max(2, Math.round(1 / chance));
-    const critical = (hitPulse + 1) % criticalEvery === 0;
-    setLastStrikeSource("manual");
-    applyDamage(critical ? tap * 3 : tap, critical, equipment.drill, oreMultiplier);
+    manualStrikeCountRef.current += 1;
+    lastManualStrikeAtRef.current = performance.now();
+    const critical = manualStrikeCountRef.current % criticalEvery === 0;
+    queueStrike(
+      critical ? tap * 3 : tap,
+      critical,
+      "manual",
+      equipment.drill,
+      oreMultiplier,
+    );
   };
 
   const handleMinePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
@@ -335,12 +355,15 @@ export function MinePrototype() {
       ({
         "--break-progress": progress.toFixed(3),
         "--cut-width": `${24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)}%`,
+        "--frontier-width": `${Math.min(88, (24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)) * 2.35)}%`,
         "--lamp-radius": `${18 + Math.min(20, equipment.lamp * 2.4) + (specializations.lamp === "reach" ? 8 : 0)}%`,
         "--rock-image": `url("${rockAssetAt(headDepth)}")`,
         "--rock-phase": `${-((headDepth * PIXELS_PER_METER) % 320)}px`,
         "--surface-y": `${16 - headDepth * PIXELS_PER_METER}px`,
         "--fracture-reveal": `${progress <= 0 ? 0 : 18 + progress * 142}px`,
         "--fracture-opacity": `${progress <= 0 ? 0 : 0.58 + progress * 0.42}`,
+        "--kerf-depth": `${progress <= 0 ? 0 : 10 + progress * 116}px`,
+        "--kerf-width": `${progress <= 0 ? 0 : 7 + progress * 29}px`,
         "--cart-duration": `${Math.max(1.9, 4.8 - equipment.cart * 0.18 - (specializations.cart === "fleet" ? 0.65 : 0))}s`,
         "--rig-scale": `${1 + (equipmentTier(equipment.drill) - 1) * 0.12}`,
         "--impact-kick": `${specializations.drill === "impact" ? 1.34 : 1}`,
@@ -498,12 +521,14 @@ export function MinePrototype() {
 
             <div className={styles.workLine} aria-hidden="true">
               <img
-                className={styles.continuousGantry}
-                src="/assets/shaft/ShaftGantry.png"
+                className={styles.frontierLip}
+                src="/assets/shaft/ShaftFrontierLip.png"
                 width={320}
                 height={128}
                 alt=""
+                key={`frontier-${hitPulse}`}
               />
+              <span className={styles.excavationKerf} />
               <div className={styles.fractureClip}>
                 <img
                   className={styles.verticalFracture}
@@ -514,15 +539,7 @@ export function MinePrototype() {
                   key={`${fractureAsset}-${hitPulse}`}
                 />
               </div>
-              <img className={styles.continuousMiner} src="/assets/miner.png" width={72} height={72} alt="" />
-              <img
-                className={styles.miningPickaxe}
-                src="/assets/shaft/MiningPickaxe.png"
-                width={64}
-                height={64}
-                alt=""
-                key={`pickaxe-${hitPulse}`}
-              />
+              <span className={styles.miningActor} key={`mining-actor-${hitPulse}`} />
               <img
                 className={styles.continuousDrill}
                 src={`/assets/equipment/Equipment_drill_tier${equipmentTier(equipment.drill)}.png`}
@@ -530,6 +547,7 @@ export function MinePrototype() {
                 height={64}
                 alt=""
               />
+              <span className={styles.contactFlash} key={`contact-${hitPulse}`} />
               <div className={styles.continuousDebris} key={`continuous-debris-${hitPulse}`}>
                 {Array.from({ length: debrisCount }, (_, index) => (
                   <span

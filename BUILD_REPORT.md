@@ -1,6 +1,42 @@
 # Build Report
 
-업데이트: 2026-08-01 (웹 연속 암반·자동 하강 기준안)
+업데이트: 2026-08-01 (Sites v4 배포·Cookie Clicker 비교 감사)
+
+## 2026-08-01 Sites v4 and Cookie Clicker comparison
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 웹 배포 | 배포됨(소유자 전용) | Sites version 4, source `7a0f29d35`, `https://deepmine-shaft-prototype.eiraworks-9813.chatgpt.site`. 배포 상태 `succeeded` |
+| 배포 응답 | 검증됨 | 소유자 우회 헤더로 HTML 200, `MinerMiningStrip.png` 200/3,021B, `ShaftFrontierLip.png` 200/3,708B. 일반 브라우저에는 의도한 ChatGPT 로그인 게이트가 먼저 표시됨 |
+| 웹 검사 | 검증됨 | `npm run lint && npm test` 통과. vinext production build와 계약 테스트 4/4 성공 |
+| 실제 첫 화면 | 검증됨(1280×720) | 자동 굴착으로 입력 없이 심도·광석이 증가하고, 제목 영역 클릭에서도 620ms 전신 타격·접촉 `−19`가 표시됨. console warning/error 0 |
+| Cookie Clicker 직접 비교 | 검증됨(공식 웹판) | 첫 쿠키 클릭이 0→1 자원 증가, 20개 파티클, 첫 업적 토스트를 한 번에 발생. 큰 쿠키·자원/CPS·상점이 같은 뷰포트에 있음 |
+| DeepMine 우위 | 확인됨 | 지나온 통로·현재 파쇄 경계·미개척 암반이 한 깊이 좌표로 이어지고, 자동 생산이 실제 세계 이동과 전신 채굴 동작으로 보임 |
+| DeepMine 핵심 격차 | 후속 필요 | 타격 지점이 장면 대비 작고, 개별 탭은 광석보다 데미지만 보여 즉시 보상이 약함. 장비 구매는 720px 첫 화면 아래에 있어 탭→보상→강화 폐루프가 한눈에 보이지 않음 |
+| 모바일 D-055 시각 증거 | 이번 실행 미확보 | 브라우저 viewport capability가 390×844 요청 뒤에도 실제 1280×720을 유지. D-054 모바일 증거를 D-055 자산·타임라인 승인으로 확대하지 않음 |
+
+후속 구현은 Cookie Clicker의 화면을 복제하지 않고, `타격→현재 층 보상/남은 시간→바로 살 수 있는
+장비→자동 생산 증가`를 첫 뷰포트 안에서 닫는 것을 1순위로 둔다. 간헐 보상은 Golden Cookie의
+역할만 참고해 기존 `ResonanceNode`를 사용하는 공명 결절 이벤트로 DeepMine 고유 표현을 유지한다.
+
+## 2026-08-01 web cohesive frontier and full-body strike
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 파쇄 경계 연속성 | 검증됨(로컬 브라우저) | 생성 `ShaftFrontierLip`의 하단 387px과 중앙 절삭 홈 시작 384px이 3px 겹침. 열린 통로→U자형 립→검은 절삭부→세로 균열이 같은 중심축 사용 |
+| 전신 채굴 액터 | 검증됨(브라우저 육안·정적) | 생성 `MinerMiningStrip` 4프레임에서 양손이 곡괭이를 잡고 준비·예비동작·무릎/몸통 하강 접촉·반동을 수행. 기존 독립 `miningPickaxe` 소비 제거 |
+| 접촉 데미지 | 검증됨(코드·계약) | 수동/자동 모두 `queueStrike`를 사용하고 230ms 접촉 뒤 `applyDamage`. 자동은 820ms 주기이며 브라우저에서 입력 없이 1.1초 동안 72.5m→72.7m 증가 |
+| 직접 조작 우선 | 검증됨(코드) | 수동 타격 뒤 640ms 동안 자동 스윙이 같은 액터 타임라인을 덮어쓰지 않음. 화면 전체 Pointer Events·18px 스크롤 취소 계약 유지 |
+| ImageGen 자산 2종 | 검증됨 | 내장 ImageGen 원본·명시 프롬프트·크로마 추출·네 안료·이진 알파·SHA·웹 복사본을 `web-gamefeel-v1`에 보존. validator 2/2 통과 |
+| 웹 검사 | 검증됨 | `npm run lint`, `npm test` 4/4 및 vinext production build 통과. 로컬 브라우저 console 로그 0 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild -quiet -project DeepMine.xcodeproj -scheme DeepMineApp -destination 'generic/platform=iOS' -derivedDataPath /tmp/DeepMineD055Derived CODE_SIGNING_ALLOWED=NO build` → exit 0 |
+| 앱 포팅 | 미구현 | 웹 체감 승인 전 단계이므로 SwiftUI Asset Catalog와 앱 채굴 장면은 변경하지 않음 |
+| 배포 | 배포됨(소유자 전용) | 후속 요청으로 Sites version 4에 D-055 기준을 배포하고 production 상태 `succeeded` 확인 |
+
+웹 조사는 GDC의 강한 키프레임·anticipation/timing, Apple의 직접 입력에 정확히 묶인 짧은
+피드백 원칙을 구조 기준으로 사용했다. SteamWorld Dig 2·Dome Keeper·Cookie Clicker의 공식
+페이지는 채굴/방치/직접 조작 루프의 제품 맥락 확인에만 사용했으며 아트·레이아웃은 복제하지 않았다.
 
 ## 2026-08-01 web continuous rock and idle descent baseline
 

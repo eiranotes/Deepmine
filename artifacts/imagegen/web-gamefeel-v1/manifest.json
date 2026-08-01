@@ -1,0 +1,36 @@
+[
+  {
+    "id": "MinerMiningStrip",
+    "logical_size": [
+      384,
+      96
+    ],
+    "crop_ratio": 4.0,
+    "frame_count": 4,
+    "maximum_brass_ratio": 0.24,
+    "prompt_id": "miner-mining-strip",
+    "prompt": "Four equal side-view frames of the same DeepMine miner: ready, anticipation, full-body impact, and recoil. The pickaxe stays in both hands in every frame; identical baseline and scale; four-pigment pixel art on a perfectly flat #00FF00 chroma-key background.",
+    "raw_source": "artifacts/imagegen/web-gamefeel-v1/raw/MinerMiningStrip.png",
+    "raw_sha256": "b282b2528e68bd7e654e9bc4e1846e75d569c8e17adb235eab18527f5cd5a0a2",
+    "extracted_source": "artifacts/imagegen/web-gamefeel-v1/extracted/MinerMiningStrip.png",
+    "processed_source": "artifacts/imagegen/web-gamefeel-v1/processed/MinerMiningStrip.png",
+    "web_source": "web/public/assets/shaft/MinerMiningStrip.png"
+  },
+  {
+    "id": "ShaftFrontierLip",
+    "logical_size": [
+      320,
+      128
+    ],
+    "crop_ratio": 2.5,
+    "frame_count": 1,
+    "maximum_brass_ratio": 0.12,
+    "prompt_id": "shaft-frontier-lip",
+    "prompt": "Panoramic front-facing rock shoulders forming one jagged U-shaped tunnel throat, with an empty upper centre and a chipped contact notch at the bottom centre; connected strata in the DeepMine four-pigment pixel style on a flat #00FF00 chroma-key background.",
+    "raw_source": "artifacts/imagegen/web-gamefeel-v1/raw/ShaftFrontierLip.png",
+    "raw_sha256": "3ace3f8a602b97485fb5be4f57aefb989d4b45f34e4d4a45b6f3ee47f2d15b11",
+    "extracted_source": "artifacts/imagegen/web-gamefeel-v1/extracted/ShaftFrontierLip.png",
+    "processed_source": "artifacts/imagegen/web-gamefeel-v1/processed/ShaftFrontierLip.png",
+    "web_source": "web/public/assets/shaft/ShaftFrontierLip.png"
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "id": "MinerMiningStrip",
+    "valid": true,
+    "brass_ratio": 0.06611258027956177,
+    "frame_coverage": [
+      1977,
+      2032,
+      1997,
+      1935
+    ]
+  },
+  {
+    "id": "ShaftFrontierLip",
+    "valid": true,
+    "brass_ratio": 0.004400700326503573,
+    "frame_coverage": [
+      21133
+    ]
+  }
+]
