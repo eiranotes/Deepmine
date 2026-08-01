@@ -32,6 +32,18 @@ test("automatic descent and page-wide tap acceleration stay explicit", () => {
   assert.match(prototype, /자동 굴착 중/);
 });
 
+test("the first viewport closes the rock reward to equipment loop", () => {
+  assert.match(prototype, /expectedLayerOre/);
+  assert.match(prototype, /automaticBreakEta/);
+  assert.match(prototype, /recommendedUpgrade/);
+  assert.match(prototype, /파쇄 시 ◆/);
+  assert.match(prototype, /지금 강화/);
+  assert.match(prototype, /data-no-mine/);
+  assert.match(styles, /\.quickLoop/);
+  assert.match(styles, /\.workRewardPromise/);
+  assert.match(styles, /\.quickUpgrade:focus-visible/);
+});
+
 test("each equipment owns a visible scene effect and a branch choice", () => {
   for (const kind of ["drill", "cart", "lamp"]) {
     assert.match(prototype, new RegExp(`${kind}: \\[`, "m"));

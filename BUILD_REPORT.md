@@ -1,6 +1,19 @@
 # Build Report
 
-업데이트: 2026-08-01 (Sites v4 배포·Cookie Clicker 비교 감사)
+업데이트: 2026-08-01 (D-056 첫 뷰포트 경제 폐루프)
+
+## 2026-08-01 first-viewport reward and upgrade loop
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 층 보상 예고 | 검증됨(브라우저) | 작업 접점에 남은 파쇄율과 `파쇄 시 ◆29~30`, 행동대에 현재 암반 예상 광석과 자동 완료 ETA를 실시간 표시 |
+| 빠른 추천 강화 | 검증됨(실제 포인터) | 드릴 Lv.5 구매 뒤 탭 위력 19→22, 다음 추천 램프 Lv.3, 설치 상태 알림이 한 번에 갱신. 버튼 외 제목 탭도 260ms 뒤 22.4m→23.2m 진행 |
+| 데스크톱 첫 화면 | 검증됨(1280×720) | shaft bottom 708.6px, 행동대 bottom 698.6px, 초기 scrollY 0. 실제 좌표 포인터 구매 뒤에도 scrollY 0 |
+| 모바일 첫 화면 | 검증됨(390×844) | shaft bottom 797.6px, 행동대 bottom 791.6px, horizontal overflow 없음. 실제 포인터 구매 뒤 scrollY 0·console warning/error 0 |
+| 접근성 | 검증됨(DOM) | 행동대는 `role=img` 밖의 `aside`이며 `현재 암반 보상과 추천 강화` 이름 보유. 구매는 고유 접근성 이름, 결과는 `role=status`/`aria-live=polite`로 노출 |
+| 경제 보존 | 검증됨(코드) | 개별 탭 광석 지급을 추가하지 않고 기존 4m 파쇄 보상만 사용. 추천 강화도 명시적 클릭에서만 구매 |
+| 웹 검사 | 검증됨 | lint, vinext production build, 계약 테스트 5/5, `git diff --check` 통과 |
+| 앱 포팅 | 미구현 | D-056 행동대와 보상 예고는 웹 체감 승인 전이며 SwiftUI 홈에는 아직 없음 |
 
 ## 2026-08-01 Sites v4 and Cookie Clicker comparison
 
@@ -8,12 +21,12 @@
 |---|---|---|
 | 웹 배포 | 배포됨(소유자 전용) | Sites version 4, source `7a0f29d35`, `https://deepmine-shaft-prototype.eiraworks-9813.chatgpt.site`. 배포 상태 `succeeded` |
 | 배포 응답 | 검증됨 | 소유자 우회 헤더로 HTML 200, `MinerMiningStrip.png` 200/3,021B, `ShaftFrontierLip.png` 200/3,708B. 일반 브라우저에는 의도한 ChatGPT 로그인 게이트가 먼저 표시됨 |
-| 웹 검사 | 검증됨 | `npm run lint && npm test` 통과. vinext production build와 계약 테스트 4/4 성공 |
+| 웹 검사 | 검증됨 | `npm run lint && npm test` 통과. vinext production build와 계약 테스트 5/5 성공 |
 | 실제 첫 화면 | 검증됨(1280×720) | 자동 굴착으로 입력 없이 심도·광석이 증가하고, 제목 영역 클릭에서도 620ms 전신 타격·접촉 `−19`가 표시됨. console warning/error 0 |
 | Cookie Clicker 직접 비교 | 검증됨(공식 웹판) | 첫 쿠키 클릭이 0→1 자원 증가, 20개 파티클, 첫 업적 토스트를 한 번에 발생. 큰 쿠키·자원/CPS·상점이 같은 뷰포트에 있음 |
 | DeepMine 우위 | 확인됨 | 지나온 통로·현재 파쇄 경계·미개척 암반이 한 깊이 좌표로 이어지고, 자동 생산이 실제 세계 이동과 전신 채굴 동작으로 보임 |
-| DeepMine 핵심 격차 | 후속 필요 | 타격 지점이 장면 대비 작고, 개별 탭은 광석보다 데미지만 보여 즉시 보상이 약함. 장비 구매는 720px 첫 화면 아래에 있어 탭→보상→강화 폐루프가 한눈에 보이지 않음 |
-| 모바일 D-055 시각 증거 | 이번 실행 미확보 | 브라우저 viewport capability가 390×844 요청 뒤에도 실제 1280×720을 유지. D-054 모바일 증거를 D-055 자산·타임라인 승인으로 확대하지 않음 |
+| DeepMine 핵심 격차 | D-056 1차 해소 | 타격 접점의 층 보상 예고와 첫 화면 추천 강화 행동대를 추가. 공명 결절·타격/SFX 변주·자동 생산의 장면 누적은 후속 |
+| 모바일 D-055/D-056 시각 증거 | 검증됨 | viewport capability 390×844에서 D-055 자산·전신 타격과 D-056 행동대가 첫 화면에 함께 보이며 가로 넘침·console 오류 없음 |
 
 후속 구현은 Cookie Clicker의 화면을 복제하지 않고, `타격→현재 층 보상/남은 시간→바로 살 수 있는
 장비→자동 생산 증가`를 첫 뷰포트 안에서 닫는 것을 1순위로 둔다. 간헐 보상은 Golden Cookie의

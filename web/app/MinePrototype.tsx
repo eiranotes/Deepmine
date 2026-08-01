@@ -58,6 +58,7 @@ const equipmentCopy: Record<
 
 const initialEquipment: EquipmentState = { drill: 4, cart: 5, lamp: 2 };
 const initialSpecializations: Specializations = { drill: null, cart: null, lamp: null };
+const equipmentKinds: EquipmentKind[] = ["drill", "cart", "lamp"];
 
 const specializationOptions = {
   drill: [
@@ -105,6 +106,22 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
 }
 
+function formatSeconds(value: number) {
+  if (value < 1) return "1초 이내";
+  if (value < 10) return `${value.toFixed(1)}초`;
+  return `${Math.ceil(value)}초`;
+}
+
+function upgradeEffect(kind: EquipmentKind, level: number) {
+  if (kind === "drill") {
+    return `탭 ${formatNumber(tapPower(level))} → ${formatNumber(tapPower(level + 1))}`;
+  }
+  if (kind === "cart") {
+    return `자동 ${formatNumber(automationPower(level))} → ${formatNumber(automationPower(level + 1))}/초`;
+  }
+  return `급소 ${Math.round(criticalChance(level) * 100)} → ${Math.round(criticalChance(level + 1) * 100)}%`;
+}
+
 function isSecondaryControl(target: EventTarget | null) {
   return (
     target instanceof Element
@@ -138,6 +155,7 @@ export function MinePrototype() {
   const [isBreaking, setIsBreaking] = useState(false);
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
+  const [upgradeNotice, setUpgradeNotice] = useState<string | null>(null);
   const pointerRef = useRef<{
     id: number;
     x: number;
@@ -145,6 +163,7 @@ export function MinePrototype() {
     cancelled: boolean;
   } | null>(null);
   const breakTimerRef = useRef<number | null>(null);
+  const upgradeTimerRef = useRef<number | null>(null);
   const strikeTimersRef = useRef<Set<number>>(new Set());
   const manualStrikeCountRef = useRef(0);
   const lastManualStrikeAtRef = useRef(0);
@@ -164,6 +183,24 @@ export function MinePrototype() {
   );
   const oreMultiplier = specializations.cart === "freight" ? 1.25 : 1;
   const headDepth = mine.depth + progress * METERS_PER_LAYER;
+  const expectedLayerOre = Math.round(
+    (28 + mine.depth * 0.12 + (mine.brokenLayers % 7 === 6 ? 38 : 0)) * oreMultiplier,
+  );
+  const remainingIntegrity = Math.max(0, integrity - mine.damage);
+  const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
+  const remainingPercent = Math.max(0, Math.round((1 - progress) * 100));
+  const recommendedUpgrade = equipmentKinds
+    .map((kind) => ({
+      kind,
+      level: equipment[kind],
+      cost: upgradeCost(kind, equipment[kind]),
+    }))
+    .sort((left, right) => {
+      const leftAffordable = left.cost <= mine.ore;
+      const rightAffordable = right.cost <= mine.ore;
+      if (leftAffordable !== rightAffordable) return leftAffordable ? -1 : 1;
+      return left.cost - right.cost;
+    })[0];
   const cartCount =
     equipment.cart <= 1
       ? 0
@@ -278,6 +315,7 @@ export function MinePrototype() {
   useEffect(
     () => () => {
       if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
+      if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
       for (const timer of strikeTimersRef.current) window.clearTimeout(timer);
       strikeTimersRef.current.clear();
     },
@@ -336,10 +374,16 @@ export function MinePrototype() {
   };
 
   const upgrade = (kind: EquipmentKind) => {
-    const cost = upgradeCost(kind, equipment[kind]);
+    const currentLevel = equipment[kind];
+    const cost = upgradeCost(kind, currentLevel);
     if (mine.ore < cost) return;
     setMine((current) => ({ ...current, ore: current.ore - cost }));
     setEquipment((current) => ({ ...current, [kind]: current[kind] + 1 }));
+    setUpgradeNotice(
+      `${equipmentCopy[kind].name} Lv.${currentLevel + 1} 설치 · ${upgradeEffect(kind, currentLevel)}`,
+    );
+    if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
+    upgradeTimerRef.current = window.setTimeout(() => setUpgradeNotice(null), 1800);
   };
 
   const specialize = (kind: EquipmentKind, option: string) => {
@@ -444,12 +488,13 @@ export function MinePrototype() {
             <span style={{ width: `${progress * 100}%` }} />
           </div>
 
-          <div
-            className={`${styles.shaft} ${isCritical ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
-            style={sceneStyle}
-            role="img"
-            aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착`}
-          >
+          <div className={styles.shaftStage}>
+            <div
+              className={`${styles.shaft} ${isCritical ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+              style={sceneStyle}
+              role="img"
+              aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${expectedLayerOre}`}
+            >
             <div className={styles.rockWorld} aria-hidden="true" />
 
             <img
@@ -574,6 +619,10 @@ export function MinePrototype() {
                     ? `급소 −${tap * 3}`
                     : `−${tap}`}
               </span>
+              <div className={styles.workRewardPromise}>
+                <span>{remainingPercent}% 남음</span>
+                <strong>파쇄 시 ◆{formatNumber(expectedLayerOre)}</strong>
+              </div>
               {lastGain !== null && <span className={styles.continuousOreGain}>+{lastGain} 광석</span>}
             </div>
 
@@ -605,6 +654,48 @@ export function MinePrototype() {
               <i>↓</i>
             </div>
 
+            </div>
+
+            <aside
+              className={styles.quickLoop}
+              aria-label="현재 암반 보상과 추천 강화"
+              data-no-mine
+            >
+              <div className={styles.quickReward}>
+                <span>현재 암반</span>
+                <strong>◆ {formatNumber(expectedLayerOre)}</strong>
+                <small>
+                  {automaticBreakEta === null
+                    ? `${remainingPercent}% 남음`
+                    : `자동 ${formatSeconds(automaticBreakEta)}`}
+                </small>
+              </div>
+              <span className={styles.quickArrow} aria-hidden="true">→</span>
+              <button
+                className={styles.quickUpgrade}
+                type="button"
+                onClick={() => upgrade(recommendedUpgrade.kind)}
+                disabled={mine.ore < recommendedUpgrade.cost}
+                aria-label={`${equipmentCopy[recommendedUpgrade.kind].name} 레벨 ${recommendedUpgrade.level + 1} 바로 강화, 광석 ${recommendedUpgrade.cost}`}
+              >
+                <span>
+                  {mine.ore >= recommendedUpgrade.cost
+                    ? "지금 강화"
+                    : `◆ ${formatNumber(recommendedUpgrade.cost - mine.ore)} 더 필요`}
+                </span>
+                <strong>
+                  {equipmentCopy[recommendedUpgrade.kind].name} Lv.{recommendedUpgrade.level + 1}
+                </strong>
+                <small>
+                  {upgradeEffect(recommendedUpgrade.kind, recommendedUpgrade.level)} · ◆{formatNumber(recommendedUpgrade.cost)}
+                </small>
+              </button>
+              {upgradeNotice !== null && (
+                <p className={styles.upgradeToast} role="status" aria-live="polite">
+                  {upgradeNotice}
+                </p>
+              )}
+            </aside>
           </div>
         </section>
 
@@ -618,16 +709,11 @@ export function MinePrototype() {
           </div>
 
           <div className={styles.equipmentGrid}>
-            {(Object.keys(equipment) as EquipmentKind[]).map((kind) => {
+            {equipmentKinds.map((kind) => {
               const level = equipment[kind];
               const cost = upgradeCost(kind, level);
               const affordable = mine.ore >= cost;
-              const visualValue =
-                kind === "drill"
-                  ? `${formatNumber(tapPower(level))} → ${formatNumber(tapPower(level + 1))}`
-                  : kind === "cart"
-                    ? `${formatNumber(automationPower(level))} → ${formatNumber(automationPower(level + 1))}/초`
-                    : `${Math.round(criticalChance(level) * 100)} → ${Math.round(criticalChance(level + 1) * 100)}%`;
+              const visualValue = upgradeEffect(kind, level);
 
               return (
                 <article className={styles.equipmentCard} key={kind}>

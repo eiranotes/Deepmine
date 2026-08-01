@@ -1153,6 +1153,10 @@
   margin: 0 2px 7px;
 }
 
+.shaftStage {
+  position: relative;
+}
+
 .shaft {
   --workline: 36%;
   --rock-image: url("/assets/shaft/ShaftRock_entry.png");
@@ -1160,8 +1164,8 @@
   --surface-y: 0px;
   --fracture-reveal: 24px;
   position: relative;
-  height: clamp(540px, calc(100svh - 142px), 700px);
-  min-height: 540px;
+  height: clamp(520px, calc(100svh - 176px), 680px);
+  min-height: 520px;
   overflow: hidden;
   background: #11100d;
   cursor: crosshair;
@@ -1531,6 +1535,32 @@
   animation-delay: 220ms;
 }
 
+.workRewardPromise {
+  position: absolute;
+  z-index: 8;
+  top: 49px;
+  left: calc(50% + 62px);
+  display: grid;
+  min-width: 104px;
+  padding: 5px 7px;
+  border-left: 2px solid var(--brass);
+  background: rgb(10 10 9 / 0.72);
+  text-shadow: 1px 1px 0 var(--coal);
+}
+
+.workRewardPromise span {
+  color: var(--limestone-muted);
+  font-size: 0.52rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.workRewardPromise strong {
+  margin-top: 1px;
+  color: var(--brass-bright);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .collapseBand {
   position: absolute;
   z-index: 9;
@@ -1655,6 +1685,123 @@
   animation: descent-arrow 720ms ease-in-out infinite;
 }
 
+.quickLoop {
+  position: absolute;
+  z-index: 25;
+  bottom: 10px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) 26px minmax(0, 1.45fr);
+  align-items: stretch;
+  width: min(540px, calc(100% - 28px));
+  min-height: 62px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(240 189 93 / 0.68);
+  background: rgb(10 10 9 / 0.94);
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.5);
+}
+
+.quickReward {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 7px 10px;
+}
+
+.quickReward span,
+.quickReward small {
+  color: var(--limestone-muted);
+  font-size: 0.56rem;
+}
+
+.quickReward strong {
+  margin-block: 1px;
+  color: var(--brass-bright);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.quickArrow {
+  display: grid;
+  place-items: center;
+  color: var(--brass);
+  font-size: 1rem;
+}
+
+.quickUpgrade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  min-width: 0;
+  min-height: 60px;
+  padding: 7px 10px;
+  border: 0;
+  border-left: 1px solid rgb(10 10 9 / 0.38);
+  border-radius: 0;
+  background: var(--brass);
+  color: var(--coal);
+  text-align: left;
+  cursor: pointer;
+  transition: background 100ms ease, transform 80ms ease;
+}
+
+.quickUpgrade > span {
+  align-self: end;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.quickUpgrade > strong {
+  align-self: end;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.quickUpgrade > small {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 0.55rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quickUpgrade:hover:not(:disabled) {
+  background: var(--brass-bright);
+}
+
+.quickUpgrade:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.quickUpgrade:focus-visible {
+  outline: 3px solid var(--limestone);
+  outline-offset: -4px;
+}
+
+.quickUpgrade:disabled {
+  background: var(--shale);
+  color: var(--limestone-muted);
+  cursor: not-allowed;
+}
+
+.upgradeToast {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 7px);
+  max-width: min(360px, calc(100vw - 36px));
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--brass);
+  background: var(--coal);
+  color: var(--brass-bright);
+  font-size: 0.68rem;
+  font-weight: 850;
+  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.46);
+  animation: upgrade-toast-in 180ms ease-out both;
+}
+
 @keyframes continuous-cart-travel {
   from { transform: translateY(12px); }
   to { transform: translateY(-240px); }
@@ -1705,6 +1852,11 @@
   50% { transform: translateY(4px); opacity: 1; }
 }
 
+@keyframes upgrade-toast-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 640px) {
   .page { padding: 5px 6px 42px; }
   .header { padding-bottom: 6px; }
@@ -1731,7 +1883,20 @@
   .shaftStatus > div:nth-child(-n + 2) { border-bottom: 1px solid rgb(233 227 210 / 0.16); }
   .miningActor { left: calc(50% - 108px); }
   .continuousDrill { left: calc(50% + 33px); }
+  .workRewardPromise {
+    left: calc(50% + 48px);
+    min-width: 92px;
+    padding-inline: 5px;
+  }
   .descentIndicator { right: 7px; }
+  .quickLoop {
+    bottom: 6px;
+    grid-template-columns: minmax(0, 0.8fr) 18px minmax(0, 1.4fr);
+    width: calc(100% - 12px);
+    min-height: 60px;
+  }
+  .quickReward { padding-inline: 7px; }
+  .quickUpgrade { padding-inline: 7px; }
 }
 
 @media (max-width: 390px) {
@@ -1742,6 +1907,14 @@
   .strikeAssist small { font-size: 0.5rem; }
   .shaftHeading h2 { font-size: 1rem; }
   .shaft { --workline: 34%; }
+  .quickLoop {
+    grid-template-columns: minmax(0, 0.76fr) minmax(0, 1.4fr);
+  }
+  .quickArrow { display: none; }
+  .quickReward strong { font-size: 0.78rem; }
+  .quickUpgrade > span,
+  .quickUpgrade > small { font-size: 0.5rem; }
+  .quickUpgrade > strong { font-size: 0.7rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1756,5 +1929,9 @@
   .continuousHitLabel {
     animation-delay: 0ms !important;
     animation-duration: 120ms !important;
+  }
+
+  .upgradeToast {
+    animation: none;
   }
 }
