@@ -18,6 +18,11 @@ final class GamePersistenceTests: XCTestCase {
         let state = PlayerState(
             resources: Resources(ore: 12_345.5, crystals: 17, coreShards: 4),
             equipment: EquipmentLevels(drill: 8, cart: 6, lamp: 5),
+            equipmentModifications: EquipmentModifications(
+                drill: .drillWide,
+                cart: .cartFreight,
+                lamp: .lampReach
+            ),
             runFocusCredits: 31.5,
             lifetimeFocusCredits: 94.25,
             runSegmentsBroken: 88,
@@ -85,7 +90,22 @@ final class GamePersistenceTests: XCTestCase {
                 remainingIntegrity: RockGenerator.segment(at: 412).maximumIntegrity / 3,
                 impact: ImpactMeter(value: 42),
                 lifetimeSegmentsBroken: 1_902,
-                lifetimeSeamsBroken: 74
+                lifetimeSeamsBroken: 74,
+                boreHistory: [
+                    BoreRecord(
+                        segmentIndex: 410,
+                        drillLevel: 7,
+                        cartLevel: 5,
+                        lampLevel: 4
+                    ),
+                    BoreRecord(
+                        segmentIndex: 411,
+                        drillLevel: 8,
+                        cartLevel: 6,
+                        lampLevel: 5,
+                        drillModification: .drillWide
+                    )
+                ]
             ),
             deepestSegmentIndex: 690,
             lastSettledAt: Date(timeIntervalSince1970: 1_750_000_500)
@@ -124,6 +144,8 @@ final class GamePersistenceTests: XCTestCase {
         XCTAssertEqual(entity.returnReminderPermissionRawValue, OnboardingPermissionOutcome.notAsked.rawValue)
         XCTAssertEqual(entity.lastSelectedPlanRawValue, MinePlan.safe.rawValue)
         XCTAssertEqual(entity.lastSelectedDurationRawValue, SessionLength.minutes25.rawValue)
+        XCTAssertTrue(entity.equipmentModificationsData.isEmpty)
+        XCTAssertTrue(entity.mineFaceBoreHistoryData.isEmpty)
     }
 
     func testUnsupportedSchemaVersionFailsClosed() throws {

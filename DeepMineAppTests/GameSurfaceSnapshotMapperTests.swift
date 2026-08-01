@@ -91,7 +91,7 @@ final class GameSurfaceSnapshotMapperTests: XCTestCase {
                 equipment: .drill, currentLevel: 1, nextLevel: 2,
                 cost: 100, availableOre: 500, marginalExpectedOre: 12
             ),
-            nextPromise: ReturnNextPromise(
+            nextGoal: ReturnDepthGoal(
                 currentRegion: .ruins, nextRegion: .abyss, remainingDepthMeters: 300
             )
         )

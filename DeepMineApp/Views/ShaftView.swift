@@ -4,9 +4,8 @@ import SwiftUI
 /// The mine, seen from the side.
 ///
 /// Depth is the number this game is about, so it is drawn as a place instead of a label:
-/// broken shaft above, the face being worked in the middle, unbroken rock fading into the
-/// dark below. Breaking through moves the whole column up by one band, which is the
-/// player descending.
+/// old passage above, the head travelling through one continuous geological body, and
+/// future rock fading into darkness below.
 ///
 /// This view owns the automation tick. It is the only place a timer advances the mine, so
 /// on-screen progress and offline catch-up cannot disagree about how fast the mine runs.
@@ -17,7 +16,7 @@ struct ShaftView: View {
     var onPersist: (PlayerState) -> Void = { _ in }
     /// Fixtures render the shaft for screen tests, where a mine that advances on a timer
     /// would make every capture different. A still shaft is still the real view — the
-    /// same layers, the same geometry — with the clock and the dice held.
+    /// same geology and geometry — with the clock and the dice held.
     var isLive = true
 
     @State private var generator = SeededGenerator(seed: UInt64.random(in: .min ... .max))
@@ -34,8 +33,7 @@ struct ShaftView: View {
     ).autoconnect()
 
     private var power: StrikePower { MiningLoop.power(for: player) }
-    private var layers: [ShaftLayer] { ShaftVision.layers(for: player) }
-    private var face: Int { player.mineFace.segmentIndex }
+    private var scene: ShaftScene { ShaftSceneEngine.scene(for: player) }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -58,30 +56,37 @@ struct ShaftView: View {
     // MARK: Shaft column
 
     private var shaft: some View {
-        ZStack(alignment: .top) {
-            DeepMinePalette.coal.color
-            if face == 0 { surfaceCanopy }
-            ForEach(layers) { layer in
-                row(layer)
-                    .offset(y: ShaftGeometry.offset(of: layer.segment.index, face: face))
+        GeometryReader { proxy in
+            ZStack(alignment: .top) {
+                DeepMinePalette.coal.color
+                ShaftGeologyView(
+                    scene: scene,
+                    player: player,
+                    isStruck: struckWeakPoint,
+                    onStrike: strike(onWeakPoint:)
+                )
+                if player.mineFace.segmentIndex == 0 { surfaceCanopy }
+                depthRuler(width: proxy.size.width)
+                regionPlates(width: proxy.size.width)
+                ShaftEffectsView(
+                    gains: floatingGains,
+                    debris: debrisBursts,
+                    reduceMotion: reduceMotion
+                )
+                .position(
+                    x: proxy.size.width / 2,
+                    y: ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+                )
             }
-            ShaftEffectsView(
-                gains: floatingGains,
-                debris: debrisBursts,
-                reduceMotion: reduceMotion
-            )
-            .offset(y: ShaftGeometry.faceTop)
         }
-        .frame(height: ShaftGeometry.columnHeight(
-            below: ShaftVision.visibleLayersBelow(lampLevel: player.equipment.lamp)
-        ))
+        .frame(height: ShaftGeometry.columnHeight(for: scene))
         .clipShape(RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius))
         .overlay {
             RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
                 .stroke(DeepMinePalette.limestone.color.opacity(0.28))
         }
-        // The column is a scene, not a list: the layers below the lamp are dark on
-        // purpose, so a screen reader gets the one fact the picture is carrying.
+        // Marks are overlays, so the scene remains centred instead of being pushed right
+        // by a ruler column.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mine-shaft")
         .animation(
@@ -90,72 +95,79 @@ struct ShaftView: View {
                 dampingFraction: 1,
                 blendDuration: 0.08
             ),
-            value: face
+            value: player.mineFace.segmentIndex
+        )
+        .animation(
+            reduceMotion ? nil : .easeOut(duration: 0.16),
+            value: player.mineFace.brokenFraction
         )
     }
 
     private var surfaceCanopy: some View {
-        HStack(spacing: 0) {
-            Color.clear.frame(width: 50)
-            GeometryReader { proxy in
-                GameArtView(entry: GameArtCatalog.shaftSurface, fill: proxy.size)
-            }
+        GeometryReader { proxy in
+            GameArtView(entry: GameArtCatalog.shaftSurface, fill: proxy.size)
         }
-        .frame(height: ShaftGeometry.faceTop)
+        .frame(height: 54)
+        .opacity(0.88)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
-    private func row(_ layer: ShaftLayer) -> some View {
-        HStack(spacing: 0) {
-            depthTick(layer)
-            ShaftLayerView(
-                layer: layer,
-                isStruck: struckWeakPoint,
-                brokenFraction: layer.position == .current ? player.mineFace.brokenFraction : 0,
-                onStrike: strike(onWeakPoint:)
-            )
-        }
-        .overlay(alignment: .topTrailing) {
-            if layer.isRegionEntrance, layer.segment.index > 0 {
-                regionPlate(layer)
+    private func depthRuler(width: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(ShaftGeometry.depthMarks(in: scene), id: \.self) { depth in
+                HStack(spacing: 3) {
+                    Rectangle()
+                        .fill(DeepMinePalette.limestone.color.opacity(0.45))
+                        .frame(width: 8, height: 1)
+                    Text("\(depth)m")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.62))
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(DeepMinePalette.coal.color.opacity(0.68), in: Capsule())
+                .position(
+                    x: 30,
+                    y: ShaftGeometry.y(for: Double(depth), in: scene)
+                )
             }
+            Text("\(Int(scene.headDepthMeters.rounded()))m")
+                .font(.caption2.monospacedDigit().weight(.black))
+                .foregroundStyle(DeepMinePalette.coal.color)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(DeepMinePalette.brass.color, in: Capsule())
+                .position(
+                    x: 31,
+                    y: ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+                )
         }
-    }
-
-    /// The ruler down the left edge. Numbers only where they mean something — every band
-    /// labelled would be a wall of digits four metres apart.
-    private func depthTick(_ layer: ShaftLayer) -> some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            // Bands are four metres apart. A 20m cadence stays legible and matches the
-            // visual specification; the current face is always labelled between marks.
-            if layer.position == .current
-                || layer.depthMeters.isMultiple(of: 20) {
-                Text("\(layer.depthMeters)m")
-                    .font(.caption2.monospacedDigit().weight(layer.position == .current ? .bold : .regular))
-                    .foregroundStyle(
-                        layer.position == .current
-                            ? DeepMinePalette.brass.color
-                            : DeepMinePalette.limestone.color.opacity(0.5)
-                    )
-            }
-        }
-        .frame(width: 44, alignment: .trailing)
-        .padding(.trailing, 6)
-        .frame(height: ShaftGeometry.height(of: layer.position), alignment: .top)
-        .padding(.top, 3)
+        .frame(width: width)
+        .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
-    private func regionPlate(_ layer: ShaftLayer) -> some View {
-        Text(DeepMineStrings.text(DeepMineProgressLabels.regionKey(layer.segment.region)))
-            .font(.caption2.weight(.bold))
-            .foregroundStyle(DeepMinePalette.coal.color)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 2)
-            .background(DeepMinePalette.brass.color, in: Capsule())
-            .padding(.trailing, 12)
-            .accessibilityIdentifier("shaft-region-\(layer.segment.region.rawValue)")
+    private func regionPlates(width: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(scene.strata.filter(\.isRegionEntrance)) { stratum in
+                if stratum.startDepthMeters > 0 {
+                    Text(DeepMineStrings.text(DeepMineProgressLabels.regionKey(stratum.region)))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(DeepMinePalette.coal.color)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(DeepMinePalette.brass.color, in: Capsule())
+                        .position(
+                            x: width - 46,
+                            y: ShaftGeometry.y(for: stratum.startDepthMeters, in: scene) + 12
+                        )
+                        .accessibilityIdentifier("shaft-region-\(stratum.region.rawValue)")
+                }
+            }
+        }
+        .frame(width: width)
+        .allowsHitTesting(false)
     }
 
     // MARK: Actions
@@ -242,7 +254,13 @@ struct ShaftView: View {
     }
 
     private func showDebris(isLarge: Bool) {
-        let burst = DebrisBurst(isLarge: isLarge)
+        let tier = EquipmentEngine.visualTier(level: player.equipment.drill)
+        let wideBonus = player.equipmentModifications.drill == .drillWide ? 2 : 0
+        let impactBonus = player.equipmentModifications.drill == .drillImpact ? 1 : 0
+        let burst = DebrisBurst(
+            isLarge: isLarge,
+            density: 3 + tier * 2 + wideBonus + impactBonus
+        )
         debrisBursts.append(burst)
         guard !reduceMotion else {
             Task {

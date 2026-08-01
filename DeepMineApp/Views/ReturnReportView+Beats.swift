@@ -72,7 +72,7 @@ extension ReturnReportView {
         .accessibilityIdentifier(identifier)
     }
 
-    var nextPromise: some View {
+    var nextGoalPanel: some View {
         VStack(alignment: .leading, spacing: 13) {
             DeepMineRivetedPanel {
                 VStack(alignment: .leading, spacing: 12) {
@@ -108,13 +108,13 @@ extension ReturnReportView {
 
     @ViewBuilder
     var nextRegionLine: some View {
-        if let next = presentation.nextPromise.nextRegion {
+        if let next = presentation.nextGoal.nextRegion {
             Label(
-                "\(presentation.nextPromise.remainingDepthMeters)m · \(regionTitle(next))",
+                "\(presentation.nextGoal.remainingDepthMeters)m · \(regionTitle(next))",
                 systemImage: "arrow.down.to.line.compact"
             )
             .font(.subheadline.weight(.semibold))
-            Text(DeepMineStrings.text(.returnRegionPromise))
+            Text(DeepMineStrings.text(.returnRegionProgress))
                 .font(.caption)
                 .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.72))
         } else {

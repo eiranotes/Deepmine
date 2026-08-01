@@ -60,6 +60,41 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
+    func testModificationPurchasePersistsChoiceAndOreDebit() throws {
+        let fixture = makeFixture(player: PlayerState(
+            resources: Resources(ore: 1_000),
+            equipment: EquipmentLevels(drill: Balance.equipmentModificationUnlockLevel)
+        ))
+
+        let result = try fixture.store.purchaseEquipmentModification(
+            .drillImpact,
+            commandID: UUID()
+        )
+
+        XCTAssertEqual(
+            result,
+            .purchased(modification: .drillImpact, cost: Balance.drillModificationCost)
+        )
+        XCTAssertEqual(fixture.repository.player.equipmentModifications.drill, .drillImpact)
+        XCTAssertEqual(
+            fixture.repository.player.resources.ore,
+            1_000 - Balance.drillModificationCost
+        )
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
+    }
+
+    func testRejectedModificationDoesNotSave() throws {
+        let player = PlayerState(resources: Resources(ore: 10_000))
+        let fixture = makeFixture(player: player)
+
+        XCTAssertEqual(
+            try fixture.store.purchaseEquipmentModification(.lampReach),
+            .levelLocked(requiredLevel: Balance.equipmentModificationUnlockLevel)
+        )
+        XCTAssertEqual(fixture.repository.player, player)
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
+    }
+
     func testMineLedgerSummarisesTheWholeRetainedHistory() throws {
         let timeZone = TimeZone(secondsFromGMT: 0)!
         var calendar = Calendar(identifier: .iso8601)

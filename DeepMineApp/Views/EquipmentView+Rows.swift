@@ -257,7 +257,9 @@ extension EquipmentView {
 
     func retry() {
         notice = nil
-        if let pendingPurchase {
+        if let pendingModification {
+            purchaseModification(pendingModification.kind, commandID: pendingModification.commandID)
+        } else if let pendingPurchase {
             purchase(pendingPurchase.equipment, commandID: pendingPurchase.commandID)
         } else {
             refresh()

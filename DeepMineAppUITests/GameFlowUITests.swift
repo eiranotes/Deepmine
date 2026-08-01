@@ -14,13 +14,9 @@ final class GameFlowUITests: XCTestCase {
         let upgrade = app.buttons["onboarding-demo-upgrade"]
         XCTAssertTrue(upgrade.waitForExistence(timeout: 5))
         upgrade.tap()
-        for _ in 0..<3 {
-            let allow = app.buttons["onboarding-permission-allow"]
-            XCTAssertTrue(allow.waitForExistence(timeout: 4))
-            allow.tap()
-        }
         XCTAssertTrue(element("mine-home-screen").waitForExistence(timeout: 5))
 
+        open("mine-home-focus-amplifier")
         open("mine-home-start")
         XCTAssertTrue(element("preflight-selection").waitForExistence(timeout: 3))
         open("preflight-confirm-start")
@@ -57,7 +53,7 @@ final class GameFlowUITests: XCTestCase {
 
     private func open(_ identifier: String) {
         let target = element(identifier)
-        for _ in 0..<5 where !target.exists || !target.isHittable { app.swipeUp() }
+        for _ in 0..<10 where !target.exists || !target.isHittable { app.swipeUp() }
         XCTAssertTrue(target.waitForExistence(timeout: 5), identifier)
         XCTAssertTrue(target.isHittable, identifier)
         target.tap()

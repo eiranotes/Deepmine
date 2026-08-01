@@ -102,6 +102,7 @@ public enum PrestigeEngine {
             preview.gains.coreShards
         )
         state.equipment = EquipmentLevels()
+        state.equipmentModifications = .empty
         state.runFocusCredits = 0
         state.runSegmentsBroken = 0
         // Back to the surface with the tools gone. Keeping the position while resetting

@@ -22,57 +22,43 @@ public enum OnboardingPermissionOutcome: String, Codable, CaseIterable, Sendable
     case deferred
 }
 
-public enum DemoBeginResult: Equatable, Sendable {
-    case started(endsAt: Date)
-    case resumed(endsAt: Date)
-    case alreadyCompleted
-}
-
-public enum DemoCompletionResult: Equatable, Sendable {
-    case tooEarly(remainingSeconds: Int)
-    case rewarded(ore: Double, vein: VeinKind)
+public enum DemoStrikeResult: Equatable, Sendable {
+    case struck(update: MineFaceUpdate)
+    case rewarded(update: MineFaceUpdate, ore: Double, vein: VeinKind)
     case alreadyRewarded
 }
 
 public enum OnboardingEngine {
-    public static func advancePremise(in state: inout PlayerState) {
-        switch state.onboardingStage {
-        case .premiseBlocks: state.onboardingStage = .premiseSessions
-        case .premiseSessions: state.onboardingStage = .demo
-        default: break
-        }
-    }
-
-    public static func beginDemo(at date: Date, in state: inout PlayerState) -> DemoBeginResult {
-        guard state.demoRewardReceiptID == nil else { return .alreadyCompleted }
-        if let startedAt = state.demoStartedAt {
-            return .resumed(endsAt: startedAt.addingTimeInterval(Balance.demoDurationSeconds))
-        }
-        state.demoStartedAt = date
-        state.onboardingStage = .demo
-        return .started(endsAt: date.addingTimeInterval(Balance.demoDurationSeconds))
-    }
-
-    public static func completeDemo(
+    /// The first interaction is the real clicker loop, not a shortened focus session.
+    /// Existing pre-demo stages are accepted so saves from the prior two-page flow land
+    /// on the same breakable rock instead of being stranded in removed screens.
+    public static func strikeDemo<R: RandomNumberGenerator>(
         at date: Date,
         receiptID: UUID,
+        hitWeakPoint: Bool = false,
+        using generator: inout R,
         in state: inout PlayerState
-    ) -> DemoCompletionResult {
+    ) -> DemoStrikeResult {
         guard state.demoRewardReceiptID == nil else { return .alreadyRewarded }
-        guard let startedAt = state.demoStartedAt else {
-            return .tooEarly(remainingSeconds: Int(Balance.demoDurationSeconds))
-        }
-        let remaining = startedAt.addingTimeInterval(Balance.demoDurationSeconds)
-            .timeIntervalSince(date)
-        guard remaining <= 0 else {
-            return .tooEarly(remainingSeconds: Int(ceil(remaining)))
-        }
-        state.resources.ore += Balance.demoOreGrant
+        if state.demoStartedAt == nil { state.demoStartedAt = date }
+        state.onboardingStage = .demo
+
+        let update = MiningLoop.strike(
+            hitWeakPoint: hitWeakPoint,
+            using: &generator,
+            in: &state
+        )
+        guard update.brokeSomething else { return .struck(update: update) }
+
+        // The normal first rock pays four ore. Top the wallet up to one exact drill
+        // upgrade so the tutorial teaches the real break path without changing the
+        // established first-purchase contract.
+        state.resources.ore = max(state.resources.ore, Balance.demoOreGrant)
         state.demoCompletedAt = date
         state.demoRewardReceiptID = receiptID
         state.onboardingStage = .demoReward
-        // The practice return demonstrates the vein reveal, which is the moment the
-        // whole loop is built around. Its crystal is granted so the reward screen has
+        // The first rock demonstrates the vein reveal, which is the moment the whole
+        // loop is built around. Its crystal is granted so the reward screen has
         // something concrete to show.
         _ = WorldProgression.apply(
             vein: Balance.demoGuaranteedVein,
@@ -80,7 +66,11 @@ public enum OnboardingEngine {
             regionIndex: 0,
             to: &state
         )
-        return .rewarded(ore: Balance.demoOreGrant, vein: Balance.demoGuaranteedVein)
+        return .rewarded(
+            update: update,
+            ore: Balance.demoOreGrant,
+            vein: Balance.demoGuaranteedVein
+        )
     }
 
     public static func purchaseRecommendedUpgrade(
@@ -100,7 +90,9 @@ public enum OnboardingEngine {
         )
         if case .purchased = result {
             state.demoUpgradePurchaseID = commandID
-            state.onboardingStage = .permissions
+            // Permissions belong to the optional focus amplifier, not the gate into the
+            // idle clicker. Settings and preflight keep the contextual request paths.
+            state.onboardingStage = .complete
         }
         return result
     }

@@ -78,15 +78,35 @@ extension Balance {
 
     // MARK: Shaft
 
-    /// How much of the shaft the player can see at once. Depth is the number the whole
-    /// game is about, so it is shown as a place rather than a label: broken rock above,
-    /// the face being worked in the middle, unbroken rock fading into the dark below.
-    public static let visibleLayersAbove = 3
-    /// Rock below the face is only visible where the lamp reaches. Buying light is the
-    /// most literal upgrade a mine can sell — the shaft opens up as it gets brighter.
-    public static let baseVisibleLayersBelow = 2.0
-    public static let visibleLayersPerLampLevel = 0.15
-    public static let maximumVisibleLayersBelow = 8.0
+    /// Shaft space is continuous. Four metres is still one economy segment, but it is
+    /// never a rendering band: the head travels through those metres before the next
+    /// segment begins.
+    public static let shaftPointsPerMeter = 9.0
+    public static let shaftVisibleMetersAbove = 24.0
+    /// Rock below the head is visible only where the lamp reaches.
+    public static let baseVisibleMetersBelow = 8.0
+    public static let visibleMetersPerLampLevel = 0.6
+    public static let maximumVisibleMetersBelow = 36.0
+    public static let reachModificationVisibleMeters = 8.0
+
+    /// A bought drill leaves a wider permanent scar. Old records keep their original
+    /// width, which makes progress readable when the player looks up the shaft.
+    public static let boreWidthBasePoints = 70.0
+    public static let boreWidthPerDrillLevel = 1.4
+    public static let boreWidthMaximumPoints = 150.0
+    public static let wideModificationBoreWidthPoints = 20.0
+    public static let maximumBoreHistoryRecords = 64
+
+    // MARK: Equipment modifications
+
+    public static let equipmentModificationUnlockLevel = 5
+    public static let drillModificationCost = 460.0
+    public static let cartModificationCost = 560.0
+    public static let lampModificationCost = 660.0
+    public static let impactModificationDamageMultiplier = 1.35
+    public static let fleetModificationAutomationMultiplier = 1.25
+    public static let freightModificationOreMultiplier = 1.25
+    public static let fortuneModificationCriticalChance = 0.08
 
     // MARK: Offline
 

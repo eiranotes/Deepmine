@@ -2,35 +2,45 @@ import XCTest
 @testable import DeepMineCore
 
 final class OnboardingEngineTests: XCTestCase {
-    func testDemoAwardsExactlyOneDrillUpgradeWithoutNormalProgress() throws {
+    func testBreakingTheFirstRealRockAwardsExactlyOneDrillUpgrade() throws {
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         let rewardID = UUID()
         let purchaseID = UUID()
         var state = PlayerState()
+        var generator = SeededGenerator(seed: 42)
 
-        XCTAssertEqual(
-            OnboardingEngine.beginDemo(at: start, in: &state),
-            .started(endsAt: start.addingTimeInterval(Balance.demoDurationSeconds))
+        let first = OnboardingEngine.strikeDemo(
+            at: start,
+            receiptID: rewardID,
+            using: &generator,
+            in: &state
         )
-        XCTAssertEqual(
-            OnboardingEngine.completeDemo(
-                at: start.addingTimeInterval(Balance.demoDurationSeconds - 1),
+        guard case let .struck(firstUpdate) = first else {
+            return XCTFail("The first tap should damage, not finish, the first rock")
+        }
+        XCTAssertGreaterThan(firstUpdate.damage, .zero)
+        XCTAssertGreaterThan(state.mineFace.brokenFraction, 0)
+        XCTAssertEqual(state.onboardingStage, .demo)
+
+        var completion: DemoStrikeResult = first
+        for _ in 0..<20 {
+            completion = OnboardingEngine.strikeDemo(
+                at: start,
                 receiptID: rewardID,
+                using: &generator,
                 in: &state
-            ),
-            .tooEarly(remainingSeconds: 1)
-        )
-        XCTAssertEqual(
-            OnboardingEngine.completeDemo(
-                at: start.addingTimeInterval(Balance.demoDurationSeconds),
-                receiptID: rewardID,
-                in: &state
-            ),
-            .rewarded(ore: Balance.demoOreGrant, vein: Balance.demoGuaranteedVein)
-        )
+            )
+            if case .rewarded = completion { break }
+        }
+        guard case let .rewarded(update, ore, vein) = completion else {
+            return XCTFail("The first rock did not break within the tutorial tap budget")
+        }
+        XCTAssertTrue(update.brokeSomething)
+        XCTAssertEqual(ore, Balance.demoOreGrant)
+        XCTAssertEqual(vein, Balance.demoGuaranteedVein)
+        XCTAssertEqual(state.mineFace.segmentIndex, 1)
+        XCTAssertEqual(state.depthMeters, Balance.metersPerSegment)
         XCTAssertEqual(state.resources.ore, Balance.drillBasePrice)
-        // The practice vein really pays its crystal, so the reveal is not a claim the
-        // demo fails to honour. It still must not count as focus progress.
         XCTAssertEqual(state.resources.crystals, 1)
         XCTAssertEqual(state.completedSessionCount, 0)
         XCTAssertEqual(state.lifetimeFocusCredits, 0)
@@ -42,7 +52,10 @@ final class OnboardingEngineTests: XCTestCase {
         )
         XCTAssertEqual(state.equipment.drill, 2)
         XCTAssertEqual(state.resources.ore, 0)
-        XCTAssertEqual(state.onboardingStage, .permissions)
+        XCTAssertEqual(state.onboardingStage, .complete)
+        XCTAssertEqual(state.focusProtectionPermission, .notAsked)
+        XCTAssertEqual(state.endAlertPermission, .notAsked)
+        XCTAssertEqual(state.returnReminderPermission, .notAsked)
     }
 
     func testDemoAndUpgradeAreIdempotent() {
@@ -50,16 +63,25 @@ final class OnboardingEngineTests: XCTestCase {
         let rewardID = UUID()
         let purchaseID = UUID()
         var state = PlayerState()
-        _ = OnboardingEngine.beginDemo(at: start, in: &state)
-        _ = OnboardingEngine.completeDemo(
-            at: start.addingTimeInterval(Balance.demoDurationSeconds),
-            receiptID: rewardID,
-            in: &state
-        )
+        var generator = SeededGenerator(seed: 7)
+        for _ in 0..<20 {
+            let result = OnboardingEngine.strikeDemo(
+                at: start,
+                receiptID: rewardID,
+                using: &generator,
+                in: &state
+            )
+            if case .rewarded = result { break }
+        }
         _ = OnboardingEngine.purchaseRecommendedUpgrade(commandID: purchaseID, in: &state)
 
         XCTAssertEqual(
-            OnboardingEngine.completeDemo(at: start.addingTimeInterval(180), receiptID: UUID(), in: &state),
+            OnboardingEngine.strikeDemo(
+                at: start.addingTimeInterval(180),
+                receiptID: UUID(),
+                using: &generator,
+                in: &state
+            ),
             .alreadyRewarded
         )
         XCTAssertEqual(
@@ -67,6 +89,22 @@ final class OnboardingEngineTests: XCTestCase {
             .duplicate
         )
         XCTAssertEqual(state.equipment.drill, 2)
+    }
+
+    func testLegacyPremiseStageCanEnterTheInteractiveRock() {
+        var state = PlayerState(onboardingStage: .premiseSessions)
+        var generator = SeededGenerator(seed: 3)
+
+        _ = OnboardingEngine.strikeDemo(
+            at: Date(timeIntervalSince1970: 1_800_000_000),
+            receiptID: UUID(),
+            using: &generator,
+            in: &state
+        )
+
+        XCTAssertEqual(state.onboardingStage, .demo)
+        XCTAssertNotNil(state.demoStartedAt)
+        XCTAssertGreaterThan(state.mineFace.brokenFraction, 0)
     }
 
     func testSelectionsPersistOnlyUnlockedPlan() {

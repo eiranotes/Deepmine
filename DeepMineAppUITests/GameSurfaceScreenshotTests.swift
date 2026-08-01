@@ -11,20 +11,16 @@ final class GameSurfaceScreenshotTests: XCTestCase {
 
     func testCaptureCoreLoopScreens() {
         launch("fresh")
-        captureScreen(after: "onboarding-premise-blocks", named: "01-onboarding")
-        app.buttons["onboarding-next"].tap()
-        captureScreen(
-            after: "onboarding-premise-sessions",
-            named: "01b-onboarding-sessions"
-        )
+        captureScreen(after: "onboarding-demo-active", named: "01-onboarding-first-rock")
 
         launch("progress-populated")
         captureScreen(after: "mine-home-screen", named: "02-mine-home")
 
         launch("preflight-survey")
+        open("mine-home-focus-amplifier")
         let start = app.buttons["mine-home-start"]
         XCTAssertTrue(start.waitForExistence(timeout: 15))
-        for _ in 0..<5 where !start.isHittable { app.swipeUp() }
+        for _ in 0..<10 where !start.isHittable { app.swipeUp() }
         XCTAssertTrue(start.isHittable, "mine-home-start")
         start.tap()
         captureScreen(after: "preflight-selection", named: "03-preflight")
@@ -105,7 +101,7 @@ final class GameSurfaceScreenshotTests: XCTestCase {
 
     private func open(_ identifier: String) {
         let target = element(identifier)
-        for _ in 0..<5 where !target.exists || !target.isHittable { app.swipeUp() }
+        for _ in 0..<10 where !target.exists || !target.isHittable { app.swipeUp() }
         XCTAssertTrue(target.waitForExistence(timeout: 15), identifier)
         target.tap()
     }

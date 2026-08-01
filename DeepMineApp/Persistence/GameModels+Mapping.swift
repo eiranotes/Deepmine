@@ -38,6 +38,10 @@ extension PlayerStateEntity {
         mineFaceImpact = state.mineFace.impact.value
         mineFaceLifetimeSegmentsBroken = state.mineFace.lifetimeSegmentsBroken
         mineFaceLifetimeSeamsBroken = state.mineFace.lifetimeSeamsBroken
+        equipmentModificationsData =
+            (try? JSONEncoder().encode(state.equipmentModifications)) ?? Data()
+        mineFaceBoreHistoryData =
+            (try? JSONEncoder().encode(state.mineFace.boreHistory)) ?? Data()
         deepestSegmentIndex = state.deepestSegmentIndex
         runSegmentsBroken = state.runSegmentsBroken
         lastSettledAt = state.lastSettledAt
@@ -54,8 +58,22 @@ extension PlayerStateEntity {
                 : try? JSONDecoder().decode(BigNumber.self, from: mineFaceRemainingIntegrityData),
             impact: ImpactMeter(value: mineFaceImpact),
             lifetimeSegmentsBroken: mineFaceLifetimeSegmentsBroken,
-            lifetimeSeamsBroken: mineFaceLifetimeSeamsBroken
+            lifetimeSeamsBroken: mineFaceLifetimeSeamsBroken,
+            boreHistory: mineFaceBoreHistoryData.isEmpty
+                ? []
+                : (try? JSONDecoder().decode(
+                    [BoreRecord].self,
+                    from: mineFaceBoreHistoryData
+                )) ?? []
         )
+    }
+
+    func storedEquipmentModifications() -> EquipmentModifications {
+        guard !equipmentModificationsData.isEmpty else { return .empty }
+        return (try? JSONDecoder().decode(
+            EquipmentModifications.self,
+            from: equipmentModificationsData
+        )) ?? .empty
     }
 
     func latestDayKey() throws -> DayKey? {

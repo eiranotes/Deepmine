@@ -202,8 +202,10 @@ struct DeepMineApp: App {
         switch name {
         case "demo-active":
             return PlayerState(onboardingStage: .demo, demoStartedAt: Date())
-        case "demo-completed", "permissions":
+        case "demo-completed":
             return GameFixtures.onboardingDemoCompleted.player
+        case "permissions":
+            return GameFixtures.onboardingLegacyPermissionsPlayer
         case "home-fresh":
             return GameFixtures.returningPlayer()
         case "home-progressed":

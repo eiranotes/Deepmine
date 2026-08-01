@@ -9,8 +9,8 @@ struct MineHomeView: View {
     /// player is actually doing.
     var mineFace: AnyView?
     let recommendation: UpgradeRecommendation?
-    /// Expected ore for the currently selected plan, used only to turn an ore shortfall
-    /// into an estimated number of expeditions. Nil when it cannot be computed.
+    /// Kept for return-report compatibility. Focus is an optional amplifier here, not
+    /// the mine's progression source.
     let projectedOrePerSession: Double?
     let onSelectPlan: (MinePlan) -> Void
     let onSelectDuration: (SessionLength) -> Void
@@ -18,6 +18,7 @@ struct MineHomeView: View {
     let onUpgrade: (EquipmentKind) -> Void
     let onOpenSettings: () -> Void
     let progressContext: ProgressNavigationContext
+    @State private var isFocusExpanded = false
 
     var body: some View {
         ScrollView {
@@ -32,12 +33,6 @@ struct MineHomeView: View {
                         .accessibilityIdentifier("mine-home-rock")
                 }
                 equipmentSummary
-                DeepMineRivetedPanel {
-                    VStack(spacing: 15) {
-                        nextPromise
-                        mineScene
-                    }
-                }
                 ProgressNavigationPanel(context: progressContext)
                 focusAmplifier
             }
@@ -57,7 +52,6 @@ struct MineHomeView: View {
                 Text(DeepMineStrings.text(.homeMineScene))
                     .font(.title2.weight(.heavy))
                     .accessibilityIdentifier("mine-home")
-                streakLine
             }
             Spacer()
             Label(
@@ -84,26 +78,37 @@ struct MineHomeView: View {
     /// player opens it, so a mine that never focuses never has to look at a timer.
     private var focusAmplifier: some View {
         DeepMineRivetedPanel {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 10) {
-                    Image(systemName: "target")
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(DeepMineStrings.text(.homeFocusAmplifierTitle))
-                            .font(.subheadline.weight(.bold))
-                        Text(DeepMineStrings.text(.homeFocusAmplifierDetail))
-                            .font(.caption2)
-                            .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
-                            .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 0) {
+                Button { isFocusExpanded.toggle() } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "target")
+                            .foregroundStyle(DeepMinePalette.brass.color)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(DeepMineStrings.text(.homeFocusAmplifierTitle))
+                                .font(.subheadline.weight(.bold))
+                            Text(DeepMineStrings.text(.homeFocusAmplifierDetail))
+                                .font(.caption2)
+                                .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 4)
+                        Image(systemName: "chevron.right")
+                            .rotationEffect(.degrees(isFocusExpanded ? 90 : 0))
                     }
-                    Spacer(minLength: 0)
+                    .contentShape(Rectangle())
                 }
-                .accessibilityElement(children: .combine)
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("mine-home-focus-amplifier")
-                todayProgress
-                planSelector
-                durationSelector
-                startButton
+                .accessibilityAddTraits(isFocusExpanded ? .isSelected : [])
+                if isFocusExpanded {
+                    VStack(alignment: .leading, spacing: 14) {
+                        todayProgress
+                        planSelector
+                        durationSelector
+                        startButton
+                    }
+                    .padding(.top, 12)
+                }
             }
         }
     }

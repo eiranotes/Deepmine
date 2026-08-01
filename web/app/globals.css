@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --coal: #0a0a09;
+  --coal-raised: #11110f;
+  --shale: #34332d;
+  --shale-light: #45443b;
+  --limestone: #e9e3d2;
+  --limestone-muted: #aaa597;
+  --brass: #d29331;
+  --brass-bright: #f0bd5d;
+  --danger: #c87445;
+  --line: rgb(233 227 210 / 0.22);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--coal);
+}
+
+body {
+  min-height: 100svh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -10%, rgb(210 147 49 / 0.08), transparent 34rem),
+    var(--coal);
+  color: var(--limestone);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+summary {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--brass);
+  color: var(--coal);
+}

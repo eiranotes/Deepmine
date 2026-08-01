@@ -1,6 +1,56 @@
 # Build Report
 
-업데이트: 2026-07-31 (갱도 에셋·진행 계약 마감)
+업데이트: 2026-08-01 (클리커 우선 첫 실행)
+
+## 2026-08-01 clicker-first onboarding
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 첫 행동 | 구현·검증됨(코어) | 설명/대기 대신 실제 `MiningLoop.strike`. `OnboardingEngineTests` 4/4 |
+| 보상·강화 | 구현·검증됨(코어·저장) | 첫 4m 파괴 뒤 광석 100·수정 1개, 드릴 2레벨 구매 뒤 홈. `GameStoreOnboardingTests` 2/2 |
+| 권한 없는 진입 | 구현됨 | 강화 직후 `.complete`; FamilyControls·AlarmKit·알림은 온보딩에서 호출하지 않음 |
+| 옛 저장 복구 | 검증됨(코어·UI 일부) | 옛 설명 단계는 첫 암반으로, 옛 권한 단계는 3회 유예 뒤 홈으로 이동. 레거시 UI 경로 통과 |
+| 접근성 | 검증됨(시뮬레이터) | 갱도 장식 레이어를 숨기고 홈 암반을 단일 기본 액션 버튼으로 노출. 신규/진행 홈 focused XCUITest 1/1 |
+| 시각 증거 | 검증됨(시뮬레이터) | 한국어·다크·medium 상단 정렬 화면을 육안 확인. `artifacts/ui/onboarding-clicker-first/first-rock.png` |
+| Core 전체 | 검증됨 | `swift test --package-path DeepMineCore` 195/195, 실패 0 |
+| generic simulator build | 검증됨 | `xcodebuild ... -destination 'generic/platform=iOS Simulator' build` 성공 |
+| focused UI | 검증됨 | 신규/진행 홈 단일 갱도·집중 패널 1/1, 코어 루프 5화면 캡처 1/1. 전체 UI 스위트로 확대하지 않음 |
+| 범위 밖 회귀 | 기록 | 온보딩+디자인 계약 묶음 실행 8통과/1실패. 현재 dirty 장비 티어 계약이 tier2 대신 tier3을 반환; 이번 작업에서는 수정하지 않음 |
+
+### UI 판단
+
+- 첫 캡처에서 콘텐츠가 화면 중앙에 걸려 상단이 과도하게 비어 있었다. `minHeight` 컨테이너를
+  상단 정렬해 제목→진척도→암반→방치 안내가 첫 뷰포트에서 바로 이어지게 했다.
+- 갱도 아트는 새 자산을 더 만들지 않고 D-048의 생성 지표·벽면·구조물을 재사용했다. 암반
+  크기와 질감 밀도가 충분해 별도 온보딩 삽화보다 실제 게임 장면이 더 정직했다.
+- 물리 탭 감각, VoiceOver 실제 초점, 햅틱과 고대비는 실기기 릴리스 게이트다.
+
+## 2026-08-01 continuous shaft and visible equipment
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 연속 하강 모델 | 검증됨(단위) | `ShaftSceneEngine`이 `faceDepth + brokenFraction × 4m`로 헤드 심도를 산출. 지층은 지역 경계에서만 분할하고 보어 이력을 별도 보존 |
+| 장비 분기 6종 | 검증됨(단위) | 레벨 5 잠금, 비용 460/560/660, 장비별 상호 배타, 명령 멱등, 프레스티지 리셋, 수치 효과 테스트 |
+| 장비 시각 계약 | 검증됨(코드·웹) | 드릴=보어 폭/도구/스윙/파편, 광차=레일/대수/속도/적재량, 램프=설비/조사 거리/약점 광택 |
+| 지표 작업선 | 검증됨(시뮬레이터) | 첫 UI 영상에서 찾은 0m 헤드 잘림을 surface inset으로 수정. 한국어·다크·medium 캡처에서 광부·드릴·램프와 가운데 축 확인 |
+| 저장 | 검증됨(focused unit) | `equipmentModificationsData`, `mineFaceBoreHistoryData` 왕복과 옛 빈 Data의 안전 기본값을 focused App unit 14/14로 확인 |
+| 웹 정적 검사 | 검증됨 | `npm run lint`, `npm test` 3/3, `npm run build` 통과 |
+| 웹 실제 좌표 | 검증됨(로컬 브라우저) | 한 일반 타격의 진행률 13%에서 굴착 헤드가 약 15.4px 내려갔고 한 세그먼트 전체 이동량은 약 120px. 깊이 표기도 소수 1자리로 함께 증가 |
+| 웹 비공개 배포 | 배포됨 | version 2, commit `ca4296fdcda98a5543f60abdd41e8d5def845b70`, `https://deepmine-shaft-prototype.eiraworks-9813.chatgpt.site` |
+| Core 전체 | 검증됨 | `swift test --package-path DeepMineCore` **195/195**, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild ... -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build` 성공 |
+| App focused unit | 검증됨 | `GamePersistenceTests` + `GameStoreProgressionTests` **14/14**, 실패·skip 0 |
+| App 전체 unit | **미검증** | 제품 assertion 실패는 없었지만 `Mach error -308`, runner 연결 전 exit, 고아 UI 빌드 간섭, result-record finalize 대기로 네 차례 유효한 전체 결과를 만들지 못함 |
+| UI focused | 검증됨 | `OnboardingHomeUITests/testFreshAndProgressedHomeUseOneMineControlScene` 1/1, `GameSurfaceScreenshotTests/testCaptureCoreLoopScreens` 1/1. 한국어·다크·medium 캡처 5장 육안 확인 |
+| UI 전체 | **미검증** | 위 focused 2건을 전체 `DeepMineAppUITests` 통과로 확대하지 않음 |
+| 실기기 체감 | 미검증(실기기 필요) | 실제 OLED 대비, 연속 탭/햅틱, 광차 왕복의 멀미·과밀, Reduce Motion·VoiceOver |
+
+### 구사양 판정
+
+- 집중 출정·앱 차단·AlarmKit·Live Activity는 D-037의 선택적 증폭기 전용 기능이라 유지한다.
+- 계획·시간·오늘 집중·연속 일수는 접힌 집중 패널과 집중 귀환 화면에만 격리한다.
+- 기본 홈의 다음 약속·다음 세 걸음·중복 광산 장면은 제거했다.
+- 귀환의 `nextPromise` 타입과 카피는 다음 지역까지의 `nextGoal`/“다음 굴착 목표”로 교체했다.
 
 ## 2026-07-31 clicker audit and shaft visual payoff
 
@@ -8,7 +58,7 @@
 |---|---|---|
 | 클리커 코어 루프 | 검증됨 | 탭→4단계 파괴→광석→장비→8시간 오프라인→프레스티지가 Core·SwiftData·홈에 연결. `swift test --package-path DeepMineCore` 188/188 |
 | 권한 없는 완결성 | 검증됨(코드·30일 시뮬레이션) | 심도·장비 해금·프레스티지 자격은 암반 파괴를 읽고 집중은 선택 배율. 30일 heavy/light 광석 3.462배 |
-| 피벗 잔여 흔적 | 미구현 | 온보딩 첫 화면은 차단 설명/대기 데모, 다음 걸음·스트릭은 세션 단위, 공명 결절·지역 전환·8-bit SFX는 아직 없음 |
+| 피벗 잔여 흔적 | 부분 해소 | 온보딩 차단 설명/대기 데모는 D-052로 제거. 공명 결절·지역 전환·8-bit SFX는 아직 없음 |
 | 장기 수치 모델 | 위험 기록 | 데미지/암반은 `BigNumber`지만 `Resources.ore`는 `Double`. `RockEngine` 512층 절단 시 남은 데미지를 호출부가 재정산하지 않음. 180일 모델의 장기 위험 |
 | 생성 갱도 아트 | 검증됨(정적) | 내장 ImageGen 7종. `scripts/process_shaft_assets.py --validate-only`가 7 imageset/21 PNG의 해시·1x/2x/3x·네 안료·역할별 알파를 검증 |
 | 갱도 아트 소비 경로 | 검증됨(단위·빌드·화면) | 지역 벽면 4, 지표 1, 구조·광맥 2를 배경/구조/상태로 분리. `GameArtCatalogTests`와 generic build, 홈 캡처 통과 |
@@ -79,7 +129,7 @@ xcodebuild -project DeepMine.xcodeproj -scheme DeepMineApp \
 | `DeepMineAppTests` (단위) | 검증됨 | 131/131. 갱신된 저장 왕복 테스트가 새 클리커 필드를 실제 값으로 비교한다 |
 | `DeepMineAppUITests` (UI) | **미검증** | 아래 참조. 사용자 지시로 중단했다 |
 | 갱도 화면의 실제 조작 감각 | 미검증(실기기 필요) | 탭 반응성, 층 전환 애니메이션의 체감, 햅틱은 시뮬레이터로 판정 불가 |
-| 온보딩 클리커 재작성 | 미구현 | 차단 설명 2장과 대기 데모가 아직 첫 화면이다. `docs/TASKS.md` P3에 남겼다 |
+| 온보딩 클리커 재작성 | 이후 완료 | D-052와 이 문서의 2026-08-01 clicker-first onboarding 절이 이 중간 상태를 대체한다 |
 | 다음 걸음·스트릭의 층 단위 표기 | 미구현 | 여전히 "남은 출정 N회"와 세션 기반 스트릭이다 |
 
 ### 당시 UI 스위트를 미검증으로 남긴 이유

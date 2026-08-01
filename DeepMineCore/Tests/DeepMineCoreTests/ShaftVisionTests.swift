@@ -2,72 +2,85 @@ import XCTest
 @testable import DeepMineCore
 
 final class ShaftVisionTests: XCTestCase {
-    func testColumnHasExactlyOneFaceAndOrdersDeepestLast() {
-        var state = PlayerState(mineFace: MineFaceState(segmentIndex: 40))
-        state.equipment.lamp = 1
+    func testHeadMovesContinuouslyThroughCurrentSegment() {
+        let face = MineFaceState(
+            segmentIndex: 40,
+            remainingIntegrity: RockGenerator.segment(at: 40).maximumIntegrity * 0.25
+        )
+        let scene = ShaftSceneEngine.scene(for: PlayerState(mineFace: face))
 
-        let layers = ShaftVision.layers(for: state)
-
-        XCTAssertEqual(layers.filter { $0.position == .current }.count, 1)
-        XCTAssertEqual(layers.first { $0.position == .current }?.segment.index, 40)
-        XCTAssertEqual(layers.map(\.segment.index), layers.map(\.segment.index).sorted())
-        XCTAssertTrue(layers.filter { $0.segment.index < 40 }.allSatisfy { $0.position == .broken })
-        XCTAssertTrue(layers.filter { $0.segment.index > 40 }.allSatisfy { $0.position == .untouched })
+        XCTAssertEqual(scene.faceDepthMeters, 160)
+        XCTAssertEqual(scene.headDepthMeters, 163, accuracy: 0.001)
+        XCTAssertEqual(
+            scene.y(forDepthMeters: scene.headDepthMeters)
+                - scene.y(forDepthMeters: scene.faceDepthMeters),
+            3 * Balance.shaftPointsPerMeter,
+            accuracy: 0.001
+        )
     }
 
-    func testTheSurfaceDoesNotShowRockAboveItself() {
-        let state = PlayerState(mineFace: MineFaceState(segmentIndex: 0))
-        let layers = ShaftVision.layers(for: state)
+    func testSurfaceViewportNeverStartsAboveGround() {
+        let scene = ShaftSceneEngine.scene(for: PlayerState())
 
-        XCTAssertEqual(layers.first?.segment.index, 0)
-        XCTAssertTrue(layers.allSatisfy { $0.segment.index >= 0 })
-        XCTAssertEqual(layers.first?.position, .current)
+        XCTAssertEqual(scene.topDepthMeters, 0)
+        XCTAssertGreaterThan(scene.bottomDepthMeters, scene.headDepthMeters)
     }
 
-    func testTheLampWidensTheViewAndStopsAtItsCeiling() {
-        let dim = ShaftVision.visibleLayersBelow(lampLevel: Balance.minimumEquipmentLevel)
-        let bright = ShaftVision.visibleLayersBelow(lampLevel: 30)
-        let blinding = ShaftVision.visibleLayersBelow(lampLevel: Balance.maximumEquipmentLevel)
+    func testLampAndReachModificationOpenTheFutureRock() {
+        let dim = ShaftSceneEngine.visibleMetersBelow(lampLevel: 1)
+        let bright = ShaftSceneEngine.visibleMetersBelow(lampLevel: 30)
+        let reach = ShaftSceneEngine.visibleMetersBelow(
+            lampLevel: 1,
+            modifications: EquipmentModifications(lamp: .lampReach)
+        )
 
         XCTAssertGreaterThan(bright, dim)
-        XCTAssertGreaterThan(blinding, bright)
-        XCTAssertEqual(blinding, Int(Balance.maximumVisibleLayersBelow))
-
-        var state = PlayerState(mineFace: MineFaceState(segmentIndex: 100))
-        state.equipment.lamp = 1
-        let narrow = ShaftVision.layers(for: state).count
-        state.equipment.lamp = 30
-        XCTAssertGreaterThan(ShaftVision.layers(for: state).count, narrow)
-    }
-
-    func testLightingFallsOffBelowTheFaceAndIsFullAboveIt() {
-        var state = PlayerState(mineFace: MineFaceState(segmentIndex: 50))
-        state.equipment.lamp = 20
-        let layers = ShaftVision.layers(for: state)
-
-        let above = layers.filter { $0.segment.index <= 50 }
-        XCTAssertTrue(above.allSatisfy { $0.lighting == 1 })
-
-        let below = layers.filter { $0.segment.index > 50 }
-        XCTAssertEqual(below.map(\.lighting), below.map(\.lighting).sorted(by: >))
-        XCTAssertTrue(below.allSatisfy { $0.lighting >= 0 && $0.lighting <= 1 })
-    }
-
-    func testRegionEntranceMarksOnlyTheFirstLayerOfARegion() {
-        let firstCrystal = ProgressionEngine.segmentIndex(forDepth: Balance.crystalRegionDepth)
-        var state = PlayerState(mineFace: MineFaceState(segmentIndex: firstCrystal))
-        state.equipment.lamp = 1
-        let layers = ShaftVision.layers(for: state)
-
-        let entrances = layers.filter(\.isRegionEntrance).map(\.segment.index)
-        XCTAssertEqual(entrances, [firstCrystal])
+        XCTAssertGreaterThan(reach, dim)
         XCTAssertEqual(
-            layers.first { $0.segment.index == firstCrystal }?.segment.region,
-            .crystal
+            ShaftSceneEngine.visibleMetersBelow(lampLevel: Balance.maximumEquipmentLevel),
+            Balance.maximumVisibleMetersBelow
         )
-        XCTAssertEqual(
-            layers.first { $0.segment.index == firstCrystal - 1 }?.segment.region,
-            .entry
+    }
+
+    func testStrataSplitAtRegionBoundaryNotEverySegment() {
+        let firstCrystal = ProgressionEngine.segmentIndex(forDepth: Balance.crystalRegionDepth)
+        let scene = ShaftSceneEngine.scene(for: PlayerState(
+            mineFace: MineFaceState(segmentIndex: firstCrystal)
+        ))
+
+        XCTAssertEqual(scene.strata.map(\.region), [.entry, .crystal])
+        XCTAssertEqual(scene.strata.last?.startDepthMeters, Double(Balance.crystalRegionDepth))
+        XCTAssertTrue(scene.strata.last?.isRegionEntrance == true)
+    }
+
+    func testBoreHistoryPreservesTheWidthUsedWhenRockBroke() {
+        let narrow = BoreRecord(segmentIndex: 10, drillLevel: 1, cartLevel: 1, lampLevel: 1)
+        let wide = BoreRecord(
+            segmentIndex: 11,
+            drillLevel: 8,
+            cartLevel: 3,
+            lampLevel: 4,
+            drillModification: .drillWide
+        )
+        let state = PlayerState(mineFace: MineFaceState(
+            segmentIndex: 12,
+            boreHistory: [narrow, wide]
+        ))
+        let records = ShaftSceneEngine.scene(for: state).boreHistory
+
+        XCTAssertEqual(records.map(\.segmentIndex), [10, 11])
+        XCTAssertGreaterThan(records[1].boreWidthPoints, records[0].boreWidthPoints)
+    }
+
+    func testLightingFallsOffBelowTheHead() {
+        let scene = ShaftSceneEngine.scene(for: PlayerState(
+            mineFace: MineFaceState(segmentIndex: 50)
+        ))
+
+        XCTAssertEqual(scene.lighting(atDepthMeters: scene.headDepthMeters), 1)
+        XCTAssertGreaterThan(
+            scene.lighting(atDepthMeters: scene.headDepthMeters + 1),
+            scene.lighting(atDepthMeters: scene.bottomDepthMeters)
         )
     }
 }

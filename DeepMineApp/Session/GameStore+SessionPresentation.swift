@@ -29,7 +29,7 @@ struct ReturnUpgradeRecommendation: Equatable, Hashable, Sendable {
     var isAffordable: Bool { availableOre >= cost }
 }
 
-struct ReturnNextPromise: Equatable, Sendable {
+struct ReturnDepthGoal: Equatable, Sendable {
     let currentRegion: MineRegion
     let nextRegion: MineRegion?
     let remainingDepthMeters: Int
@@ -40,7 +40,7 @@ struct ReturnReportPresentation: Equatable, Sendable {
     let length: SessionLength
     let plan: MinePlan
     let recommendation: ReturnUpgradeRecommendation?
-    let nextPromise: ReturnNextPromise
+    let nextGoal: ReturnDepthGoal
 }
 
 enum ReturnPresentationLoadState: Equatable, Sendable {
@@ -72,7 +72,7 @@ extension GameStore {
             length: length,
             plan: plan,
             recommendation: try returnRecommendation(player: player),
-            nextPromise: nextPromise(depth: report.depthMeters)
+            nextGoal: nextDepthGoal(depth: report.depthMeters)
         )
     }
 
@@ -253,7 +253,7 @@ extension GameStore {
         return best
     }
 
-    private func nextPromise(depth: Int) -> ReturnNextPromise {
+    private func nextDepthGoal(depth: Int) -> ReturnDepthGoal {
         let current = WorldProgression.region(forDepth: depth)
         let target: (MineRegion, Int)? = switch current {
         case .entry: (.crystal, Balance.crystalRegionDepth)
@@ -261,7 +261,7 @@ extension GameStore {
         case .ruins: (.abyss, Balance.abyssRegionDepth)
         case .abyss: nil
         }
-        return ReturnNextPromise(
+        return ReturnDepthGoal(
             currentRegion: current,
             nextRegion: target?.0,
             remainingDepthMeters: max(0, (target?.1 ?? depth) - depth)

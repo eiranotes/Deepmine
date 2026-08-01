@@ -662,13 +662,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Install drill upgrade"
+            "value": "Upgrade and enter the mine"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "드릴 강화 장착"
+            "value": "강화하고 광산 열기"
           }
         }
       }
@@ -1082,52 +1082,52 @@
       }
     },
     "equipment.effect.cart": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Carries more from 25 and 50 minute expeditions."
+            "value": "Runs carts through the shaft and raises automatic drilling damage."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "25분·50분 출정에서 더 많은 광석을 운반합니다."
+            "value": "갱도에 광차를 운행하고 자동 굴착 피해를 높입니다."
           }
         }
       }
     },
     "equipment.effect.drill": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Raises ore output on every completed return."
+            "value": "Raises tap damage and leaves a wider passage in the shaft."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "완료한 모든 귀환의 광석 생산량을 높입니다."
+            "value": "탭 피해를 높이고 갱도에 더 넓은 통로를 남깁니다."
           }
         }
       }
     },
     "equipment.effect.lamp": {
-      "extractionState": "stale",
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Improves the chance of finding a hidden vein."
+            "value": "Reveals deeper geology and raises critical chance."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "숨은 광맥을 발견할 확률을 높입니다."
+            "value": "더 아래 지층을 비추고 치명타 확률을 높입니다."
           }
         }
       }
@@ -1181,6 +1181,118 @@
             "value": "최대 레벨"
           }
         }
+      }
+    },
+    "equipment.modification.cart.fleet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Twin Rail" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "쌍선 레일" } }
+      }
+    },
+    "equipment.modification.cart.fleet.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Automation damage ×1.25 and another visible cart." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "자동 굴착 ×1.25, 갱도에 광차가 한 대 더 보입니다." } }
+      }
+    },
+    "equipment.modification.cart.freight": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Large Hopper" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "대형 호퍼" } }
+      }
+    },
+    "equipment.modification.cart.freight.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Each opened stratum yields ×1.25 ore." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "뚫은 지층마다 얻는 광석이 ×1.25가 됩니다." } }
+      }
+    },
+    "equipment.modification.drill.impact": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Impact Bit" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "충격 비트" } }
+      }
+    },
+    "equipment.modification.drill.impact.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Keep a narrow bore and raise tap damage ×1.35." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "좁은 통로를 유지하고 탭 위력을 ×1.35 높입니다." } }
+      }
+    },
+    "equipment.modification.drill.wide": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Wide Bit" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "확폭 비트" } }
+      }
+    },
+    "equipment.modification.drill.wide.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Cut a visibly wider passage and larger debris field." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "눈에 보이는 통로 폭과 파편 범위를 넓힙니다." } }
+      }
+    },
+    "equipment.modification.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Choose one branch per tool for this descent. Prestige resets the choice." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "이번 하강에서 장비마다 한 갈래를 고릅니다. 프레스티지하면 다시 선택할 수 있습니다." } }
+      }
+    },
+    "equipment.modification.lamp.fortune": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Vein Lens" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "광맥 렌즈" } }
+      }
+    },
+    "equipment.modification.lamp.fortune.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Critical chance +8 percentage points." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "치명타 확률이 8%p 증가합니다." } }
+      }
+    },
+    "equipment.modification.lamp.reach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Long Reflector" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "장거리 반사경" } }
+      }
+    },
+    "equipment.modification.lamp.reach.effect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Reveal 8m more of the uncut geology below." } },
+        "ko": { "stringUnit": { "state": "translated", "value": "아래 미개척 지층을 8m 더 비춥니다." } }
+      }
+    },
+    "equipment.modification.locked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Opens at Lv.%lld" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "Lv.%lld에서 개방" } }
+      }
+    },
+    "equipment.modification.selected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Installed" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "장착됨" } }
+      }
+    },
+    "equipment.modification.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Tool Branches" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "장비 분기" } }
       }
     },
     "equipment.preview": {
@@ -1655,23 +1767,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "분"
-          }
-        }
-      }
-    },
-    "game.nextPromise": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next promise"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다음 약속"
           }
         }
       }
@@ -2997,13 +3092,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose what stays outside. The mine door helps keep one small promise until you return."
+            "value": "Tap the working face, crack the rock, and open the first four metres yourself."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "밖에 둘 방해를 고르세요. 갱도 문이 귀환까지 하나의 작은 약속을 지켜줍니다."
+            "value": "막장을 탭해 암반을 깨고 첫 4m를 직접 여세요."
           }
         }
       }
@@ -3014,13 +3109,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 of 2 · THE MINE DOOR"
+            "value": "FIRST SHIFT · SURFACE"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 / 2 · 갱도 문"
+            "value": "첫 작업 · 지표"
           }
         }
       }
@@ -3031,13 +3126,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Close the door on distractions"
+            "value": "Break your first rock"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "방해를 갱도 밖에 두세요"
+            "value": "첫 암반을 부숴보세요"
           }
         }
       }
@@ -3048,13 +3143,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unsealed practice · no apps are hidden"
+            "value": "Tap the working face to open the first 4m"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "개방 연습 · 어떤 앱도 가리지 않아요"
+            "value": "막장을 탭해서 첫 4m를 여세요"
           }
         }
       }
@@ -3065,13 +3160,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Try the complete loop before choosing any expedition readiness options."
+            "value": "Every strike damages the real rock. Break it to collect ore and descend."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "출정 준비를 선택하기 전에 채굴과 귀환의 전체 흐름을 먼저 체험합니다."
+            "value": "탭할 때마다 실제 암반이 깨집니다. 끝까지 부수면 광석을 얻고 내려갑니다."
           }
         }
       }
@@ -3082,13 +3177,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your practice ore is enough for exactly one first drill upgrade."
+            "value": "You opened the first passage yourself. The supply ore is enough for one drill upgrade."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "연습 광석으로 첫 드릴 강화를 정확히 한 번 장착할 수 있어요."
+            "value": "첫 통로를 직접 열었습니다. 보급 광석으로 드릴을 한 번 강화할 수 있어요."
           }
         }
       }
@@ -3099,13 +3194,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Practice return · 100 ore"
+            "value": "First 4m open · 100 ore"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "연습 귀환 · 광석 100"
+            "value": "첫 4m 개통 · 광석 100"
           }
         }
       }
@@ -3116,13 +3211,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "90-second practice mine"
+            "value": "Break your first rock"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "90초 연습 채굴"
+            "value": "첫 암반을 부숴보세요"
           }
         }
       }
@@ -3133,13 +3228,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Veins are revealed only when you return. Nothing interrupts you while you focus."
+            "value": "The first-shift supplies include one crystal. Deeper seams appear as you descend."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "귀환할 때만 광맥이 공개됩니다. 집중하는 동안에는 아무것도 알려주지 않습니다."
+            "value": "첫 작업 보급에 수정 1개가 들어 있습니다. 더 깊이 내려가면 광맥을 만납니다."
           }
         }
       }
@@ -3269,13 +3364,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Promise 15, 25, or 50 minutes. Finish and return to earn ore and dig faster."
+            "value": "Upgrade the cart and it mines while the app is closed. Focus expeditions are an optional boost you can prepare later."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "15·25·50분 중 하나를 약속하세요. 끝까지 집중하고 귀환하면 광석이 늘고 채굴이 빨라집니다."
+            "value": "광차를 강화하면 앱을 닫아도 채굴합니다. 집중 출정은 나중에 선택하는 증폭기예요."
           }
         }
       }
@@ -3303,13 +3398,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Focus makes the mine run faster"
+            "value": "The mine can keep working without you"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "집중은 채굴 속도를 올립니다"
+            "value": "광산은 내려놓아도 움직입니다"
           }
         }
       }
@@ -3320,13 +3415,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A stronger drill improves future ore. This first upgrade spends all practice ore."
+            "value": "Drill level 2 raises tap damage. This first upgrade uses all 100 supply ore."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "강한 드릴은 다음 광석을 늘립니다. 첫 강화에는 연습 광석을 모두 사용합니다."
+            "value": "드릴 2단계는 탭 피해를 높입니다. 첫 강화에는 보급 광석 100을 모두 사용합니다."
           }
         }
       }
@@ -4355,13 +4450,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "One next promise"
+            "value": "Next digging target"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "다음 약속 하나"
+            "value": "다음 굴착 목표"
           }
         }
       }
@@ -4536,7 +4631,7 @@
         }
       }
     },
-    "return.region.promise": {
+    "return.region.progress": {
       "extractionState": "stale",
       "localizations": {
         "en": {

@@ -202,6 +202,7 @@ final class GameRepository {
         PlayerState(
             resources: Resources(ore: root.ore, crystals: root.crystals, coreShards: root.coreShards),
             equipment: EquipmentLevels(drill: equipment.drillLevel, cart: equipment.cartLevel, lamp: equipment.lampLevel),
+            equipmentModifications: root.storedEquipmentModifications(),
             runFocusCredits: root.runFocusCredits,
             lifetimeFocusCredits: root.lifetimeFocusCredits,
             runSegmentsBroken: root.runSegmentsBroken,

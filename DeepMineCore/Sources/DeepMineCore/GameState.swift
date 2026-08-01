@@ -6,6 +6,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
     /// Highest level ever bought for each tool. Prestige keeps it so re-buying is
     /// discounted — the mine remembers the shaft it already dug.
     public internal(set) var rememberedEquipment: EquipmentLevels
+    public internal(set) var equipmentModifications: EquipmentModifications
     public internal(set) var runFocusCredits: Double
     public internal(set) var lifetimeFocusCredits: Double
     /// Segments broken since the last prestige. This is what a reset is measured in: the
@@ -68,6 +69,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         resources: Resources = Resources(),
         equipment: EquipmentLevels = EquipmentLevels(),
         rememberedEquipment: EquipmentLevels? = nil,
+        equipmentModifications: EquipmentModifications = .empty,
         runFocusCredits: Double = 0,
         lifetimeFocusCredits: Double = 0,
         runSegmentsBroken: Int = 0,
@@ -111,6 +113,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         self.resources = resources
         self.equipment = equipment
         self.rememberedEquipment = Self.mergedRemembered(rememberedEquipment, equipment)
+        self.equipmentModifications = equipmentModifications
         self.runFocusCredits = runFocusCredits
         self.lifetimeFocusCredits = lifetimeFocusCredits
         self.runSegmentsBroken = max(0, runSegmentsBroken)
@@ -163,6 +166,10 @@ public struct PlayerState: Codable, Equatable, Sendable {
             try container.decodeIfPresent(EquipmentLevels.self, forKey: .rememberedEquipment),
             equipment
         )
+        equipmentModifications = try container.decodeIfPresent(
+            EquipmentModifications.self,
+            forKey: .equipmentModifications
+        ) ?? .empty
         runFocusCredits = try container.decode(Double.self, forKey: .runFocusCredits)
         lifetimeFocusCredits = try container.decode(Double.self, forKey: .lifetimeFocusCredits)
         // Saves written before prestige was measured in rock have no run counter. Seeding

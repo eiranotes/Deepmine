@@ -26,6 +26,32 @@ enum DeepMineProgressLabels {
         }
     }
 
+    static func modificationTitleKey(
+        _ modification: EquipmentModificationKind
+    ) -> DeepMineStringKey {
+        switch modification {
+        case .drillWide: .equipmentModificationDrillWide
+        case .drillImpact: .equipmentModificationDrillImpact
+        case .cartFleet: .equipmentModificationCartFleet
+        case .cartFreight: .equipmentModificationCartFreight
+        case .lampReach: .equipmentModificationLampReach
+        case .lampFortune: .equipmentModificationLampFortune
+        }
+    }
+
+    static func modificationEffectKey(
+        _ modification: EquipmentModificationKind
+    ) -> DeepMineStringKey {
+        switch modification {
+        case .drillWide: .equipmentModificationDrillWideEffect
+        case .drillImpact: .equipmentModificationDrillImpactEffect
+        case .cartFleet: .equipmentModificationCartFleetEffect
+        case .cartFreight: .equipmentModificationCartFreightEffect
+        case .lampReach: .equipmentModificationLampReachEffect
+        case .lampFortune: .equipmentModificationLampFortuneEffect
+        }
+    }
+
     static func regionKey(_ region: MineRegion) -> DeepMineStringKey {
         switch region {
         case .entry: .regionEntry

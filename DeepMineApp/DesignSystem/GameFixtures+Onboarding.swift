@@ -24,9 +24,10 @@ extension GameFixtures {
         let player = PlayerState(
             resources: Resources(ore: Balance.demoOreGrant),
             onboardingStage: .demoReward,
-            demoStartedAt: referenceDate.addingTimeInterval(-Balance.demoDurationSeconds),
+            demoStartedAt: referenceDate,
             demoCompletedAt: referenceDate,
-            demoRewardReceiptID: rewardID
+            demoRewardReceiptID: rewardID,
+            mineFace: MineFaceState(segmentIndex: 1)
         )
         return GameFixtureState(
             scenario: .demoCompleted,
@@ -37,6 +38,22 @@ extension GameFixtures {
             report: nil,
             status: .completed,
             noticeKey: nil
+        )
+    }
+
+    static var onboardingLegacyPermissionsPlayer: PlayerState {
+        PlayerState(
+            equipment: EquipmentLevels(drill: 2),
+            onboardingStage: .permissions,
+            demoStartedAt: referenceDate,
+            demoCompletedAt: referenceDate,
+            demoRewardReceiptID: UUID(
+                uuidString: "44454550-4D49-4E45-0000-000000000090"
+            ),
+            demoUpgradePurchaseID: UUID(
+                uuidString: "44454550-4D49-4E45-0000-000000000091"
+            ),
+            mineFace: MineFaceState(segmentIndex: 1)
         )
     }
 

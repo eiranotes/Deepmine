@@ -50,7 +50,8 @@ extension PlayerState {
             segmentIndex: saturatingAdd(face.segmentIndex, segments),
             impact: face.impact,
             lifetimeSegmentsBroken: face.lifetimeSegmentsBroken,
-            lifetimeSeamsBroken: face.lifetimeSeamsBroken
+            lifetimeSeamsBroken: face.lifetimeSeamsBroken,
+            boreHistory: face.boreHistory
         )
     }
 

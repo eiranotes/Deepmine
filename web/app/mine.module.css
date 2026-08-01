@@ -1,0 +1,1080 @@
+.page {
+  min-height: 100svh;
+  padding: 28px 16px 72px;
+}
+
+.appFrame {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 4px 20px;
+}
+
+.eyebrow,
+.sectionLabel {
+  margin: 0 0 5px;
+  color: var(--brass);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.header h1,
+.shaftHeading h2,
+.sectionIntro h2,
+.equipmentCard h3 {
+  margin: 0;
+  letter-spacing: -0.035em;
+}
+
+.header h1 {
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 1;
+}
+
+.headerNote {
+  margin: 9px 0 0;
+  color: var(--limestone-muted);
+  font-size: 0.86rem;
+}
+
+.oreCounter {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 8px;
+  min-width: 126px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  background: var(--shale);
+  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.36);
+}
+
+.oreCounter > span,
+.oreCounter strong {
+  color: var(--brass-bright);
+}
+
+.oreCounter > span {
+  font-size: 0.8rem;
+}
+
+.oreCounter strong {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.oreCounter small {
+  grid-column: 2;
+  color: var(--limestone-muted);
+  font-size: 0.65rem;
+  text-align: right;
+}
+
+.statusStrip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-block: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.statusStrip > div {
+  min-width: 0;
+  padding: 12px 10px;
+  border-right: 1px solid var(--line);
+}
+
+.statusStrip > div:last-child {
+  border-right: 0;
+}
+
+.statusStrip span,
+.statusStrip strong {
+  display: block;
+}
+
+.statusStrip span {
+  margin-bottom: 3px;
+  color: var(--limestone-muted);
+  font-size: 0.65rem;
+}
+
+.statusStrip strong {
+  overflow: hidden;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shaftSection,
+.equipmentSection {
+  border: 1px solid var(--line);
+  background: var(--coal-raised);
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.3);
+}
+
+.shaftSection {
+  padding: 14px;
+}
+
+.shaftHeading,
+.sectionIntro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.shaftHeading {
+  padding: 4px 2px 12px;
+}
+
+.shaftHeading h2,
+.sectionIntro h2 {
+  font-size: 1.2rem;
+}
+
+.faceProgress {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.faceProgress span {
+  color: var(--limestone-muted);
+  font-size: 0.72rem;
+}
+
+.faceProgress strong {
+  color: var(--brass-bright);
+}
+
+.progressTrack {
+  height: 5px;
+  margin: 0 2px 12px;
+  overflow: hidden;
+  border: 1px solid rgb(233 227 210 / 0.28);
+  background: var(--coal);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+  transition: width 120ms linear;
+}
+
+.shaft {
+  --break-progress: 0.4;
+  --cut-width: 28%;
+  --lamp-radius: 24%;
+  --geology-shift: 0px;
+  --head-top: 57%;
+  --hole-width: 72px;
+  --hole-height: 58px;
+  --fracture-size: 132px;
+  --fracture-opacity: 0.7;
+  --cart-duration: 4s;
+  --rig-scale: 1;
+  --impact-kick: 1;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: min(720px, 112svh);
+  min-height: 600px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgb(233 227 210 / 0.3);
+  border-radius: 0;
+  background: var(--coal);
+  color: inherit;
+  cursor: crosshair;
+  isolation: isolate;
+  touch-action: manipulation;
+}
+
+.shaft:focus-visible {
+  outline: 3px solid var(--brass-bright);
+  outline-offset: 3px;
+}
+
+.shaft::before,
+.shaft::after {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  content: "";
+}
+
+.shaft::before {
+  inset: 0;
+  border: 8px solid rgb(10 10 9 / 0.68);
+  box-shadow: inset 0 0 0 1px rgb(233 227 210 / 0.13);
+}
+
+.shaft::after {
+  inset: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.2), transparent 13%, transparent 87%, rgb(0 0 0 / 0.2));
+}
+
+.geology {
+  position: absolute;
+  inset: -16px 0;
+  transform: translateY(var(--geology-shift));
+  transition: transform 180ms linear;
+}
+
+.stratum {
+  position: absolute;
+  left: -2%;
+  width: 104%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+}
+
+.entryRock {
+  top: 0;
+  height: 34%;
+  background-image: url("/assets/shaft/ShaftRock_entry.png");
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 84% 93%, 68% 89%, 49% 96%, 31% 91%, 14% 95%, 0 90%);
+}
+
+.crystalRock {
+  top: 29%;
+  height: 30%;
+  background-image: url("/assets/shaft/ShaftRock_crystal.png");
+  clip-path: polygon(0 8%, 17% 3%, 34% 8%, 51% 0, 68% 7%, 84% 2%, 100% 8%, 100% 92%, 82% 97%, 64% 91%, 45% 98%, 25% 92%, 0 96%);
+}
+
+.ruinsRock {
+  top: 54%;
+  height: 29%;
+  background-image: url("/assets/shaft/ShaftRock_ruins.png");
+  clip-path: polygon(0 7%, 19% 1%, 37% 7%, 55% 0, 75% 6%, 100% 2%, 100% 93%, 79% 99%, 59% 92%, 36% 98%, 17% 91%, 0 96%);
+}
+
+.abyssRock {
+  top: 78%;
+  height: 27%;
+  background-image: url("/assets/shaft/ShaftRock_abyss.png");
+  clip-path: polygon(0 5%, 20% 0, 39% 7%, 58% 1%, 78% 6%, 100% 0, 100% 100%, 0 100%);
+}
+
+.surfaceCanopy {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 76px;
+  object-fit: fill;
+  image-rendering: pixelated;
+}
+
+.futureSeam {
+  position: absolute;
+  z-index: 2;
+  top: 72%;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  object-fit: fill;
+  opacity: 0.75;
+  image-rendering: pixelated;
+}
+
+.boreHistory,
+.pastTunnel {
+  position: absolute;
+  z-index: 4;
+  top: 24px;
+  left: 50%;
+  height: calc(var(--head-top) - 24px);
+  transform: translateX(-50%);
+}
+
+.boreHistory {
+  width: 100%;
+  transition: height 120ms linear;
+}
+
+.boreSegment {
+  position: absolute;
+  left: 50%;
+  height: 8.4%;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, rgb(63 61 52 / 0.62) 0 6px, transparent 6px calc(100% - 6px), rgb(63 61 52 / 0.62) calc(100% - 6px)),
+    linear-gradient(90deg, #080807, #12120f 48%, #080807);
+  clip-path: polygon(9% 0, 90% 0, 97% 18%, 90% 39%, 96% 61%, 89% 82%, 94% 100%, 6% 100%, 11% 79%, 4% 58%, 10% 37%, 3% 18%);
+  box-shadow: inset 14px 0 20px rgb(0 0 0 / 0.45), inset -14px 0 20px rgb(0 0 0 / 0.45);
+  transition: width 300ms ease, top 420ms ease;
+}
+
+.pastTunnel {
+  z-index: 6;
+  width: var(--cut-width);
+  transition: width 300ms ease, height 120ms linear;
+}
+
+.support {
+  position: absolute;
+  left: 7%;
+  width: 86%;
+  height: 5px;
+  border-block: 1px solid rgb(233 227 210 / 0.23);
+  background: var(--shale-light);
+  box-shadow: 0 5px 0 rgb(0 0 0 / 0.28);
+}
+
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 18px;
+  transform: translateX(-50%);
+  border-inline: 2px solid rgb(210 147 49 / 0.58);
+  background: repeating-linear-gradient(to bottom, transparent 0 16px, rgb(210 147 49 / 0.5) 16px 19px);
+}
+
+.movingCart {
+  position: absolute;
+  z-index: 2;
+  bottom: 3%;
+  left: calc(50% - 15px);
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+  animation: cart-travel var(--cart-duration) linear infinite;
+  transition: width 220ms ease, height 220ms ease, filter 220ms ease;
+}
+
+.freightCart {
+  width: 38px;
+  height: 38px;
+  filter: drop-shadow(0 0 5px rgb(210 147 49 / 0.35));
+}
+
+.installedLamp {
+  position: absolute;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 0 8px rgb(240 189 93 / 0.6));
+  image-rendering: pixelated;
+}
+
+.recordPlate {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  padding: 3px 7px;
+  transform: translateX(-50%);
+  border: 1px solid #7b531c;
+  background: var(--brass);
+  color: var(--coal);
+  font-size: 0.55rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.historyScars {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.historyScar {
+  position: absolute;
+  width: clamp(58px, 13vw, 86px);
+  height: auto;
+  opacity: 0.62;
+  filter: sepia(0.3) contrast(1.15);
+  image-rendering: pixelated;
+}
+
+.currentWork {
+  position: absolute;
+  z-index: 8;
+  top: var(--head-top);
+  left: 50%;
+  width: 100%;
+  height: 154px;
+  transform: translate(-50%, -50%);
+  transition: top 190ms cubic-bezier(0.18, 0.72, 0.22, 1);
+  pointer-events: none;
+}
+
+.gantry {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  opacity: 0.58;
+  image-rendering: pixelated;
+}
+
+.faceHole {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: var(--hole-width);
+  height: var(--hole-height);
+  transform: translate(-50%, -38%);
+  background: #070706;
+  clip-path: polygon(41% 0, 67% 8%, 91% 31%, 82% 54%, 96% 74%, 68% 93%, 46% 84%, 25% 100%, 8% 72%, 18% 51%, 3% 28%, 27% 13%);
+  box-shadow: 0 0 0 4px rgb(10 10 9 / 0.52);
+  transition: width 120ms linear, height 120ms linear;
+}
+
+.currentFracture {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  width: var(--fracture-size);
+  height: var(--fracture-size);
+  transform: translate(-50%, -50%);
+  opacity: var(--fracture-opacity);
+  image-rendering: pixelated;
+  animation: crack-pulse 160ms ease-out;
+}
+
+.miner {
+  position: absolute;
+  z-index: 3;
+  top: 22%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  filter: drop-shadow(3px 4px 0 rgb(0 0 0 / 0.7));
+  animation: miner-strike 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.drillRig {
+  position: absolute;
+  z-index: 4;
+  top: 37%;
+  left: calc(50% + 23px);
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%) rotate(12deg) scale(var(--rig-scale));
+  transition: transform 240ms ease;
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75));
+  image-rendering: pixelated;
+}
+
+.impactBuild .drillRig {
+  animation: impact-drill 180ms cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.debrisCloud {
+  position: absolute;
+  z-index: 5;
+  top: 48%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.debrisCloud span {
+  --chip-x: 20px;
+  --chip-y: -30px;
+  --chip-delay: 0ms;
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgb(10 10 9 / 0.72);
+  background: var(--shale-light);
+  box-shadow: 2px 2px 0 rgb(0 0 0 / 0.34);
+  animation: debris-flight 460ms cubic-bezier(0.12, 0.75, 0.26, 1) var(--chip-delay) both;
+}
+
+.weakPoint {
+  position: absolute;
+  z-index: 2;
+  top: 52%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  opacity: 0.86;
+  image-rendering: pixelated;
+}
+
+.hitLabel,
+.oreGain {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  color: var(--limestone);
+  font-size: 0.82rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 2px 2px 0 var(--coal);
+  animation: gain-rise 700ms ease-out both;
+}
+
+.hitLabel {
+  top: 42%;
+}
+
+.oreGain {
+  top: 20%;
+  color: var(--brass-bright);
+}
+
+.critical .hitLabel {
+  color: var(--brass-bright);
+  font-size: 1rem;
+}
+
+.fortuneBuild .weakPoint {
+  filter: drop-shadow(0 0 11px var(--brass-bright));
+  animation: fortune-pulse 850ms ease-in-out infinite alternate;
+}
+
+.futureDarkness {
+  position: absolute;
+  z-index: 11;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+    circle at 50% var(--head-top),
+      transparent 0 var(--lamp-radius),
+      rgb(10 10 9 / 0.3) calc(var(--lamp-radius) + 12%),
+      rgb(10 10 9 / 0.85) calc(var(--lamp-radius) + 30%)
+    ),
+    linear-gradient(to bottom, transparent 0 59%, rgb(10 10 9 / 0.08) 67%, rgb(10 10 9 / 0.74) 100%);
+  transition: background 260ms ease;
+}
+
+.depthOverlay {
+  position: absolute;
+  z-index: 16;
+  inset: 0;
+  pointer-events: none;
+}
+
+.depthOverlay span {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgb(233 227 210 / 0.5);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 var(--coal);
+}
+
+.depthOverlay span::after {
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.depthOverlay .currentDepthMark {
+  top: var(--head-top);
+  color: var(--brass-bright);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.depthOverlay .currentDepthMark::after {
+  width: 28px;
+  height: 2px;
+}
+
+.sceneLegend {
+  position: absolute;
+  z-index: 17;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  gap: 5px;
+  padding: 6px;
+  background: rgb(10 10 9 / 0.78);
+  color: rgb(233 227 210 / 0.68);
+  font-size: 0.56rem;
+  letter-spacing: -0.02em;
+}
+
+.sceneLegend span + span::before {
+  margin-right: 5px;
+  color: var(--brass);
+  content: "/";
+}
+
+.equipmentSection {
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.sectionIntro > p {
+  max-width: 280px;
+  margin: 0;
+  color: var(--limestone-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.equipmentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.workshop {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+
+.workshopHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.workshopHeading h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.workshopHeading > p {
+  max-width: 360px;
+  margin: 0;
+  color: var(--limestone-muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.specializationList {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.specializationRow {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+}
+
+.specializationRow > strong {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--coal);
+  color: var(--brass);
+  font-size: 0.68rem;
+}
+
+.specializationChoices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.specializationChoices button {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--shale);
+  color: var(--limestone);
+  text-align: left;
+  cursor: pointer;
+}
+
+.specializationChoices button:hover:not(:disabled) {
+  border-color: var(--brass);
+}
+
+.specializationChoices button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+.specializationChoices button:disabled {
+  opacity: 0.44;
+  cursor: not-allowed;
+}
+
+.specializationChoices button.selectedSpecialization {
+  border-color: var(--brass);
+  background: rgb(210 147 49 / 0.12);
+  opacity: 1;
+}
+
+.specializationChoices span,
+.specializationChoices strong,
+.specializationChoices small {
+  display: block;
+}
+
+.specializationChoices strong {
+  font-size: 0.72rem;
+}
+
+.specializationChoices small {
+  margin-top: 3px;
+  color: var(--limestone-muted);
+  font-size: 0.62rem;
+}
+
+.specializationChoices em {
+  color: var(--brass-bright);
+  font-size: 0.62rem;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.equipmentCard {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--shale);
+}
+
+.equipmentTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.equipmentArt {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(233 227 210 / 0.18);
+  background: var(--coal);
+}
+
+.equipmentArt img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.equipmentTop span {
+  color: var(--brass);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.equipmentCard h3 {
+  margin-top: 2px;
+  font-size: 1rem;
+}
+
+.equipmentCard > p {
+  min-height: 2.8em;
+  margin: 12px 0;
+  color: var(--limestone-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.effectReadout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding-top: 9px;
+  border-top: 1px solid rgb(233 227 210 / 0.15);
+}
+
+.effectReadout span {
+  color: var(--limestone-muted);
+  font-size: 0.63rem;
+}
+
+.effectReadout strong {
+  color: var(--brass-bright);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.equipmentCard > button {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--brass);
+  border-radius: 0;
+  background: var(--coal);
+  color: var(--limestone);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.equipmentCard > button:hover:not(:disabled) {
+  background: var(--brass);
+  color: var(--coal);
+}
+
+.equipmentCard > button:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.equipmentCard > button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+.equipmentCard > button:disabled {
+  border-color: rgb(233 227 210 / 0.14);
+  color: rgb(233 227 210 / 0.32);
+  cursor: not-allowed;
+}
+
+.equipmentCard > button span,
+.equipmentCard > button strong {
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.equipmentCard > button strong {
+  color: var(--brass-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.equipmentCard > button:hover:not(:disabled) strong {
+  color: var(--coal);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 4px 0;
+  color: rgb(233 227 210 / 0.42);
+  font-size: 0.66rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+@keyframes miner-strike {
+  0% { transform: translate(-50%, -50%) rotate(calc(-7deg * var(--impact-kick))); }
+  55% { transform: translate(-48%, -46%) rotate(calc(9deg * var(--impact-kick))); }
+  100% { transform: translate(-50%, -50%) rotate(0); }
+}
+
+@keyframes impact-drill {
+  0% { transform: translate(-50%, -50%) rotate(5deg) scale(var(--rig-scale)); }
+  55% { transform: translate(-45%, -40%) rotate(18deg) scale(calc(var(--rig-scale) * 1.1)); }
+  100% { transform: translate(-50%, -50%) rotate(12deg) scale(var(--rig-scale)); }
+}
+
+@keyframes debris-flight {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5) rotate(0); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--chip-x), var(--chip-y)) scale(1) rotate(140deg); }
+}
+
+@keyframes fortune-pulse {
+  from { opacity: 0.72; transform: translate(-50%, -50%) scale(0.94); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes crack-pulse {
+  0% { filter: brightness(2); transform: translate(-50%, -50%) scale(0.9); }
+  100% { filter: brightness(1); transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes gain-rise {
+  0% { opacity: 0; transform: translate(-50%, 12px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -36px); }
+}
+
+@keyframes cart-travel {
+  from { transform: translateY(12px); }
+  to { transform: translateY(-350px); }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 12px 10px 46px;
+  }
+
+  .header {
+    align-items: center;
+    padding-bottom: 15px;
+  }
+
+  .headerNote {
+    display: none;
+  }
+
+  .oreCounter {
+    min-width: 112px;
+  }
+
+  .statusStrip > div {
+    padding-inline: 7px;
+  }
+
+  .shaftSection {
+    padding: 9px;
+  }
+
+  .shaft {
+    height: 640px;
+    min-height: 0;
+  }
+
+  .depthOverlay span {
+    left: 8px;
+  }
+
+  .equipmentSection {
+    padding: 13px;
+  }
+
+  .sectionIntro > p {
+    display: none;
+  }
+
+  .equipmentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .equipmentCard {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .equipmentTop {
+    grid-column: 1 / 3;
+  }
+
+  .equipmentCard > p {
+    display: none;
+  }
+
+  .effectReadout {
+    grid-column: 1 / 3;
+    margin: 0;
+  }
+
+  .equipmentCard > button {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    width: 110px;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.2;
+  }
+
+  .workshopHeading > p {
+    display: none;
+  }
+
+  .specializationRow {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .specializationChoices button {
+    display: block;
+  }
+
+  .specializationChoices em {
+    display: block;
+    margin-top: 6px;
+  }
+
+  .footer {
+    display: block;
+  }
+
+  .footer p + p {
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 390px) {
+  .header h1 {
+    font-size: 1.95rem;
+  }
+
+  .eyebrow {
+    font-size: 0.58rem;
+  }
+
+  .oreCounter {
+    min-width: 102px;
+    padding-inline: 9px;
+  }
+
+  .shaftHeading h2,
+  .sectionIntro h2 {
+    font-size: 1.08rem;
+  }
+
+  .faceProgress span {
+    display: none;
+  }
+
+  .sceneLegend {
+    font-size: 0.5rem;
+  }
+
+  .equipmentCard > button {
+    width: 96px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

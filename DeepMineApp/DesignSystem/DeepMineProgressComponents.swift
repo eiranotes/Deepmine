@@ -8,11 +8,7 @@ enum DeepMineArt {
     }
 
     static func equipmentTier(level: Int) -> Int {
-        switch min(Balance.maximumEquipmentLevel, max(Balance.minimumEquipmentLevel, level)) {
-        case ...20: 1
-        case ...40: 2
-        default: 3
-        }
+        EquipmentEngine.visualTier(level: level)
     }
 
     static func vein(_ kind: VeinKind) -> String { "Vein_\(kind.rawValue)" }

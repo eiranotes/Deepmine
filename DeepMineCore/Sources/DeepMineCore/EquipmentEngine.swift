@@ -68,6 +68,16 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
 }
 
 public enum EquipmentEngine {
+    /// The three current sprite families change early enough that an upgrade is seen in
+    /// play, not only in the workbench number.
+    public static func visualTier(level: Int) -> Int {
+        switch max(Balance.minimumEquipmentLevel, level) {
+        case ...4: 1
+        case ...14: 2
+        default: 3
+        }
+    }
+
     public static func level(of equipment: EquipmentKind, in levels: EquipmentLevels) -> Int {
         switch equipment {
         case .drill: levels.drill

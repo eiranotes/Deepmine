@@ -158,9 +158,13 @@ final class ActiveMineUITests: XCTestCase {
     }
 
     private func tapHomeStart() {
+        let amplifier = app.buttons["mine-home-focus-amplifier"]
+        for _ in 0..<10 where !amplifier.exists || !amplifier.isHittable { app.swipeUp() }
+        XCTAssertTrue(amplifier.waitForExistence(timeout: 5), "mine-home-focus-amplifier")
+        amplifier.tap()
         let start = app.buttons["mine-home-start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5), "mine-home-start")
-        for _ in 0..<5 where !start.isHittable { app.swipeUp() }
+        for _ in 0..<10 where !start.isHittable { app.swipeUp() }
         XCTAssertTrue(start.isHittable, "mine-home-start")
         start.tap()
     }

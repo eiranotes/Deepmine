@@ -8,18 +8,23 @@ protocol OnboardingPermissionCoordinating: AnyObject {
 struct OnboardingFlowView: View {
     let gameStore: GameStore
     let permissionCoordinator: any OnboardingPermissionCoordinating
+    let feedback: GameFeedback
     let onFinished: (PlayerState) -> Void
     @State var player: PlayerState
-    @State var remainingSeconds = Int(Balance.demoDurationSeconds)
     @State var isRequesting = false
+    @State var struckWeakPoint = false
+    @State var lastStrikeText: String?
+
     init(
         gameStore: GameStore,
         player: PlayerState,
         permissionCoordinator: any OnboardingPermissionCoordinating,
+        feedback: GameFeedback,
         onFinished: @escaping (PlayerState) -> Void
     ) {
         self.gameStore = gameStore
         self.permissionCoordinator = permissionCoordinator
+        self.feedback = feedback
         self.onFinished = onFinished
         _player = State(initialValue: player)
     }
@@ -30,108 +35,111 @@ struct OnboardingFlowView: View {
                 ScrollView {
                     Group {
                         switch player.onboardingStage {
-                        case .premiseBlocks:
-                            premise(
-                                eyebrow: .onboardingBlocksEyebrow,
-                                title: .onboardingBlocksTitle,
-                                body: .onboardingBlocksBody,
-                                assetName: "Onboarding_blocks",
-                                identifier: "onboarding-premise-blocks"
-                            )
-                        case .premiseSessions:
-                            premise(
-                                eyebrow: .onboardingSessionsEyebrow,
-                                title: .onboardingSessionsTitle,
-                                body: .onboardingSessionsBody,
-                                assetName: "Onboarding_sessions",
-                                identifier: "onboarding-premise-sessions"
-                            )
-                        case .demo: demo
+                        case .premiseBlocks, .premiseSessions, .demo: demo
                         case .demoReward: reward
                         case .permissions: permission
                         case .complete: EmptyView()
                         }
                     }
-                    .frame(minHeight: proxy.size.height)
+                    .frame(minHeight: proxy.size.height, alignment: .top)
                     .padding(17)
                 }
             }
         }
         .foregroundStyle(DeepMinePalette.limestone.color)
-        .task(id: player.demoStartedAt) { await monitorDemoIfNeeded() }
     }
-    func premise(
-        eyebrow: DeepMineStringKey,
-        title: DeepMineStringKey,
-        body: DeepMineStringKey,
-        assetName: String,
-        identifier: String
-    ) -> some View {
+
+    var demo: some View {
         VStack(spacing: 24) {
-            Spacer()
-            DeepMinePixelImage(name: assetName, size: 88)
-                .frame(width: 88, height: 88)
-                .background(DeepMinePalette.shale.color, in: RoundedRectangle(cornerRadius: 9))
-                .accessibilityHidden(true)
             VStack(spacing: 9) {
-                Text(DeepMineStrings.text(eyebrow))
+                Text(DeepMineStrings.text(.onboardingBlocksEyebrow))
                     .font(.caption.weight(.bold))
                     .foregroundStyle(DeepMinePalette.brass.color)
-                Text(DeepMineStrings.text(title))
+                Text(DeepMineStrings.text(.onboardingDemoTitle))
                     .font(.title2.weight(.heavy))
                     .multilineTextAlignment(.center)
-                    .accessibilityIdentifier(identifier)
-                Text(DeepMineStrings.text(body))
+                    .accessibilityIdentifier("onboarding-demo-active")
+                Text(DeepMineStrings.text(.onboardingDemoBody))
                     .font(.body)
                     .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.76))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
-            Button { advancePremise() } label: {
-                DeepMineActionLabel(titleKey: .actionNext, detailKey: nil, symbol: "arrow.right")
-            }
-            .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
-            .accessibilityIdentifier("onboarding-next")
-        }
-    }
-    var demo: some View {
-        VStack(spacing: 17) {
-            Spacer()
+
             DeepMineRivetedPanel {
-                VStack(spacing: 15) {
-                    Image("MinerSprite")
-                        .resizable().interpolation(.none).scaledToFit()
-                        .frame(width: 96, height: 96)
-                        .accessibilityHidden(true)
-                    Text(DeepMineStrings.text(.onboardingDemoTitle))
-                        .font(.title2.weight(.heavy))
-                        .accessibilityIdentifier("onboarding-demo-active")
-                    Text(DeepMineStrings.text(.onboardingDemoBody))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.76))
-                    DeepMineStatusMarker(status: player.demoStartedAt == nil ? .notStarted : .mining)
-                    if player.demoStartedAt != nil {
-                        Text(timerText)
-                            .font(.system(.largeTitle, design: .monospaced).weight(.bold))
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("0m → 4m")
+                            .font(.caption.monospacedDigit().weight(.bold))
+                        Spacer()
+                        Text("\(Int((player.mineFace.brokenFraction * 100).rounded()))%")
+                            .font(.caption.monospacedDigit().weight(.bold))
                             .foregroundStyle(DeepMinePalette.brass.color)
-                            .accessibilityLabel(timerAccessibilityLabel)
-                            .accessibilityIdentifier("onboarding-demo-timer")
-                        Text(DeepMineStrings.text(.onboardingDemoActive))
-                            .font(.caption)
-                            .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.72))
                     }
+                    DeepMineProgressRail(
+                        value: player.mineFace.brokenFraction,
+                        total: 1,
+                        accessibilityLabel: DeepMineStrings.text(.mineIntegrity)
+                    )
+                    demoShaft
+                    Text(lastStrikeText ?? DeepMineStrings.text(.onboardingDemoActive))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DeepMinePalette.brass.color)
+                        .contentTransition(.numericText())
                 }
                 .frame(maxWidth: .infinity)
             }
-            Spacer()
-            if player.demoStartedAt == nil {
-                Button { startDemo() } label: {
-                    DeepMineActionLabel(titleKey: .actionStart, detailKey: .onboardingDemoActive, symbol: "hammer.fill")
-                }
-                .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
-                .accessibilityIdentifier("onboarding-demo-start")
+
+            VStack(spacing: 5) {
+                Label(
+                    DeepMineStrings.text(.onboardingSessionsTitle),
+                    systemImage: "shippingbox.fill"
+                )
+                .font(.headline)
+                .foregroundStyle(DeepMinePalette.brass.color)
+                Text(DeepMineStrings.text(.onboardingSessionsBody))
+                    .font(.subheadline)
+                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+
+    private var demoShaft: some View {
+        let scene = ShaftSceneEngine.scene(for: player)
+        let sceneHeight = ShaftGeometry.columnHeight(for: scene)
+        return ZStack(alignment: .top) {
+            DeepMinePalette.coal.color
+            ShaftGeologyView(
+                scene: scene,
+                player: player,
+                isStruck: struckWeakPoint,
+                onStrike: strike(onWeakPoint:)
+            )
+            .frame(height: sceneHeight)
+            .offset(y: 48)
+            GeometryReader { proxy in
+                GameArtView(
+                    entry: GameArtCatalog.shaftSurface,
+                    fill: CGSize(width: proxy.size.width, height: 48)
+                )
+            }
+            .frame(height: 48)
+            .allowsHitTesting(false)
+        }
+        .frame(height: min(210, sceneHeight + 48))
+        .clipShape(RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
+                .stroke(DeepMinePalette.brass.color.opacity(0.72), lineWidth: 2)
+                .allowsHitTesting(false)
+        }
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(DeepMineStrings.text(.onboardingDemoTitle))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("onboarding-demo-rock")
+        .accessibilityAction { strike(onWeakPoint: false) }
     }
 }

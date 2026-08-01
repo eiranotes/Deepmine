@@ -47,6 +47,8 @@ final class PlayerStateEntity {
     var unlockedDecorationsData: Data
     var appliedVeinEffectIDsData: Data
     var appliedPrestigeCommandIDsData: Data
+    /// Run-scoped equipment branch choices. Empty data is the legacy/default state.
+    var equipmentModificationsData: Data = Data()
     var onboardingStageRawValue: String = "premiseBlocks"
     var demoStartedAt: Date?
     var demoCompletedAt: Date?
@@ -70,6 +72,7 @@ final class PlayerStateEntity {
     var mineFaceImpact: Double = 0
     var mineFaceLifetimeSegmentsBroken: Int = 0
     var mineFaceLifetimeSeamsBroken: Int = 0
+    var mineFaceBoreHistoryData: Data = Data()
     var deepestSegmentIndex: Int = 0
     var runSegmentsBroken: Int = 0
     var lastSettledAt: Date?

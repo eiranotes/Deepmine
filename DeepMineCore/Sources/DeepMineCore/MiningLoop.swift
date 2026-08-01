@@ -26,6 +26,8 @@ public enum MiningLoop {
             face: state.mineFace,
             power: power(for: state),
             hitWeakPoint: hitWeakPoint,
+            equipment: state.equipment,
+            modifications: state.equipmentModifications,
             using: &generator
         )
         commit(update, to: &state)
@@ -48,7 +50,9 @@ public enum MiningLoop {
         let update = MineFaceEngine.advance(
             face: state.mineFace,
             power: power(for: state),
-            seconds: seconds
+            seconds: seconds,
+            equipment: state.equipment,
+            modifications: state.equipmentModifications
         )
         commit(update, to: &state)
         if let now { state.lastSettledAt = now }
@@ -59,6 +63,7 @@ public enum MiningLoop {
         StrikeEngine.power(
             equipment: state.equipment,
             permanent: state.permanentUpgrades,
+            modifications: state.equipmentModifications,
             prestigeMultiplier: PrestigeEngine.memoryMultiplier(
                 level: state.excavationMemoryLevel
             )

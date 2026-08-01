@@ -3,78 +3,6 @@ import SwiftUI
 
 /// The panels inside the mine control scene.
 extension MineHomeView {
-    var streakLine: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "flame.fill")
-                .font(.caption2)
-                .foregroundStyle(DeepMinePalette.brass.color)
-            Text("\(DeepMineStrings.text(.homeStreakActive)) \(player.streakDays)\(DeepMineStrings.text(.gameDays))")
-                .font(.caption.weight(.semibold))
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("mine-home-streak")
-    }
-
-    var mineScene: some View {
-        ZStack(alignment: .bottomLeading) {
-            Image(DeepMineArt.theme(player.selectedTheme))
-                .resizable()
-                .interpolation(.none)
-                .scaledToFill()
-                .frame(height: 142)
-                .clipped()
-                .opacity(0.72)
-                .accessibilityHidden(true)
-            // The pixel art is busy and goes red-monochrome in StandBy Night Mode, so
-            // the readable numbers get their own ground instead of sitting on top of it.
-            LinearGradient(
-                colors: [DeepMinePalette.coal.color.opacity(0), DeepMinePalette.coal.color.opacity(0.92)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 88)
-            .frame(maxHeight: .infinity, alignment: .bottom)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-            MineDecorationScene(decorations: player.unlockedDecorations)
-                .padding(.trailing, 12)
-                .padding(.bottom, 8)
-            MinerCrewScene(crewSize: MineCrew.size(for: player))
-                .padding(.leading, 12)
-                .padding(.bottom, 10)
-            HStack(alignment: .bottom, spacing: 12) {
-                Spacer().frame(width: 68)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("\(player.depthMeters)m")
-                        .font(.title2.monospacedDigit().weight(.heavy))
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                    HStack(spacing: 10) {
-                        resourceAmount(
-                            name: DeepMineArt.crystal,
-                            value: player.resources.crystals
-                        )
-                        resourceAmount(
-                            name: DeepMineArt.coreShard,
-                            value: player.resources.coreShards
-                        )
-                    }
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(12)
-        }
-        .background(DeepMinePalette.coal.color)
-        .clipShape(RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius))
-        .overlay {
-            RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
-                .stroke(DeepMinePalette.limestone.color.opacity(0.28))
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            "\(DeepMineStrings.text(.gameDepth)) \(player.depthMeters)m, \(depthResources)"
-        )
-    }
-
     var todayProgress: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -130,51 +58,6 @@ extension MineHomeView {
                 }
             }
         }
-    }
-
-    /// Three reachable goals instead of one sentence. The single-promise rule keeps the
-    /// screen to one brass action; it should not hide the horizon that makes the next
-    /// weeks worth showing up for.
-    var nextPromise: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 10) {
-                Image(systemName: "signpost.right.and.left.fill")
-                    .foregroundStyle(DeepMinePalette.brass.color)
-                    .frame(width: 28)
-                Text(DeepMineStrings.text(.gameNextPromise))
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(DeepMinePalette.brass.color)
-            }
-            if nextSteps.isEmpty {
-                Text(nextPromiseText)
-                    .font(.subheadline)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("mine-home-next-promise")
-            } else {
-                ForEach(nextSteps, id: \.kind) { stepRow($0) }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func stepRow(_ step: NextStep) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(stepTitle(step))
-                    .font(.caption.weight(.semibold))
-                Spacer(minLength: 8)
-                Text(stepDetail(step))
-                    .font(.caption2.monospacedDigit())
-                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
-            }
-            DeepMineProgressRail(
-                value: Double(step.current),
-                total: Double(max(1, step.target)),
-                accessibilityLabel: stepTitle(step)
-            )
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("mine-home-step-\(step.kind.rawValue)")
     }
 
     var equipmentSummary: some View {
@@ -297,12 +180,4 @@ extension MineHomeView {
         .accessibilityElement(children: .combine)
     }
 
-    func resourceAmount(name: String, value: Int) -> some View {
-        HStack(spacing: 4) {
-            DeepMinePixelImage(name: name, size: 16)
-                .accessibilityHidden(true)
-            Text("\(value)")
-                .font(.caption.monospacedDigit().weight(.semibold))
-        }
-    }
 }

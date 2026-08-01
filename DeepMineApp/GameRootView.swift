@@ -80,7 +80,8 @@ struct GameRootView: View {
                     OnboardingFlowView(
                         gameStore: gameStore,
                         player: player,
-                        permissionCoordinator: settingsCoordinator
+                        permissionCoordinator: settingsCoordinator,
+                        feedback: feedback
                     ) { completed in
                         player = completed
                     }

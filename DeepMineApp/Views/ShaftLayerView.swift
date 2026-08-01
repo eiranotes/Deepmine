@@ -1,207 +1,299 @@
 import DeepMineCore
 import SwiftUI
 
-/// One horizontal band of the shaft.
-///
-/// Each region owns one wide rock-wall texture. Damage remains procedural and overlays
-/// that texture, so the face can change on every strike without returning to a row of
-/// repeated square boulders.
-struct ShaftLayerView: View {
-    let layer: ShaftLayer
+/// Continuous geology, the permanent passage cut through it, and the work rig at the
+/// head. Four-metre segments exist only in the economy; no view here draws a row per
+/// segment.
+struct ShaftGeologyView: View {
+    let scene: ShaftScene
+    let player: PlayerState
     let isStruck: Bool
-    let brokenFraction: Double
     let onStrike: (Bool) -> Void
 
     var body: some View {
-        ZStack {
-            switch layer.position {
-            case .broken: openShaft
-            case .current: face
-            case .untouched: unbrokenRock
+        GeometryReader { proxy in
+            ZStack(alignment: .topLeading) {
+                geology(width: proxy.size.width)
+                passedBore(width: proxy.size.width)
+                currentBore(width: proxy.size.width)
+                installations(width: proxy.size.width)
+                futureDarkness
+                ShaftWorkingLightView(scene: scene, width: proxy.size.width)
+                currentFace(width: proxy.size.width)
+                depthRecordPlate(width: proxy.size.width)
             }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: height)
-        .clipped()
-        .overlay(alignment: .top) { shaftWalls }
-    }
-
-    // MARK: Bands
-
-    /// Rock the player already broke: a dark opening with the cut walls left behind.
-    private var openShaft: some View {
-        ZStack {
-            DeepMinePalette.coal.color
-            // Hewn rock, not empty black. The band has to read as a place the player cut
-            // through rather than as a gap in the layout.
-            LinearGradient(
-                colors: [
-                    DeepMinePalette.shale.color,
-                    DeepMinePalette.shale.color.opacity(0.35)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
+            .contentShape(Rectangle())
+            .onTapGesture { onStrike(false) }
+            .accessibilityIdentifier("rock-face")
+            .accessibilityLabel(
+                Text("\(DeepMineStrings.text(.gameDepth)) \(player.depthMeters)m")
             )
-            Rectangle()
-                .fill(DeepMinePalette.limestone.color.opacity(0.07))
-                .frame(height: 1)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-            if layer.segment.isSeam {
-                // A worked-out seam is worth remembering; it is where the ore was.
-                GameArtView(entry: GameArtCatalog.debris(isLarge: true), size: 22)
-                    .opacity(0.5)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.trailing, 24)
-            }
+            .accessibilityAddTraits(.isButton)
         }
-        .accessibilityHidden(true)
     }
 
-    /// The band being worked. The only one that takes a tap.
-    private var face: some View {
-        ZStack {
-            rockTexture
-            if layer.segment.isSeam { seamVein }
-            // Damage reads as the rock giving way from the top down, which is the
-            // direction the player is going.
+    private func geology(width: CGFloat) -> some View {
+        ForEach(scene.strata) { stratum in
             GeometryReader { proxy in
-                DeepMinePalette.coal.color
-                    .frame(height: proxy.size.height * brokenFraction)
-                    .overlay(alignment: .bottom) {
-                        Rectangle()
-                            .fill(DeepMinePalette.brass.color.opacity(0.7))
-                            .frame(height: 1.5)
-                    }
-            }
-            .allowsHitTesting(false)
-            if damageStage > 1 {
-                GameArtView(entry: GameArtCatalog.fracture(intensity: fractureIntensity), size: height)
-                    .opacity(0.85)
-                    .allowsHitTesting(false)
-            }
-            if let point = layer.segment.weakPoint {
-                weakPoint(point)
-            }
-            gantry
-        }
-        // The face is the one band that takes a tap, so it says so with an edge rather
-        // than relying on the player noticing it is taller than its neighbours.
-        .overlay {
-            Rectangle()
-                .stroke(DeepMinePalette.brass.color.opacity(0.85), lineWidth: 2)
-                .allowsHitTesting(false)
-        }
-        .contentShape(Rectangle())
-        .onTapGesture { onStrike(false) }
-        .accessibilityIdentifier("rock-face")
-        .accessibilityLabel(Text("\(DeepMineStrings.text(.gameDepth)) \(layer.depthMeters)m"))
-        .accessibilityAddTraits(.isButton)
-    }
-
-    /// Rock below the face, dimmed by how far the lamp reaches. The falloff is curved
-    /// rather than linear: on already-dark art a straight ramp barely reads, and the
-    /// point of the band is that the shaft disappears into the dark.
-    private var unbrokenRock: some View {
-        ZStack {
-            rockTexture
-            if layer.segment.isSeam { seamVein }
-            DeepMinePalette.coal.color.opacity(1 - pow(max(0, layer.lighting), 1.8))
-        }
-        .accessibilityHidden(true)
-    }
-
-    // MARK: Parts
-
-    private var rockTexture: some View {
-        GeometryReader { proxy in
-            GameArtView(
-                entry: GameArtCatalog.shaftRock(region: layer.segment.region.rawValue),
-                fill: proxy.size
-            )
-        }
-    }
-
-    private var gantry: some View {
-        GeometryReader { proxy in
-            GameArtView(
-                entry: GameArtCatalog.shaftGantry,
-                size: height,
-                fill: proxy.size
-            )
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    private var seamVein: some View {
-        GeometryReader { proxy in
-            GameArtView(
-                entry: GameArtCatalog.seamVein,
-                size: height,
-                fill: proxy.size
-            )
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    private func weakPoint(_ point: RockSegment.WeakPoint) -> some View {
-        GeometryReader { proxy in
-            GameArtView(entry: GameArtCatalog.weakPoint(isStruck: isStruck), size: 36)
-                .frame(width: 48, height: 48)
-                .position(
-                    x: proxy.size.width * point.unitX,
-                    y: proxy.size.height * point.unitY
+                GameArtView(
+                    entry: GameArtCatalog.shaftRock(region: stratum.region.rawValue),
+                    fill: proxy.size
                 )
-                .contentShape(Rectangle())
-                .highPriorityGesture(TapGesture().onEnded { onStrike(true) })
-                .accessibilityIdentifier("rock-weak-point")
-                .accessibilityLabel(DeepMineStrings.text(.shaftWeakPoint))
-                .accessibilityAddTraits(.isButton)
+                .overlay {
+                    LinearGradient(
+                        colors: [
+                            DeepMinePalette.limestone.color.opacity(0.05),
+                            DeepMinePalette.coal.color.opacity(0.16)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                }
+            }
+            .frame(
+                width: width,
+                height: ShaftGeometry.height(
+                    from: stratum.startDepthMeters,
+                    to: stratum.endDepthMeters
+                )
+            )
+            .offset(y: ShaftGeometry.y(for: stratum.startDepthMeters, in: scene))
+            .accessibilityHidden(true)
         }
     }
 
-    /// The cut sides of the shaft, drawn over every band so the column reads as one hole
-    /// rather than a stack of unrelated stripes.
-    private var shaftWalls: some View {
-        HStack {
-            wall
-            Spacer()
-            wall
+    private func passedBore(width: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(scene.boreHistory) { record in
+                let start = Double(record.depthMeters)
+                Rectangle()
+                    .fill(DeepMinePalette.coal.color)
+                    .frame(
+                        width: min(width * 0.72, CGFloat(record.boreWidthPoints)),
+                        height: ShaftGeometry.height(
+                            from: start,
+                            to: start + Double(Balance.metersPerSegment)
+                        ) + 1
+                    )
+                    .overlay(alignment: .leading) { cutEdge }
+                    .overlay(alignment: .trailing) { cutEdge }
+                    .position(
+                        x: width / 2,
+                        y: ShaftGeometry.y(for: start, in: scene)
+                            + ShaftGeometry.height(
+                                from: start,
+                                to: start + Double(Balance.metersPerSegment)
+                            ) / 2
+                    )
+                if record.segmentIndex.isMultiple(of: 3) {
+                    GameArtView(entry: GameArtCatalog.fracture(intensity: .light), size: 52)
+                        .opacity(0.42)
+                        .position(
+                            x: width / 2,
+                            y: ShaftGeometry.y(
+                                for: start + Double(Balance.metersPerSegment),
+                                in: scene
+                            )
+                        )
+                }
+            }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
-    private var wall: some View {
-        Rectangle()
-            .fill(DeepMinePalette.shale.color)
-            .frame(width: 7)
-            .overlay(alignment: .center) {
-                Rectangle()
-                    .fill(DeepMinePalette.limestone.color.opacity(0.18))
-                    .frame(width: 1)
-            }
-    }
-
-    // MARK: Derived
-
-    var height: CGFloat {
-        ShaftGeometry.height(of: layer.position)
-    }
-
-    private var damageStage: Int {
-        layer.position == .current
-            ? layer.segment.damageStage(
-                remaining: layer.segment.maximumIntegrity * (1 - brokenFraction)
+    private func currentBore(width: CGFloat) -> some View {
+        let startY = ShaftGeometry.y(for: scene.faceDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        return RoundedRectangle(cornerRadius: 9)
+            .fill(DeepMinePalette.coal.color)
+            .frame(
+                width: min(width * 0.72, CGFloat(scene.currentBoreWidthPoints)),
+                height: max(8, headY - startY + 10)
             )
-            : 1
+            .overlay(alignment: .leading) { cutEdge }
+            .overlay(alignment: .trailing) { cutEdge }
+            .position(
+                x: width / 2,
+                y: startY + max(8, headY - startY + 10) / 2
+            )
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+
+    private var cutEdge: some View {
+        Rectangle()
+            .fill(DeepMinePalette.limestone.color.opacity(0.14))
+            .frame(width: 2)
+    }
+
+    private func installations(width: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            if player.equipment.cart > Balance.minimumEquipmentLevel {
+                rail(width: width)
+                ShaftCartTrafficView(
+                    scene: scene,
+                    level: player.equipment.cart,
+                    modification: player.equipmentModifications.cart,
+                    width: width
+                )
+            }
+            ForEach(scene.boreHistory.filter {
+                $0.cartLevel > Balance.minimumEquipmentLevel
+                    && $0.segmentIndex.isMultiple(of: 8)
+            }) { record in
+                DeepMinePixelImage(
+                    name: DeepMineArt.equipment(.cart, level: record.cartLevel),
+                    size: 34
+                )
+                .position(
+                    x: width / 2,
+                    y: ShaftGeometry.y(
+                        for: Double(record.depthMeters) + 2,
+                        in: scene
+                    )
+                )
+            }
+            ForEach(scene.boreHistory.filter {
+                $0.lampLevel > Balance.minimumEquipmentLevel
+                    && $0.segmentIndex.isMultiple(of: 5)
+            }) { record in
+                let boreHalf = min(width * 0.34, CGFloat(record.boreWidthPoints) / 2)
+                DeepMinePixelImage(
+                    name: DeepMineArt.equipment(.lamp, level: record.lampLevel),
+                    size: 24
+                )
+                .position(
+                    x: width / 2 + boreHalf - 9,
+                    y: ShaftGeometry.y(
+                        for: Double(record.depthMeters) + 1,
+                        in: scene
+                    )
+                )
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    private func rail(width: CGFloat) -> some View {
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        return HStack(spacing: 34) {
+            Rectangle().fill(DeepMinePalette.brass.color.opacity(0.48)).frame(width: 2)
+            Rectangle().fill(DeepMinePalette.brass.color.opacity(0.48)).frame(width: 2)
+        }
+        .frame(width: 40, height: max(0, headY))
+        .overlay {
+            VStack(spacing: 12) {
+                ForEach(0..<max(1, Int(headY / 12)), id: \.self) { _ in
+                    Rectangle()
+                        .fill(DeepMinePalette.brass.color.opacity(0.3))
+                        .frame(width: 38, height: 1)
+                }
+            }
+        }
+        .position(x: width / 2, y: headY / 2)
+    }
+
+    private var futureDarkness: some View {
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        return LinearGradient(
+            colors: [.clear, DeepMinePalette.coal.color.opacity(0.94)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .frame(height: max(0, ShaftGeometry.columnHeight(for: scene) - headY))
+        .offset(y: headY)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    private func currentFace(width: CGFloat) -> some View {
+        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        return ZStack {
+            GameArtView(
+                entry: GameArtCatalog.fracture(intensity: fractureIntensity),
+                size: 98 + CGFloat(player.mineFace.brokenFraction * 42)
+            )
+            .opacity(0.92)
+            GameArtView(entry: GameArtCatalog.shaftGantry, size: 94)
+                .offset(y: -18)
+            HStack(spacing: -9) {
+                WorkingMinerView(
+                    isWorking: true,
+                    intensity: min(
+                        1,
+                        player.mineFace.impact.fraction
+                            + (player.equipmentModifications.drill == .drillImpact ? 0.28 : 0)
+                    )
+                )
+                    .frame(width: 54, height: 54)
+                DeepMinePixelImage(
+                    name: DeepMineArt.equipment(.drill, level: player.equipment.drill),
+                    size: 38
+                )
+            }
+            .offset(y: -16)
+            DeepMinePixelImage(
+                name: DeepMineArt.equipment(.lamp, level: player.equipment.lamp),
+                size: 25
+            )
+            .position(
+                x: width / 2 + min(width * 0.31, CGFloat(scene.currentBoreWidthPoints) / 2) - 8,
+                y: 35
+            )
+            if let point = player.mineFace.segment.weakPoint {
+                weakPoint(point, width: width)
+            }
+        }
+        .frame(width: width, height: 112)
+        .position(x: width / 2, y: headY)
+        .allowsHitTesting(true)
+    }
+
+    private func weakPoint(_ point: RockSegment.WeakPoint, width: CGFloat) -> some View {
+        GameArtView(entry: GameArtCatalog.weakPoint(isStruck: isStruck), size: 36)
+            .shadow(
+                color: player.equipmentModifications.lamp == .lampFortune
+                    ? DeepMinePalette.brass.color.opacity(0.9)
+                    : .clear,
+                radius: player.equipmentModifications.lamp == .lampFortune ? 11 : 0
+            )
+            .frame(width: 48, height: 48)
+            .position(
+                x: width * point.unitX,
+                y: 56 + 36 * (point.unitY - 0.5)
+            )
+            .contentShape(Rectangle())
+            .highPriorityGesture(TapGesture().onEnded { onStrike(true) })
+            .accessibilityIdentifier("rock-weak-point")
+            .accessibilityLabel(DeepMineStrings.text(.shaftWeakPoint))
+            .accessibilityAddTraits(.isButton)
+    }
+
+    private func depthRecordPlate(width: CGFloat) -> some View {
+        let record = Double(player.recordDepthMeters)
+        return Group {
+            if record >= scene.topDepthMeters && record <= scene.bottomDepthMeters {
+                Text("RECORD · \(player.recordDepthMeters)m")
+                    .font(.caption2.monospacedDigit().weight(.black))
+                    .foregroundStyle(DeepMinePalette.coal.color)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(DeepMinePalette.brass.color, in: Capsule())
+                    .position(
+                        x: width - 62,
+                        y: ShaftGeometry.y(for: record, in: scene)
+                    )
+                    .accessibilityIdentifier("shaft-record-plate")
+            }
+        }
     }
 
     private var fractureIntensity: FractureIntensity {
-        switch damageStage {
-        case 2: .light
-        case 3: .medium
+        switch player.mineFace.damageStage {
+        case ...1: .light
+        case 2: .medium
         default: .heavy
         }
     }

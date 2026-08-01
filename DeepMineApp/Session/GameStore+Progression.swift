@@ -25,6 +25,20 @@ extension GameStore {
         return result
     }
 
+    @discardableResult
+    func purchaseEquipmentModification(
+        _ modification: EquipmentModificationKind,
+        commandID: UUID = UUID()
+    ) throws -> EquipmentModificationPurchaseResult {
+        var player = try repository.loadPlayer()
+        let result = EquipmentModificationEngine.purchase(
+            EquipmentModificationCommand(id: commandID, modification: modification),
+            in: &player
+        )
+        if case .purchased = result { try repository.savePlayer(player) }
+        return result
+    }
+
     func recommendedUpgrade(
         verificationGrade: VerificationGrade = .sealed
     ) throws -> UpgradeRecommendation? {

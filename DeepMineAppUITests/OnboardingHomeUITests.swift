@@ -9,66 +9,57 @@ final class OnboardingHomeUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testTwoPremisePagesLeadToPersistedDemoStart() {
-        launch(fixture: "fresh", reset: true)
-        XCTAssertTrue(app.staticTexts["onboarding-premise-blocks"].waitForExistence(timeout: 5))
-        app.buttons["onboarding-next"].tap()
-        XCTAssertTrue(app.staticTexts["onboarding-premise-sessions"].waitForExistence(timeout: 2))
-        app.buttons["onboarding-next"].tap()
-        app.buttons["onboarding-demo-start"].tap()
+    func testFreshLaunchStartsOnTheBreakableRockAndPersistsTheReward() {
+        let storeID = "first-rock-\(UUID().uuidString)"
+        launch(fixture: "fresh", reset: true, storeID: storeID)
         XCTAssertTrue(app.staticTexts["onboarding-demo-active"].waitForExistence(timeout: 2))
-        let timer = app.staticTexts["onboarding-demo-timer"]
-        XCTAssertTrue(timer.exists)
-        // Guards a seconds/minutes mix-up: the practice dig is ten seconds, not ten minutes.
-        XCTAssertFalse(timer.label.contains("10분") || timer.label.contains("10 minutes"))
+        XCTAssertTrue(app.buttons["onboarding-demo-rock"].exists)
+        tapFirstRockUntilReward()
+        XCTAssertTrue(app.staticTexts["onboarding-demo-reward"].waitForExistence(timeout: 3))
+
+        app.terminate()
+        launch(fixture: "fresh", reset: false, storeID: storeID)
+        XCTAssertTrue(app.staticTexts["onboarding-demo-reward"].waitForExistence(timeout: 5))
     }
 
     func testDeterministicDemoCompletionShowsRewardAndSavedUpgrade() {
         launch(fixture: "demo-completed", reset: true)
         XCTAssertTrue(app.staticTexts["onboarding-demo-reward"].waitForExistence(timeout: 5))
         app.buttons["onboarding-demo-upgrade"].tap()
-        XCTAssertTrue(
-            app.staticTexts["onboarding-permission-focusProtection"].waitForExistence(timeout: 2)
-        )
+        XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["onboarding-permission-focusProtection"].exists)
         app.terminate()
         launch(fixture: "demo-completed", reset: false)
-        XCTAssertTrue(
-            app.staticTexts["onboarding-permission-focusProtection"].waitForExistence(timeout: 5)
-        )
+        XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 5))
     }
 
-    func testEachPermissionDenialStillReachesPlayableHome() {
-        for denial in ["deny-focus", "deny-end", "deny-return"] {
-            launch(fixture: "permissions", reset: true, permission: denial)
-            app.buttons["onboarding-demo-upgrade"].tap()
-            for _ in 0..<3 {
-                XCTAssertTrue(
-                    app.buttons["onboarding-permission-allow"].waitForExistence(timeout: 3)
-                )
-                app.buttons["onboarding-permission-allow"].tap()
-            }
-            XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 3))
-            XCTAssertTrue(app.buttons["mine-home-start"].exists)
-            app.terminate()
+    func testLegacyPermissionStageCanStillDeferIntoPlayableHome() {
+        launch(fixture: "permissions", reset: true)
+        for _ in 0..<3 {
+            XCTAssertTrue(app.buttons["onboarding-permission-defer"].waitForExistence(timeout: 3))
+            app.buttons["onboarding-permission-defer"].tap()
         }
+        XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 3))
     }
 
     func testFreshAndProgressedHomeUseOneMineControlScene() {
         launch(fixture: "home-fresh", reset: true)
         XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 5))
-        // The single promise sentence became three reachable steps.
-        XCTAssertTrue(app.otherElements["mine-home-step-equipment"].exists)
+        XCTAssertTrue(app.buttons["rock-face"].waitForExistence(timeout: 5))
+        openFocusAmplifier()
         XCTAssertTrue(app.staticTexts["mine-home-deep-lock-reason"].exists)
         app.terminate()
 
         launch(fixture: "home-progressed", reset: true)
         XCTAssertTrue(app.staticTexts["mine-home"].waitForExistence(timeout: 5))
+        openFocusAmplifier()
         XCTAssertTrue(app.buttons["mine-home-plan-safe"].isSelected)
         XCTAssertTrue(app.buttons["mine-home-start"].exists)
     }
 
     func testDeepPlanIsLockedThenUnlocked() {
         launch(fixture: "home-fresh", reset: true)
+        openFocusAmplifier()
         let locked = app.buttons["mine-home-plan-deep"]
         XCTAssertTrue(locked.waitForExistence(timeout: 5))
         XCTAssertFalse(locked.isEnabled)
@@ -76,6 +67,7 @@ final class OnboardingHomeUITests: XCTestCase {
         app.terminate()
 
         launch(fixture: "home-unlocked", reset: true)
+        openFocusAmplifier()
         let unlocked = app.buttons["mine-home-plan-deep"]
         XCTAssertTrue(unlocked.waitForExistence(timeout: 5))
         XCTAssertTrue(unlocked.isEnabled)
@@ -86,6 +78,7 @@ final class OnboardingHomeUITests: XCTestCase {
     func testPlanAndDurationSelectionPersistAcrossRelaunch() {
         let storeID = "selection-\(UUID().uuidString)"
         launch(fixture: "home-unlocked", reset: true, storeID: storeID)
+        openFocusAmplifier()
         app.buttons["mine-home-plan-deep"].tap()
         let duration = app.buttons["mine-home-duration-50"]
         if !duration.isHittable { app.swipeUp() }
@@ -95,6 +88,7 @@ final class OnboardingHomeUITests: XCTestCase {
         app.terminate()
 
         launch(fixture: "home-unlocked", reset: false, storeID: storeID)
+        openFocusAmplifier()
         XCTAssertTrue(app.buttons["mine-home-plan-deep"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["mine-home-plan-deep"].isSelected)
         let reloadedDuration = app.buttons["mine-home-duration-50"]
@@ -119,5 +113,26 @@ final class OnboardingHomeUITests: XCTestCase {
         app.launchEnvironment["DEEPMINE_UI_STORE_ID"] = storeID
             ?? "\(name)-\(fixture)-\(permission)"
         app.launch()
+    }
+
+    private func tapFirstRockUntilReward() {
+        for _ in 0..<20 {
+            if app.staticTexts["onboarding-demo-reward"].exists { return }
+            let rock = app.buttons["onboarding-demo-rock"]
+            XCTAssertTrue(rock.waitForExistence(timeout: 2))
+            rock.tap()
+        }
+    }
+
+    private func openFocusAmplifier() {
+        let amplifier = app.buttons["mine-home-focus-amplifier"]
+        for _ in 0..<10 where !amplifier.exists || !amplifier.isHittable { app.swipeUp() }
+        XCTAssertTrue(amplifier.waitForExistence(timeout: 5))
+        XCTAssertTrue(amplifier.isHittable)
+        amplifier.tap()
+    }
+
+    private func element(_ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any)[identifier]
     }
 }

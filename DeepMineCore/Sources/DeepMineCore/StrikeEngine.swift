@@ -7,17 +7,20 @@ public struct StrikePower: Equatable, Sendable {
     public let damagePerSecond: BigNumber
     public let criticalChance: Double
     public let criticalMultiplier: Double
+    public let oreMultiplier: Double
 
     public init(
         tapDamage: BigNumber,
         damagePerSecond: BigNumber,
         criticalChance: Double,
-        criticalMultiplier: Double
+        criticalMultiplier: Double,
+        oreMultiplier: Double = 1
     ) {
         self.tapDamage = tapDamage
         self.damagePerSecond = damagePerSecond
         self.criticalChance = criticalChance
         self.criticalMultiplier = criticalMultiplier
+        self.oreMultiplier = oreMultiplier
     }
 
     public var isAutomated: Bool { !damagePerSecond.isZero }
@@ -74,6 +77,7 @@ public enum StrikeEngine {
     public static func power(
         equipment: EquipmentLevels,
         permanent: PermanentUpgradeLevels,
+        modifications: EquipmentModifications = .empty,
         prestigeMultiplier: Double = 1
     ) -> StrikePower {
         let safeMultiplier = prestigeMultiplier.isFinite && prestigeMultiplier > 0
@@ -82,6 +86,9 @@ public enum StrikeEngine {
 
         let tap = BigNumber(Balance.baseTapDamage)
             * BigNumber(Balance.drillMultiplier(level: equipment.drill))
+            * (modifications.drill == .drillImpact
+                ? Balance.impactModificationDamageMultiplier
+                : 1)
             * safeMultiplier
 
         let cartSteps = Balance.levelsAboveBase(equipment.cart)
@@ -89,6 +96,9 @@ public enum StrikeEngine {
             ? BigNumber.zero
             : BigNumber(Balance.automationDamagePerLevel * Double(cartSteps))
                 * BigNumber(Balance.automationGrowthRate).raised(to: Double(cartSteps))
+                * (modifications.cart == .cartFleet
+                    ? Balance.fleetModificationAutomationMultiplier
+                    : 1)
                 * safeMultiplier
 
         let lampSteps = Balance.levelsAboveBase(equipment.lamp)
@@ -96,6 +106,9 @@ public enum StrikeEngine {
             Balance.maximumCriticalChance,
             Balance.baseCriticalChance
                 + Double(lampSteps) * Balance.lampCriticalChanceIncreasePerLevel
+                + (modifications.lamp == .lampFortune
+                    ? Balance.fortuneModificationCriticalChance
+                    : 0)
         )
         let multiplier = Balance.baseCriticalMultiplier
             + Double(lampSteps) * Balance.lampCriticalMultiplierIncreasePerLevel
@@ -105,7 +118,10 @@ public enum StrikeEngine {
             tapDamage: tap,
             damagePerSecond: automation,
             criticalChance: chance,
-            criticalMultiplier: multiplier
+            criticalMultiplier: multiplier,
+            oreMultiplier: modifications.cart == .cartFreight
+                ? Balance.freightModificationOreMultiplier
+                : 1
         )
     }
 

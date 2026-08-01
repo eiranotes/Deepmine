@@ -1,7 +1,7 @@
 import DeepMineCore
 import SwiftUI
 
-/// The practice reward, permission and hand-off steps.
+/// The first-rock reward, legacy permission recovery and home hand-off steps.
 @MainActor
 extension OnboardingFlowView {
     var reward: some View {
@@ -16,8 +16,8 @@ extension OnboardingFlowView {
                     Text(DeepMineStrings.text(.onboardingDemoRewardBody))
                         .multilineTextAlignment(.center)
                     Divider().overlay(DeepMinePalette.limestone.color.opacity(0.25))
-                    // The practice return always finds a vein, so the first thing a new
-                    // player sees includes the mechanic the loop is built around.
+                    // The first rock always finds a vein, so every new player sees the
+                    // mechanic the loop is built around.
                     Label(
                         DeepMineStrings.text(
                             DeepMineProgressLabels.veinKey(Balance.demoGuaranteedVein)
@@ -86,54 +86,38 @@ extension OnboardingFlowView {
         }
     }
 
-    var timerText: String {
-        String(format: "%d:%02d", remainingSeconds / 60, remainingSeconds % 60)
-    }
-
-    var timerAccessibilityLabel: String {
-        let minutes = remainingSeconds / 60
-        let seconds = remainingSeconds % 60
-        let minutePart = minutes > 0
-            ? "\(minutes) \(DeepMineStrings.text(.gameMinutes))"
-            : ""
-        return [minutePart, "\(seconds) \(DeepMineStrings.text(.gameSeconds))"]
-            .filter { !$0.isEmpty }
-            .joined(separator: " ")
-    }
-
     var nextPermission: OnboardingPermissionKind {
         if player.focusProtectionPermission == .notAsked { return .focusProtection }
         if player.endAlertPermission == .notAsked { return .endAlert }
         return .returnReminder
     }
 
-    func advancePremise() {
-        if let updated = try? gameStore.advanceOnboardingPremise() { player = updated }
-    }
-
-    func startDemo() {
-        guard let state = try? gameStore.beginOrResumeDemo() else { return }
-        remainingSeconds = state.remainingSeconds
+    func strike(onWeakPoint: Bool) {
+        struckWeakPoint = onWeakPoint
+        guard let result = try? gameStore.strikeOnboardingRock(hitWeakPoint: onWeakPoint) else {
+            return
+        }
+        switch result {
+        case let .struck(update), let .rewarded(update, _, _):
+            feedback.play(update.wasCritical ? .criticalStrike : .strike)
+            if update.brokeSomething { feedback.play(.segmentBroken) }
+            lastStrikeText = "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))"
+        case .alreadyRewarded:
+            break
+        }
         player = (try? gameStore.playerState()) ?? player
-    }
-
-    func monitorDemoIfNeeded() async {
-        guard player.onboardingStage == .demo, player.demoStartedAt != nil else { return }
-        while !Task.isCancelled {
-            guard let state = try? gameStore.demoState() else { return }
-            remainingSeconds = state.remainingSeconds
-            if state.remainingSeconds == 0 {
-                _ = try? gameStore.completeDemoIfNeeded()
-                player = (try? gameStore.playerState()) ?? player
-                return
-            }
-            try? await Task.sleep(for: .seconds(1))
+        guard onWeakPoint else { return }
+        Task {
+            try? await Task.sleep(for: .milliseconds(120))
+            struckWeakPoint = false
         }
     }
 
     func installUpgrade() {
-        _ = try? gameStore.purchaseDemoUpgrade()
+        let result = try? gameStore.purchaseDemoUpgrade()
         player = (try? gameStore.playerState()) ?? player
+        if case .purchased = result { feedback.play(.upgradeInstalled) }
+        if player.onboardingStage == .complete { onFinished(player) }
     }
 
     func request(_ kind: OnboardingPermissionKind) async {

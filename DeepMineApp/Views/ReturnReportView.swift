@@ -24,7 +24,7 @@ struct ReturnReportView: View {
                 VStack(alignment: .leading, spacing: 17) {
                     confirmation
                     if beat >= 1 { rewardReveal }
-                    if beat >= 2 { nextPromise }
+                    if beat >= 2 { nextGoalPanel }
                 }
                 .padding(17)
             }

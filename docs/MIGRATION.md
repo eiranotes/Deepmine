@@ -13,7 +13,7 @@ Every model carries `schemaVersion = 1`; the repository accepts exactly the curr
 
 | Model | Persisted responsibility |
 | --- | --- |
-| `PlayerStateEntity` | Resources, focus totals, session/depth progress, streak summary, world unlocks, selected theme, vein state, prestige, permanent levels, onboarding/demo receipts, permission outcomes, last expedition choice, and idempotency sets |
+| `PlayerStateEntity` | Resources, focus totals, session/depth progress, bore history, per-run equipment modifications, streak summary, world unlocks, selected theme, vein state, prestige, permanent levels, onboarding/demo receipts, permission outcomes, last expedition choice, and idempotency sets |
 | `EquipmentStateEntity` | Drill, cart, and lamp levels |
 | `SessionRecordEntity` | Ordered session history and completion outcomes |
 | `DailyRecordEntity` | Ordered daily focus, goal, streak, rest-day, and finalization history |
@@ -21,7 +21,7 @@ Every model carries `schemaVersion = 1`; the repository accepts exactly the curr
 
 The repository reconstructs a complete `DeepMineCore.PlayerState`; derived values such as current depth and region remain Core-owned calculations.
 
-The unreleased v1 schema now includes onboarding stage, demo timestamps and receipt IDs, three neutral permission outcomes, last plan/duration, daily goal and streak records, run/lifetime focus, regions/themes/decorations, vein miss/effect state, prestige and permanent upgrades, active session origin command IDs, and a persisted return report. Required attributes carry explicit defaults while optional timestamps and receipts remain absent. This is a pre-release schema consolidation, not a substitute for the versioned migration procedure required after release. Full-state round-trip, temporary-store reopen, defaults, unsupported-version, corruption, session, and return-report tests cover it.
+The unreleased v1 schema now includes onboarding stage, demo timestamps and receipt IDs, three neutral permission outcomes, last plan/duration, daily goal and streak records, run/lifetime focus, regions/themes/decorations, vein miss/effect state, prestige and permanent upgrades, active session origin command IDs, the selected per-run equipment modifications, the encoded `BoreRecord` history, and a persisted return report. Both new data fields default to empty data and decode legacy saves as `.empty`/`[]`. Required attributes carry explicit defaults while optional timestamps and receipts remain absent. This is a pre-release schema consolidation, not a substitute for the versioned migration procedure required after release. Full-state round-trip, temporary-store reopen, defaults, unsupported-version, corruption, session, and return-report tests cover it.
 
 ## Cross-process command queue
 
