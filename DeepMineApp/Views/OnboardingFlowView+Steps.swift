@@ -93,6 +93,7 @@ extension OnboardingFlowView {
     }
 
     func strike(onWeakPoint: Bool) {
+        strikeSignal &+= 1
         struckWeakPoint = onWeakPoint
         guard let result = try? gameStore.strikeOnboardingRock(hitWeakPoint: onWeakPoint) else {
             return

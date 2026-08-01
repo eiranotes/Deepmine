@@ -17,6 +17,9 @@ struct GameArtView: View {
     /// rock art is square and a shaft band is wide; laying squares side by side reads as
     /// a row of boulders rather than a rock face.
     var fill: CGSize?
+    /// Fit the entire image inside a non-square frame. Tall transparent overlays such as
+    /// the shaft fracture must keep their silhouette instead of being centre-cropped.
+    var fit: CGSize?
 
     var body: some View {
         Group {
@@ -30,7 +33,10 @@ struct GameArtView: View {
                 GameArtPlaceholderView(placeholder: entry.placeholder)
             }
         }
-        .frame(width: fill?.width ?? size, height: fill?.height ?? size)
+        .frame(
+            width: fill?.width ?? fit?.width ?? size,
+            height: fill?.height ?? fit?.height ?? size
+        )
         .clipped()
         .foregroundStyle(tint ?? ProbePalette.limestone)
         .accessibilityHidden(true)

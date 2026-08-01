@@ -100,6 +100,7 @@
 		7803CFDFDA901CBE9C0A9C29 /* GameStoreSettingsPrestigeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494AD32360B4E279B1916191 /* GameStoreSettingsPrestigeTests.swift */; };
 		78FE3DFE57396FC2B22C2B6B /* SharedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E3019687B7661259BADDE7A /* SharedAssets.xcassets */; };
 		7A36C5631AF10F683BC55A00 /* ProbeIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD2558B68F634F1023BC1762 /* ProbeIntents.swift */; };
+		7E2AF52BEE56EB9C601C119F /* ShaftView+Effects.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3390533E9EE92958A42B4B /* ShaftView+Effects.swift */; };
 		7EAA0915C4EB5A058C2596FE /* GameActivitySurfaceFixtureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80675BB78D1F3C44DDEAF76A /* GameActivitySurfaceFixtureView.swift */; };
 		7F18C65B4C3BEC7C7ABB759C /* GameWidgetSnapshotFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA072484F9FCBFDD04BD59 /* GameWidgetSnapshotFixtures.swift */; };
 		7F44BEC7E9CF49913510EF27 /* PixelMinerIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA955734BEE368632BB32E4 /* PixelMinerIcon.swift */; };
@@ -132,6 +133,7 @@
 		A3CA77A15FE2B295D387437E /* GameActivityComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6783352927B80927EECEEB50 /* GameActivityComponents.swift */; };
 		A5339EA5D176EF4D168ABECB /* ProbeSharedStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1702A576D351774E174EA34 /* ProbeSharedStoreTests.swift */; };
 		A5C6FAF821F76412EE5E9517 /* ProbeScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01EAF3FDADC537F8C8E66B7 /* ProbeScreenshotTests.swift */; };
+		A66837E8090D53908089D530 /* ShaftGroundFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A7AA7F7A80C829A66F2E3 /* ShaftGroundFaceView.swift */; };
 		A7202077FB7B5C6DF1F8A2B3 /* DeepMineAchievementLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5701A151634B5962BDD4A7F /* DeepMineAchievementLabels.swift */; };
 		AB14101DFBE780FF4BC95C9D /* ProbeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8386662C163891D26E218EF5 /* ProbeModels.swift */; };
 		ADAD249B5BCF82370EA60259 /* SettingsPrestigeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111F933BDE3D92651CCFA76F /* SettingsPrestigeUITests.swift */; };
@@ -281,6 +283,7 @@
 		21F88019A4E4A7EFEED3DE94 /* ShaftHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaftHUDView.swift; sourceTree = "<group>"; };
 		227D43619A91203D7469CBF5 /* ReturnReportView+Beats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReturnReportView+Beats.swift"; sourceTree = "<group>"; };
 		25DB86935865A668F4EEFC1E /* ActiveMineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMineView.swift; sourceTree = "<group>"; };
+		271A7AA7F7A80C829A66F2E3 /* ShaftGroundFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaftGroundFaceView.swift; sourceTree = "<group>"; };
 		28E56C775EA0E83150D32684 /* GamePassiveSurfaceRefreshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePassiveSurfaceRefreshTests.swift; sourceTree = "<group>"; };
 		2AD42AB37658ABB40DBC7477 /* DeepMineCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DeepMineCore; path = DeepMineCore; sourceTree = SOURCE_ROOT; };
 		2F68F4F71483FF708972C7E3 /* GameFeedbackPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFeedbackPreferenceTests.swift; sourceTree = "<group>"; };
@@ -392,6 +395,7 @@
 		DA2FCCB5E602FF095FEE3F6A /* GameStore+Progression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameStore+Progression.swift"; sourceTree = "<group>"; };
 		DB8D85918D825D8EBDDCFF1B /* DeepMineLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMineLiveActivityWidget.swift; sourceTree = "<group>"; };
 		DC3CE79D79B37AD12FFA9CC9 /* EquipmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipmentView.swift; sourceTree = "<group>"; };
+		DE3390533E9EE92958A42B4B /* ShaftView+Effects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShaftView+Effects.swift"; sourceTree = "<group>"; };
 		DE6021994C4AC62981A2EE6A /* GameStoreOnboardingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStoreOnboardingTests.swift; sourceTree = "<group>"; };
 		E01EAF3FDADC537F8C8E66B7 /* ProbeScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeScreenshotTests.swift; sourceTree = "<group>"; };
 		E0D43E90C1EA27821BBA3A46 /* ReturnReportUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReportUITests.swift; sourceTree = "<group>"; };
@@ -580,9 +584,11 @@
 				48F547ED1BCC70B57DDE9EAE /* SettingsView+Actions.swift */,
 				7E3749ADA4063D7AFC076CBD /* ShaftEffectsView.swift */,
 				D6EE591C322A67862CBD0443 /* ShaftGeometry.swift */,
+				271A7AA7F7A80C829A66F2E3 /* ShaftGroundFaceView.swift */,
 				21F88019A4E4A7EFEED3DE94 /* ShaftHUDView.swift */,
 				E7922E610F15F3D4FCFDBABF /* ShaftLayerView.swift */,
 				456FF782DDE43990AAE7970C /* ShaftView.swift */,
+				DE3390533E9EE92958A42B4B /* ShaftView+Effects.swift */,
 				6C0C91E6DEC1DECBA48795F0 /* StatisticsView.swift */,
 				3C9E700A1078706707B22E64 /* StatisticsView+Growth.swift */,
 				CF0371406369A0B19D6B7EC6 /* ThemeView.swift */,
@@ -1158,8 +1164,10 @@
 				E81D7840B7F606FD5EBFFEDA /* SettingsView.swift in Sources */,
 				15214D6CDDC74E14FD456EB8 /* ShaftEffectsView.swift in Sources */,
 				5BA5BE6C0F4F14721134D452 /* ShaftGeometry.swift in Sources */,
+				A66837E8090D53908089D530 /* ShaftGroundFaceView.swift in Sources */,
 				87D9D0E2AC4411A2CB6DC3C6 /* ShaftHUDView.swift in Sources */,
 				D626F69D942E7199C97987AC /* ShaftLayerView.swift in Sources */,
+				7E2AF52BEE56EB9C601C119F /* ShaftView+Effects.swift in Sources */,
 				1276237104FDAF3997BE09D8 /* ShaftView.swift in Sources */,
 				C99A54C993F1C6B510F6D7D8 /* StatisticsView+Growth.swift in Sources */,
 				4D46C51DACC85850942B82E2 /* StatisticsView.swift in Sources */,

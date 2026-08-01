@@ -9,12 +9,25 @@ const styles = readFileSync(join(projectRoot, "app/mine.module.css"), "utf8");
 
 test("continuous shaft contract remains explicit", () => {
   assert.match(prototype, /boreHistory/);
-  assert.match(prototype, /--head-top/);
-  assert.match(prototype, /47 \+ progress \* 18/);
+  assert.match(prototype, /--rock-phase/);
+  assert.match(prototype, /--surface-y/);
+  assert.match(prototype, /passageHistory/);
+  assert.match(prototype, /styles\.openShaft/);
+  assert.match(prototype, /styles\.workLine/);
   assert.match(prototype, /headDepth\.toFixed\(1\)/);
-  assert.match(styles, /\.boreSegment/);
-  assert.match(styles, /top: var\(--head-top\)/);
+  assert.match(styles, /\.rockWorld/);
+  assert.match(styles, /top: var\(--workline\)/);
+  assert.match(styles, /background-position: center var\(--rock-phase\)/);
   assert.doesNotMatch(prototype, /다음 약속|연속 일수|출정 횟수/);
+});
+
+test("automatic descent and page-wide tap acceleration stay explicit", () => {
+  assert.match(prototype, /AUTO_DAMAGE_STEP_MS/);
+  assert.match(prototype, /automation \* \(AUTO_DAMAGE_STEP_MS \/ 1000\)/);
+  assert.match(prototype, /onPointerDown=\{handleMinePointerDown\}/);
+  assert.match(prototype, /onPointerUp=\{handleMinePointerUp\}/);
+  assert.match(prototype, /isSecondaryControl/);
+  assert.match(prototype, /자동 굴착 중/);
 });
 
 test("each equipment owns a visible scene effect and a branch choice", () => {
@@ -22,10 +35,11 @@ test("each equipment owns a visible scene effect and a branch choice", () => {
     assert.match(prototype, new RegExp(`${kind}: \\[`, "m"));
     assert.match(prototype, new RegExp(`Equipment_\\$\\{kind\\}_tier`));
   }
-  assert.match(prototype, /installedLamp/);
-  assert.match(prototype, /movingCart/);
-  assert.match(prototype, /drillRig/);
-  assert.match(prototype, /debrisCloud/);
+  assert.match(prototype, /continuousLamp/);
+  assert.match(prototype, /continuousCart/);
+  assert.match(prototype, /continuousDrill/);
+  assert.match(prototype, /continuousDebris/);
+  assert.match(prototype, /miningPickaxe/);
   assert.match(styles, /--cart-duration/);
   assert.match(styles, /fortuneBuild/);
 });
@@ -40,6 +54,10 @@ test("all prototype art is project-local and deployable", () => {
     "public/assets/shaft/ShaftRock_ruins.png",
     "public/assets/shaft/ShaftRock_abyss.png",
     "public/assets/shaft/SeamVein.png",
+    "public/assets/shaft/MiningPickaxe.png",
+    "public/assets/shaft/ShaftFractureVertical_light.png",
+    "public/assets/shaft/ShaftFractureVertical_medium.png",
+    "public/assets/shaft/ShaftFractureVertical_heavy.png",
     "public/og/deepmine-shaft-social.png",
   ];
 

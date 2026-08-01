@@ -1,0 +1,34 @@
+[
+  {
+    "asset": "MiningPickaxe",
+    "generator": "OpenAI ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-99ddb410-6ce5-4137-94fb-d4a510df084b.png",
+    "project_raw_copy": "artifacts/imagegen/shaft-assets-v1/raw/MiningPickaxe.png",
+    "derivation": "new generation"
+  },
+  {
+    "asset": "ShaftFractureVertical_light",
+    "generator": "OpenAI ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-5cd9ecc5-2caa-4ade-a3bb-36f150b32c18.png",
+    "project_raw_copy": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_light.png",
+    "derivation": "new generation"
+  },
+  {
+    "asset": "ShaftFractureVertical_medium",
+    "generator": "OpenAI ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-05cfff76-df11-42f3-8082-7d7ef0b49633.png",
+    "project_raw_copy": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_medium.png",
+    "derivation": "edit of ShaftFractureVertical_light"
+  },
+  {
+    "asset": "ShaftFractureVertical_heavy",
+    "generator": "OpenAI ImageGen tool",
+    "generated_on": "2026-08-01",
+    "source_reference": "generated_images/019fbb65-2ebc-70a1-b2c9-a7b22a5dd1f7/exec-90aa3dea-cf29-4c0c-b14f-34d9a20e3fd9.png",
+    "project_raw_copy": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_heavy.png",
+    "derivation": "edit of ShaftFractureVertical_medium"
+  }
+]

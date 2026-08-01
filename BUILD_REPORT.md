@@ -1,6 +1,62 @@
 # Build Report
 
-업데이트: 2026-08-01 (클리커 우선 첫 실행)
+업데이트: 2026-08-01 (웹 연속 암반·자동 하강 기준안)
+
+## 2026-08-01 web continuous rock and idle descent baseline
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 연속 암반 | 검증됨(로컬 브라우저) | 과거 통로와 현재 작업면을 별도 장면으로 쌓지 않고, `headDepth` 하나로 암반 텍스처·지표·보어 이력·심도 눈금을 같은 속도로 위로 이동 |
+| 무입력 하강 | 검증됨(로컬 브라우저) | 광차 자동 데미지를 120ms 고정 스텝으로 적용. 입력 없이 1초 동안 18.9m→19.2m 증가 |
+| 화면 전체 탭 | 검증됨(로컬 브라우저) | `main`의 Pointer Events로 버튼이 아닌 제목 영역 탭도 굴착에 반영. 19.2m→20.0m 즉시 증가. 18px 이동 시 스크롤로 판정해 취소 |
+| 곡괭이·세로 균열 | 검증됨(브라우저 육안) | 생성 `MiningPickaxe`를 광부와 독립 회전시키고, 생성 `ShaftFractureVertical_*`를 진행률에 따라 위→아래 공개 |
+| 파괴 연속성 | 구현·정적 검증됨 | 4m 돌파 전후 `headDepth`가 동일 좌표를 유지하고, 좌우 암반 붕괴 뒤 같은 `rock-phase`에서 다음 굴착을 계속함 |
+| 첫 화면 | 검증됨(390×844) | 상단 설명·외부 상태줄을 줄이고 제목 다음에 즉시 갱도 배치. 과거 구간은 빈 여백이 아니라 지지대·레일·광차가 있는 열린 통로로 표시 |
+| 웹 검사 | 검증됨 | `npm run lint`, `npm test` 4/4, vinext production build 통과. 브라우저 console warning/error 0 |
+| 배포 | 미수행 | 이번 기준안은 로컬 웹 검증만 수행. 기존 비공개 version 2 배포에는 반영하지 않았고 iOS 포팅도 시작하지 않음 |
+
+이 기준안은 D-054의 앱 포팅 전 승인 대상으로 둔다. 실제 앱의 지반 버튼과 D-053 모션은
+이번 웹 변경으로 교체하지 않았으며, 웹 체감 확정 뒤 같은 좌표·자동화 계약으로 옮긴다.
+
+## 2026-08-01 breakable ground and visible pickaxe strike
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 큰 파괴 대상 | 검증됨(시뮬레이터) | 갱도 전체 탭 제스처를 제거하고 현재 `ShaftRock_*` 지반을 화면 폭 대부분의 실제 `Button`으로 노출. 한국어·다크·medium 캡처 육안 확인 |
+| 곡괭이 타격 | 검증됨(시뮬레이터 영상) | 독립 `MiningPickaxe`가 준비 각도에서 약 70° 내려찍고 spring으로 복귀. 0.9초 클립과 16프레임 판독에서 연속 동작 확인 |
+| 세로 균열 | 검증됨(시뮬레이터·정적) | 진행률 0에서는 숨기고 첫 타격부터 위→아래 공개. damage stage에 따라 light/medium/heavy로 교체. 캡처에서 중앙 세로 경로 확인 |
+| 타격 피드백 | 검증됨(UI) | `testGroundStrikeChangesVisibleIntegrity` 1/1. `rock-face` 탭 뒤 내구 레이블 100%→89%, 작은 파편과 타격 숫자 표시 |
+| 파괴 전환 | 검증됨(UI·시뮬레이터 영상) | `testGroundBreakDescendsToTheNextSegment` 1/1. 9회 타격 뒤 `rock-face`가 0m→4m로 바뀌며, 이전 지반 전체 폭이 중앙에서 벌어져 좌우 회전·낙하하는 장면을 2.33초 클립과 키프레임으로 확인 |
+| Reduce Motion | 구현·빌드 검증됨 | 도구 상태·균열·보상은 유지하고 지반 흔들림·분할 낙하·카메라 보간을 축소 |
+| ImageGen 자산 4종 | 검증됨 | `MiningPickaxe`, `ShaftFractureVertical_*` 3종을 내장 ImageGen으로 생성/편집. `provenance.json`에 원본 참조와 계보 보존 |
+| shaft asset validator | 검증됨 | `PYTHONDONTWRITEBYTECODE=1 uv run --with pillow python scripts/process_shaft_assets.py --validate-only` → 11/11 imageset 통과 |
+| 아트 카탈로그 | 검증됨 | `GameArtCatalogTests` 12/12, 실패 0. 11개 shaft 슬롯 설치·프롬프트·폴백 계약 포함 |
+| Core 전체 | 검증됨 | `swift test --package-path DeepMineCore` 195/195, 실패 0 |
+| generic iOS build | 검증됨 | `xcodebuild ... -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build` → BUILD SUCCEEDED |
+| 시뮬레이터 build | 검증됨 | iPhone 17 Pro iOS 26.5 대상 build → BUILD SUCCEEDED |
+| 실기기 타격감 | 미검증(실기기 필요) | 실제 손가락 아래 press-down 지연, 햅틱 강도, OLED 대비, VoiceOver·Reduce Motion 체감 |
+
+### Visual evidence
+
+- 정적 전체 화면: `artifacts/imagegen/shaft-assets-v1/ui-captures/breakable-ground.png`
+- 타격 핵심 프레임: `artifacts/imagegen/shaft-assets-v1/ui-captures/ground-strike-keyframes.png`
+- 짧은 런타임 클립: `artifacts/imagegen/shaft-assets-v1/ui-captures/ground-strike-motion.mp4`
+- 파괴·하강 핵심 프레임: `artifacts/imagegen/shaft-assets-v1/ui-captures/ground-break-keyframes.png`
+- 파괴·하강 클립: `artifacts/imagegen/shaft-assets-v1/ui-captures/ground-break-motion.mp4`
+- 자산 비교판: `artifacts/imagegen/shaft-assets-v1/contact-sheet.png`
+
+컴퓨터 제어로 Simulator 창을 직접 읽으려 했으나 macOS 접근성 제공자가 보이는 창을
+접근성 창으로 반환하지 않아 중단했다. 권한은 granted였으므로 같은 시도를 반복하지 않고,
+`simctl` 녹화와 실제 XCUITest 탭을 결합해 타격 프레임을 검증했다. 최초 정적 캡처도 앱 전환
+중 검은 프레임이라 폐기하고 정상 실행 뒤 다시 캡처했다.
+
+파괴 UI 테스트 작성 중 1차는 `mine-depth`를 `StaticText`라고 가정해 타격 전에 실패했고,
+2차는 레이블 전체 변화로 반복을 끊어 첫 타격 뒤 실패했다. 제품 파괴 실패가 아니라 테스트
+조회·반복 조건 문제였으며, `rock-face`의 심도가 0m인 동안 반복하도록 고친 최종 실행은 1/1 통과했다.
+
+홈의 실제 작업면을 끝까지 깨는 0m→4m 경로는 검증했다. 남은 범위는 온보딩 첫 암반의
+보상→강화→홈까지를 같은 신규 표현으로 한 번에 보는 전체 UI 경로다. 시뮬레이터 영상을
+실제 손가락 아래 press-down·햅틱·OLED 체감까지 검증된 것으로 확대하지 않는다.
 
 ## 2026-08-01 clicker-first onboarding
 
@@ -34,8 +90,8 @@
 | 장비 시각 계약 | 검증됨(코드·웹) | 드릴=보어 폭/도구/스윙/파편, 광차=레일/대수/속도/적재량, 램프=설비/조사 거리/약점 광택 |
 | 지표 작업선 | 검증됨(시뮬레이터) | 첫 UI 영상에서 찾은 0m 헤드 잘림을 surface inset으로 수정. 한국어·다크·medium 캡처에서 광부·드릴·램프와 가운데 축 확인 |
 | 저장 | 검증됨(focused unit) | `equipmentModificationsData`, `mineFaceBoreHistoryData` 왕복과 옛 빈 Data의 안전 기본값을 focused App unit 14/14로 확인 |
-| 웹 정적 검사 | 검증됨 | `npm run lint`, `npm test` 3/3, `npm run build` 통과 |
-| 웹 실제 좌표 | 검증됨(로컬 브라우저) | 한 일반 타격의 진행률 13%에서 굴착 헤드가 약 15.4px 내려갔고 한 세그먼트 전체 이동량은 약 120px. 깊이 표기도 소수 1자리로 함께 증가 |
+| 웹 정적 검사 | 검증됨 | 현 기준 `npm run lint`, `npm test` 4/4, `npm run build` 통과 |
+| 웹 실제 좌표 | 대체됨(D-054) | 헤드를 화면 안에서 4m씩 이동하던 version 2 기준은 과거 기록. 현 로컬 기준은 막장 경계를 고정하고 전체 암반 좌표를 무입력 상태에서도 연속 이동 |
 | 웹 비공개 배포 | 배포됨 | version 2, commit `ca4296fdcda98a5543f60abdd41e8d5def845b70`, `https://deepmine-shaft-prototype.eiraworks-9813.chatgpt.site` |
 | Core 전체 | 검증됨 | `swift test --package-path DeepMineCore` **195/195**, 실패 0 |
 | generic iOS build | 검증됨 | `xcodebuild ... -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build` 성공 |

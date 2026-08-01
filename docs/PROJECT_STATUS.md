@@ -1,6 +1,6 @@
 # Project Status
 
-업데이트: 2026-08-01 (클리커 우선 첫 실행)
+업데이트: 2026-08-01 (웹 연속 암반·자동 하강 기준안)
 
 ## Current state
 
@@ -36,6 +36,9 @@
 | P4-2 | 장비 분기 6종과 갱도 내 물리적 시각 반영 (D-051) | 완료 |
 | P4-3 | 현재 에셋 기반 웹 프로토타입·브라우저 계약 테스트·비공개 배포 | 완료 |
 | P4-4 | 실제 첫 암반→저장 보상→드릴 강화→홈 온보딩 (D-052) | 완료 |
+| P4-5 | 큰 지반 직접 조작→곡괭이 하강→세로 균열→붕괴→카메라 하강 (D-053) | 완료 |
+| P4-6 | 단일 암반 좌표·고정 막장·무입력 자동 하강 웹 기준안 (D-054) | 완료(로컬 웹) |
+| P4-7 | 승인된 웹 기준을 SwiftUI 홈 갱도에 포팅 | 대기 |
 
 ## 진행 곡선 (D-044 이후)
 
@@ -71,7 +74,8 @@
   강화·온보딩. 4색/PNG/브라스 비율/알파 검증과 화면별 실제 소비 경로 포함
 - 클리커 암반 아트 24종: 지역별 4단계 암반 16, 투명 균열 3, 약점 2, 파편 2, 공명 결절 1.
   고유 ImageGen 원본과 64/128/192 PNG imageset, 네 안료·이진 알파 검증 포함
-- 갱도 장면 아트 7종: 지역별 와이드 벽면 4, 지표 캐노피 1, 작업면 구조물과 광맥 상태 2.
+- 갱도 장면 아트 11종: 지역별 와이드 벽면 4, 지표 캐노피 1, 작업면 구조물과 광맥 상태 2,
+  독립 곡괭이 1, 세로 균열 light/medium/heavy 3.
   ImageGen 원본, 역할별 320×128/320×90, 1x/2x/3x PNG, 정확한 네 안료·알파·프롬프트
   provenance를 별도 매니페스트로 보존
 - 한국어·영어 현지화와 default-medium 의미 접근성 fixture
@@ -85,9 +89,17 @@
 - 레벨 5 장비 분기 6종: 넓은/충격 드릴, 군집/화물 광차, 탐사/행운 램프
 - 장비 수치와 장면을 한 계약으로 연결: 드릴 티어·보어 폭·파편·스윙, 광차 대수·속도·적재량,
   램프 조사 거리·설비·행운 약점 광택
-- 현재 에셋을 재사용한 웹 프로토타입과 비공개 Sites 배포본
+- 현재 에셋을 재사용한 웹 프로토타입과 비공개 Sites version 2 배포본. D-054 연속 암반·
+  자동 하강 변경은 로컬 웹에만 있으며 아직 재배포하지 않았다
+- 웹 로컬 기준은 화면 전체를 Pointer Events 탭 가속 영역으로 사용하되 버튼 입력과 18px 이상
+  스크롤을 제외한다. 광차 자동 데미지는 입력 없이 120ms 고정 스텝으로 계속 진행한다
 - 첫 실행을 실제 갱도 장면으로 통합. 탭마다 `mineFace`가 저장되고 첫 4m 파괴 뒤 광석 100과
   수정 1개를 지급하며, 드릴 2레벨 구매 즉시 홈을 연다. 옛 설명 단계 저장도 같은 암반으로 복구
+- 막장 전체 폭의 생성 지반을 실제 `Button`으로 만들었다. 터치 중 지반이 즉시 눌리고,
+  생성 곡괭이가 몸과 독립적으로 준비 각도에서 약 70° 내려찍는다. 손상률에 따라 세로 균열을
+  위에서 아래로 공개하며 light→medium→heavy로 굵어진다
+- 층 파괴는 새 지층으로 즉시 바뀌지 않는다. 기존 지역의 생성 지반을 좌우 두 조각으로 갈라
+  아래로 떨어뜨린 뒤 120ms 늦게 카메라가 다음 4m를 따라간다. 일반 타격에도 작은 파편을 낸다
 
 ## Shaft screen (D-050, D-051)
 
@@ -100,11 +112,15 @@
 - 좌측 심도 눈금은 장면 위 오버레이이므로 가운데 보어를 오른쪽으로 밀지 않는다
 - 홈 순서: 갱도 → 장비 → 진행 화면 → 접힌 집중 증폭기
 - 작업면은 생성 구조물로 프레이밍하고, 광맥층은 생성 광맥 오버레이로 일반 암반과 구분한다
+- 작업면의 유일한 기본 탭 대상은 크게 노출된 현재 지반이다. 배경 전체 탭을 제거해 플레이어가
+  무엇을 깨는지 직접 보게 하고, 약점만 그 위의 별도 48×48pt 버튼으로 둔다
 - 정사각 암반 반복 대신 지역별 와이드 벽면을 쓰고, 지표는 생성 캐노피로 빈 공간을 채운다
 - 상단 HUD가 탭/자동 데미지, 내구, 충격 배율, 다음 광맥층을 보여준다. 탭은 데미지,
   파괴는 광석과 파편으로 즉시 구분한다
 - 약점은 36pt 표식에 48×48pt 조작 영역을 부여하고 연속 하강은 네이티브 spring으로 연결한다.
   Reduce Motion에서는 위치 보간을 줄이고 장비는 정적 최종 위치로 보여준다
+- 누름→타격→균열→붕괴→하강 순서를 유지한다. Reduce Motion에서도 곡괭이 상태 변화와
+  균열·보상은 남기고, 지반 흔들림·낙하·카메라 보간만 줄인다
 
 ## Retention systems
 
@@ -125,9 +141,26 @@
 - `마치기`와 `다음 출정 준비` 동등 위계, 강제 재시작/소급 스트릭 파괴 없음
 - 상세 설계: `docs/GAME_IMPLEMENTATION.md`, `docs/GAME_DESIGN_REVIEW.md`
 
-## Verification state (2026-08-01 continuous shaft)
+## Verification state (2026-08-01 breakable ground)
 
 - `swift test --package-path DeepMineCore`: **195/195 통과**
+- `GameArtCatalogTests`: **12/12 통과**. 갱도 11슬롯의 프롬프트·설치·폴백 계약 포함
+- 생성 갱도 아트 validator: **11/11 imageset 통과**. 새 곡괭이와 세로 균열 3종의
+  1x/2x/3x, 정확한 네 안료, 이진 알파, 크기·해시를 검사했다
+- generic iOS unsigned build: **통과**
+- `OnboardingHomeUITests/testGroundStrikeChangesVisibleIntegrity`: **1/1 통과**.
+  `rock-face` 버튼 탭 뒤 접근성 내구 레이블이 실제로 변경됨을 확인했다
+- `OnboardingHomeUITests/testGroundBreakDescendsToTheNextSegment`: **1/1 통과**.
+  9회 실제 버튼 탭 뒤 현재 작업면의 접근성 심도가 0m→4m로 교체됨을 확인했다
+- 한국어·다크·medium 시뮬레이터에서 큰 생성 지반, 중앙 세로 균열, 광부·곡괭이 정렬을
+  육안 확인했다. `artifacts/imagegen/shaft-assets-v1/ui-captures/breakable-ground.png`
+- 0.9초 시뮬레이터 녹화와 16프레임 판독에서 곡괭이 하강·복귀, 작은 파편, 내구 변화가
+  연속으로 보였다. `ground-strike-motion.mp4`, `ground-strike-keyframes.png`
+- 2.33초 파괴 녹화와 키프레임 판독에서 heavy 세로 균열→전체 폭 좌우 분할→회전·낙하→
+  새 4m 작업면 순서를 확인했다. `ground-break-motion.mp4`, `ground-break-keyframes.png`
+- 실제 햅틱 강도, 손가락 아래 체감, VoiceOver·Reduce Motion 체감은 **미검증(실기기 필요)**
+
+## Verification state (2026-08-01 continuous shaft)
 - `OnboardingEngineTests`: **4/4 통과**
 - `GameStoreOnboardingTests`: **2/2 통과**
 - `xcodebuild -destination 'generic/platform=iOS Simulator' build`: **통과**
@@ -135,9 +168,10 @@
 - 전체 `DeepMineAppTests`: **미검증.** `Mach error -308`, runner 연결 전 종료, 고아 UI 빌드
   간섭, result-record finalize 대기로 유효한 전체 결과를 만들지 못했다. 제품 assertion 실패로
   기록하지 않고 위 focused 14건만 이번 변경의 근거로 사용한다
-- 웹 `npm run lint && npm test && npm run build`: **3/3 계약 테스트 포함 통과**
-- 로컬 브라우저에서 한 타격 뒤 헤드 y가 진행률에 비례해 내려가는 것을 DOM 좌표로 확인
-- 생성 갱도 아트 validator: **7/7 imageset 통과** (21 PNG, 네 안료·알파·크기·해시)
+- 웹 `npm run lint && npm test && npm run build`: **4/4 계약 테스트 포함 통과**
+- 로컬 브라우저에서 무입력 1초 동안 18.9m→19.2m, 비버튼 제목 탭 뒤 19.2m→20.0m를 확인.
+  390×844에서 첫 화면 갱도·곡괭이·세로 균열·레일을 육안 확인했고 console warning/error는 0
+- 생성 갱도 아트 validator 당시 결과: **7/7 imageset 통과**. 현재 결과는 위 11/11이 대체한다
 - 한국어·다크·medium 첫 암반 화면: 육안 확인 및
   `artifacts/ui/onboarding-clicker-first/first-rock.png` 보존
 - 신규/진행 홈의 단일 갱도와 접힌 집중 패널 focused UI **1/1**, 코어 루프 5화면 캡처 UI
@@ -145,7 +179,8 @@
   홈을 육안 확인했다. 첫 암반을 실제로 끝까지 탭하는 UI 경로는 전체 UI와 함께 미검증이다
 - 전체 `DeepMineAppUITests`: **미실행.** 이전 이산 갱도 기준 14/14 결과를 새 화면 검증으로 확대하지 않는다
 - `DeepMineBalanceCLI --days 30/180`: 진행 곡선과 증폭기 대역 실측 (위 표)
-- 갱도 화면의 조작 감각·연속 하강 체감·어두운 층 대비: 미검증(실기기 필요)
+- 현 웹 기준의 SwiftUI 포팅: **미구현.** 앱의 조작 감각·햅틱·어두운 층 대비는 여전히
+  실기기 릴리스 게이트다
 
 ## Verification state (이전 단계)
 

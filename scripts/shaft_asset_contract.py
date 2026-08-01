@@ -108,4 +108,49 @@ ASSETS = (
         logical_size=(320, 90),
         crop_anchor="top",
     ),
+    spec(
+        "MiningPickaxe",
+        "mining-pickaxe",
+        "One isolated side-view mining pickaxe on a perfectly flat #00FF00 chroma-key "
+        "background. The long handle runs from lower-left to upper-right and the broad "
+        "iron head sits at upper-right so the lower-left end can serve as an animation "
+        "pivot. Chunky straight-on pixel art using the four DeepMine pigments only. "
+        "No hands, character, extra tools, shadow, text, glow, gradient or UI frame.",
+        transparent=True,
+        logical_size=(64, 64),
+        maximum_brass_ratio=0.08,
+    ),
+    spec(
+        "ShaftFractureVertical_light",
+        "shaft-fracture-vertical-light",
+        "One long light vertical crack on a perfectly flat #00FF00 chroma-key background, "
+        "beginning at the exact top centre and running almost to the bottom centre with "
+        "only one very short side branch. Coal fissure with a sparse limestone edge; "
+        "never a radial impact star, horizontal seam, rock background or debris.",
+        transparent=True,
+        logical_size=(72, 160),
+        maximum_brass_ratio=0.001,
+    ),
+    spec(
+        "ShaftFractureVertical_medium",
+        "shaft-fracture-vertical-medium",
+        "The matching medium vertical crack on a perfectly flat #00FF00 chroma-key "
+        "background. Preserve the top-to-bottom path, widen it modestly and add exactly "
+        "two short branches at different heights. Coal fissure with a sparse limestone "
+        "edge; no radial burst, horizontal seam, rock background or debris.",
+        transparent=True,
+        logical_size=(72, 160),
+        maximum_brass_ratio=0.001,
+    ),
+    spec(
+        "ShaftFractureVertical_heavy",
+        "shaft-fracture-vertical-heavy",
+        "The matching heavy near-collapse vertical fissure on a perfectly flat #00FF00 "
+        "chroma-key background. Preserve the top-to-bottom path, make the same fissure "
+        "substantially wider and add three short asymmetrical branches and missing-edge "
+        "notches. No radial burst, horizontal seam, rock background or detached debris.",
+        transparent=True,
+        logical_size=(72, 160),
+        maximum_brass_ratio=0.001,
+    ),
 )

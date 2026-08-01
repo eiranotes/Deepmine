@@ -13,6 +13,7 @@ struct OnboardingFlowView: View {
     @State var player: PlayerState
     @State var isRequesting = false
     @State var struckWeakPoint = false
+    @State var strikeSignal = 0
     @State var lastStrikeText: String?
 
     init(
@@ -115,6 +116,7 @@ struct OnboardingFlowView: View {
                 scene: scene,
                 player: player,
                 isStruck: struckWeakPoint,
+                strikeSignal: strikeSignal,
                 onStrike: strike(onWeakPoint:)
             )
             .frame(height: sceneHeight)

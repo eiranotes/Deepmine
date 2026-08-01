@@ -33,5 +33,25 @@
     "id": "ShaftSurface",
     "valid": true,
     "brass_ratio": 0.07854406130268199
+  },
+  {
+    "id": "MiningPickaxe",
+    "valid": true,
+    "brass_ratio": 0.07450331125827815
+  },
+  {
+    "id": "ShaftFractureVertical_light",
+    "valid": true,
+    "brass_ratio": 0.0
+  },
+  {
+    "id": "ShaftFractureVertical_medium",
+    "valid": true,
+    "brass_ratio": 0.0
+  },
+  {
+    "id": "ShaftFractureVertical_heavy",
+    "valid": true,
+    "brass_ratio": 0.0008123476848090983
   }
 ]

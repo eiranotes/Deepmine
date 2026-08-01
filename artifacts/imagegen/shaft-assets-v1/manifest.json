@@ -148,5 +148,93 @@
       3
     ],
     "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftSurface.png"
+  },
+  {
+    "id": "MiningPickaxe",
+    "prompt_id": "mining-pickaxe",
+    "prompt": "One isolated side-view mining pickaxe on a perfectly flat #00FF00 chroma-key background. The long handle runs from lower-left to upper-right and the broad iron head sits at upper-right so the lower-left end can serve as an animation pivot. Chunky straight-on pixel art using the four DeepMine pigments only. No hands, character, extra tools, shadow, text, glow, gradient or UI frame.",
+    "transparent": true,
+    "logical_size": [
+      64,
+      64
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.08,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/MiningPickaxe.png",
+    "raw_sha256": "ae93eef92dedba9935bacb8de058a4546c84e992ecbcaf342ee71e41539dc1b2",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/MiningPickaxe.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/MiningPickaxe.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/MiningPickaxe.png"
+  },
+  {
+    "id": "ShaftFractureVertical_light",
+    "prompt_id": "shaft-fracture-vertical-light",
+    "prompt": "One long light vertical crack on a perfectly flat #00FF00 chroma-key background, beginning at the exact top centre and running almost to the bottom centre with only one very short side branch. Coal fissure with a sparse limestone edge; never a radial impact star, horizontal seam, rock background or debris.",
+    "transparent": true,
+    "logical_size": [
+      72,
+      160
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.001,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_light.png",
+    "raw_sha256": "3ea2493507e10efb235f934e116b0d30198aeaa2c27594235bd70cb7468425be",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftFractureVertical_light.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftFractureVertical_light.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftFractureVertical_light.png"
+  },
+  {
+    "id": "ShaftFractureVertical_medium",
+    "prompt_id": "shaft-fracture-vertical-medium",
+    "prompt": "The matching medium vertical crack on a perfectly flat #00FF00 chroma-key background. Preserve the top-to-bottom path, widen it modestly and add exactly two short branches at different heights. Coal fissure with a sparse limestone edge; no radial burst, horizontal seam, rock background or debris.",
+    "transparent": true,
+    "logical_size": [
+      72,
+      160
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.001,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_medium.png",
+    "raw_sha256": "c1d52839b6ca5782f216fb597e11d4aae36cb51e29f5a4c26584a474060e4605",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftFractureVertical_medium.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftFractureVertical_medium.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftFractureVertical_medium.png"
+  },
+  {
+    "id": "ShaftFractureVertical_heavy",
+    "prompt_id": "shaft-fracture-vertical-heavy",
+    "prompt": "The matching heavy near-collapse vertical fissure on a perfectly flat #00FF00 chroma-key background. Preserve the top-to-bottom path, make the same fissure substantially wider and add three short asymmetrical branches and missing-edge notches. No radial burst, horizontal seam, rock background or detached debris.",
+    "transparent": true,
+    "logical_size": [
+      72,
+      160
+    ],
+    "crop_anchor": "center",
+    "maximum_brass_ratio": 0.001,
+    "raw_source": "artifacts/imagegen/shaft-assets-v1/raw/ShaftFractureVertical_heavy.png",
+    "raw_sha256": "001687bd8594a69420197e4f0b81952c23eab316f2345e7c5900d6ccd3fed26f",
+    "processed_source": "artifacts/imagegen/shaft-assets-v1/processed/ShaftFractureVertical_heavy.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftFractureVertical_heavy.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ],
+    "extracted_source": "artifacts/imagegen/shaft-assets-v1/extracted/ShaftFractureVertical_heavy.png"
   }
 ]

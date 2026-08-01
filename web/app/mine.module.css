@@ -1078,3 +1078,633 @@
     transition-duration: 1ms !important;
   }
 }
+
+/* Continuous-shaft web baseline: one moving rock world, one carved passage. */
+.page {
+  min-height: 100svh;
+  padding: 10px 14px 64px;
+  touch-action: pan-y;
+}
+
+.pagePressed .shaft {
+  filter: brightness(1.08);
+  transform: scale(0.998);
+}
+
+.header {
+  align-items: center;
+  padding: 4px 3px 10px;
+}
+
+.header h1 {
+  font-size: clamp(1.7rem, 5vw, 2.45rem);
+}
+
+.headerActions {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.oreCounter {
+  min-width: 112px;
+  padding: 7px 10px;
+}
+
+.strikeAssist {
+  min-width: 88px;
+  padding: 6px 9px;
+  border: 1px solid var(--brass);
+  border-radius: 0;
+  background: var(--brass);
+  color: var(--coal);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.strikeAssist small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  opacity: 0.72;
+}
+
+.strikeAssist:active {
+  transform: translateY(2px);
+}
+
+.strikeAssist:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+.shaftSection {
+  padding: 8px;
+}
+
+.shaftHeading {
+  padding: 2px 2px 7px;
+}
+
+.progressTrack {
+  margin: 0 2px 7px;
+}
+
+.shaft {
+  --workline: 36%;
+  --rock-image: url("/assets/shaft/ShaftRock_entry.png");
+  --rock-phase: 0px;
+  --surface-y: 0px;
+  --fracture-reveal: 24px;
+  position: relative;
+  height: clamp(540px, calc(100svh - 142px), 700px);
+  min-height: 540px;
+  overflow: hidden;
+  background: #11100d;
+  cursor: crosshair;
+  transition: filter 80ms ease, transform 80ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.shaftPressed {
+  box-shadow: inset 0 0 0 2px rgb(240 189 93 / 0.5);
+}
+
+.geology,
+.boreHistory,
+.pastTunnel,
+.historyScars,
+.currentWork,
+.futureDarkness,
+.depthOverlay,
+.sceneLegend {
+  display: none;
+}
+
+.rockWorld {
+  position: absolute;
+  z-index: 1;
+  inset: -320px 0;
+  background-color: #29271f;
+  background-image: var(--rock-image);
+  background-position: center var(--rock-phase);
+  background-repeat: repeat-y;
+  background-size: 100% 320px;
+  image-rendering: pixelated;
+  transition: background-position 120ms linear;
+}
+
+.rockWorld::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.36), transparent 18%, transparent 82%, rgb(0 0 0 / 0.36)),
+    repeating-linear-gradient(to bottom, transparent 0 111px, rgb(8 8 7 / 0.08) 112px 114px);
+  content: "";
+}
+
+.continuousSurface {
+  position: absolute;
+  z-index: 5;
+  top: var(--workline);
+  left: 0;
+  width: 100%;
+  height: 78px;
+  transform: translateY(var(--surface-y));
+  object-fit: fill;
+  image-rendering: pixelated;
+  transition: transform 120ms linear;
+}
+
+.openShaft {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 50%;
+  width: var(--cut-width);
+  height: calc(var(--workline) + 3px);
+  transform: translateX(-50%);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.92), #11110e 18%, #090908 50%, #11110e 82%, rgb(0 0 0 / 0.92));
+  clip-path: polygon(7% 0, 94% 0, 97% 8%, 93% 15%, 98% 23%, 94% 31%, 98% 40%, 93% 50%, 97% 60%, 92% 70%, 97% 80%, 92% 90%, 96% 100%, 5% 100%, 9% 91%, 3% 81%, 8% 71%, 3% 61%, 8% 51%, 3% 41%, 8% 31%, 3% 22%, 8% 13%);
+  transition: width 300ms ease, height 120ms linear;
+}
+
+.tunnelVoid {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 14px 0 24px rgb(0 0 0 / 0.72), inset -14px 0 24px rgb(0 0 0 / 0.72);
+}
+
+.tunnelLeftEdge,
+.tunnelRightEdge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: repeating-linear-gradient(to bottom, #353228 0 9px, #171612 9px 17px);
+  opacity: 0.82;
+}
+
+.tunnelLeftEdge { left: 2%; }
+.tunnelRightEdge { right: 2%; }
+
+.continuousRail {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+  left: 50%;
+  width: 21px;
+  transform: translateX(-50%);
+  border-inline: 2px solid rgb(210 147 49 / 0.64);
+  background: repeating-linear-gradient(to bottom, transparent 0 15px, rgb(210 147 49 / 0.52) 15px 18px);
+}
+
+.continuousCart {
+  position: absolute;
+  z-index: 3;
+  bottom: -34px;
+  left: calc(50% - 16px);
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.76));
+  image-rendering: pixelated;
+  animation: continuous-cart-travel var(--cart-duration) linear infinite;
+}
+
+.passageHistory {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  pointer-events: none;
+}
+
+.supportFrame {
+  position: absolute;
+  top: calc(var(--workline) + var(--history-offset));
+  left: 50%;
+  width: var(--history-width);
+  height: 26px;
+  transform: translate(-50%, -13px);
+  border-inline: 5px solid #4a4436;
+  transition: top 120ms linear, width 300ms ease;
+}
+
+.supportFrame > span {
+  position: absolute;
+  top: 0;
+  left: -7%;
+  width: 114%;
+  height: 6px;
+  border-block: 1px solid rgb(233 227 210 / 0.2);
+  background: #575040;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.42);
+}
+
+.continuousLamp {
+  position: absolute;
+  z-index: 2;
+  top: -11px;
+  right: -18px;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 9px rgb(240 189 93 / 0.78));
+  image-rendering: pixelated;
+}
+
+.continuousScar {
+  position: absolute;
+  top: 5px;
+  left: -38px;
+  width: 36px;
+  height: 78px;
+  object-fit: fill;
+  opacity: 0.38;
+  image-rendering: pixelated;
+}
+
+.shaftStatus {
+  position: absolute;
+  z-index: 18;
+  top: 9px;
+  left: 9px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(62px, 1fr));
+  width: min(520px, calc(100% - 76px));
+  border: 1px solid rgb(233 227 210 / 0.22);
+  background: rgb(10 10 9 / 0.78);
+  backdrop-filter: blur(7px);
+}
+
+.shaftStatus > div {
+  min-width: 0;
+  padding: 7px 8px;
+  border-right: 1px solid rgb(233 227 210 / 0.16);
+}
+
+.shaftStatus > div:last-child { border-right: 0; }
+.shaftStatus span,
+.shaftStatus strong { display: block; }
+
+.shaftStatus span {
+  color: var(--limestone-muted);
+  font-size: 0.56rem;
+}
+
+.shaftStatus strong {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--limestone);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workLine {
+  position: absolute;
+  z-index: 10;
+  top: var(--workline);
+  left: 50%;
+  width: 100%;
+  height: 178px;
+  transform: translate(-50%, -18px);
+  pointer-events: none;
+}
+
+.continuousGantry {
+  position: absolute;
+  z-index: 1;
+  top: -50px;
+  left: 0;
+  width: 100%;
+  height: 128px;
+  object-fit: fill;
+  opacity: 0.62;
+  image-rendering: pixelated;
+}
+
+.fractureClip {
+  position: absolute;
+  z-index: 3;
+  top: 18px;
+  left: 50%;
+  width: 92px;
+  height: var(--fracture-reveal);
+  transform: translateX(-50%);
+  overflow: hidden;
+  transition: height 120ms linear;
+}
+
+.verticalFracture {
+  width: 72px;
+  height: 160px;
+  margin-left: 10px;
+  object-fit: fill;
+  opacity: var(--fracture-opacity);
+  filter: drop-shadow(0 0 3px rgb(240 189 93 / 0.28));
+  image-rendering: pixelated;
+  animation: vertical-crack-hit 260ms ease-out;
+}
+
+.continuousMiner {
+  position: absolute;
+  z-index: 5;
+  top: -56px;
+  left: calc(50% - 46px);
+  width: 66px;
+  height: 66px;
+  filter: drop-shadow(3px 4px 0 rgb(0 0 0 / 0.72));
+  image-rendering: pixelated;
+  animation: miner-working 820ms ease-in-out infinite;
+}
+
+.miningPickaxe {
+  position: absolute;
+  z-index: 7;
+  top: -34px;
+  left: calc(50% + 1px);
+  width: 58px;
+  height: 58px;
+  transform-origin: 13px 47px;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.7));
+  image-rendering: pixelated;
+  animation: pickaxe-strike 420ms cubic-bezier(0.18, 0.78, 0.16, 1) both;
+}
+
+.continuousDrill {
+  position: absolute;
+  z-index: 4;
+  top: -9px;
+  left: calc(50% + 38px);
+  width: 38px;
+  height: 38px;
+  transform: rotate(18deg) scale(var(--rig-scale));
+  transform-origin: left center;
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75));
+  image-rendering: pixelated;
+}
+
+.continuousDebris {
+  position: absolute;
+  z-index: 8;
+  top: 23px;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+}
+
+.continuousDebris span {
+  --chip-x: 20px;
+  --chip-y: -30px;
+  --chip-delay: 0ms;
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgb(10 10 9 / 0.72);
+  background: #716753;
+  box-shadow: 2px 2px 0 rgb(0 0 0 / 0.34);
+  animation: debris-flight 460ms cubic-bezier(0.12, 0.75, 0.26, 1) var(--chip-delay) both;
+}
+
+.continuousWeakPoint {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  left: 50%;
+  width: 42px;
+  height: 42px;
+  transform: translateX(-50%);
+  opacity: 0.72;
+  image-rendering: pixelated;
+}
+
+.continuousHitLabel,
+.continuousOreGain {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  color: var(--limestone);
+  font-size: 0.76rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 2px 2px 0 var(--coal);
+  animation: gain-rise 700ms ease-out both;
+}
+
+.continuousHitLabel { top: 8px; }
+.continuousOreGain { top: -28px; color: var(--brass-bright); }
+.critical .continuousHitLabel { color: var(--brass-bright); font-size: 0.92rem; }
+
+.collapseBand {
+  position: absolute;
+  z-index: 9;
+  top: calc(var(--workline) - 8px);
+  left: 0;
+  width: 100%;
+  height: 118px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.collapseLeft,
+.collapseRight {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #29271f;
+  background-image: var(--rock-image);
+  background-position: center calc(var(--rock-phase) - var(--workline));
+  background-size: 200% 320px;
+  image-rendering: pixelated;
+}
+
+.collapseLeft {
+  left: 0;
+  clip-path: polygon(0 0, 100% 0, 91% 17%, 98% 38%, 86% 61%, 95% 83%, 80% 100%, 0 100%);
+  animation: collapse-left 560ms cubic-bezier(0.16, 0.72, 0.2, 1) both;
+}
+
+.collapseRight {
+  right: 0;
+  background-position-x: right;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 18% 100%, 5% 82%, 14% 62%, 2% 39%, 10% 18%);
+  animation: collapse-right 560ms cubic-bezier(0.16, 0.72, 0.2, 1) both;
+}
+
+.collapseGap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 100%;
+  transform: translateX(-50%);
+  background: #080807;
+  animation: collapse-gap 520ms ease-out both;
+}
+
+.continuousDarkness {
+  position: absolute;
+  z-index: 13;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% var(--workline), transparent 0 var(--lamp-radius), rgb(10 10 9 / 0.28) calc(var(--lamp-radius) + 12%), rgb(10 10 9 / 0.86) calc(var(--lamp-radius) + 33%)),
+    linear-gradient(to bottom, transparent 0 54%, rgb(10 10 9 / 0.08) 62%, rgb(10 10 9 / 0.68) 100%);
+}
+
+.continuousDepthOverlay {
+  position: absolute;
+  z-index: 16;
+  inset: 0;
+  pointer-events: none;
+}
+
+.continuousDepthOverlay span {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgb(233 227 210 / 0.48);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 var(--coal);
+  transition: top 120ms linear;
+}
+
+.continuousDepthOverlay span::after {
+  width: 13px;
+  height: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.continuousDepthOverlay .currentDepthMark {
+  color: var(--brass-bright);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.descentIndicator {
+  position: absolute;
+  z-index: 18;
+  top: calc(var(--workline) + 66px);
+  right: 10px;
+  display: grid;
+  justify-items: end;
+  padding: 7px 8px;
+  border-right: 2px solid var(--brass);
+  background: rgb(10 10 9 / 0.68);
+  pointer-events: none;
+}
+
+.descentIndicator span {
+  color: var(--limestone-muted);
+  font-size: 0.54rem;
+  letter-spacing: 0.06em;
+}
+
+.descentIndicator strong {
+  margin-top: 2px;
+  color: var(--brass-bright);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.descentIndicator i {
+  color: var(--brass-bright);
+  font-size: 1rem;
+  font-style: normal;
+  animation: descent-arrow 720ms ease-in-out infinite;
+}
+
+@keyframes continuous-cart-travel {
+  from { transform: translateY(12px); }
+  to { transform: translateY(-240px); }
+}
+
+@keyframes miner-working {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  45% { transform: translateY(3px) rotate(3deg); }
+}
+
+@keyframes pickaxe-strike {
+  0% { opacity: 0; transform: rotate(-76deg) translate(-4px, -5px); }
+  12% { opacity: 1; }
+  54% { transform: rotate(34deg) translate(3px, 6px); }
+  68% { transform: rotate(25deg) translate(2px, 4px); }
+  100% { opacity: 1; transform: rotate(-42deg); }
+}
+
+@keyframes vertical-crack-hit {
+  0% { opacity: 0; filter: brightness(2.2); transform: scaleY(0.3); transform-origin: top; }
+  100% { opacity: var(--fracture-opacity); filter: brightness(1); transform: scaleY(1); transform-origin: top; }
+}
+
+@keyframes collapse-left {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(-42px, 54px) rotate(-9deg); }
+}
+
+@keyframes collapse-right {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(42px, 58px) rotate(10deg); }
+}
+
+@keyframes collapse-gap {
+  0% { opacity: 0; transform: translateX(-50%) scaleX(1); }
+  28% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scaleX(42); }
+}
+
+@keyframes descent-arrow {
+  0%, 100% { transform: translateY(-2px); opacity: 0.55; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .page { padding: 5px 6px 42px; }
+  .header { padding-bottom: 6px; }
+  .headerActions { gap: 4px; }
+  .oreCounter { min-width: 94px; padding-inline: 7px; }
+  .strikeAssist { min-width: 76px; padding-inline: 6px; }
+  .shaftSection { padding: 5px; }
+  .shaftHeading { padding-bottom: 5px; }
+  .shaftHeading .sectionLabel { display: none; }
+  .progressTrack { margin-bottom: 5px; }
+  .shaft {
+    --workline: 35%;
+    height: clamp(520px, calc(100dvh - 108px), 680px);
+    min-height: 520px;
+  }
+  .shaftStatus {
+    top: 6px;
+    left: 6px;
+    grid-template-columns: repeat(2, minmax(70px, 1fr));
+    width: min(280px, calc(100% - 58px));
+  }
+  .shaftStatus > div { padding: 5px 6px; }
+  .shaftStatus > div:nth-child(2) { border-right: 0; }
+  .shaftStatus > div:nth-child(-n + 2) { border-bottom: 1px solid rgb(233 227 210 / 0.16); }
+  .continuousMiner { left: calc(50% - 42px); }
+  .miningPickaxe { left: calc(50% - 1px); }
+  .continuousDrill { left: calc(50% + 33px); }
+  .descentIndicator { right: 7px; }
+}
+
+@media (max-width: 390px) {
+  .header h1 { font-size: 1.55rem; }
+  .eyebrow { font-size: 0.52rem; }
+  .oreCounter { min-width: 86px; }
+  .strikeAssist { min-width: 68px; font-size: 0.64rem; }
+  .strikeAssist small { font-size: 0.5rem; }
+  .shaftHeading h2 { font-size: 1rem; }
+  .shaft { --workline: 34%; }
+}

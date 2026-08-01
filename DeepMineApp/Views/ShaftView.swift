@@ -21,10 +21,12 @@ struct ShaftView: View {
 
     @State private var generator = SeededGenerator(seed: UInt64.random(in: .min ... .max))
     @State private var struckWeakPoint = false
-    @State private var floatingGains: [FloatingGain] = []
-    @State private var debrisBursts: [DebrisBurst] = []
+    @State private var strikeSignal = 0
+    @State var floatingGains: [FloatingGain] = []
+    @State var debrisBursts: [DebrisBurst] = []
+    @State var groundCollapses: [GroundCollapseBurst] = []
     @State private var lastTick = Date()
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     private let tick = Timer.publish(
         every: Balance.automationStepSeconds,
@@ -63,6 +65,7 @@ struct ShaftView: View {
                     scene: scene,
                     player: player,
                     isStruck: struckWeakPoint,
+                    strikeSignal: strikeSignal,
                     onStrike: strike(onWeakPoint:)
                 )
                 if player.mineFace.segmentIndex == 0 { surfaceCanopy }
@@ -71,6 +74,7 @@ struct ShaftView: View {
                 ShaftEffectsView(
                     gains: floatingGains,
                     debris: debrisBursts,
+                    collapses: groundCollapses,
                     reduceMotion: reduceMotion
                 )
                 .position(
@@ -90,11 +94,13 @@ struct ShaftView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mine-shaft")
         .animation(
-            reduceMotion ? nil : .interactiveSpring(
-                response: 0.34,
-                dampingFraction: 1,
-                blendDuration: 0.08
-            ),
+            reduceMotion
+                ? nil
+                : .interactiveSpring(
+                    response: 0.34,
+                    dampingFraction: 1,
+                    blendDuration: 0.08
+                ).delay(0.12),
             value: player.mineFace.segmentIndex
         )
         .animation(
@@ -173,13 +179,15 @@ struct ShaftView: View {
     // MARK: Actions
 
     private func strike(onWeakPoint: Bool) {
+        let struckRegion = player.mineFace.region.rawValue
+        strikeSignal &+= 1
         struckWeakPoint = onWeakPoint
         let update = MiningLoop.strike(
             hitWeakPoint: onWeakPoint,
             using: &generator,
             in: &player
         )
-        announce(update, isTap: true)
+        announce(update, isTap: true, struckRegion: struckRegion)
         guard onWeakPoint else { return }
         Task {
             try? await Task.sleep(for: .milliseconds(120))
@@ -195,11 +203,22 @@ struct ShaftView: View {
     /// return.
     private func advance(by elapsed: TimeInterval, at now: Date) {
         guard elapsed > 0 else { return }
+        let struckRegion = player.mineFace.region.rawValue
         let update = MiningLoop.advance(seconds: elapsed, at: now, in: &player)
-        if update.brokeSomething { announce(update, isTap: false) }
+        if !update.damage.isZero {
+            strikeSignal &+= 1
+            if !update.brokeSomething { showDebris(isLarge: false, densityOverride: 2) }
+        }
+        if update.brokeSomething {
+            announce(update, isTap: false, struckRegion: struckRegion)
+        }
     }
 
-    private func announce(_ update: MineFaceUpdate, isTap: Bool) {
+    private func announce(
+        _ update: MineFaceUpdate,
+        isTap: Bool,
+        struckRegion: String
+    ) {
         if isTap {
             feedback.play(update.wasCritical ? .criticalStrike : .strike)
         }
@@ -211,6 +230,7 @@ struct ShaftView: View {
         // and lets the caller throttle the rest.
         onPersist(player)
         if update.brokeSomething {
+            showGroundCollapse(region: struckRegion)
             showDebris(isLarge: update.seamsBroken > 0)
             show(FloatingGain(
                 text: "+\(DeepMineNumberFormatter.string(update.oreGained.doubleValue))",
@@ -218,6 +238,10 @@ struct ShaftView: View {
                 offsetX: Double.random(in: -34...34)
             ))
         } else if isTap {
+            showDebris(
+                isLarge: false,
+                densityOverride: update.wasCritical ? 4 : 2
+            )
             show(FloatingGain(
                 text: "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))",
                 kind: update.wasCritical ? .critical : .damage,
@@ -226,64 +250,4 @@ struct ShaftView: View {
         }
     }
 
-    private func show(_ gain: FloatingGain) {
-        floatingGains.append(gain)
-        guard !reduceMotion else {
-            Task {
-                try? await Task.sleep(for: .milliseconds(220))
-                withAnimation(.linear(duration: 0.18)) {
-                    if let index = floatingGains.firstIndex(where: { $0.id == gain.id }) {
-                        floatingGains[index].opacity = 0
-                    }
-                }
-                try? await Task.sleep(for: .milliseconds(200))
-                floatingGains.removeAll { $0.id == gain.id }
-            }
-            return
-        }
-        withAnimation(.easeOut(duration: 0.7)) {
-            if let index = floatingGains.firstIndex(where: { $0.id == gain.id }) {
-                floatingGains[index].offsetY = -90
-                floatingGains[index].opacity = 0
-            }
-        }
-        Task {
-            try? await Task.sleep(for: .seconds(0.8))
-            floatingGains.removeAll { $0.id == gain.id }
-        }
-    }
-
-    private func showDebris(isLarge: Bool) {
-        let tier = EquipmentEngine.visualTier(level: player.equipment.drill)
-        let wideBonus = player.equipmentModifications.drill == .drillWide ? 2 : 0
-        let impactBonus = player.equipmentModifications.drill == .drillImpact ? 1 : 0
-        let burst = DebrisBurst(
-            isLarge: isLarge,
-            density: 3 + tier * 2 + wideBonus + impactBonus
-        )
-        debrisBursts.append(burst)
-        guard !reduceMotion else {
-            Task {
-                try? await Task.sleep(for: .milliseconds(180))
-                withAnimation(.linear(duration: 0.16)) {
-                    if let index = debrisBursts.firstIndex(where: { $0.id == burst.id }) {
-                        debrisBursts[index].opacity = 0
-                    }
-                }
-                try? await Task.sleep(for: .milliseconds(180))
-                debrisBursts.removeAll { $0.id == burst.id }
-            }
-            return
-        }
-        withAnimation(.easeOut(duration: 0.42)) {
-            if let index = debrisBursts.firstIndex(where: { $0.id == burst.id }) {
-                debrisBursts[index].progress = 1
-                debrisBursts[index].opacity = 0
-            }
-        }
-        Task {
-            try? await Task.sleep(for: .milliseconds(480))
-            debrisBursts.removeAll { $0.id == burst.id }
-        }
-    }
 }

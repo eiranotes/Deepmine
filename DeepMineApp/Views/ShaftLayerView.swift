@@ -8,6 +8,7 @@ struct ShaftGeologyView: View {
     let scene: ShaftScene
     let player: PlayerState
     let isStruck: Bool
+    let strikeSignal: Int
     let onStrike: (Bool) -> Void
 
     var body: some View {
@@ -22,13 +23,7 @@ struct ShaftGeologyView: View {
                 currentFace(width: proxy.size.width)
                 depthRecordPlate(width: proxy.size.width)
             }
-            .contentShape(Rectangle())
-            .onTapGesture { onStrike(false) }
-            .accessibilityIdentifier("rock-face")
-            .accessibilityLabel(
-                Text("\(DeepMineStrings.text(.gameDepth)) \(player.depthMeters)m")
-            )
-            .accessibilityAddTraits(.isButton)
+            .accessibilityElement(children: .contain)
         }
     }
 
@@ -210,65 +205,14 @@ struct ShaftGeologyView: View {
 
     private func currentFace(width: CGFloat) -> some View {
         let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
-        return ZStack {
-            GameArtView(
-                entry: GameArtCatalog.fracture(intensity: fractureIntensity),
-                size: 98 + CGFloat(player.mineFace.brokenFraction * 42)
-            )
-            .opacity(0.92)
-            GameArtView(entry: GameArtCatalog.shaftGantry, size: 94)
-                .offset(y: -18)
-            HStack(spacing: -9) {
-                WorkingMinerView(
-                    isWorking: true,
-                    intensity: min(
-                        1,
-                        player.mineFace.impact.fraction
-                            + (player.equipmentModifications.drill == .drillImpact ? 0.28 : 0)
-                    )
-                )
-                    .frame(width: 54, height: 54)
-                DeepMinePixelImage(
-                    name: DeepMineArt.equipment(.drill, level: player.equipment.drill),
-                    size: 38
-                )
-            }
-            .offset(y: -16)
-            DeepMinePixelImage(
-                name: DeepMineArt.equipment(.lamp, level: player.equipment.lamp),
-                size: 25
-            )
-            .position(
-                x: width / 2 + min(width * 0.31, CGFloat(scene.currentBoreWidthPoints) / 2) - 8,
-                y: 35
-            )
-            if let point = player.mineFace.segment.weakPoint {
-                weakPoint(point, width: width)
-            }
-        }
-        .frame(width: width, height: 112)
-        .position(x: width / 2, y: headY)
-        .allowsHitTesting(true)
-    }
-
-    private func weakPoint(_ point: RockSegment.WeakPoint, width: CGFloat) -> some View {
-        GameArtView(entry: GameArtCatalog.weakPoint(isStruck: isStruck), size: 36)
-            .shadow(
-                color: player.equipmentModifications.lamp == .lampFortune
-                    ? DeepMinePalette.brass.color.opacity(0.9)
-                    : .clear,
-                radius: player.equipmentModifications.lamp == .lampFortune ? 11 : 0
-            )
-            .frame(width: 48, height: 48)
-            .position(
-                x: width * point.unitX,
-                y: 56 + 36 * (point.unitY - 0.5)
-            )
-            .contentShape(Rectangle())
-            .highPriorityGesture(TapGesture().onEnded { onStrike(true) })
-            .accessibilityIdentifier("rock-weak-point")
-            .accessibilityLabel(DeepMineStrings.text(.shaftWeakPoint))
-            .accessibilityAddTraits(.isButton)
+        return ShaftWorkFaceView(
+            width: width,
+            player: player,
+            isStruck: isStruck,
+            strikeSignal: strikeSignal,
+            onStrike: onStrike
+        )
+        .position(x: width / 2, y: headY + 50)
     }
 
     private func depthRecordPlate(width: CGFloat) -> some View {
@@ -287,14 +231,6 @@ struct ShaftGeologyView: View {
                     )
                     .accessibilityIdentifier("shaft-record-plate")
             }
-        }
-    }
-
-    private var fractureIntensity: FractureIntensity {
-        switch player.mineFace.damageStage {
-        case ...1: .light
-        case 2: .medium
-        default: .heavy
         }
     }
 }

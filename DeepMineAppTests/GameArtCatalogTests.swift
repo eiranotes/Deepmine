@@ -30,7 +30,7 @@ final class GameArtCatalogTests: XCTestCase {
 
     func testCatalogCoversTheFullPlannedSlotCount() {
         XCTAssertEqual(GameArtCatalog.allEntries.count, 24)
-        XCTAssertEqual(GameArtCatalog.shaftEntries.count, 7)
+        XCTAssertEqual(GameArtCatalog.shaftEntries.count, 11)
     }
 
     func testSlotNamesAreUnique() {

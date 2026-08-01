@@ -57,6 +57,25 @@ final class OnboardingHomeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["mine-home-start"].exists)
     }
 
+    func testGroundStrikeChangesVisibleIntegrity() {
+        launch(fixture: "home-fresh", reset: true)
+        let rockFace = app.buttons["rock-face"]
+        XCTAssertTrue(rockFace.waitForExistence(timeout: 5))
+        let integrityBeforeStrike = rockFace.label
+        rockFace.tap()
+        XCTAssertNotEqual(rockFace.label, integrityBeforeStrike)
+    }
+
+    func testGroundBreakDescendsToTheNextSegment() {
+        launch(fixture: "home-fresh", reset: true)
+        let rockFace = app.buttons["rock-face"]
+        XCTAssertTrue(rockFace.waitForExistence(timeout: 5))
+        for _ in 0..<20 where rockFace.label.contains("0m") {
+            rockFace.tap()
+        }
+        XCTAssertTrue(rockFace.label.contains("4m"))
+    }
+
     func testDeepPlanIsLockedThenUnlocked() {
         launch(fixture: "home-fresh", reset: true)
         openFocusAmplifier()

@@ -1,8 +1,8 @@
 # Shaft Scene Art Prompts
 
-- 목적: 세로 갱도의 작업 지점·지역별 지질·지상 입구·고보상 암맥을 읽히게 하는 와이드 자산 7종
+- 목적: 세로 갱도의 작업 지점·지역별 지질·지상 입구·고보상 암맥·직접 타격을 읽히게 하는 생성 자산 11종
 - 생성: Codex 내장 ImageGen (`gpt-image-2`)
-- 출력: PNG 원본, 투명 자산의 크로마 제거 RGBA, 320×128(지상 입구 320×90) 논리 PNG와 1x/2x/3x imageset
+- 출력: PNG 원본, 투명 자산의 크로마 제거 RGBA, 역할별 논리 PNG와 1x/2x/3x imageset
 - 팔레트: coal `#10100F`, shale `#373630`, limestone `#E7E0CF`, brass `#C58C39`
 - 후처리·검증: `scripts/process_shaft_assets.py`
 
@@ -49,6 +49,27 @@
 0m 갱도 위 90pt를 채우는 지상 입구 오버레이. 위쪽의 얇은 흙·석재 단면, 좌우 끝의 작은
 지지대, 황동 표지등 하나만 두고 중앙과 아래 중앙 75% 이상을 비운다. 기존 막장용 gantry의
 도르래·레일·케이블을 반복하지 않는다.
+
+## `mining-pickaxe` → `MiningPickaxe`
+
+광부의 손과 분리해 회전시키는 단일 측면 곡괭이. 손잡이는 좌하단에서 우상단으로 길게 뻗고,
+넓은 철제 날은 우상단에 둔다. 좌하단 끝을 어깨 회전축으로 사용할 수 있도록 여백을 확보한다.
+광부·손·다른 공구·그림자는 넣지 않는다.
+
+## `shaft-fracture-vertical-light` → `ShaftFractureVertical_light`
+
+상단 중앙에서 시작해 하단 중앙 가까이까지 이어지는 가는 세로 균열. 짧은 가지는 하나만
+허용하며 방사형 충격점, 가로 광맥, 돌 배경, 파편은 금지한다.
+
+## `shaft-fracture-vertical-medium` → `ShaftFractureVertical_medium`
+
+동일한 세로 경로를 유지한 중간 손상. 주 균열을 조금 넓히고 높이가 다른 짧은 가지 두 개만
+추가한다. 중심 폭발이나 별 모양으로 읽히면 안 된다.
+
+## `shaft-fracture-vertical-heavy` → `ShaftFractureVertical_heavy`
+
+동일한 세로 경로를 유지한 붕괴 직전 손상. 위에서 아래까지 주 균열을 크게 벌리고 짧은
+비대칭 가지 세 개와 결손 모서리를 둔다. 여전히 하나의 아래 방향 갈라짐으로 읽혀야 한다.
 
 ## 편입 계약
 

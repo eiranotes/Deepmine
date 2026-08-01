@@ -4,10 +4,14 @@ import SwiftUI
 struct ShaftEffectsView: View {
     let gains: [FloatingGain]
     let debris: [DebrisBurst]
+    let collapses: [GroundCollapseBurst]
     let reduceMotion: Bool
 
     var body: some View {
         ZStack {
+            ForEach(collapses) { collapse in
+                groundCollapseView(collapse)
+            }
             ForEach(debris) { burst in
                 debrisView(burst)
             }
@@ -39,6 +43,58 @@ struct ShaftEffectsView: View {
             }
         }
         .opacity(burst.opacity)
+    }
+
+    private func groundCollapseView(_ collapse: GroundCollapseBurst) -> some View {
+        ZStack {
+            collapseGap(collapse)
+            collapseHalf(collapse, isLeading: true)
+            collapseHalf(collapse, isLeading: false)
+            GameArtView(
+                entry: GameArtCatalog.shaftFracture(intensity: .heavy),
+                fit: CGSize(width: 70, height: 146)
+            )
+            .offset(y: 72 + collapse.progress * 38)
+            .opacity(max(0, collapse.opacity - collapse.progress * 0.62))
+        }
+        .opacity(collapse.opacity)
+    }
+
+    private func collapseGap(_ collapse: GroundCollapseBurst) -> some View {
+        ZStack {
+            Rectangle()
+                .fill(DeepMinePalette.coal.color)
+                .frame(width: 8 + 58 * collapse.progress, height: 136)
+            HStack(spacing: 8 + 54 * collapse.progress) {
+                Rectangle()
+                Rectangle()
+            }
+            .foregroundStyle(DeepMinePalette.brass.color.opacity(0.55))
+            .frame(width: 20 + 64 * collapse.progress, height: 136)
+        }
+        .offset(y: 72 + 40 * collapse.progress)
+        .scaleEffect(y: 1 + collapse.progress * 0.18, anchor: .top)
+    }
+
+    private func collapseHalf(
+        _ collapse: GroundCollapseBurst,
+        isLeading: Bool
+    ) -> some View {
+        GameArtView(
+            entry: GameArtCatalog.shaftRock(region: collapse.region),
+            fill: CGSize(width: 348, height: 134)
+        )
+        .frame(width: 174, height: 134, alignment: isLeading ? .leading : .trailing)
+        .clipped()
+        .rotationEffect(.degrees(
+            reduceMotion ? 0 : (isLeading ? -11 : 11) * collapse.progress
+        ))
+        .offset(
+            x: (isLeading ? -87 : 87)
+                + (reduceMotion ? 0 : (isLeading ? -54 : 54) * collapse.progress),
+            y: 72 + (reduceMotion ? 0 : 68 * collapse.progress)
+        )
+        .brightness(0.08 * collapse.progress)
     }
 
     private func chip(
@@ -85,6 +141,13 @@ struct DebrisBurst: Identifiable, Equatable {
     let id = UUID()
     let isLarge: Bool
     let density: Int
+    var progress: CGFloat = 0
+    var opacity: Double = 1
+}
+
+struct GroundCollapseBurst: Identifiable, Equatable {
+    let id = UUID()
+    let region: String
     var progress: CGFloat = 0
     var opacity: Double = 1
 }

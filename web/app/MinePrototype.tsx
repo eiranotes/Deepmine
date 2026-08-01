@@ -1,7 +1,15 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styles from "./mine.module.css";
 
 type EquipmentKind = "drill" | "cart" | "lamp";
@@ -23,6 +31,8 @@ type Specializations = {
 };
 
 const METERS_PER_LAYER = 4;
+const PIXELS_PER_METER = 28;
+const AUTO_DAMAGE_STEP_MS = 120;
 
 const equipmentCopy: Record<
   EquipmentKind,
@@ -45,7 +55,7 @@ const equipmentCopy: Record<
   },
 };
 
-const initialEquipment: EquipmentState = { drill: 4, cart: 3, lamp: 2 };
+const initialEquipment: EquipmentState = { drill: 4, cart: 5, lamp: 2 };
 const initialSpecializations: Specializations = { drill: null, cart: null, lamp: null };
 
 const specializationOptions = {
@@ -94,21 +104,47 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
 }
 
+function isSecondaryControl(target: EventTarget | null) {
+  return (
+    target instanceof Element
+    && target.closest("button, a, input, select, textarea, [data-no-mine]") !== null
+  );
+}
+
+function rockAssetAt(depth: number) {
+  if (depth >= 1600) return "/assets/shaft/ShaftRock_abyss.png";
+  if (depth >= 800) return "/assets/shaft/ShaftRock_ruins.png";
+  if (depth >= 240) return "/assets/shaft/ShaftRock_crystal.png";
+  return "/assets/shaft/ShaftRock_entry.png";
+}
+
 export function MinePrototype() {
   const [mine, setMine] = useState<MineState>({
-    depth: 104,
-    recordDepth: 148,
+    depth: 8,
+    recordDepth: 8,
     ore: 1840,
-    damage: 62,
-    brokenLayers: 26,
-    boreHistory: [2, 2, 3, 3, 3, 4, 4],
+    damage: 0,
+    brokenLayers: 2,
+    boreHistory: [3, 4],
   });
   const [equipment, setEquipment] = useState<EquipmentState>(initialEquipment);
   const [specializations, setSpecializations] =
     useState<Specializations>(initialSpecializations);
   const [hitPulse, setHitPulse] = useState(0);
+  const [collapsePulse, setCollapsePulse] = useState(0);
   const [lastGain, setLastGain] = useState<number | null>(null);
   const [isCritical, setIsCritical] = useState(false);
+  const [isBreaking, setIsBreaking] = useState(false);
+  const [isPressing, setIsPressing] = useState(false);
+  const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
+  const pointerRef = useRef<{
+    id: number;
+    x: number;
+    y: number;
+    cancelled: boolean;
+  } | null>(null);
+  const breakTimerRef = useRef<number | null>(null);
+  const previousBrokenLayersRef = useRef(mine.brokenLayers);
 
   const integrity = integrityAt(mine.depth);
   const progress = Math.min(1, mine.damage / integrity);
@@ -144,7 +180,13 @@ export function MinePrototype() {
   );
 
   const applyDamage = useCallback(
-    (rawDamage: number, critical = false, drillLevel = 1, payoutMultiplier = 1) => {
+    (
+      rawDamage: number,
+      critical = false,
+      drillLevel = 1,
+      payoutMultiplier = 1,
+      showsImpact = true,
+    ) => {
       setMine((current) => {
         let damage = current.damage + rawDamage;
         let depth = current.depth;
@@ -181,25 +223,96 @@ export function MinePrototype() {
           boreHistory,
         };
       });
-      setIsCritical(critical);
-      setHitPulse((value) => value + 1);
+      if (showsImpact) {
+        setIsCritical(critical);
+        setHitPulse((value) => value + 1);
+      }
     },
     [],
   );
 
   useEffect(() => {
     if (automation <= 0) return;
-    const timer = window.setInterval(
-      () => applyDamage(automation / 5, false, equipment.drill, oreMultiplier),
-      200,
+    const damageTimer = window.setInterval(
+      () =>
+        applyDamage(
+          automation * (AUTO_DAMAGE_STEP_MS / 1000),
+          false,
+          equipment.drill,
+          oreMultiplier,
+          false,
+        ),
+      AUTO_DAMAGE_STEP_MS,
     );
-    return () => window.clearInterval(timer);
+    const swingTimer = window.setInterval(() => {
+      setLastStrikeSource("auto");
+      setIsCritical(false);
+      setHitPulse((value) => value + 1);
+    }, 820);
+    return () => {
+      window.clearInterval(damageTimer);
+      window.clearInterval(swingTimer);
+    };
   }, [applyDamage, automation, equipment.drill, oreMultiplier]);
+
+  useEffect(() => {
+    if (mine.brokenLayers <= previousBrokenLayersRef.current) return;
+    previousBrokenLayersRef.current = mine.brokenLayers;
+    setCollapsePulse((value) => value + 1);
+    setIsBreaking(true);
+    if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
+    breakTimerRef.current = window.setTimeout(() => setIsBreaking(false), 560);
+  }, [mine.brokenLayers]);
+
+  useEffect(
+    () => () => {
+      if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
+    },
+    [],
+  );
 
   const strike = () => {
     const criticalEvery = Math.max(2, Math.round(1 / chance));
     const critical = (hitPulse + 1) % criticalEvery === 0;
+    setLastStrikeSource("manual");
     applyDamage(critical ? tap * 3 : tap, critical, equipment.drill, oreMultiplier);
+  };
+
+  const handleMinePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!event.isPrimary || event.button !== 0 || isSecondaryControl(event.target)) return;
+    pointerRef.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      cancelled: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsPressing(true);
+  };
+
+  const handleMinePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    const pointer = pointerRef.current;
+    if (pointer === null || pointer.id !== event.pointerId || pointer.cancelled) return;
+    if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) <= 18) return;
+    pointer.cancelled = true;
+    setIsPressing(false);
+  };
+
+  const handleMinePointerUp = (event: ReactPointerEvent<HTMLElement>) => {
+    const pointer = pointerRef.current;
+    if (pointer === null || pointer.id !== event.pointerId) return;
+    pointerRef.current = null;
+    setIsPressing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (!pointer.cancelled) strike();
+  };
+
+  const handleMinePointerCancel = (event: ReactPointerEvent<HTMLElement>) => {
+    if (pointerRef.current?.id !== event.pointerId) return;
+    pointerRef.current = null;
+    setIsPressing(false);
   };
 
   const upgrade = (kind: EquipmentKind) => {
@@ -223,12 +336,11 @@ export function MinePrototype() {
         "--break-progress": progress.toFixed(3),
         "--cut-width": `${24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)}%`,
         "--lamp-radius": `${18 + Math.min(20, equipment.lamp * 2.4) + (specializations.lamp === "reach" ? 8 : 0)}%`,
-        "--geology-shift": `${-(mine.brokenLayers - 26 + progress) * 14}px`,
-        "--head-top": `${47 + progress * 18}%`,
-        "--hole-width": `${42 + progress * 96 + (specializations.drill === "wide" ? 26 : 0)}px`,
-        "--hole-height": `${24 + progress * 96}px`,
-        "--fracture-size": `${90 + progress * 96}px`,
-        "--fracture-opacity": `${0.4 + progress * 0.55}`,
+        "--rock-image": `url("${rockAssetAt(headDepth)}")`,
+        "--rock-phase": `${-((headDepth * PIXELS_PER_METER) % 320)}px`,
+        "--surface-y": `${16 - headDepth * PIXELS_PER_METER}px`,
+        "--fracture-reveal": `${progress <= 0 ? 0 : 18 + progress * 142}px`,
+        "--fracture-opacity": `${progress <= 0 ? 0 : 0.58 + progress * 0.42}`,
         "--cart-duration": `${Math.max(1.9, 4.8 - equipment.cart * 0.18 - (specializations.cart === "fleet" ? 0.65 : 0))}s`,
         "--rig-scale": `${1 + (equipmentTier(equipment.drill) - 1) * 0.12}`,
         "--impact-kick": `${specializations.drill === "impact" ? 1.34 : 1}`,
@@ -237,7 +349,7 @@ export function MinePrototype() {
       equipment.drill,
       equipment.cart,
       equipment.lamp,
-      mine.brokenLayers,
+      headDepth,
       progress,
       specializations.drill,
       specializations.cart,
@@ -247,51 +359,57 @@ export function MinePrototype() {
 
   const fractureAsset =
     progress > 0.67
-      ? "/assets/effects/Fracture_heavy.png"
+      ? "/assets/shaft/ShaftFractureVertical_heavy.png"
       : progress > 0.33
-        ? "/assets/effects/Fracture_medium.png"
-        : "/assets/effects/Fracture_light.png";
+        ? "/assets/shaft/ShaftFractureVertical_medium.png"
+        : "/assets/shaft/ShaftFractureVertical_light.png";
+
+  const depthMarks = useMemo(() => {
+    const first = Math.max(0, Math.floor(headDepth / METERS_PER_LAYER) * METERS_PER_LAYER - 16);
+    return Array.from({ length: 10 }, (_, index) => first + index * METERS_PER_LAYER);
+  }, [headDepth]);
+
+  const passageHistory = useMemo(
+    () =>
+      mine.boreHistory.map((drillLevel, index) => ({
+        depth: mine.depth - (mine.boreHistory.length - index) * METERS_PER_LAYER,
+        drillLevel,
+      })),
+    [mine.boreHistory, mine.depth],
+  );
 
   return (
-    <main className={styles.page}>
+    <main
+      className={`${styles.page} ${isPressing ? styles.pagePressed : ""}`}
+      onPointerDown={handleMinePointerDown}
+      onPointerMove={handleMinePointerMove}
+      onPointerUp={handleMinePointerUp}
+      onPointerCancel={handleMinePointerCancel}
+    >
       <div className={styles.appFrame}>
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>DEEPMINE / WEB PROTOTYPE</p>
             <h1>오늘의 갱도</h1>
-            <p className={styles.headerNote}>큰 지층 하나를, 가운데부터 아래로 뚫습니다.</p>
           </div>
-          <div className={styles.oreCounter} aria-label={`광석 ${formatNumber(mine.ore)}`}>
-            <span aria-hidden="true">◆</span>
-            <strong>{formatNumber(mine.ore)}</strong>
-            <small>광석</small>
+          <div className={styles.headerActions}>
+            <div className={styles.oreCounter} aria-label={`광석 ${formatNumber(mine.ore)}`}>
+              <span aria-hidden="true">◆</span>
+              <strong>{formatNumber(mine.ore)}</strong>
+              <small>광석</small>
+            </div>
+            <button className={styles.strikeAssist} type="button" onClick={strike}>
+              탭 가속
+              <small>자동 굴착 중</small>
+            </button>
           </div>
         </header>
-
-        <section className={styles.statusStrip} aria-label="현재 채굴 상태">
-          <div>
-            <span>현재 심도</span>
-            <strong>{headDepth.toFixed(1)}m</strong>
-          </div>
-          <div>
-            <span>최고 심도</span>
-            <strong>{mine.recordDepth}m</strong>
-          </div>
-          <div>
-            <span>타격</span>
-            <strong>{formatNumber(tap)}</strong>
-          </div>
-          <div>
-            <span>자동</span>
-            <strong>{automation > 0 ? `${formatNumber(automation)}/초` : "—"}</strong>
-          </div>
-        </section>
 
         <section className={styles.shaftSection} aria-labelledby="shaft-heading">
           <div className={styles.shaftHeading}>
             <div>
-              <p className={styles.sectionLabel}>연속 지층</p>
-              <h2 id="shaft-heading">막장을 눌러 굴착</h2>
+              <p className={styles.sectionLabel}>하나로 이어진 암반</p>
+              <h2 id="shaft-heading">통로 끝을 계속 굴착</h2>
             </div>
             <div className={styles.faceProgress}>
               <span>다음 4m</span>
@@ -303,55 +421,31 @@ export function MinePrototype() {
             <span style={{ width: `${progress * 100}%` }} />
           </div>
 
-          <button
-            className={`${styles.shaft} ${isCritical ? styles.critical : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+          <div
+            className={`${styles.shaft} ${isCritical ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
             style={sceneStyle}
-            type="button"
-            onClick={strike}
-            aria-label={`막장 타격. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착`}
+            role="img"
+            aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착`}
           >
-            <div className={styles.geology} aria-hidden="true">
-              <div className={`${styles.stratum} ${styles.entryRock}`} />
-              <div className={`${styles.stratum} ${styles.crystalRock}`} />
-              <div className={`${styles.stratum} ${styles.ruinsRock}`} />
-              <div className={`${styles.stratum} ${styles.abyssRock}`} />
-              <img
-                className={styles.surfaceCanopy}
-                src="/assets/shaft/ShaftSurface.png"
-                width={320}
-                height={90}
-                alt=""
-              />
-              <img
-                className={styles.futureSeam}
-                src="/assets/shaft/SeamVein.png"
-                width={320}
-                height={128}
-                alt=""
-              />
-            </div>
+            <div className={styles.rockWorld} aria-hidden="true" />
 
-            <div className={styles.boreHistory} aria-hidden="true">
-              {mine.boreHistory.map((drillLevel, index) => (
-                <span
-                  className={styles.boreSegment}
-                  style={{
-                    top: `${4 + index * 7.55}%`,
-                    width: `${19 + Math.min(11, drillLevel * 1.7)}%`,
-                  }}
-                  key={`${index}-${drillLevel}`}
-                />
-              ))}
-            </div>
+            <img
+              className={styles.continuousSurface}
+              src="/assets/shaft/ShaftSurface.png"
+              width={320}
+              height={90}
+              alt=""
+              aria-hidden="true"
+            />
 
-            <div className={styles.pastTunnel} aria-hidden="true">
-              {Array.from({ length: 6 }, (_, index) => (
-                <span className={styles.support} style={{ top: `${12 + index * 15}%` }} key={index} />
-              ))}
-              {equipment.cart > 1 && <span className={styles.rail} />}
+            <div className={styles.openShaft} aria-hidden="true">
+              <span className={styles.tunnelVoid} />
+              <span className={styles.tunnelLeftEdge} />
+              <span className={styles.tunnelRightEdge} />
+              {equipment.cart > 1 && <span className={styles.continuousRail} />}
               {Array.from({ length: cartCount }, (_, index) => (
                 <img
-                  className={`${styles.movingCart} ${specializations.cart === "freight" ? styles.freightCart : ""}`}
+                  className={`${styles.continuousCart} ${specializations.cart === "freight" ? styles.freightCart : ""}`}
                   style={{ animationDelay: `${index * -1.3}s` }}
                   src={`/assets/equipment/Equipment_cart_tier${equipmentTier(equipment.cart)}.png`}
                   width={32}
@@ -359,76 +453,84 @@ export function MinePrototype() {
                   alt=""
                   key={index}
                 />
-                ),
-              )}
-              {Array.from({ length: installedLampCount }, (_, index) => (
-                <img
-                  className={styles.installedLamp}
-                  style={{
-                    top: `${18 + index * 14}%`,
-                    left: index % 2 === 0 ? "4%" : "calc(96% - 22px)",
-                  }}
-                  src={`/assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`}
-                  width={32}
-                  height={32}
-                  alt=""
-                  key={index}
-                />
-              ))}
-              <span className={styles.recordPlate}>최고 {mine.recordDepth}m</span>
-            </div>
-
-            <div className={styles.historyScars} aria-hidden="true">
-              {[18, 28, 39, 49].map((top, index) => (
-                <img
-                  src={`/assets/effects/Fracture_${["light", "medium", "heavy", "medium"][index]}.png`}
-                  className={styles.historyScar}
-                  style={{
-                    top: `${top}%`,
-                    left: index % 2 === 0 ? "26%" : "62%",
-                    transform: `rotate(${index % 2 === 0 ? -18 : 22}deg)`,
-                  }}
-                  width={64}
-                  height={64}
-                  alt=""
-                  key={top}
-                />
               ))}
             </div>
 
-            <div className={styles.currentWork} aria-hidden="true">
+            <div className={styles.passageHistory} aria-hidden="true">
+              {passageHistory.map(({ depth, drillLevel }, index) => (
+                <div
+                  className={styles.supportFrame}
+                  style={{
+                    "--history-offset": `${(depth - headDepth) * PIXELS_PER_METER}px`,
+                    "--history-width": `${24 + Math.min(9, drillLevel * 0.9)}%`,
+                  } as CSSProperties}
+                  key={`${depth}-${drillLevel}`}
+                >
+                  <span />
+                  {index < installedLampCount && (
+                    <img
+                      className={styles.continuousLamp}
+                      src={`/assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`}
+                      width={32}
+                      height={32}
+                      alt=""
+                    />
+                  )}
+                  {index % 2 === 0 && (
+                    <img
+                      className={styles.continuousScar}
+                      src="/assets/shaft/ShaftFractureVertical_light.png"
+                      width={72}
+                      height={160}
+                      alt=""
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.shaftStatus} aria-label="현재 채굴 상태">
+              <div><span>현재 심도</span><strong>{headDepth.toFixed(1)}m</strong></div>
+              <div><span>최고 심도</span><strong>{Math.max(mine.recordDepth, headDepth).toFixed(1)}m</strong></div>
+              <div><span>탭 위력</span><strong>{formatNumber(tap)}</strong></div>
+              <div><span>자동 굴착</span><strong>{formatNumber(automation)}/초</strong></div>
+            </div>
+
+            <div className={styles.workLine} aria-hidden="true">
               <img
-                className={styles.gantry}
+                className={styles.continuousGantry}
                 src="/assets/shaft/ShaftGantry.png"
                 width={320}
                 height={128}
                 alt=""
               />
-              <div className={styles.faceHole} />
+              <div className={styles.fractureClip}>
+                <img
+                  className={styles.verticalFracture}
+                  src={fractureAsset}
+                  width={72}
+                  height={160}
+                  alt=""
+                  key={`${fractureAsset}-${hitPulse}`}
+                />
+              </div>
+              <img className={styles.continuousMiner} src="/assets/miner.png" width={72} height={72} alt="" />
               <img
-                className={styles.currentFracture}
-                src={fractureAsset}
+                className={styles.miningPickaxe}
+                src="/assets/shaft/MiningPickaxe.png"
                 width={64}
                 height={64}
                 alt=""
-                key={`${fractureAsset}-${hitPulse}`}
+                key={`pickaxe-${hitPulse}`}
               />
               <img
-                className={styles.miner}
-                src="/assets/miner.png"
-                width={72}
-                height={72}
-                alt=""
-                key={`miner-${hitPulse}`}
-              />
-              <img
-                className={styles.drillRig}
+                className={styles.continuousDrill}
                 src={`/assets/equipment/Equipment_drill_tier${equipmentTier(equipment.drill)}.png`}
                 width={64}
                 height={64}
                 alt=""
               />
-              <div className={styles.debrisCloud} key={`debris-${hitPulse}`}>
+              <div className={styles.continuousDebris} key={`continuous-debris-${hitPulse}`}>
                 {Array.from({ length: debrisCount }, (_, index) => (
                   <span
                     style={{
@@ -441,36 +543,51 @@ export function MinePrototype() {
                 ))}
               </div>
               <img
-                className={styles.weakPoint}
+                className={styles.continuousWeakPoint}
                 src={isCritical ? "/assets/effects/WeakPoint_hit.png" : "/assets/effects/WeakPoint_idle.png"}
                 width={64}
                 height={64}
                 alt=""
               />
-              <span className={styles.hitLabel} key={`hit-${hitPulse}`}>
-                {isCritical ? `급소 −${tap * 3}` : `−${tap}`}
+              <span className={styles.continuousHitLabel} key={`continuous-hit-${hitPulse}`}>
+                {lastStrikeSource === "auto"
+                  ? "자동 굴착"
+                  : isCritical
+                    ? `급소 −${tap * 3}`
+                    : `−${tap}`}
               </span>
-              {lastGain !== null && <span className={styles.oreGain}>+{lastGain} 광석</span>}
+              {lastGain !== null && <span className={styles.continuousOreGain}>+{lastGain} 광석</span>}
             </div>
 
-            <div className={styles.futureDarkness} aria-hidden="true" />
+            {isBreaking && (
+              <div className={styles.collapseBand} aria-hidden="true" key={`collapse-${collapsePulse}`}>
+                <span className={styles.collapseLeft} />
+                <span className={styles.collapseRight} />
+                <span className={styles.collapseGap} />
+              </div>
+            )}
 
-            <div className={styles.depthOverlay} aria-hidden="true">
-              <span style={{ top: "13%" }}>{Math.max(0, mine.depth - 20)}m</span>
-              <span style={{ top: "34%" }}>{Math.max(0, mine.depth - 12)}m</span>
-              <span className={styles.currentDepthMark}>
-                {headDepth.toFixed(1)}m ↓
-              </span>
-              <span style={{ top: "77%" }}>{mine.depth + 8}m</span>
-              <span style={{ top: "92%" }}>{mine.depth + 16}m</span>
+            <div className={styles.continuousDarkness} aria-hidden="true" />
+
+            <div className={styles.continuousDepthOverlay} aria-hidden="true">
+              {depthMarks.map((depth) => (
+                <span
+                  className={Math.abs(depth - headDepth) < 2 ? styles.currentDepthMark : ""}
+                  style={{ top: `calc(var(--workline) + ${(depth - headDepth) * PIXELS_PER_METER}px)` }}
+                  key={depth}
+                >
+                  {depth}m
+                </span>
+              ))}
             </div>
 
-            <div className={styles.sceneLegend} aria-hidden="true">
-              <span>지나온 길</span>
-              <span>현재 막장</span>
-              <span>앞으로 팔 지층</span>
+            <div className={styles.descentIndicator} aria-hidden="true">
+              <span>자동 하강</span>
+              <strong>{headDepth.toFixed(1)}m</strong>
+              <i>↓</i>
             </div>
-          </button>
+
+          </div>
         </section>
 
         <section className={styles.equipmentSection} aria-labelledby="equipment-heading">

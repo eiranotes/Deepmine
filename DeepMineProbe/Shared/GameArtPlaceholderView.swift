@@ -28,6 +28,10 @@ struct GameArtPlaceholderView: View {
             ShaftRockPlaceholder(region: region)
         case .shaftSurface:
             ShaftSurfacePlaceholder()
+        case .miningPickaxe:
+            MiningPickaxePlaceholder()
+        case let .shaftFracture(intensity):
+            FracturePlaceholder(intensity: intensity)
         }
     }
 }
@@ -254,6 +258,24 @@ private struct ShaftSurfacePlaceholder: View {
                     Spacer()
                     Rectangle().fill(ProbePalette.shale).frame(width: 8)
                 }
+            }
+        }
+    }
+}
+
+private struct MiningPickaxePlaceholder: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .bottomLeading) {
+                Capsule()
+                    .fill(ProbePalette.limestone)
+                    .frame(width: proxy.size.width * 0.16, height: proxy.size.height * 0.76)
+                    .rotationEffect(.degrees(42), anchor: .bottom)
+                Capsule()
+                    .fill(ProbePalette.shale)
+                    .frame(width: proxy.size.width * 0.68, height: proxy.size.height * 0.15)
+                    .rotationEffect(.degrees(-8))
+                    .offset(x: proxy.size.width * 0.28, y: -proxy.size.height * 0.46)
             }
         }
     }

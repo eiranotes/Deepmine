@@ -83,6 +83,20 @@ enum GameArtCatalog {
         placeholder: .shaftSurface
     )
 
+    static let miningPickaxe = GameArtEntry(
+        name: "MiningPickaxe",
+        promptID: "mining-pickaxe",
+        placeholder: .miningPickaxe
+    )
+
+    static func shaftFracture(intensity: FractureIntensity) -> GameArtEntry {
+        GameArtEntry(
+            name: "ShaftFractureVertical_\(intensity.rawValue)",
+            promptID: "shaft-fracture-vertical-\(intensity.rawValue)",
+            placeholder: .shaftFracture(intensity: intensity)
+        )
+    }
+
     /// The full slot list, used by the audit test that keeps this registry and the prompt
     /// document from drifting apart.
     static var allEntries: [GameArtEntry] {
@@ -109,6 +123,10 @@ enum GameArtCatalog {
         shaftRock(region: "ruins"),
         shaftRock(region: "abyss"),
         shaftSurface,
+        miningPickaxe,
+        shaftFracture(intensity: .light),
+        shaftFracture(intensity: .medium),
+        shaftFracture(intensity: .heavy),
     ]
 
     static var installedEntries: [GameArtEntry] {
@@ -148,4 +166,6 @@ enum GameArtPlaceholder: Equatable, Sendable {
     case seamVein
     case shaftRock(region: String)
     case shaftSurface
+    case miningPickaxe
+    case shaftFracture(intensity: FractureIntensity)
 }
