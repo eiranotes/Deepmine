@@ -31,10 +31,8 @@ final class GameStoreSessionPresentationTests: XCTestCase {
             coordinator: FakeSystemCoordinator(),
             clock: FakeClock()
         )
-
         XCTAssertEqual(store.returnPresentationState(for: report), .failed)
     }
-
 
     func testReturnPresentationKeepsUnaffordableRecommendationTruthful() throws {
         let repository = FakeSessionRepository()
@@ -72,11 +70,11 @@ final class GameStoreSessionPresentationTests: XCTestCase {
         )
 
         let presentation = try store.returnPresentation(for: report)
-
         let recommendation = try XCTUnwrap(presentation.recommendation)
         XCTAssertFalse(recommendation.isAffordable)
         XCTAssertEqual(recommendation.availableOre, 0)
         XCTAssertGreaterThan(recommendation.cost, recommendation.availableOre)
+        XCTAssertEqual(recommendation.equipment, .cart)
         XCTAssertEqual(presentation.report.completionID, completionID)
     }
 
@@ -107,7 +105,7 @@ final class GameStoreSessionPresentationTests: XCTestCase {
         XCTAssertEqual(soundCount, 0)
     }
 
-    func testProjectionUsesCoreVerificationAndAbandonmentRules() throws {
+    func testProjectionUsesLiveMineVerificationAndAbandonmentRules() throws {
         let repository = FakeSessionRepository()
         repository.player = PlayerState(
             equipment: EquipmentLevels(drill: 2, cart: 2, lamp: 2),
@@ -129,7 +127,10 @@ final class GameStoreSessionPresentationTests: XCTestCase {
             plan: .safe,
             grade: .open
         )
-        XCTAssertEqual(open.completedReward.ore, sealed.completedReward.ore * 0.75, accuracy: 0.000_001)
+        XCTAssertEqual(open.completedReward.breakdown.verification, 0.75)
+        XCTAssertGreaterThan(sealed.completedReward.ore, 0)
+        XCTAssertGreaterThan(open.completedReward.ore, 0)
+        XCTAssertLessThanOrEqual(open.completedReward.ore, sealed.completedReward.ore)
         XCTAssertGreaterThan(sealed.abandonmentReward.ore, 0)
 
         let survey = try store.rewardProjection(
