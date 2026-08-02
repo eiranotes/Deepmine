@@ -117,6 +117,28 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
+    func testRepeatedRefinementCommandDoesNotSpendOrSaveTwice() throws {
+        let level = RefinementEngine.requiredLevel(forTier: 1)
+        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let commandID = UUID()
+        let fixture = makeFixture(player: PlayerState(
+            resources: Resources(ore: BigNumber(cost + 100)),
+            equipment: EquipmentLevels(drill: level)
+        ))
+
+        _ = try fixture.store.purchaseRefinement(.drill, commandID: commandID)
+        let replay = try fixture.store.purchaseRefinement(.drill, commandID: commandID)
+
+        XCTAssertEqual(replay, .duplicate)
+        XCTAssertEqual(fixture.repository.player.refinementTiers.drill, 1)
+        XCTAssertEqual(
+            fixture.repository.player.resources.ore.doubleValue,
+            100,
+            accuracy: 0.000_001
+        )
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
+    }
+
     func testLockedRefinementDoesNotSaveOrMutatePlayer() throws {
         let player = PlayerState(resources: Resources(ore: 10_000))
         let fixture = makeFixture(player: player)
