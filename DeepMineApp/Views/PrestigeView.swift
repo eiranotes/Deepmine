@@ -189,7 +189,7 @@ struct PrestigeView: View {
 
     private func actionButton(
         _ key: DeepMineStringKey, symbol: String, id: String,
-        role: DeepMineMetalButtonStyle.Role = .primary,
+        role: DeepMineMetalButtonRole = .primary,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) { DeepMineActionLabel(titleKey: key, detailKey: nil, symbol: symbol) }
