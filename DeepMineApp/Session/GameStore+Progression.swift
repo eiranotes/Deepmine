@@ -18,7 +18,6 @@ extension GameStore {
             in: &player
         )
         if case .purchased = result {
-            // Level thresholds can only be crossed here, so this is where they resolve.
             AchievementEngine.evaluate(in: &player)
             try repository.savePlayer(player)
         }
@@ -39,9 +38,6 @@ extension GameStore {
         return result
     }
 
-    /// Refinement is an explicit purchase, not a value derived from level. Keep the write
-    /// behind `GameStore` like equipment and modifications so the UI never owns a state
-    /// that persistence has not accepted. The command ID makes an ambiguous retry safe.
     @discardableResult
     func purchaseRefinement(
         _ equipment: EquipmentKind,
@@ -57,66 +53,18 @@ extension GameStore {
     }
 
     func recommendedUpgrade(
-        verificationGrade: VerificationGrade = .sealed
+        verificationGrade _: VerificationGrade = .sealed
     ) throws -> UpgradeRecommendation? {
-        try recommendedUpgrade(
-            for: try repository.loadPlayer(),
-            verificationGrade: verificationGrade
-        )
+        recommendedUpgrade(for: try repository.loadPlayer())
     }
 
-    /// Overload for callers that already hold the player, so rendering never triggers
-    /// a redundant store read.
+    /// Home and equipment recommendations optimize the live mine, not a hypothetical
+    /// focus payout. The verification parameter remains only on the repository-loading
+    /// overload for source compatibility with older callers.
     func recommendedUpgrade(
         for player: PlayerState,
-        verificationGrade: VerificationGrade = .sealed
-    ) throws -> UpgradeRecommendation? {
-        let input = try recommendationInput(
-            for: player,
-            verificationGrade: verificationGrade
-        )
-        let baselineChance = VeinEngine.chance(
-            plan: input.plan,
-            lampLevel: player.equipment.lamp,
-            permanentResonanceLevel: player.permanentResonanceLevel,
-            consecutiveMisses: 0
-        )
-        let protectedChance = VeinEngine.chance(
-            plan: input.plan,
-            lampLevel: player.equipment.lamp,
-            permanentResonanceLevel: player.permanentResonanceLevel,
-            consecutiveMisses: player.consecutiveVeinMisses
-        )
-        return try UpgradeAdvisor.recommend(
-            for: player,
-            nextSession: input,
-            additionalVeinChance: max(0, protectedChance - baselineChance)
-        )
-    }
-
-    private func recommendationInput(
-        for player: PlayerState,
-        verificationGrade: VerificationGrade
-    ) throws -> RewardInput {
-        let day = try MiningStreak.dayKey(
-            for: clock.wallNow(),
-            calendar: calendar,
-            timeZone: timeZone
-        )
-        let daily = player.dailyRecords.first { $0.dayKey == day }
-        return RewardInput(
-            completionID: UUID(uuidString: "44454550-4D49-4E45-0000-000000000140")!,
-            outcome: .completed,
-            sessionLength: player.lastSelectedDuration,
-            plan: player.lastSelectedPlan,
-            verificationGrade: verificationGrade,
-            growthFocusCredits: player.lifetimeFocusCredits,
-            streakDays: player.streakDays,
-            dailySessionNumber: (daily?.sessionCount ?? 0) + 1,
-            equipment: player.equipment,
-            vein: nil,
-            resonanceBoostActive: player.resonanceBoostPending,
-            permanentUpgrades: player.permanentUpgrades
-        )
+        verificationGrade _: VerificationGrade = .sealed
+    ) -> UpgradeRecommendation? {
+        UpgradeAdvisor.recommendForMining(for: player)
     }
 }
