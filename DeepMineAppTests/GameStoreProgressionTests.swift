@@ -7,9 +7,7 @@ import XCTest
 final class GameStoreProgressionTests: XCTestCase {
     func testPurchasePersistsCanonicalOreDebitAndLevel() throws {
         let fixture = makeFixture(player: PlayerState(resources: Resources(ore: 500)))
-
         let result = try fixture.store.purchaseEquipment(.drill, commandID: UUID())
-
         XCTAssertEqual(result, .purchased(equipment: .drill, newLevel: 2, cost: 100))
         XCTAssertEqual(fixture.repository.player.resources.ore, 400)
         XCTAssertEqual(fixture.repository.player.equipment.drill, 2)
@@ -19,9 +17,7 @@ final class GameStoreProgressionTests: XCTestCase {
     func testInsufficientPurchaseDoesNotSaveOrMutatePlayer() throws {
         let player = PlayerState(resources: Resources(ore: 99))
         let fixture = makeFixture(player: player)
-
         let result = try fixture.store.purchaseEquipment(.drill, commandID: UUID())
-
         XCTAssertEqual(result, .insufficientOre(required: 100, available: 99))
         XCTAssertEqual(fixture.repository.player, player)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
@@ -30,24 +26,19 @@ final class GameStoreProgressionTests: XCTestCase {
     func testRepeatedCommandDoesNotSpendOreTwice() throws {
         let fixture = makeFixture(player: PlayerState(resources: Resources(ore: 500)))
         let commandID = UUID()
-
         _ = try fixture.store.purchaseEquipment(.drill, commandID: commandID)
         let replay = try fixture.store.purchaseEquipment(.drill, commandID: commandID)
-
         XCTAssertEqual(replay, .duplicate)
         XCTAssertEqual(fixture.repository.player.resources.ore, 400)
         XCTAssertEqual(fixture.repository.player.equipment.drill, 2)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
-    /// There is no game ceiling any more; this pins the arithmetic bound, which a real
-    /// player cannot reach because depth gates the ladder at one level per 15m (D-069).
     func testArithmeticBoundDoesNotSave() throws {
         let fixture = makeFixture(player: PlayerState(
             resources: Resources(ore: 10_000),
             equipment: EquipmentLevels(drill: Balance.equipmentLevelArithmeticBound)
         ))
-
         XCTAssertEqual(try fixture.store.purchaseEquipment(.drill), .maximumLevel)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
     }
@@ -56,7 +47,6 @@ final class GameStoreProgressionTests: XCTestCase {
         let player = PlayerState(resources: Resources(ore: 500))
         let fixture = makeFixture(player: player)
         fixture.repository.failPlayerSave = true
-
         XCTAssertThrowsError(try fixture.store.purchaseEquipment(.drill))
         XCTAssertEqual(fixture.repository.player, player)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
@@ -67,12 +57,10 @@ final class GameStoreProgressionTests: XCTestCase {
             resources: Resources(ore: 1_000),
             equipment: EquipmentLevels(drill: Balance.equipmentModificationUnlockLevel)
         ))
-
         let result = try fixture.store.purchaseEquipmentModification(
             .drillImpact,
             commandID: UUID()
         )
-
         XCTAssertEqual(
             result,
             .purchased(modification: .drillImpact, cost: Balance.drillModificationCost)
@@ -88,10 +76,58 @@ final class GameStoreProgressionTests: XCTestCase {
     func testRejectedModificationDoesNotSave() throws {
         let player = PlayerState(resources: Resources(ore: 10_000))
         let fixture = makeFixture(player: player)
-
         XCTAssertEqual(
             try fixture.store.purchaseEquipmentModification(.lampReach),
             .levelLocked(requiredLevel: Balance.equipmentModificationUnlockLevel)
+        )
+        XCTAssertEqual(fixture.repository.player, player)
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
+    }
+
+    func testRefinementPurchasePersistsTierAndOreDebit() throws {
+        let level = RefinementEngine.requiredLevel(forTier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
+        let fixture = makeFixture(player: PlayerState(
+            resources: Resources(ore: cost + Double(100)),
+            equipment: EquipmentLevels(drill: level)
+        ))
+        let result = try fixture.store.purchaseRefinement(.drill)
+        XCTAssertEqual(result, .refined(equipment: .drill, newTier: 1, cost: cost))
+        XCTAssertEqual(fixture.repository.player.refinementTiers.drill, 1)
+        XCTAssertEqual(
+            fixture.repository.player.resources.ore.doubleValue,
+            100,
+            accuracy: 0.000_001
+        )
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
+    }
+
+    func testRepeatedRefinementCommandDoesNotSpendOrSaveTwice() throws {
+        let level = RefinementEngine.requiredLevel(forTier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
+        let commandID = UUID()
+        let fixture = makeFixture(player: PlayerState(
+            resources: Resources(ore: cost + Double(100)),
+            equipment: EquipmentLevels(drill: level)
+        ))
+        _ = try fixture.store.purchaseRefinement(.drill, commandID: commandID)
+        let replay = try fixture.store.purchaseRefinement(.drill, commandID: commandID)
+        XCTAssertEqual(replay, .duplicate)
+        XCTAssertEqual(fixture.repository.player.refinementTiers.drill, 1)
+        XCTAssertEqual(
+            fixture.repository.player.resources.ore.doubleValue,
+            100,
+            accuracy: 0.000_001
+        )
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
+    }
+
+    func testLockedRefinementDoesNotSaveOrMutatePlayer() throws {
+        let player = PlayerState(resources: Resources(ore: 10_000))
+        let fixture = makeFixture(player: player)
+        XCTAssertEqual(
+            try fixture.store.purchaseRefinement(.drill),
+            .locked(requiredLevel: RefinementEngine.requiredLevel(forTier: 1))
         )
         XCTAssertEqual(fixture.repository.player, player)
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
@@ -113,9 +149,7 @@ final class GameStoreProgressionTests: XCTestCase {
             calendar: calendar,
             timeZone: timeZone
         )
-
         let ledger = try fixture.store.mineLedger()
-        // Lifetime scope, so the run that fell outside the old ISO week now counts.
         XCTAssertEqual(ledger.recordedRuns, 2)
         XCTAssertEqual(ledger.completedRuns, 2)
         XCTAssertEqual(ledger.deepestReturnMeters, 160)
@@ -123,11 +157,7 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(ledger.veinHistory.map(\.vein), [.crystal])
     }
 
-    func testRecommendationUsesSelectedPlanDurationAndGrade() throws {
-        let timeZone = TimeZone(secondsFromGMT: 0)!
-        var calendar = Calendar(identifier: .iso8601)
-        calendar.timeZone = timeZone
-        let now = date(2026, 7, 29, calendar: calendar, timeZone: timeZone)
+    func testRecommendationUsesLiveMineAndIgnoresFocusSelection() throws {
         let player = PlayerState(
             resources: Resources(ore: 10_000),
             equipment: EquipmentLevels(drill: 3, cart: 2, lamp: 2),
@@ -136,26 +166,14 @@ final class GameStoreProgressionTests: XCTestCase {
             lastSelectedPlan: .survey,
             lastSelectedDuration: .minutes50
         )
-        let fixture = makeFixture(player: player, date: now, calendar: calendar, timeZone: timeZone)
-        let expected = try UpgradeAdvisor.recommend(
-            for: player,
-            nextSession: RewardInput(
-                completionID: UUID(uuidString: "44454550-4D49-4E45-0000-000000000140")!,
-                outcome: .completed,
-                sessionLength: .minutes50,
-                plan: .survey,
-                verificationGrade: .open,
-                growthFocusCredits: 12,
-                streakDays: 7,
-                dailySessionNumber: 1,
-                equipment: player.equipment,
-                vein: nil,
-                resonanceBoostActive: false,
-                permanentUpgrades: player.permanentUpgrades
-            )
-        )
+        let fixture = makeFixture(player: player)
+        let expected = UpgradeAdvisor.recommendForMining(for: player)
 
         XCTAssertEqual(try fixture.store.recommendedUpgrade(verificationGrade: .open), expected)
+        XCTAssertEqual(
+            fixture.store.recommendedUpgrade(for: player, verificationGrade: .sealed),
+            expected
+        )
     }
 
     private func makeFixture(

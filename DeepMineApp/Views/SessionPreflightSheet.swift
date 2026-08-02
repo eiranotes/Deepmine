@@ -41,6 +41,7 @@ struct SessionPreflightSheet: View {
     let readiness: SessionReadiness
     let projection: SessionRewardProjection
     let feedback: GameFeedback
+    let onStartStateChange: (Bool) -> Void
     let onStarted: (PersistedGameSession) -> Void
     let onConfigure: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -72,6 +73,7 @@ struct SessionPreflightSheet: View {
             }
         }
         .tint(DeepMinePalette.brass.color)
+        .interactiveDismissDisabled(isPreparing)
         .alert(DeepMineStrings.text(.preflightStartFailed), isPresented: $startFailed) {
             Button(DeepMineStrings.text(.actionConfirm), role: .cancel) {}
         }
@@ -237,19 +239,23 @@ struct SessionPreflightSheet: View {
 
     private func start() async {
         isPreparing = true
+        onStartStateChange(true)
         do {
             try await gameStore.start(length: length, plan: plan)
             // Sealed and open starts feel different because they are different promises.
             feedback.play(readiness == .sealed ? .sessionSealed : .sessionOpen)
             guard let session = gameStore.activeSession else {
                 isPreparing = false
+                onStartStateChange(false)
                 startFailed = true
                 return
             }
             onStarted(session)
+            onStartStateChange(false)
             dismiss()
         } catch {
             isPreparing = false
+            onStartStateChange(false)
             startFailed = true
         }
     }

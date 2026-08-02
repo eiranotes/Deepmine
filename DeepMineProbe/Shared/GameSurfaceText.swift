@@ -1,3 +1,4 @@
+import DeepMineCore
 import Foundation
 
 enum GameSurfaceText {
@@ -92,6 +93,14 @@ enum GameSurfaceText {
         return Int(safe.rounded()).formatted(.number.locale(locale))
     }
 
+    static func number(_ value: BigNumber, locale: Locale) -> String {
+        let projection = value.doubleValue
+        if value.exponent < 15, projection.isFinite {
+            return number(projection, locale: locale)
+        }
+        return value.scientificDescription
+    }
+
     static func durationShort(_ minutes: Int, locale: Locale) -> String {
         let suffix = locale.language.languageCode?.identifier == "ko" ? "분" : "m"
         return "\(minutes)\(suffix)"
@@ -101,12 +110,14 @@ enum GameSurfaceText {
         _ recommendation: GameSurfaceUpgradeRecommendation,
         locale: Locale
     ) -> String {
-        [
+        let cost = recommendation.bigCost.map { number($0, locale: locale) }
+            ?? number(recommendation.cost, locale: locale)
+        return [
             localized("surface.recommendationAction", locale: locale),
             equipment(recommendation.equipmentID, locale: locale),
             "\(localized("surface.level", locale: locale)) \(recommendation.nextLevel)",
             "\(localized("surface.cost", locale: locale)) "
-                + "\(number(recommendation.cost, locale: locale)) "
+                + "\(cost) "
                 + localized("game.ore", locale: locale)
         ].joined(separator: ", ")
     }

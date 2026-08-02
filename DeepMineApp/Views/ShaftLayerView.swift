@@ -32,7 +32,10 @@ struct ShaftGeologyView: View {
         ForEach(scene.strata) { stratum in
             GeometryReader { proxy in
                 GameArtView(
-                    entry: GameArtCatalog.shaftRock(region: stratum.region.rawValue),
+                    entry: GameArtCatalog.shaftRock(
+                        region: stratum.region.rawValue,
+                        depthMeters: stratum.startDepthMeters
+                    ),
                     fill: proxy.size
                 )
                 .overlay {
@@ -123,8 +126,6 @@ struct ShaftGeologyView: View {
             .frame(width: 2)
     }
 
-    /// Plant installed by the equipment the player owns right now, as opposed to the bore
-    /// history above, which is the record of what was owned on the way down (D-059).
     private var plant: MineInfrastructure {
         MineInfrastructureEngine.infrastructure(
             equipment: player.equipment,
@@ -132,15 +133,11 @@ struct ShaftGeologyView: View {
         )
     }
 
-    /// Crew work the deck just above the face, so growth reads as a busier work site
-    /// rather than as figures scattered down the shaft.
     private func workCrew(width: CGFloat) -> some View {
         let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
         return ForEach(1..<max(2, plant.crew), id: \.self) { index in
             let x = width / 2 + (index.isMultiple(of: 2) ? 54 : -58) + CGFloat(index) * 4
             let y = max(30, headY - 26 - CGFloat(index % 2) * 34)
-            // A miner standing on nothing reads as a sprite pasted over the passage. The
-            // deck is what makes the same figure read as someone working in it.
             ZStack(alignment: .bottom) {
                 Rectangle()
                     .fill(DeepMinePalette.brass.color.opacity(0.42))
@@ -154,8 +151,6 @@ struct ShaftGeologyView: View {
         }
     }
 
-    /// Fixed lighting along the open passage. Count comes from the lamp level, so buying a
-    /// lamp lights more of the shaft instead of only widening an invisible survey radius.
     private func serviceLamps(width: CGFloat) -> some View {
         let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
         let span = max(40, headY - 30)
@@ -266,8 +261,6 @@ struct ShaftGeologyView: View {
             strikeVariant: strikeVariant,
             onStrike: onStrike
         )
-        // Keeps the rock's top edge at the head depth after the face grew taller to make
-        // room for the frontier lip: centre = headY + (frameHeight / 2 - groundTop) + 8.
         .position(x: width / 2, y: headY + 26)
     }
 

@@ -1,0 +1,69 @@
+name: DeepMine Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - name: Bundle shared gameplay logic
+        run: |
+          mkdir -p pages-dist
+          cp pages-static/index.html pages-static/styles.css pages-static/app.js pages-dist/
+          npx esbuild app/coreBalance.ts \
+            --bundle \
+            --format=esm \
+            --platform=browser \
+            --outfile=pages-dist/coreBalance.js
+          touch pages-dist/.nojekyll
+        working-directory: web
+      - name: Browser module smoke test
+        run: |
+          node -e "import('./pages-dist/coreBalance.js').then(m => { const base = { drill: 1, cart: 1, lamp: 1 }; if (m.automationDamagePerSecond(1) !== 0 || m.automationDamagePerSecond(2) <= 0 || m.upgradeCost('drill', 201) == null || m.recommendMiningUpgrade(base, 100, 8) !== 'cart') process.exit(1) })"
+        working-directory: web
+      - name: Static artifact contract
+        run: |
+          test -s pages-dist/index.html
+          test -s pages-dist/styles.css
+          test -s pages-dist/app.js
+          test -s pages-dist/coreBalance.js
+        working-directory: web
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          path: web/pages-dist
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -17,6 +17,7 @@ struct StatisticsView: View {
             timeZone: timeZone
         )
     }
+    private var power: StrikePower { MiningLoop.power(for: player) }
     @State var ledger: MineLedger?
     @State var loadFailed = false
 
@@ -25,8 +26,9 @@ struct StatisticsView: View {
             VStack(spacing: 17) {
                 if loadFailed { recoveryPanel }
                 if let ledger, !loadFailed {
+                    liveMineGauges
                     if ledger.recordedRuns == 0 { zeroPanel }
-                    gauges(ledger)
+                    sessionGauges(ledger)
                     growthPanel
                     codexPanel
                     planMix(ledger)
@@ -44,19 +46,59 @@ struct StatisticsView: View {
         .task { load() }
     }
 
+    private var liveMineGauges: some View {
+        DeepMineRivetedPanel {
+            VStack(spacing: 0) {
+                Label(DeepMineStrings.text(.homeMineScene), systemImage: "hammer.fill")
+                    .font(.caption.weight(.bold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                statRow(
+                    title: .gameDepth,
+                    value: "\(player.depthMeters)m",
+                    symbol: "arrow.down.to.line.compact",
+                    identifier: "statistics-current-depth"
+                )
+                divider
+                statRow(
+                    title: .prestigeSegments,
+                    value: "\(player.mineFace.lifetimeSegmentsBroken)",
+                    symbol: "square.stack.3d.down.right.fill",
+                    identifier: "statistics-rocks-broken"
+                )
+                divider
+                statRow(
+                    title: .gameOre,
+                    value: DeepMineNumberFormatter.string(big: player.resources.ore),
+                    symbol: "shippingbox.fill",
+                    identifier: "statistics-wallet"
+                )
+                divider
+                statRow(
+                    title: .gameCart,
+                    value: power.isAutomated
+                        ? "\(DeepMineNumberFormatter.string(big: power.damagePerSecond))/s"
+                        : "0/s",
+                    symbol: "gearshape.2.fill",
+                    identifier: "statistics-automation-output"
+                )
+            }
+        }
+        .accessibilityIdentifier("statistics-live-mine")
+    }
+
     private var zeroPanel: some View {
         DeepMineRivetedPanel {
-            Label(DeepMineStrings.text(.statisticsEmpty), systemImage: "gauge.with.dots.needle.0percent")
+            Label(DeepMineStrings.text(.statisticsEmpty), systemImage: "timer")
                 .font(.subheadline)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityIdentifier("statistics-zero")
     }
 
-    private func gauges(_ ledger: MineLedger) -> some View {
+    private func sessionGauges(_ ledger: MineLedger) -> some View {
         DeepMineRivetedPanel {
             VStack(spacing: 0) {
-                Text(DeepMineStrings.text(.navigationStatistics))
+                Text(DeepMineStrings.text(.homeFocusAmplifierTitle))
                     .font(.caption.weight(.bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 statRow(
@@ -127,9 +169,6 @@ struct StatisticsView: View {
                             .foregroundStyle(DeepMinePalette.brass.color)
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(
-                        "\(DeepMineStrings.text(DeepMineProgressLabels.planKey(item.plan))) \(item.count)"
-                    )
                     .accessibilityIdentifier("statistics-plan-\(item.plan.rawValue)")
                     DeepMineProgressRail(
                         value: Double(item.count),

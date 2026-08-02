@@ -1,6 +1,36 @@
 # Build Report
 
-업데이트: 2026-08-02 (광석 용량 실측 · 180일 역전 분해)
+업데이트: 2026-08-02 (현재 코드·PR·Pro 교차 감사 closeout)
+
+## 2026-08-02 current-audit closeout
+
+**판정: 계획 전체 완료가 아니다.** 이번 closeout은 single-clock, 장시간 정산, 첫 자동화
+저축, 주요 `BigNumber` 구매 표면, 생산률/구매·정련 피드백, 장기 지질/에셋과 Pages 로컬
+계약을 구현·검증했다. 실제 UI 정책 장기 시뮬레이션, 집중 경제 통합, 정련 재설치,
+`NextStepPlanner` 극후반 진행도, Lv.100,000 산술 안전 천장 이후 성장, 전체 UI/실기기/원격
+배포 게이트는 열린 상태다.
+
+| 항목 | 현재 결과 | 근거/경계 |
+|---|---|---|
+| Core 전체 | **282/282 통과** | `swift test --package-path DeepMineCore`, 실패 0. 150/500km 정산, exponent 383 구매 표면, 정련 preview 포함 |
+| App 단위 전체 | **150/150 통과** | 전용 iPhone 17 Pro / iOS 26.5 시뮬레이터, 실패·skip 0. xcresult `/tmp/deepmine-current-audit-tests/Logs/Test/Test-DeepMineApp-2026.08.02_23-33-56-+0900.xcresult` |
+| 저장 경로 집중 회귀 | **9/9 통과** | 직접 재열기, 레거시 빈 필드, 원자적 명령, 세션 종료가 기억 장비·정련·업적을 보존 |
+| 최종 persistence/명령 큐 회귀 | **23/23 통과** | 원자적 명령 책임 분리와 테스트 재배치 뒤 세션 저장까지 포함해 실패·skip 0. xcresult `/tmp/deepmine-current-audit-tests/Logs/Test/Test-DeepMineApp-2026.08.02_23-55-35-+0900.xcresult` |
+| 정련 실화면 | **1/1 통과** | `testRefinementExplainsTierLeapAndActualOutputImpact`; R0→R1 저장, 전용 notice, 실제 출력 변화. xcresult `/tmp/deepmine-growth-feedback-tests/Logs/Test/Test-DeepMineApp-2026.08.02_23-32-49-+0900.xcresult` |
+| 생산/정련 계산 집중 회귀 | **17/17 통과** | `WorkFaceForecastTests`; 잠긴 행은 최소 해금 레벨 preview, 램프는 실제 총 치명타 배율 비율 |
+| generic iOS device build | **통과** | code signing 비활성 build exit 0. 기존 `OfflineSettlement.swift`·`ShaftView.swift`의 unused `try?` warning은 남음 |
+| 웹 | **15/15 통과** | `npm test`가 production build와 패리티/계약을 실행, `npm run lint` 통과. 웹은 JavaScript `number` formula harness이며 앱의 `BigNumber` 범위 증거가 아님 |
+| 정적 Pages 로컬 계약 | **11/11 통과** | 정적 페이지 DOM 로직과 첫 광차 저축 readout, workflow bundle/module smoke 확인. PR은 build만, main push만 deploy |
+| 장기 진행 에셋 | **7/7 통과** | strict PNG/SHA/정확한 ID 집합/카탈로그/웹 복사본과 provenance ID·raw-source 대응 검사 |
+| Swift 파일 크기 | **통과** | 이번 변경 파일은 모두 300줄 이하. 기존 baseline `GameActivitySurfaceContent.swift` 302줄만 남음 |
+| 웹 개발 서버 | **HTTP 200** | `http://127.0.0.1:4173`. 첫 로컬 이동 실패 뒤 인앱 Browser 보안 정책이 재시도를 막아 최종 화면 육안 판독은 수행하지 못함 |
+| 원격/실기기 | **미검증** | push 전 GitHub Actions/Pages, FamilyControls·AlarmKit·Live Activity, 실제 VoiceOver/Reduce Motion/햅틱은 출시 차단 게이트 |
+
+## Historical verification log
+
+아래 날짜별 표는 해당 단계에서 사실이었던 기록이다. `Double` 지갑, 정련 UI 미구현,
+6,144 총상한, D-056~D-060 앱 미포팅 같은 판정은 위 current-audit closeout이 대체하며
+현재 상태로 읽지 않는다.
 
 ## 2026-08-02 ore capacity and the 180-day inversion
 

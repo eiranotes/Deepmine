@@ -31,14 +31,15 @@ struct ShaftHUDView: View {
             VStack(alignment: .trailing, spacing: 1) {
                 Text(String(
                     format: DeepMineStrings.text(.shaftTapDamage),
-                    DeepMineNumberFormatter.string(power.tapDamage.doubleValue)
+                    DeepMineNumberFormatter.string(big: power.tapDamage)
                 ))
-                Text(String(
-                    format: DeepMineStrings.text(.shaftAutomationDamage),
-                    power.isAutomated
-                        ? DeepMineNumberFormatter.string(power.damagePerSecond.doubleValue)
-                        : "—"
-                ))
+                if let oreRate = forecast.automaticOrePerSecond,
+                   let layerRate = forecast.automaticLayersPerSecond {
+                    Text("\(DeepMineRateFormatter.string(oreRate)) \(DeepMineStrings.text(.shaftRateOre))")
+                    Text("\(DeepMineRateFormatter.string(layerRate)) \(DeepMineStrings.text(.shaftRateLayers))")
+                } else {
+                    Text(DeepMineStrings.text(.shaftRateManual))
+                }
             }
             .font(.caption2.monospacedDigit())
             .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.72))
@@ -98,5 +99,9 @@ struct ShaftHUDView: View {
     private var layersUntilSeam: Int {
         let remainder = player.mineFace.segmentIndex % Balance.seamSegmentInterval
         return Balance.seamSegmentInterval - remainder
+    }
+
+    private var forecast: WorkFaceForecast {
+        MiningLoop.forecast(for: player)
     }
 }

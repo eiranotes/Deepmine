@@ -10,8 +10,16 @@ final class ProgressViewsUITests: XCTestCase {
     }
 
     func testHomeRoutesToEveryProgressLedger() {
-        assertRoute(button: "mine-home-equipment", fixture: "progress-populated", screen: "equipment-screen")
-        assertRoute(button: "mine-home-statistics", fixture: "progress-populated", screen: "statistics-screen")
+        assertRoute(
+            button: "mine-home-equipment",
+            fixture: "progress-populated",
+            screen: "equipment-screen"
+        )
+        assertRoute(
+            button: "mine-home-statistics",
+            fixture: "progress-populated",
+            screen: "statistics-screen"
+        )
 
         launch("return-normal")
         XCTAssertTrue(element("return-recommendation-affordable").waitForExistence(timeout: 6))
@@ -32,7 +40,10 @@ final class ProgressViewsUITests: XCTestCase {
         open("mine-home-equipment")
         XCTAssertTrue(element("equipment-upgrade-drill").waitForExistence(timeout: 3))
         element("equipment-upgrade-drill").tap()
-        XCTAssertTrue(element("equipment-notice-success").waitForExistence(timeout: 3))
+        let notice = element("equipment-notice-success")
+        XCTAssertTrue(notice.waitForExistence(timeout: 3))
+        XCTAssertTrue(notice.label.contains("→"))
+        XCTAssertTrue(notice.label.contains("%"))
         app.terminate()
 
         launch("equipment-success", reset: false, storeID: storeID)
@@ -51,6 +62,48 @@ final class ProgressViewsUITests: XCTestCase {
         XCTAssertTrue(element("equipment-ore").label.contains("400"))
     }
 
+    func testRefinementExplainsTierLeapAndActualOutputImpact() {
+        launch("equipment-refinement")
+        open("mine-home-equipment")
+        reveal("equipment-refinement-drill").tap()
+
+        let notice = element("equipment-notice-refinement")
+        XCTAssertTrue(notice.waitForExistence(timeout: 3))
+        XCTAssertTrue(notice.label.contains("R0"))
+        XCTAssertTrue(notice.label.contains("R1"))
+        XCTAssertTrue(notice.label.contains("2.5"))
+        XCTAssertTrue(notice.label.contains("탭 출력"))
+        XCTAssertTrue(notice.label.contains("→"))
+        XCTAssertTrue(notice.label.contains("%"))
+    }
+
+    func testBulkPurchaseControlsAreAvailableAndMutateLevel() {
+        launch("progress-populated")
+        open("mine-home-equipment")
+        let level = element("equipment-level-drill")
+        XCTAssertTrue(level.waitForExistence(timeout: 3))
+        let before = level.label
+        let bulk = reveal("equipment-bulk-drill-×10")
+        XCTAssertTrue(bulk.isEnabled)
+        bulk.tap()
+        XCTAssertTrue(element("equipment-notice-success").waitForExistence(timeout: 3))
+        XCTAssertNotEqual(level.label, before)
+    }
+
+    func testAutomaticMineAdvancesWhileEquipmentScreenCoversHome() {
+        launch("progress-populated")
+        let rock = element("rock-face")
+        XCTAssertTrue(rock.waitForExistence(timeout: 5))
+        let before = rock.label
+        open("mine-home-equipment")
+        sleep(2)
+        let back = app.navigationBars.buttons.firstMatch
+        XCTAssertTrue(back.exists)
+        back.tap()
+        XCTAssertTrue(rock.waitForExistence(timeout: 3))
+        XCTAssertNotEqual(rock.label, before)
+    }
+
     func testEquipmentExplainsInsufficientOreAndMaximumLevel() {
         launch("equipment-insufficient")
         open("mine-home-equipment")
@@ -64,24 +117,24 @@ final class ProgressViewsUITests: XCTestCase {
         XCTAssertFalse(element("equipment-upgrade-drill").isEnabled)
     }
 
-
     func testStatisticsReadAtZeroAndFiveHundredHistoryEntries() {
         launch("progress-empty")
         open("mine-home-statistics")
-        XCTAssertTrue(element("statistics-zero").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("statistics-live-mine").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("statistics-zero").exists)
         app.terminate()
 
         launch("progress-overflow")
         open("mine-home-statistics")
+        XCTAssertTrue(element("statistics-live-mine").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("statistics-rocks-broken").exists)
+        XCTAssertTrue(element("statistics-automation-output").exists)
         XCTAssertTrue(element("statistics-total-sessions").waitForExistence(timeout: 3))
         let completions = element("statistics-total-sessions").label
         XCTAssertTrue(completions.contains("완료한 채굴"))
         XCTAssertTrue(completions.contains("428 / 500"))
         let depth = element("statistics-depth").label
         XCTAssertTrue(depth.contains("최고 귀환 심도"))
-        // Depth is lifetime and monotonic, so the current depth IS the deepest ever.
-        // The old 1,607m was only the deepest entry the 500-record cap still held, which
-        // under-reports once history is truncated.
         XCTAssertTrue(depth.contains("1.5만m"))
         XCTAssertTrue(element("statistics-ore").label.contains("귀환 광석"))
         XCTAssertTrue(element("statistics-plan-mix").exists)
@@ -122,6 +175,7 @@ final class ProgressViewsUITests: XCTestCase {
         launch("progress-populated", language: "en")
         open("mine-home-statistics")
         XCTAssertTrue(element("statistics-screen").waitForExistence(timeout: 3))
+        XCTAssertTrue(element("statistics-live-mine").exists)
         XCTAssertTrue(element("statistics-total-sessions").label.contains("Completed mines"))
         XCTAssertTrue(element("statistics-plan-mix").exists)
         XCTAssertTrue(element("statistics-vein-history").exists)
@@ -145,7 +199,7 @@ final class ProgressViewsUITests: XCTestCase {
 
     private func reveal(_ identifier: String) -> XCUIElement {
         let target = app.descendants(matching: .any).matching(identifier: identifier).firstMatch
-        for _ in 0..<4 where !target.exists { app.swipeUp() }
+        for _ in 0..<4 where !target.exists || !target.isHittable { app.swipeUp() }
         XCTAssertTrue(target.waitForExistence(timeout: 3))
         return target
     }

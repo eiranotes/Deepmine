@@ -1,6 +1,39 @@
 # Tasks
 
-업데이트: 2026-08-01
+업데이트: 2026-08-02 (current audit closeout)
+
+## 2026-08-02 current audit closeout
+
+아래가 현재 작업 큐다. 이후의 P0~P4 목록은 각 시점의 구현 기록이며, 상한 60/200이나
+정련 UI 미구현 같은 문구는 역사적 상태로 읽는다.
+
+완료:
+
+- [x] 세션 복구·시작 준비·활성 집중과 홈 자동/오프라인 채굴의 단일 clock gate
+- [x] 150km·500km 8시간 carried-resolution 무손실 회귀
+- [x] 광석 134에서도 첫 광차 ◆180 저축 목표 유지
+- [x] 자동 광석/초·층/초 HUD와 구매 전후 탭/자동 출력·ETA 변화
+- [x] 장비별 정련 발견성 패널과 일반 구매와 구분된 성공 피드백
+- [x] 구매 결과·추천 비용의 사용자 표면까지 `BigNumber` 보존
+- [x] 일반 저장·원자적 명령·세션 종료에서 기억 장비·정련 단계·달성 업적 영속화
+- [x] 5km·20km·100km 시각 지질 경계와 앱/웹 v2 텍스처 소비
+- [x] 장기 진행 PNG 7종 strict validator와 CI job
+- [x] PR build/main deploy 분리 및 Pages 권한 축소
+- [x] Vinext Sites 플러그인을 clean checkout에도 존재하는 추적 소스로 이동
+- [x] 변경 Swift 파일을 모두 300줄 이하로 분리하고 persistence/명령 큐 23/23 재검증
+
+열림:
+
+- [ ] 실제 앱 홈 추천·최저가·정련·자동화·MAX 정책을 쓰는 30/90/180일 시뮬레이션
+- [ ] 집중 보상을 별도 세션 광석이 아닌 실제 `MiningLoop` 진행으로 통합
+- [ ] 정련 MAX와 프레스티지 후 기억 정련 일괄 재설치
+- [ ] 통계·도전과제의 세션 중심 잔여 비중 재편
+- [ ] `NextStepPlanner` 목표 진행도와 호환용 추천 비용 투영의 극후반 `BigNumber` 전환
+- [ ] Lv.100,000 산술 안전 천장 이후에도 유한 정수 순회와 저장 계약을 보존하는 true-uncapped 성장
+- [ ] JavaScript `number` 범위를 넘는 앱 경제는 웹이 아닌 Core 회귀로 계속 검증
+- [ ] 프레스티지의 정련 손실 고지와 홈 진입/재구축 UX 실화면 회귀
+- [ ] main push 뒤 Pages와 validation workflow의 실제 원격 성공
+- [ ] 전체 `DeepMineAppUITests`와 FamilyControls/AlarmKit/Live Activity 실기기 릴리스 게이트
 
 ## Gameplay-complete MVP — implemented
 

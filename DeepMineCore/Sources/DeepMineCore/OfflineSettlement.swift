@@ -1,24 +1,15 @@
 import Foundation
 
-/// What the mine produced while the app was closed.
 public struct OfflineSettlement: Equatable, Sendable, Identifiable {
-    /// Real time since the last settlement, before the cap.
     public let elapsedSeconds: TimeInterval
-    /// Time actually paid for, after the cap.
     public let creditedSeconds: TimeInterval
     public let oreGained: BigNumber
     public let segmentsBroken: Int
     public let seamsBroken: Int
     public let regionChanged: Bool
-    /// The player was away longer than the cap allows. Worth saying out loud — a silent
-    /// cap reads as a bug the first time someone returns after a weekend.
     public let wasCapped: Bool
-    /// The elapsed time was not believable (clock moved backwards, or a timestamp from
-    /// far in the future), so nothing was paid.
     public let wasRejected: Bool
 
-    /// Distinct per settlement so a second return presents a fresh sheet rather than
-    /// being suppressed as an unchanged item.
     public var id: String {
         "\(elapsedSeconds)-\(segmentsBroken)-\(oreGained.scientificDescription)"
     }
@@ -27,7 +18,6 @@ public struct OfflineSettlement: Equatable, Sendable, Identifiable {
         segmentsBroken == 0 && oreGained.isZero
     }
 
-    /// Whether returning deserves a sheet. A few seconds away is not a homecoming.
     public var isWorthReporting: Bool {
         !wasRejected
             && !isEmpty
@@ -62,22 +52,18 @@ public struct OfflineSettlement: Equatable, Sendable, Identifiable {
 }
 
 extension MiningLoop {
-    /// Settles the time between two dates. Runs the same automation arithmetic as the
-    /// on-screen tick, scaled by the offline efficiency, so a closed app and an open one
-    /// never disagree about more than that single factor.
     @discardableResult
     public static func settleOffline(
         since lastSettled: Date?,
         now: Date,
+        calendar: Calendar = .current,
+        timeZone: TimeZone = .current,
         in state: inout PlayerState
     ) -> OfflineSettlement {
         defer { state.lastSettledAt = now }
 
         guard let lastSettled else { return .none }
         let elapsed = now.timeIntervalSince(lastSettled)
-
-        // A backwards or absurd clock pays nothing. Cheating the mine by moving the
-        // device clock must not be more profitable than playing it.
         guard elapsed.isFinite,
               elapsed > 0,
               elapsed <= Balance.maximumPlausibleOfflineSeconds else {
@@ -93,6 +79,15 @@ extension MiningLoop {
         let capped = min(elapsed, cap)
         let credited = capped * Balance.offlineEfficiency
         let update = advance(seconds: credited, in: &state)
+        if update.segmentsBroken > 0 {
+            try? MiningStreak.record(
+                at: now,
+                in: &state,
+                calendar: calendar,
+                timeZone: timeZone,
+                incrementSessionCount: false
+            )
+        }
 
         return OfflineSettlement(
             elapsedSeconds: elapsed,

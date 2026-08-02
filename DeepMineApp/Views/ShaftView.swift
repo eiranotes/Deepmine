@@ -1,29 +1,16 @@
 import DeepMineCore
 import SwiftUI
 
-/// The mine, seen from the side.
-///
-/// Depth is the number this game is about, so it is drawn as a place instead of a label:
-/// old passage above, the head travelling through one continuous geological body, and
-/// future rock fading into darkness below.
-///
-/// This view owns the automation tick. It is the only place a timer advances the mine, so
-/// on-screen progress and offline catch-up cannot disagree about how fast the mine runs.
 @MainActor
 struct ShaftView: View {
     @Binding var player: PlayerState
     let feedback: GameFeedback
     var onPersist: (PlayerState) -> Void = { _ in }
-    /// Fixtures render the shaft for screen tests, where a mine that advances on a timer
-    /// would make every capture different. A still shaft is still the real view — the
-    /// same geology and geometry — with the clock and the dice held.
     var isLive = true
 
     @State private var generator = SeededGenerator(seed: UInt64.random(in: .min ... .max))
     @State private var struckWeakPoint = false
     @State private var strikeSignal = 0
-    /// Swing bookkeeping. Damage runs on the simulation step; the visible swing runs on its
-    /// own readable period so automation cannot restart the actor mid-stroke (D-058).
     @State private var strikeVariant: StrikeVariant = .quick
     @State private var swingSequence = 0
     @State private var lastSwingAt: TimeInterval?
@@ -32,8 +19,6 @@ struct ShaftView: View {
     @State var debrisBursts: [DebrisBurst] = []
     @State var groundCollapses: [GroundCollapseBurst] = []
     @State private var lastTick = Date()
-    /// Foreground-only intermittent reward. Kept in the view because it is a moment, not
-    /// a saved fact: a node that expired while the app was closed was never offered.
     @State private var resonance = ResonanceNodeState()
     @State private var resonanceNow = Date()
     @Environment(\.scenePhase) private var scenePhase
@@ -79,8 +64,6 @@ struct ShaftView: View {
         }
     }
 
-    // MARK: Shaft column
-
     private var shaft: some View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
@@ -99,9 +82,7 @@ struct ShaftView: View {
                     feedback.play(.veinFound)
                 }
                 .position(
-                    x: resonance.prefersTrailingEdge
-                        ? proxy.size.width - 52
-                        : 52,
+                    x: resonance.prefersTrailingEdge ? proxy.size.width - 52 : 52,
                     y: max(46, ShaftGeometry.y(for: scene.headDepthMeters, in: scene) - 74)
                 )
                 depthRuler(width: proxy.size.width)
@@ -124,12 +105,8 @@ struct ShaftView: View {
             RoundedRectangle(cornerRadius: DeepMineMetrics.buttonCornerRadius)
                 .stroke(DeepMinePalette.limestone.color.opacity(0.28))
         }
-        // Marks are overlays, so the scene remains centred instead of being pushed right
-        // by a ruler column.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mine-shaft")
-        // Structural growth is readable in the scene; this is the same state in words, so
-        // VoiceOver hears the rig the sighted player can count (D-060).
         .accessibilityLabel(
             "\(DeepMineStrings.text(.homeCrewLabel)) \(plant.crew), "
                 + "\(DeepMineStrings.text(.gameCart)) \(plant.carts), "
@@ -151,8 +128,6 @@ struct ShaftView: View {
         )
     }
 
-    // MARK: Actions
-
     private func strike(onWeakPoint: Bool) {
         let struckRegion = player.mineFace.region.rawValue
         struckWeakPoint = onWeakPoint
@@ -162,8 +137,6 @@ struct ShaftView: View {
             using: &generator,
             in: &player
         )
-        // The variant is chosen from the resolved hit, so a critical reads as the heaviest
-        // swing rather than as an ordinary one with a different number over it.
         beginSwing(at: Date().timeIntervalSinceReferenceDate, wasCritical: update.wasCritical)
         lastManualStrikeAt = lastSwingAt
         announce(update, isTap: true, struckRegion: struckRegion)
@@ -174,12 +147,6 @@ struct ShaftView: View {
         }
     }
 
-    /// One automation step. Runs even when nothing is automated, because the impact meter
-    /// decays with time and a player who has not bought a cart still has one.
-    ///
-    /// Passing the tick's own timestamp keeps the settlement mark level with the screen,
-    /// so time spent watching the mine is not paid again as offline time on the next
-    /// return.
     private func advance(by elapsed: TimeInterval, at now: Date) {
         guard elapsed > 0 else { return }
         let struckRegion = player.mineFace.region.rawValue
@@ -189,9 +156,6 @@ struct ShaftView: View {
             outputMultiplier: ResonanceNodeEngine.outputMultiplier(resonance, at: now),
             in: &player
         )
-        // Damage from every step lands on the rock; only some of those steps are allowed to
-        // start a swing. Debris follows the swing, not the step, or the face would shed
-        // chips continuously while the pickaxe was nowhere near it.
         if !update.damage.isZero, StrikeTimeline.Cadence.shouldStartAutomaticSwing(
             now: now.timeIntervalSinceReferenceDate,
             lastSwingAt: lastSwingAt,
@@ -225,16 +189,20 @@ struct ShaftView: View {
         }
         if update.brokeSomething {
             feedback.play(update.seamsBroken > 0 ? .seamBroken : .segmentBroken)
+            try? MiningStreak.record(
+                at: Date(),
+                in: &player,
+                calendar: .current,
+                timeZone: .current,
+                incrementSessionCount: false
+            )
         }
-        // Persisting on every tap is a write per frame; persisting only on a break loses
-        // a whole segment of tapping when the app dies mid-face. This writes on a break
-        // and lets the caller throttle the rest.
         onPersist(player)
         if update.brokeSomething {
             showGroundCollapse(region: struckRegion)
             showDebris(isLarge: update.seamsBroken > 0)
             show(FloatingGain(
-                text: "+\(DeepMineNumberFormatter.string(update.oreGained.doubleValue))",
+                text: "+\(DeepMineNumberFormatter.string(big: update.oreGained))",
                 kind: .ore,
                 offsetX: Double.random(in: -34...34)
             ))
@@ -244,11 +212,10 @@ struct ShaftView: View {
                 densityOverride: update.wasCritical ? 4 : 2
             )
             show(FloatingGain(
-                text: "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))",
+                text: DeepMineNumberFormatter.string(big: update.damage),
                 kind: update.wasCritical ? .critical : .damage,
                 offsetX: Double.random(in: -42...42)
             ))
         }
     }
-
 }

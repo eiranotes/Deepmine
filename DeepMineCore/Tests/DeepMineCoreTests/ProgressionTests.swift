@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import DeepMineCore
-
 final class ProgressionTests: XCTestCase {
     func testSessionLengthsAdvanceExactFocusCredits() throws {
         let examples: [(SessionLength, Double)] = [

@@ -1,18 +1,21 @@
 import DeepMineCore
 import SwiftUI
 
-/// The progress lines and the reveal timing of the return report.
 @MainActor
 extension ReturnReportView {
-    /// What the session moved, not just what it paid. Depth is the identity number and
-    /// the streak is the reason to come back tomorrow, so both belong in the reveal.
     var progressLines: some View {
         VStack(alignment: .leading, spacing: 7) {
+            progressRow(
+                .gameDepth,
+                detail: "\(presentation.report.depthMeters)m",
+                symbol: "arrow.down.to.line.compact",
+                identifier: "return-current-depth"
+            )
             if presentation.report.depthGainedMeters > 0 {
                 progressRow(
                     .returnDepthGain,
                     detail: "+\(presentation.report.depthGainedMeters)m",
-                    symbol: "arrow.down.to.line.compact",
+                    symbol: "hammer.fill",
                     identifier: "return-depth-gain"
                 )
             }
@@ -133,7 +136,7 @@ extension ReturnReportView {
                 systemImage: equipmentSymbol(value.equipment)
             )
             .font(.subheadline.weight(.semibold))
-            Text("\(DeepMineStrings.text(.returnRecommendationCost)) \(DeepMineNumberFormatter.string(value.cost)) · \(DeepMineStrings.text(.returnRecommendationOwned)) \(DeepMineNumberFormatter.string(value.availableOre))")
+            Text("\(DeepMineStrings.text(.returnRecommendationCost)) \(DeepMineNumberFormatter.string(big: value.cost)) · \(DeepMineStrings.text(.returnRecommendationOwned)) \(DeepMineNumberFormatter.string(big: value.availableOre))")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.72))
             Text(DeepMineStrings.text(
@@ -158,8 +161,6 @@ extension ReturnReportView {
             completionID: presentation.report.completionID,
             grade: presentation.report.verificationGrade
         )
-        // A vein is the rare outcome and must not feel like an ordinary completion. It
-        // rides after the completion beat so the two are distinguishable.
         if played, presentation.report.vein != nil {
             try? await Task.sleep(for: .milliseconds(260))
             guard !Task.isCancelled else { return }
@@ -186,7 +187,6 @@ extension ReturnReportView {
 }
 
 extension View {
-    /// Used by both halves of the return report, so it stays internal.
     func revealTransition(reduceMotion: Bool) -> some View {
         transition(reduceMotion ? .opacity : .offset(y: 8).combined(with: .opacity))
     }

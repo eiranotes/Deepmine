@@ -28,7 +28,35 @@ final class GameSurfaceSnapshotMapperTests: XCTestCase {
         XCTAssertEqual(snapshot.todayFocusedMinutes, 40)
         XCTAssertEqual(snapshot.todayGoalMinutes, 100)
         XCTAssertEqual(snapshot.upgradeRecommendation?.equipmentID, EquipmentKind.cart.rawValue)
+        XCTAssertEqual(snapshot.upgradeRecommendation?.bigCost, 249)
         XCTAssertNil(snapshot.sessionID)
+    }
+
+    func testWaitingSnapshotKeepsRecommendationPastDoubleRange() throws {
+        let exactCost = BigNumber(mantissa: 1.25, exponent: 400)
+        let recommendation = UpgradeRecommendation(
+            equipment: .drill,
+            currentLevel: 3_000,
+            nextLevel: 3_001,
+            cost: .greatestFiniteMagnitude,
+            bigCost: exactCost,
+            marginalExpectedOre: 30,
+            efficiency: 0
+        )
+
+        let snapshot = try GameSurfaceSnapshotMapper.waiting(
+            player: makePlayer(),
+            recommendation: recommendation,
+            at: now,
+            calendar: calendar,
+            timeZone: timeZone
+        )
+
+        XCTAssertEqual(snapshot.upgradeRecommendation?.bigCost, exactCost)
+        XCTAssertTrue(GameSurfaceText.recommendationAccessibilityLabel(
+            try XCTUnwrap(snapshot.upgradeRecommendation),
+            locale: Locale(identifier: "en_US")
+        ).contains("1.250e400"))
     }
 
     func testPreparingAndMiningSnapshotsUseActualSessionAndRewardProjection() throws {

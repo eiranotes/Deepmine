@@ -6,13 +6,17 @@ import Foundation
 /// the matching `name` exists in an asset catalog, and renders the real art the moment
 /// one does. Shipping a finished asset requires no code change — drop the imageset in,
 /// and the placeholder disappears on next launch.
-///
-/// `promptID` is the heading under which the generation prompt lives in
-/// `docs/ROCK_ART_PROMPTS.md`. It is the link between an unfilled slot and the text that
-/// fills it, which is why it lives in code instead of only in the document.
 enum GameArtCatalog {
     static let promptDocumentPath = "docs/ROCK_ART_PROMPTS.md"
     static let shaftPromptDocumentPath = "docs/SHAFT_ART_PROMPTS.md"
+    static let prestigeMemoryRingName = "PrestigeMemoryRing"
+
+    static func refinementBadgeName(kind: String) -> String {
+        switch kind {
+        case "cart", "lamp": "RefinementBadge_\(kind)"
+        default: "RefinementBadge_drill"
+        }
+    }
 
     static func rockFace(region: String, stage: Int) -> GameArtEntry {
         let safeRegion = normalizedRegion(region)
@@ -69,11 +73,18 @@ enum GameArtCatalog {
     )
 
     static func shaftRock(region: String) -> GameArtEntry {
-        let safeRegion = normalizedRegion(region)
+        shaftRock(region: region, depthMeters: 0)
+    }
+
+    /// Economic regions still determine ore and unlocks. At extreme depth the art gains
+    /// additional geological generations so the abyss does not repeat for hundreds of km.
+    static func shaftRock(region: String, depthMeters: Double) -> GameArtEntry {
+        let fallback = normalizedRegion(region)
+        let visual = deepGeologyKey(depthMeters: depthMeters) ?? fallback
         return GameArtEntry(
-            name: "ShaftRock_\(safeRegion)",
-            promptID: "shaft-rock-\(safeRegion)",
-            placeholder: .shaftRock(region: safeRegion)
+            name: "ShaftRock_\(visual)",
+            promptID: "shaft-rock-\(visual)",
+            placeholder: .shaftRock(region: fallback)
         )
     }
 
@@ -97,27 +108,20 @@ enum GameArtCatalog {
         )
     }
 
-    /// The U-shaped shoulders that join the open passage to the rock being dug, so the two
-    /// read as one body instead of two stacked objects (D-055).
     static let shaftFrontierLip = GameArtEntry(
         name: "ShaftFrontierLip",
         promptID: "shaft-frontier-lip",
         placeholder: .shaftFrontierLip
     )
 
-    /// Miner, hands and pickaxe in one four-frame actor. Separate loops let the tool land
-    /// while the body was elsewhere, which is what broke the sense of force transfer.
     static let minerMiningStrip = GameArtEntry(
         name: "MinerMiningStrip",
         promptID: "miner-mining-strip",
         placeholder: .minerMiningStrip
     )
 
-    /// Frame count of `MinerMiningStrip`: ready, anticipation, contact, recoil.
     static let minerMiningFrameCount = 4
 
-    /// The full slot list, used by the audit test that keeps this registry and the prompt
-    /// document from drifting apart.
     static var allEntries: [GameArtEntry] {
         var entries: [GameArtEntry] = []
         for region in ["entry", "crystal", "ruins", "abyss"] {
@@ -141,6 +145,9 @@ enum GameArtCatalog {
         shaftRock(region: "crystal"),
         shaftRock(region: "ruins"),
         shaftRock(region: "abyss"),
+        shaftRock(region: "abyss", depthMeters: 5_000),
+        shaftRock(region: "abyss", depthMeters: 20_000),
+        shaftRock(region: "abyss", depthMeters: 100_000),
         shaftSurface,
         miningPickaxe,
         shaftFracture(intensity: .light),
@@ -152,6 +159,15 @@ enum GameArtCatalog {
 
     static var installedEntries: [GameArtEntry] {
         allEntries + shaftEntries
+    }
+
+    private static func deepGeologyKey(depthMeters: Double) -> String? {
+        switch max(0, depthMeters) {
+        case 100_000...: "core"
+        case 20_000...: "fault"
+        case 5_000...: "pressure"
+        default: nil
+        }
     }
 
     private static func normalizedRegion(_ region: String) -> String {
@@ -174,9 +190,6 @@ struct GameArtEntry: Equatable, Sendable {
     let placeholder: GameArtPlaceholder
 }
 
-/// What to draw when the real image is absent. Deliberately drawn in the same four pigments
-/// as the finished art, so an unfinished screen still reads as the same game rather than
-/// as a broken one.
 enum GameArtPlaceholder: Equatable, Sendable {
     case rockFace(region: String, stage: Int)
     case fracture(intensity: FractureIntensity)

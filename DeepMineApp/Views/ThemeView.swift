@@ -14,9 +14,17 @@ struct ThemeView: View {
         ScrollView {
             VStack(spacing: 17) {
                 DeepMineRivetedPanel {
-                    Text(DeepMineStrings.text(.themeIntro))
-                        .font(.subheadline)
-                        .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(DeepMineStrings.text(.themeIntro))
+                            .font(.subheadline)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Label(
+                            "\(player.resources.crystals)",
+                            systemImage: "diamond.fill"
+                        )
+                        .font(.headline.monospacedDigit())
+                        .foregroundStyle(DeepMinePalette.brass.color)
+                    }
                 }
                 if failed { failurePanel }
                 ForEach(options, id: \.theme) { option in themePanel(option) }
@@ -57,16 +65,26 @@ struct ThemeView: View {
                     .disabled(option.isSelected || gameStore == nil)
                     .accessibilityIdentifier("theme-select-\(option.theme.rawValue)")
                 } else {
-                    Text("\(DeepMineStrings.text(.themeUnlockDepth)) \(option.unlockDepthMeters)m")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                        .accessibilityIdentifier("theme-locked-\(option.theme.rawValue)")
-                    Button {} label: {
-                        DeepMineActionLabel(titleKey: .stateLocked, detailKey: nil, symbol: "lock.fill")
+                    HStack {
+                        Text("\(DeepMineStrings.text(.themeUnlockDepth)) \(option.unlockDepthMeters)m")
+                        Spacer()
+                        Label("\(option.crystalCost)", systemImage: "diamond.fill")
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .accessibilityIdentifier("theme-locked-\(option.theme.rawValue)")
+                    Button { purchase(option.theme) } label: {
+                        HStack {
+                            Text(DeepMineStrings.text(.actionBuy))
+                            Spacer()
+                            Text("\(option.crystalCost) ◆")
+                                .monospacedDigit()
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44)
                     }
                     .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
-                    .disabled(true)
-                    .accessibilityIdentifier("theme-select-\(option.theme.rawValue)")
+                    .disabled(!option.canAfford || gameStore == nil)
+                    .accessibilityIdentifier("theme-buy-\(option.theme.rawValue)")
                 }
                 if let notice, option.isSelected {
                     Text(DeepMineStrings.text(notice))
@@ -79,14 +97,14 @@ struct ThemeView: View {
 
     private func themePattern(_ theme: MineTheme) -> some View {
         Image(DeepMineArt.theme(theme))
-        .resizable()
-        .interpolation(.none)
-        .antialiased(false)
-        .scaledToFill()
-        .frame(maxWidth: .infinity, minHeight: 82, maxHeight: 82)
-        .clipped()
-        .background(DeepMinePalette.coal.color)
-        .accessibilityHidden(true)
+            .resizable()
+            .interpolation(.none)
+            .antialiased(false)
+            .scaledToFill()
+            .frame(maxWidth: .infinity, minHeight: 82, maxHeight: 82)
+            .clipped()
+            .background(DeepMinePalette.coal.color)
+            .accessibilityHidden(true)
     }
 
     private var failurePanel: some View {
@@ -106,14 +124,32 @@ struct ThemeView: View {
         guard let gameStore else { failed = true; return }
         do {
             guard try gameStore.selectTheme(theme) != .locked else { return }
-            let updated = try gameStore.playerState()
-            onPlayerChange(updated)
-            options = try gameStore.themePresentations()
+            refreshAfterMutation(gameStore)
             notice = .themeSelectedNotice
-            failed = false
         } catch {
             failed = true
         }
+    }
+
+    private func purchase(_ theme: MineTheme) {
+        guard let gameStore else { failed = true; return }
+        do {
+            switch try gameStore.purchaseTheme(theme) {
+            case .purchased, .duplicate, .alreadyUnlocked:
+                refreshAfterMutation(gameStore)
+                notice = .themeSelectedNotice
+            case .insufficientCrystals:
+                failed = false
+            }
+        } catch {
+            failed = true
+        }
+    }
+
+    private func refreshAfterMutation(_ gameStore: GameStore) {
+        if let updated = try? gameStore.playerState() { onPlayerChange(updated) }
+        options = (try? gameStore.themePresentations()) ?? options
+        failed = false
     }
 
     private func load() {

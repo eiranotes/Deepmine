@@ -5,10 +5,15 @@ import XCTest
 /// ladder cannot: ore buys 0.2312 levels per segment, those buy 1.0265 damage, and
 /// integrity compounds at 1.058. Refinement has to make up the difference and no more.
 final class RefinementTests: XCTestCase {
-    private func state(drill: Int = 1, cart: Int = 1, lamp: Int = 1, ore: Double = 0) -> PlayerState {
+    private func state(
+        drill: Int = 1,
+        cart: Int = 1,
+        lamp: Int = 1,
+        ore: BigNumber = .zero
+    ) -> PlayerState {
         var state = PlayerState()
         state.equipment = EquipmentLevels(drill: drill, cart: cart, lamp: lamp)
-        state.resources.ore = BigNumber(ore)
+        state.resources.ore = ore
         return state
     }
 
@@ -52,7 +57,7 @@ final class RefinementTests: XCTestCase {
     }
 
     func testBuyingSpendsOreAndRaisesTheTier() {
-        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
         var player = state(drill: 30, ore: cost + 500)
         XCTAssertEqual(
             RefinementEngine.purchase(.drill, in: &player),
@@ -62,12 +67,27 @@ final class RefinementTests: XCTestCase {
         XCTAssertEqual(player.resources.ore.doubleValue, 500, accuracy: 0.001)
     }
 
+    func testCommandReplayDoesNotSpendOreOrRaiseTheTierTwice() {
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
+        let command = RefinementPurchaseCommand(id: UUID(), equipment: .drill)
+        var player = state(drill: 30, ore: cost + 500)
+
+        XCTAssertEqual(
+            RefinementEngine.purchase(command, in: &player),
+            .refined(equipment: .drill, newTier: 1, cost: cost)
+        )
+        XCTAssertEqual(RefinementEngine.purchase(command, in: &player), .duplicate)
+        XCTAssertEqual(player.refinementTiers.drill, 1)
+        XCTAssertEqual(player.resources.ore.doubleValue, 500, accuracy: 0.001)
+        XCTAssertTrue(player.appliedPurchaseIDs.contains(command.id))
+    }
+
     func testOreShortfallReportsBothSides() {
         var player = state(drill: 30, ore: 1)
         XCTAssertEqual(
             RefinementEngine.purchase(.drill, in: &player),
             .insufficientOre(
-                required: RefinementEngine.oreCost(for: .drill, tier: 1),
+                required: RefinementEngine.oreCostBig(for: .drill, tier: 1),
                 available: 1
             )
         )
@@ -78,7 +98,7 @@ final class RefinementTests: XCTestCase {
     /// of veins, which come out of sessions, and pricing refinement in them let focus own
     /// the economy (D-068).
     func testRefinementCostsOreRatherThanCrystals() {
-        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
         var player = state(drill: 30, ore: cost)
         player.resources.crystals = 99
         _ = RefinementEngine.purchase(.drill, in: &player)
@@ -149,7 +169,10 @@ final class RefinementTests: XCTestCase {
 
     /// Prestige takes the tiers with the levels that unlocked them.
     func testPrestigeResetsRefinement() {
-        var player = state(drill: 30, ore: RefinementEngine.oreCost(for: .drill, tier: 1))
+        var player = state(
+            drill: 30,
+            ore: RefinementEngine.oreCostBig(for: .drill, tier: 1)
+        )
         _ = RefinementEngine.purchase(.drill, in: &player)
         XCTAssertEqual(player.refinementTiers.drill, 1)
 

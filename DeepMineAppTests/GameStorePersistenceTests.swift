@@ -45,7 +45,13 @@ final class GameStorePersistenceTests: XCTestCase {
             forcedShieldRemoval: false, forcedRemovalPending: false,
             openReason: nil, alarmDelivery: .none, liveActivityID: nil, warnings: []
         )
-        let player = PlayerState(resources: Resources(ore: 321))
+        let player = PlayerState(
+            resources: Resources(ore: 321),
+            equipment: EquipmentLevels(drill: 8, cart: 7, lamp: 6),
+            rememberedEquipment: EquipmentLevels(drill: 18, cart: 17, lamp: 16),
+            refinementTiers: RefinementTiers(drill: 1, cart: 2, lamp: 3),
+            earnedAchievementIDs: ["first-rock", "deep-500"]
+        )
         try repository.commitSession(player: player, report: report, cleanupSession: session)
         try repository.finishSessionCleanup(report: report)
 
@@ -53,6 +59,6 @@ final class GameStorePersistenceTests: XCTestCase {
 
         XCTAssertNil(try repository.loadReturnReport())
         XCTAssertNil(try repository.loadActiveSession())
-        XCTAssertEqual(try repository.loadPlayer().resources.ore, 321)
+        XCTAssertEqual(try repository.loadPlayer(), player)
     }
 }

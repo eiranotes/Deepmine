@@ -17,8 +17,10 @@ public struct UpgradePurchaseCommand: Codable, Equatable, Sendable {
 }
 
 public enum UpgradePurchaseResult: Codable, Equatable, Sendable {
-    case purchased(equipment: EquipmentKind, newLevel: Int, cost: Double)
-    case insufficientOre(required: Double, available: Double)
+    /// Purchase results are an economy boundary. Keeping the exact values here prevents
+    /// a successful late-game purchase from being reported as `Double.greatestFiniteMagnitude`.
+    case purchased(equipment: EquipmentKind, newLevel: Int, cost: BigNumber)
+    case insufficientOre(required: BigNumber, available: BigNumber)
     case maximumLevel
     case depthLocked(unlockedLevel: Int, requiredDepthMeters: Int)
     case duplicate
@@ -29,12 +31,20 @@ public struct UpgradeQuote: Codable, Equatable, Sendable {
     public let equipment: EquipmentKind
     public let currentLevel: Int
     public let cost: Double
+    public let bigCost: BigNumber
     public let isRemembered: Bool
 
-    public init(equipment: EquipmentKind, currentLevel: Int, cost: Double, isRemembered: Bool) {
+    public init(
+        equipment: EquipmentKind,
+        currentLevel: Int,
+        cost: Double,
+        bigCost: BigNumber? = nil,
+        isRemembered: Bool
+    ) {
         self.equipment = equipment
         self.currentLevel = currentLevel
         self.cost = cost
+        self.bigCost = bigCost ?? BigNumber(cost)
         self.isRemembered = isRemembered
     }
 }
@@ -44,6 +54,9 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
     public let currentLevel: Int
     public let nextLevel: Int
     public let cost: Double
+    /// Canonical cost for comparisons and player-facing notation. `cost` remains as a
+    /// source-compatible legacy projection for older callers, but may saturate above 1e308.
+    public let bigCost: BigNumber
     public let marginalExpectedOre: Double
     public let efficiency: Double
     public let isRemembered: Bool
@@ -53,6 +66,7 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
         currentLevel: Int,
         nextLevel: Int,
         cost: Double,
+        bigCost: BigNumber? = nil,
         marginalExpectedOre: Double,
         efficiency: Double,
         isRemembered: Bool = false
@@ -61,15 +75,53 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
         self.currentLevel = currentLevel
         self.nextLevel = nextLevel
         self.cost = cost
+        self.bigCost = bigCost ?? BigNumber(cost)
         self.marginalExpectedOre = marginalExpectedOre
         self.efficiency = efficiency
         self.isRemembered = isRemembered
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case equipment
+        case currentLevel
+        case nextLevel
+        case cost
+        case bigCost
+        case marginalExpectedOre
+        case efficiency
+        case isRemembered
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let legacyCost = try container.decode(Double.self, forKey: .cost)
+        self.init(
+            equipment: try container.decode(EquipmentKind.self, forKey: .equipment),
+            currentLevel: try container.decode(Int.self, forKey: .currentLevel),
+            nextLevel: try container.decode(Int.self, forKey: .nextLevel),
+            cost: legacyCost,
+            bigCost: try container.decodeIfPresent(BigNumber.self, forKey: .bigCost)
+                ?? BigNumber(legacyCost),
+            marginalExpectedOre: try container.decode(Double.self, forKey: .marginalExpectedOre),
+            efficiency: try container.decode(Double.self, forKey: .efficiency),
+            isRemembered: try container.decodeIfPresent(Bool.self, forKey: .isRemembered) ?? false
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(equipment, forKey: .equipment)
+        try container.encode(currentLevel, forKey: .currentLevel)
+        try container.encode(nextLevel, forKey: .nextLevel)
+        try container.encode(cost, forKey: .cost)
+        try container.encode(bigCost, forKey: .bigCost)
+        try container.encode(marginalExpectedOre, forKey: .marginalExpectedOre)
+        try container.encode(efficiency, forKey: .efficiency)
+        try container.encode(isRemembered, forKey: .isRemembered)
+    }
 }
 
 public enum EquipmentEngine {
-    /// The three current sprite families change early enough that an upgrade is seen in
-    /// play, not only in the workbench number.
     public static func visualTier(level: Int) -> Int {
         switch max(Balance.minimumEquipmentLevel, level) {
         case ...4: 1
@@ -86,22 +138,32 @@ public enum EquipmentEngine {
         }
     }
 
+    public static func upgradeCostBig(
+        for equipment: EquipmentKind,
+        currentLevel: Int,
+        rememberedLevel: Int = Balance.minimumEquipmentLevel
+    ) -> BigNumber? {
+        guard currentLevel >= Balance.minimumEquipmentLevel,
+              currentLevel < Balance.equipmentLevelArithmeticBound else { return nil }
+        var value = BigNumber(Balance.equipmentBasePrice(for: equipment))
+            * BigNumber(Balance.equipmentPriceGrowthRate)
+                .raised(to: Double(currentLevel - Balance.minimumEquipmentLevel))
+        if currentLevel < rememberedLevel {
+            value *= Balance.rememberedRebuyDiscount
+        }
+        return roundedPrice(value)
+    }
+
     public static func upgradeCost(
         for equipment: EquipmentKind,
         currentLevel: Int,
         rememberedLevel: Int = Balance.minimumEquipmentLevel
     ) -> Double? {
-        guard currentLevel >= Balance.minimumEquipmentLevel,
-              currentLevel < Balance.equipmentLevelArithmeticBound else { return nil }
-        let unrounded = Balance.equipmentBasePrice(for: equipment)
-            * Balance.compounded(
-                Balance.equipmentPriceGrowthRate,
-                currentLevel - Balance.minimumEquipmentLevel
-            )
-        let discounted = currentLevel < rememberedLevel
-            ? unrounded * Balance.rememberedRebuyDiscount
-            : unrounded
-        return ceil(discounted)
+        upgradeCostBig(
+            for: equipment,
+            currentLevel: currentLevel,
+            rememberedLevel: rememberedLevel
+        )?.doubleValue
     }
 
     public static func quote(
@@ -110,7 +172,7 @@ public enum EquipmentEngine {
     ) -> UpgradeQuote? {
         let currentLevel = level(of: equipment, in: state.equipment)
         let remembered = level(of: equipment, in: state.rememberedEquipment)
-        guard let cost = upgradeCost(
+        guard let bigCost = upgradeCostBig(
             for: equipment,
             currentLevel: currentLevel,
             rememberedLevel: remembered
@@ -118,7 +180,8 @@ public enum EquipmentEngine {
         return UpgradeQuote(
             equipment: equipment,
             currentLevel: currentLevel,
-            cost: cost,
+            cost: bigCost.doubleValue,
+            bigCost: bigCost,
             isRemembered: currentLevel < remembered
         )
     }
@@ -127,7 +190,6 @@ public enum EquipmentEngine {
         state.unlockedEquipmentLevel
     }
 
-    /// Depth required before `level` becomes purchasable, for the locked-state copy.
     public static func requiredDepth(forLevel level: Int) -> Int {
         max(0, level - Balance.equipmentLevelUnlockBase) * Balance.equipmentLevelUnlockDepthStep
     }
@@ -160,15 +222,16 @@ public enum EquipmentEngine {
             )
         }
         let remembered = level(of: command.equipment, in: state.rememberedEquipment)
-        guard let cost = upgradeCost(
+        guard let cost = upgradeCostBig(
             for: command.equipment,
             currentLevel: currentLevel,
             rememberedLevel: remembered
-        ) else {
-            return .invalidLevel
-        }
+        ) else { return .invalidLevel }
         guard state.resources.ore >= cost else {
-            return .insufficientOre(required: cost, available: state.resources.ore.doubleValue)
+            return .insufficientOre(
+                required: cost,
+                available: state.resources.ore
+            )
         }
 
         state.resources.ore -= cost
@@ -183,6 +246,14 @@ public enum EquipmentEngine {
             newLevel: newLevel,
             cost: cost
         )
+    }
+
+    private static func roundedPrice(_ value: BigNumber) -> BigNumber {
+        guard !value.isZero else { return .zero }
+        guard !value.isNegative else { return value }
+        if value.exponent < 0 { return .one }
+        if value.exponent <= 15 { return BigNumber(ceil(value.doubleValue)) }
+        return value
     }
 
     private static func setLevel(

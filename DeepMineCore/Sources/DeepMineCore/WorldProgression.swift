@@ -38,7 +38,6 @@ public enum VeinEffectResult: Codable, Equatable, Sendable {
     case vaultConvertedToCrystals(Int)
     case resonanceArmed
     case bonusDepth(Int)
-    /// Ore equal to the segments an abyss vein used to skip.
     case bonusOre(Double)
     case duplicate
 }
@@ -47,6 +46,23 @@ public enum ThemeSelectionResult: String, Codable, Equatable, Sendable {
     case selected
     case unchanged
     case locked
+}
+
+public struct ThemePurchaseCommand: Codable, Equatable, Sendable {
+    public let id: UUID
+    public let theme: MineTheme
+
+    public init(id: UUID, theme: MineTheme) {
+        self.id = id
+        self.theme = theme
+    }
+}
+
+public enum ThemePurchaseResult: Codable, Equatable, Sendable {
+    case purchased(theme: MineTheme, cost: Int)
+    case insufficientCrystals(required: Int, available: Int)
+    case alreadyUnlocked
+    case duplicate
 }
 
 public enum WorldProgression {
@@ -59,8 +75,6 @@ public enum WorldProgression {
         }
     }
 
-    /// The next region gate below the player, for the "how far to go" promise. Nil once
-    /// the deepest region is already open.
     public static func nextRegionThreshold(
         afterDepth depth: Int
     ) -> (region: MineRegion, depth: Int)? {
@@ -72,11 +86,39 @@ public enum WorldProgression {
         return gates.first { depth < $0.1 }.map { (region: $0.0, depth: $0.1) }
     }
 
+    public static func crystalCost(for theme: MineTheme) -> Int {
+        switch theme {
+        case .entry: 0
+        case .crystal: 3
+        case .ruins: 6
+        case .abyss: 10
+        }
+    }
+
+    @discardableResult
+    public static func purchaseTheme(
+        _ command: ThemePurchaseCommand,
+        in state: inout PlayerState
+    ) -> ThemePurchaseResult {
+        guard !state.appliedPurchaseIDs.contains(command.id) else { return .duplicate }
+        guard !state.unlockedThemes.contains(command.theme) else { return .alreadyUnlocked }
+        let cost = crystalCost(for: command.theme)
+        guard state.resources.crystals >= cost else {
+            return .insufficientCrystals(
+                required: cost,
+                available: state.resources.crystals
+            )
+        }
+        state.resources.crystals -= cost
+        state.unlockedThemes.insert(command.theme)
+        state.selectedTheme = command.theme
+        state.appliedPurchaseIDs.insert(command.id)
+        return .purchased(theme: command.theme, cost: cost)
+    }
+
     @discardableResult
     public static func unlockThemesForCurrentDepth(in state: inout PlayerState) -> Set<MineTheme> {
         let before = state.unlockedThemes
-        // The record, not the current position: a region opened before a prestige stays
-        // open after it (D-046).
         let depth = state.recordDepthMeters
         if depth >= Balance.crystalRegionDepth { state.unlockedThemes.insert(.crystal) }
         if depth >= Balance.ruinsRegionDepth { state.unlockedThemes.insert(.ruins) }
@@ -105,32 +147,12 @@ public enum WorldProgression {
             state.resonanceBoostPending = true
             return .resonanceArmed
         case .abyss:
-            // Used to skip 60m of intact rock. That handed depth to whoever ran the most
-            // sessions while paying no ore for the skipped segments — and the segments
-            // stayed unpaid forever, so the richest vein in the game was a long-run loss.
-            // A heavy persona took ~108 of these over 180 days: 6,480m of its 7,408m was
-            // skipped rather than dug, which is why its depth led every persona while its
-            // ore trailed all of them.
-            //
-            // Depth is earned by breaking rock (D-045). The vein now pays what those
-            // segments would have paid, so it is a large reward that does not bypass the
-            // economy it belongs to.
-            // Paying the skipped segments' ore instead was worse: that reward scales
-            // exponentially with depth, so six sessions a day collected six times an
-            // exponent and the heavy persona ran away from every other one (4.2e11x at
-            // 180 days). A session reward must not scale with the rock, or focus stops
-            // being an amplifier and becomes the economy (D-037).
-            //
-            // Crystals do not compound. They buy refinement, which is exactly the axis a
-            // deep player wants next, and the reward stays legible at every depth.
             let quantity = Balance.abyssVeinCrystals
             state.resources.crystals = saturatingAdd(state.resources.crystals, quantity)
             return .crystals(quantity)
         }
     }
 
-    /// Ore the next `abyssBonusDepthMeters` of rock would have paid, at the player's
-    /// current position. Scales with depth exactly as digging it would.
     static func skippedSegmentOre(from segmentIndex: Int) -> Double {
         let segments = max(1, Balance.abyssBonusDepthMeters / Balance.metersPerSegment)
         var total = BigNumber.zero
@@ -139,13 +161,6 @@ public enum WorldProgression {
         }
         let value = total.doubleValue
         return value.isFinite && value > 0 ? value : 0
-    }
-
-    private static func saturatingOre(_ current: Double, adding gained: Double) -> Double {
-        guard gained.isFinite, gained > 0 else { return current }
-        return current <= Double.greatestFiniteMagnitude - gained
-            ? current + gained
-            : Double.greatestFiniteMagnitude
     }
 
     public static func selectTheme(

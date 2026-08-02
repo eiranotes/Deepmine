@@ -53,6 +53,9 @@ final class PlayerStateEntity {
     var unlockedDecorationsData: Data
     var appliedVeinEffectIDsData: Data
     var appliedPrestigeCommandIDsData: Data
+    /// Empty data is the legacy/default state for stores created before achievements
+    /// were persisted as part of the player snapshot.
+    var earnedAchievementIDsData: Data = Data()
     /// Run-scoped equipment branch choices. Empty data is the legacy/default state.
     var equipmentModificationsData: Data = Data()
     var onboardingStageRawValue: String = "premiseBlocks"
@@ -126,6 +129,15 @@ final class EquipmentStateEntity {
     var drillLevel: Int
     var cartLevel: Int
     var lampLevel: Int
+    /// Highest levels survive prestige. Zero means the legacy store did not carry this
+    /// rail yet; PlayerState merges it with the current level on load.
+    var rememberedDrillLevel: Int = 0
+    var rememberedCartLevel: Int = 0
+    var rememberedLampLevel: Int = 0
+    /// Run-scoped multiplicative tiers. Defaults keep existing v1 stores loadable.
+    var drillRefinementTier: Int = 0
+    var cartRefinementTier: Int = 0
+    var lampRefinementTier: Int = 0
 
     init(schemaVersion: Int = GameSchemaV1.version) {
         id = GameSchemaV1.singletonID

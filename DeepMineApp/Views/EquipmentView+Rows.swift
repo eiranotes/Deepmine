@@ -1,17 +1,12 @@
 import DeepMineCore
 import SwiftUI
-
-/// Rows, notices and the purchase path for the workbench.
 @MainActor
 extension EquipmentView {
     func equipmentRow(_ kind: EquipmentKind) -> some View {
         let level = EquipmentEngine.level(of: kind, in: player.equipment)
         let quote = EquipmentEngine.quote(for: kind, in: player)
-        // There is no level ceiling any more, so depth is the only thing that can gate a
-        // purchase and "maxed out" is not a state the player can reach (D-069).
         let depthLocked = level >= player.unlockedEquipmentLevel
-        let cost = depthLocked ? nil : quote?.cost
-        let maximum = false
+        let cost = depthLocked ? nil : quote?.bigCost
         let recommended = highlightedEquipment == kind
         return DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -22,123 +17,99 @@ extension EquipmentView {
                         assetName: DeepMineArt.equipment(kind, level: level),
                         level: level,
                         detail: DeepMineStrings.text(DeepMineProgressLabels.equipmentEffectKey(kind)),
-                        status: maximum ? .completed : (recommended ? .attention : .notStarted)
+                        status: recommended ? .attention : .notStarted
                     ),
-                    accessory: AnyView(levelAccessory(kind: kind, level: level, cost: cost))
+                    accessory: AnyView(levelAccessory(
+                        kind: kind, level: level, cost: cost, depthLocked: depthLocked
+                    ))
                 )
                 if depthLocked {
                     Label(
-                        String(
-                            format: DeepMineStrings.text(.equipmentDepthLocked),
-                            EquipmentEngine.requiredDepth(forLevel: level + 1)
-                        ),
+                        String(format: DeepMineStrings.text(.equipmentDepthLocked),
+                               EquipmentEngine.requiredDepth(forLevel: level + 1)),
                         systemImage: "arrow.down.to.line.compact"
                     )
-                    .font(.caption)
-                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .font(.caption).foregroundStyle(DeepMinePalette.brass.color)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("equipment-depth-locked-\(kind.rawValue)")
-                } else if quote?.isRemembered == true {
-                    Label(DeepMineStrings.text(.equipmentRemembered), systemImage: "clock.arrow.circlepath")
-                        .font(.caption)
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                        .accessibilityIdentifier("equipment-remembered-\(kind.rawValue)")
-                }
-                if kind == .drill, let preview = drillPreview(currentLevel: level) {
-                    // The compounding curve is invisible one level at a time. Naming a
-                    // level far above the current one is the only place a player can see
-                    // where the ladder actually goes.
-                    Text(preview)
-                        .font(.caption2.monospacedDigit())
-                        .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.62))
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityIdentifier("equipment-preview-drill")
+                } else {
+                    bulkControls(kind, hasRememberedLevels: quote?.isRemembered == true)
+                    if quote?.isRemembered == true {
+                        Label(DeepMineStrings.text(.equipmentRemembered),
+                              systemImage: "clock.arrow.circlepath")
+                            .font(.caption).foregroundStyle(DeepMinePalette.brass.color)
+                            .accessibilityIdentifier("equipment-remembered-\(kind.rawValue)")
+                    }
                 }
             }
         }
         .accessibilityIdentifier("equipment-row-\(kind.rawValue)")
     }
 
-    func levelAccessory(kind: EquipmentKind, level: Int, cost: Double?) -> some View {
-        VStack(alignment: .trailing, spacing: 6) {
-            Text("Lv. \(level)")
-                .font(.subheadline.monospacedDigit().weight(.bold))
+    func levelAccessory(kind: EquipmentKind, level: Int, cost: BigNumber?, depthLocked: Bool) -> some View {
+        let requiredDepth = depthLocked ? EquipmentEngine.requiredDepth(forLevel: level + 1) : nil
+        return VStack(alignment: .trailing, spacing: 6) {
+            Text("Lv. \(level)").font(.subheadline.monospacedDigit().weight(.bold))
                 .accessibilityIdentifier("equipment-level-\(kind.rawValue)")
             Button { purchase(kind) } label: {
-                Text(buttonTitle(cost: cost))
-                    .font(.caption.monospacedDigit().weight(.bold))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.78)
-                    .frame(minHeight: 44)
+                Text(buttonTitle(cost: cost, requiredDepth: requiredDepth))
+                    .font(.caption.monospacedDigit().weight(.bold)).lineLimit(2)
+                    .minimumScaleFactor(0.78).frame(minHeight: 44)
             }
-            .buttonStyle(DeepMineMetalButtonStyle(role: highlightedEquipment == kind ? .primary : .secondary))
+            .buttonStyle(DeepMineMetalButtonStyle(
+                role: highlightedEquipment == kind ? .primary : .secondary
+            ))
             .disabled(cost == nil || isLoading || notice == .storageFailure)
-            .accessibilityLabel(equipmentButtonLabel(kind: kind, cost: cost))
+            .accessibilityLabel(equipmentButtonLabel(
+                kind: kind, cost: cost, requiredDepth: requiredDepth
+            ))
             .accessibilityIdentifier("equipment-upgrade-\(kind.rawValue)")
         }
         .frame(minWidth: 118)
     }
 
-    var noticePanel: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            switch notice {
-            case .success:
-                Label(DeepMineStrings.text(.equipmentPurchaseSuccess), systemImage: "checkmark.seal.fill")
-                    .accessibilityIdentifier("equipment-notice-success")
-            case let .crewGrew(size):
-                Label(
-                    String(format: DeepMineStrings.text(.returnCrewGrew), size),
-                    systemImage: "person.2.fill"
-                )
-                .accessibilityIdentifier("equipment-notice-crew")
-            case let .insufficient(required, available):
-                Label(DeepMineStrings.text(.equipmentInsufficientTitle), systemImage: "shippingbox")
-                    .accessibilityIdentifier("equipment-notice-insufficient")
-                Text("\(DeepMineNumberFormatter.string(available)) / \(DeepMineNumberFormatter.string(required))")
-                    .font(.caption.monospacedDigit())
-                Text(DeepMineStrings.text(.equipmentInsufficientBody)).font(.caption)
-            case .storageFailure, .none:
-                EmptyView()
+    func bulkControls(_ kind: EquipmentKind, hasRememberedLevels: Bool) -> some View {
+        HStack(spacing: 7) {
+            bulkButton("×10", kind: kind, maximum: 10)
+            bulkButton("×100", kind: kind, maximum: 100)
+            bulkButton("MAX", kind: kind, maximum: nil)
+            if hasRememberedLevels {
+                Button { purchaseBulk(kind, remembered: true) } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .frame(maxWidth: .infinity, minHeight: 36)
+                }
+                .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
+                .disabled(isLoading || notice == .storageFailure)
+                .accessibilityLabel(DeepMineStrings.text(.equipmentRemembered))
+                .accessibilityIdentifier("equipment-rebuild-\(kind.rawValue)")
             }
         }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(DeepMinePalette.brass.color)
-        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityIdentifier("equipment-bulk-\(kind.rawValue)")
+    }
+
+    func bulkButton(_ title: String, kind: EquipmentKind, maximum: Int?) -> some View {
+        Button { purchaseBulk(kind, maximum: maximum) } label: {
+            Text(title).font(.caption2.monospacedDigit().weight(.bold))
+                .frame(maxWidth: .infinity, minHeight: 36)
+        }
+        .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
+        .disabled(isLoading || notice == .storageFailure)
+        .accessibilityIdentifier("equipment-bulk-\(kind.rawValue)-\(title)")
     }
 
     var recoveryPanel: some View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
                 Label(DeepMineStrings.text(.equipmentStorageTitle), systemImage: "exclamationmark.triangle")
-                    .font(.headline)
-                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .font(.headline).foregroundStyle(DeepMinePalette.brass.color)
                     .accessibilityIdentifier("equipment-notice-error")
-                Text(DeepMineStrings.text(.equipmentStorageBody))
-                    .font(.subheadline)
+                Text(DeepMineStrings.text(.equipmentStorageBody)).font(.subheadline)
                     .fixedSize(horizontal: false, vertical: true)
                 Button { retry() } label: {
                     DeepMineActionLabel(titleKey: .actionRetry, detailKey: nil, symbol: "arrow.clockwise")
                 }
                 .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
-                .accessibilityIdentifier("equipment-retry")
-                .disabled(gameStore == nil)
-            }
-        }
-    }
-
-    var maximumPanel: some View {
-        DeepMineRivetedPanel {
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(maximumEquipment, id: \.self) { kind in
-                    Label(
-                        "\(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))) · "
-                            + DeepMineStrings.text(.equipmentMaximum),
-                        systemImage: DeepMineProgressLabels.equipmentSymbol(kind)
-                    )
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(DeepMinePalette.brass.color)
-                    .accessibilityIdentifier("equipment-maximum-\(kind.rawValue)")
-                }
+                .accessibilityIdentifier("equipment-retry").disabled(gameStore == nil)
             }
         }
     }
@@ -147,124 +118,171 @@ extension EquipmentView {
         (!handoffConsumed ? handoffRecommendation?.equipment : nil) ?? recommendation?.equipment
     }
 
-    /// Ore a milestone drill level would pay for the plan the player last used, so the
-    /// number is comparable to what they just earned. Nil once the milestone is behind
-    /// them or a projection cannot be made.
-    func drillPreview(currentLevel: Int) -> String? {
-        // Open-ended: the last milestone is a waypoint, not a ceiling.
-        let milestones = [10, 20, 30, 40, 60, 100, 150, 200]
-        guard let milestone = milestones.first(where: { $0 > currentLevel + 1 }) else {
-            return nil
+    func buttonTitle(cost: BigNumber?, requiredDepth: Int? = nil) -> String {
+        if let requiredDepth {
+            return String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
         }
-        var projected = player.equipment
-        projected.drill = milestone
-        guard let ore = try? RewardCalculator.calculate(RewardInput(
-            completionID: Self.previewCompletionID,
-            outcome: .completed,
-            sessionLength: player.lastSelectedDuration,
-            plan: player.lastSelectedPlan,
-            verificationGrade: .sealed,
-            growthFocusCredits: player.lifetimeFocusCredits,
-            streakDays: player.streakDays,
-            dailySessionNumber: 1,
-            equipment: projected,
-            vein: nil,
-            resonanceBoostActive: false,
-            permanentUpgrades: player.permanentUpgrades
-        )).ore else { return nil }
-        return String(
-            format: DeepMineStrings.text(.equipmentPreview),
-            milestone,
-            DeepMineNumberFormatter.string(ore)
-        )
-    }
-
-    static let previewCompletionID = UUID(uuidString: "44454550-4D49-4E45-0000-000000000160")!
-
-    var maximumEquipment: [EquipmentKind] {
-        EquipmentKind.allCases.filter {
-            EquipmentEngine.upgradeCost(
-                for: $0,
-                currentLevel: EquipmentEngine.level(of: $0, in: player.equipment)
-            ) == nil
-        }
-    }
-
-    func buttonTitle(cost: Double?) -> String {
         guard let cost else { return DeepMineStrings.text(.equipmentMaximum) }
-        return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(cost))"
+        return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(big: cost))"
     }
 
-    func equipmentButtonLabel(kind: EquipmentKind, cost: Double?) -> String {
+    func equipmentButtonLabel(kind: EquipmentKind, cost: BigNumber?, requiredDepth: Int? = nil) -> String {
         let title = DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))
+        if let requiredDepth {
+            return "\(title), " + String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
+        }
         guard let cost else { return "\(title), \(DeepMineStrings.text(.equipmentMaximum))" }
         return "\(title), \(DeepMineStrings.text(.actionUpgrade)), "
             + "\(DeepMineStrings.text(.equipmentCost)) "
-            + "\(DeepMineNumberFormatter.string(cost)) \(DeepMineStrings.text(.gameOre))"
+            + "\(DeepMineNumberFormatter.string(big: cost)) \(DeepMineStrings.text(.gameOre))"
     }
 
     func refresh() {
-        guard let gameStore else {
-            notice = .storageFailure
-            return
-        }
+        guard let gameStore else { notice = .storageFailure; return }
         do {
             player = try gameStore.playerState()
             recommendation = try gameStore.recommendedUpgrade()
             notice = nil
-        } catch {
-            notice = .storageFailure
+        } catch { notice = .storageFailure }
+    }
+
+    func purchaseBulk(
+        _ kind: EquipmentKind,
+        maximum: Int? = nil,
+        remembered: Bool = false,
+        commandID: UUID? = nil
+    ) {
+        guard let gameStore else { notice = .storageFailure; return }
+        let commandID = commandID ?? UUID()
+        let retryBaseline = pendingBulk.flatMap {
+            $0.commandID == commandID ? $0.before : nil
         }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
+        isLoading = true
+        pendingBulk = (kind, maximum, remembered, commandID, before)
+        defer { isLoading = false }
+        do {
+            switch try gameStore.purchaseEquipmentBulk(
+                kind,
+                maximumPurchases: maximum,
+                stopAtRememberedLevel: remembered,
+                commandID: commandID
+            ) {
+            case .purchased, .duplicate:
+                let after = try gameStore.playerState()
+                player = after
+                recommendation = try gameStore.recommendedUpgrade()
+                notice = purchaseNotice(equipment: kind, before: before, after: after)
+                pendingBulk = nil
+            case .nothingAffordable, .depthLocked:
+                notice = nil
+                pendingBulk = nil
+            case .invalidLevel: notice = .storageFailure
+            }
+        } catch { notice = .storageFailure }
+    }
+
+    func purchaseRefinement(_ kind: EquipmentKind, commandID: UUID? = nil) {
+        guard let gameStore else { notice = .storageFailure; return }
+        let commandID = commandID ?? UUID()
+        let retryBaseline = pendingRefinement.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
+        isLoading = true
+        pendingRefinement = (kind, commandID, before)
+        defer { isLoading = false }
+        do {
+            switch try gameStore.purchaseRefinement(kind, commandID: commandID) {
+            case .refined, .duplicate:
+                let after = try gameStore.playerState()
+                player = after
+                recommendation = try gameStore.recommendedUpgrade()
+                if let impact = RefinementImpact(before: before, after: after, equipment: kind) {
+                    notice = .refinement(impact)
+                } else {
+                    notice = .success
+                }
+                pendingRefinement = nil
+            case let .insufficientOre(required, available):
+                notice = .insufficient(required: required, available: available)
+                pendingRefinement = nil
+            case .locked: notice = nil; pendingRefinement = nil
+            }
+        } catch { notice = .storageFailure }
     }
 
     func purchase(_ kind: EquipmentKind, commandID: UUID? = nil) {
         guard let gameStore else { notice = .storageFailure; return }
         let commandID = commandID ?? UUID()
+        let retryBaseline = pendingPurchase.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
-        pendingPurchase = (kind, commandID)
+        pendingPurchase = (kind, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipment(kind, commandID: commandID) {
-            case let .purchased(equipment, newLevel, _):
-                // Crossing a crew threshold only ever happens here, so this is where the
-                // new miner gets named.
-                notice = equipment == .drill
-                    && MineCrew.size(drillLevel: newLevel) > MineCrew.size(drillLevel: newLevel - 1)
-                    ? .crewGrew(MineCrew.size(drillLevel: newLevel))
-                    : .success
-                player = try gameStore.playerState()
+            case let .purchased(equipment, _, _):
+                let after = try gameStore.playerState()
+                player = after
                 recommendation = try gameStore.recommendedUpgrade()
+                notice = purchaseNotice(equipment: equipment, before: before, after: after)
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
                 pendingPurchase = nil
             case let .insufficientOre(required, available):
                 notice = .insufficient(required: required, available: available)
                 pendingPurchase = nil
-            case .maximumLevel, .depthLocked:
-                // The row already explains why, so no banner is needed.
-                notice = nil
-                pendingPurchase = nil
+            case .maximumLevel, .depthLocked: notice = nil; pendingPurchase = nil
             case .duplicate:
-                player = try gameStore.playerState()
+                let after = try gameStore.playerState()
+                player = after
                 recommendation = try gameStore.recommendedUpgrade()
-                notice = .success
+                notice = purchaseNotice(equipment: kind, before: before, after: after)
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
                 pendingPurchase = nil
-            case .invalidLevel:
-                notice = .storageFailure
+            case .invalidLevel: notice = .storageFailure
             }
-        } catch {
-            notice = .storageFailure
-        }
+        } catch { notice = .storageFailure }
     }
 
     func retry() {
         notice = nil
-        if let pendingModification {
-            purchaseModification(pendingModification.kind, commandID: pendingModification.commandID)
-        } else if let pendingPurchase {
-            purchase(pendingPurchase.equipment, commandID: pendingPurchase.commandID)
-        } else {
-            refresh()
+        if let value = pendingRefinement { purchaseRefinement(value.equipment, commandID: value.commandID) }
+        else if let value = pendingModification { purchaseModification(value.kind, commandID: value.commandID) }
+        else if let value = pendingBulk {
+            purchaseBulk(
+                value.equipment,
+                maximum: value.maximum,
+                remembered: value.remembered,
+                commandID: value.commandID
+            )
         }
+        else if let value = pendingPurchase { purchase(value.equipment, commandID: value.commandID) }
+        else { refresh() }
+    }
+
+    func purchaseNotice(
+        equipment: EquipmentKind,
+        before: PlayerState,
+        after: PlayerState
+    ) -> Notice {
+        let beforeCrew = MineCrew.size(drillLevel: before.equipment.drill)
+        let afterCrew = MineCrew.size(drillLevel: after.equipment.drill)
+        return .purchase(
+            equipment: equipment,
+            impact: PurchaseImpact(before: before, after: after, equipment: equipment),
+            crewSize: equipment == .drill && afterCrew > beforeCrew ? afterCrew : nil
+        )
     }
 }

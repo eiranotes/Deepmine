@@ -13,8 +13,6 @@ struct SessionRewardProjection: Equatable, Sendable {
     let grade: VerificationGrade
     let completedReward: RewardResult
     let abandonmentReward: RewardResult
-    /// Includes the dry spell protection already earned, so the number shown is the
-    /// one this session will actually roll against.
     let veinChance: Double
 }
 
@@ -22,11 +20,22 @@ struct ReturnUpgradeRecommendation: Equatable, Hashable, Sendable {
     let equipment: EquipmentKind
     let currentLevel: Int
     let nextLevel: Int
-    let cost: Double
-    let availableOre: Double
+    let cost: BigNumber
+    let availableOre: BigNumber
     let marginalExpectedOre: Double
 
     var isAffordable: Bool { availableOre >= cost }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(equipment)
+        hasher.combine(currentLevel)
+        hasher.combine(nextLevel)
+        hasher.combine(cost.mantissa)
+        hasher.combine(cost.exponent)
+        hasher.combine(availableOre.mantissa)
+        hasher.combine(availableOre.exponent)
+        hasher.combine(marginalExpectedOre)
+    }
 }
 
 struct ReturnDepthGoal: Equatable, Sendable {
@@ -54,8 +63,9 @@ extension GameStore {
         do {
             return .ready(try returnPresentation(for: report))
         } catch {
-            let errorType = String(reflecting: type(of: error))
-            returnReportLogger.error("Return presentation failed: \(errorType, privacy: .public)")
+            returnReportLogger.error(
+                "Return presentation failed: \(String(reflecting: type(of: error)), privacy: .public)"
+            )
             return .failed
         }
     }
@@ -66,11 +76,10 @@ extension GameStore {
         let length = history.flatMap { entry in
             SessionLength.allCases.first { $0.minutes == entry.focusedMinutes }
         } ?? player.lastSelectedDuration
-        let plan = history?.plan ?? player.lastSelectedPlan
         return ReturnReportPresentation(
             report: report,
             length: length,
-            plan: plan,
+            plan: history?.plan ?? player.lastSelectedPlan,
             recommendation: try returnRecommendation(player: player),
             nextGoal: nextDepthGoal(depth: report.depthMeters)
         )
@@ -108,8 +117,6 @@ extension GameStore {
         )
     }
 
-    /// Overload for callers that already hold the player, so rendering never reads the
-    /// store again.
     func rewardProjection(
         for player: PlayerState,
         length: SessionLength,
@@ -121,41 +128,49 @@ extension GameStore {
         let day = try MiningStreak.dayKey(for: now, calendar: calendar, timeZone: timeZone)
         let daily = player.dailyRecords.first { $0.dayKey == day }
         let sharedID = UUID(uuidString: "44454550-4D49-4E45-0000-000000000120")!
-        let base = RewardInput(
+        let common = (
+            growth: player.lifetimeFocusCredits,
+            streak: player.streakDays,
+            daily: (daily?.sessionCount ?? 0) + 1,
+            equipment: player.equipment,
+            resonance: player.resonanceBoostPending,
+            permanent: player.permanentUpgrades
+        )
+        let completedInput = RewardInput(
             completionID: sharedID,
             outcome: .completed,
             sessionLength: length,
             plan: plan,
             verificationGrade: grade,
-            growthFocusCredits: player.lifetimeFocusCredits,
-            streakDays: player.streakDays,
-            dailySessionNumber: (daily?.sessionCount ?? 0) + 1,
-            equipment: player.equipment,
+            growthFocusCredits: common.growth,
+            streakDays: common.streak,
+            dailySessionNumber: common.daily,
+            equipment: common.equipment,
             vein: nil,
-            resonanceBoostActive: player.resonanceBoostPending,
-            permanentUpgrades: player.permanentUpgrades
+            resonanceBoostActive: common.resonance,
+            permanentUpgrades: common.permanent
         )
         let elapsed = min(length.minutes, max(0, abandonmentMinutes ?? length.minutes / 2))
-        let abandoned = RewardInput(
+        let abandonedInput = RewardInput(
             completionID: sharedID,
             outcome: .abandoned(elapsedMinutes: elapsed),
             sessionLength: length,
             plan: plan,
             verificationGrade: grade,
-            growthFocusCredits: base.growthFocusCredits,
-            streakDays: base.streakDays,
-            dailySessionNumber: base.dailySessionNumber,
-            equipment: base.equipment,
+            growthFocusCredits: common.growth,
+            streakDays: common.streak,
+            dailySessionNumber: common.daily,
+            equipment: common.equipment,
             vein: nil,
-            resonanceBoostActive: base.resonanceBoostActive,
-            permanentUpgrades: base.permanentUpgrades
+            resonanceBoostActive: common.resonance,
+            permanentUpgrades: common.permanent
         )
         return SessionRewardProjection(
             length: length,
             plan: plan,
             grade: grade,
-            completedReward: try RewardCalculator.calculate(base),
-            abandonmentReward: try RewardCalculator.calculate(abandoned),
+            completedReward: try mineProjection(input: completedInput, player: player),
+            abandonmentReward: try mineProjection(input: abandonedInput, player: player),
             veinChance: VeinEngine.chance(
                 plan: plan,
                 lampLevel: player.equipment.lamp,
@@ -170,11 +185,10 @@ extension GameStore {
         guard let session = activeSession ?? persisted else { return nil }
         let observation = ClockIntegrityChecker.finish(anchor: session.clockAnchor, source: clock)
         let elapsed = min(session.length.minutes, max(0, Int(observation.acceptedElapsed / 60)))
-        let grade = currentVerificationGrade(for: session, observation: observation)
         return try rewardProjection(
             length: session.length,
             plan: session.plan,
-            grade: grade,
+            grade: currentVerificationGrade(for: session, observation: observation),
             abandonmentMinutes: elapsed
         )
     }
@@ -193,64 +207,40 @@ extension GameStore {
         verificationGrade(for: session, observation: observation, at: clock.wallNow())
     }
 
-    private func returnRecommendation(
-        player: PlayerState
-    ) throws -> ReturnUpgradeRecommendation? {
-        let now = clock.wallNow()
-        let day = try MiningStreak.dayKey(for: now, calendar: calendar, timeZone: timeZone)
-        let daily = player.dailyRecords.first { $0.dayKey == day }
-        let input = RewardInput(
-            completionID: UUID(uuidString: "44454550-4D49-4E45-0000-000000000130")!,
-            outcome: .completed,
-            sessionLength: player.lastSelectedDuration,
-            plan: player.lastSelectedPlan,
-            verificationGrade: .sealed,
-            growthFocusCredits: player.lifetimeFocusCredits,
-            streakDays: player.streakDays,
-            dailySessionNumber: (daily?.sessionCount ?? 0) + 1,
-            equipment: player.equipment,
-            vein: nil,
-            resonanceBoostActive: player.resonanceBoostPending,
-            permanentUpgrades: player.permanentUpgrades
+    private func mineProjection(input: RewardInput, player: PlayerState) throws -> RewardResult {
+        let basis = try RewardCalculator.calculate(input)
+        let equipment = max(1, basis.breakdown.equipment)
+        let permanent = max(1, basis.breakdown.permanent)
+        let rate = basis.breakdown.combinedMultiplier / equipment / permanent
+        var projected = player
+        let update = MiningLoop.advance(
+            seconds: TimeInterval(basis.focusedMinutes * 60) * (rate.isFinite ? max(0, rate) : 0),
+            in: &projected
         )
-        let baselineChance = VeinEngine.chance(
-            plan: input.plan,
-            lampLevel: player.equipment.lamp,
-            permanentResonanceLevel: player.permanentResonanceLevel,
-            consecutiveMisses: 0
+        let ore = update.oreGained.doubleValue
+        return RewardResult(
+            completionID: basis.completionID,
+            focusedMinutes: basis.focusedMinutes,
+            focusCredits: basis.focusCredits,
+            ore: ore.isFinite ? max(0, ore) : Double.greatestFiniteMagnitude,
+            breakdown: basis.breakdown,
+            wasDuplicate: basis.wasDuplicate
         )
-        let protectedChance = VeinEngine.chance(
-            plan: input.plan,
-            lampLevel: player.equipment.lamp,
-            permanentResonanceLevel: player.permanentResonanceLevel,
-            consecutiveMisses: player.consecutiveVeinMisses
-        )
-        let marginal = try UpgradeAdvisor.marginalExpectedOre(
+    }
+
+    private func returnRecommendation(player: PlayerState) throws -> ReturnUpgradeRecommendation? {
+        guard let value = UpgradeAdvisor.recommendForMining(
             for: player,
-            nextSession: input,
-            additionalVeinChance: max(0, protectedChance - baselineChance)
+            affordableOnly: false
+        ) else { return nil }
+        return ReturnUpgradeRecommendation(
+            equipment: value.equipment,
+            currentLevel: value.currentLevel,
+            nextLevel: value.nextLevel,
+            cost: value.bigCost,
+            availableOre: player.resources.ore,
+            marginalExpectedOre: value.marginalExpectedOre
         )
-        var best: ReturnUpgradeRecommendation?
-        var bestEfficiency = -Double.infinity
-        for equipment in EquipmentKind.allCases {
-            let level = EquipmentEngine.level(of: equipment, in: player.equipment)
-            guard let cost = EquipmentEngine.upgradeCost(
-                for: equipment, currentLevel: level
-            ), let gain = marginal[equipment], gain > 0 else { continue }
-            let efficiency = gain / cost
-            if efficiency > bestEfficiency {
-                bestEfficiency = efficiency
-                best = ReturnUpgradeRecommendation(
-                    equipment: equipment,
-                    currentLevel: level,
-                    nextLevel: level + 1,
-                    cost: cost,
-                    availableOre: player.resources.ore.doubleValue,
-                    marginalExpectedOre: gain
-                )
-            }
-        }
-        return best
     }
 
     private func nextDepthGoal(depth: Int) -> ReturnDepthGoal {

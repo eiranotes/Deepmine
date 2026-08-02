@@ -1,14 +1,15 @@
 import Foundation
 
 public struct PrestigeLossPreview: Codable, Equatable, Sendable {
-    public let ore: Double
+    public let ore: BigNumber
     public let runSegmentsBroken: Int
     public let equipment: EquipmentLevels
+    public let refinementTiers: RefinementTiers
+    public let modificationCount: Int
 }
 
 public struct PrestigeGainPreview: Codable, Equatable, Sendable {
     public let coreShards: Int
-    /// Depth, crystals, themes, streak and the remembered rebuy discount all survive.
     public let keptDepthMeters: Int
     public let rebuyDiscount: Double
 }
@@ -60,7 +61,6 @@ public enum PermanentUpgradePurchaseResult: Codable, Equatable, Sendable {
 }
 
 public enum PrestigeEngine {
-    /// Segments the current run must break before a reset is offered.
     public static func target(prestigeIndex: Int) -> Int {
         let value = Balance.initialPrestigeTarget
             * pow(Balance.prestigeTargetGrowthRate, Double(max(0, prestigeIndex)))
@@ -72,9 +72,11 @@ public enum PrestigeEngine {
         let target = target(prestigeIndex: state.prestigeIndex)
         return PrestigePreview(
             losses: PrestigeLossPreview(
-                ore: state.resources.ore.doubleValue,
+                ore: state.resources.ore,
                 runSegmentsBroken: state.runSegmentsBroken,
-                equipment: state.equipment
+                equipment: state.equipment,
+                refinementTiers: state.refinementTiers,
+                modificationCount: modificationCount(state.equipmentModifications)
             ),
             gains: PrestigeGainPreview(
                 coreShards: shardGrant(runSegmentsBroken: state.runSegmentsBroken),
@@ -103,16 +105,9 @@ public enum PrestigeEngine {
         )
         state.equipment = EquipmentLevels()
         state.equipmentModifications = .empty
-        // Refinement resets with the levels that unlocked it. Keeping it would make a
-        // reset pure profit and remove the decision prestige is supposed to be; the
-        // remembered-level rebuy discount already covers the cost of climbing back.
         state.refinementTiers = .none
         state.runFocusCredits = 0
         state.runSegmentsBroken = 0
-        // Back to the surface with the tools gone. Keeping the position while resetting
-        // the equipment left the player facing rock they could no longer break, which is
-        // a reset that costs everything and returns nothing (D-046). The ceiling, the
-        // regions and the depth achievements all read `recordDepthMeters` and stay.
         state.mineFace = MineFaceState(
             lifetimeSegmentsBroken: state.mineFace.lifetimeSegmentsBroken,
             lifetimeSeamsBroken: state.mineFace.lifetimeSeamsBroken
@@ -175,13 +170,15 @@ public enum PrestigeEngine {
         )
     }
 
-    /// Scales with the run that was actually dug, so overshooting the target is never
-    /// wasted and a later prestige is never worth less than an earlier one.
     static func shardGrant(runSegmentsBroken: Int) -> Int {
         guard runSegmentsBroken > 0 else { return 1 }
         let scaled = floor(Double(runSegmentsBroken) / Balance.prestigeShardSegmentDivisor)
         guard scaled.isFinite, scaled < Double(Int.max) else { return Int.max }
         return max(1, Int(scaled))
+    }
+
+    private static func modificationCount(_ value: EquipmentModifications) -> Int {
+        EquipmentKind.allCases.count { value.selected(for: $0) != nil }
     }
 
     private static func level(of upgrade: PermanentUpgradeKind, in state: PlayerState) -> Int {

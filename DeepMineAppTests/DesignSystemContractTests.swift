@@ -101,6 +101,17 @@ final class DesignSystemContractTests: XCTestCase {
         XCTAssertEqual(DeepMineNumberFormatter.string(.infinity, locale: korean), "—")
     }
 
+    func testUnboundedNumberFormattingKeepsTheExponent() {
+        let huge = BigNumber(mantissa: 1.234, exponent: 42)
+        let formatted = DeepMineNumberFormatter.string(
+            big: huge,
+            locale: Locale(identifier: "ko_KR")
+        )
+        XCTAssertEqual(formatted, huge.scientificDescription)
+        XCTAssertTrue(formatted.hasSuffix("e42"))
+        XCTAssertNotEqual(formatted, "—")
+    }
+
     func testHitTargetsAndReducedMotionMappingAreExact() {
         XCTAssertGreaterThanOrEqual(DeepMineMetrics.minimumHitTarget, 44)
         XCTAssertGreaterThanOrEqual(DeepMineMetrics.buttonHeight, 44)

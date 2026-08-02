@@ -1,0 +1,104 @@
+name: DeepMine validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: deepmine-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assets:
+    name: Generated asset contracts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate long-progression PNGs
+        run: python3 scripts/validate_long_progression_assets.py
+
+  apple:
+    name: Core and iOS app
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 26.5
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Test DeepMineCore
+        run: swift test --package-path DeepMineCore
+
+      - name: Test app unit suite
+        run: |
+          xcodebuild -quiet \
+            -project DeepMine.xcodeproj \
+            -scheme DeepMineApp \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' \
+            -only-testing:DeepMineAppTests \
+            test
+
+      - name: Build unsigned iOS app
+        run: |
+          xcodebuild -quiet \
+            -project DeepMine.xcodeproj \
+            -scheme DeepMineApp \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Enforce Swift file size contract
+        run: |
+          offenders=$(find DeepMineApp DeepMineCore DeepMineProbe \
+            -path '*/.build' -prune -o \
+            -name '*.swift' -type f -print0 \
+            | xargs -0 wc -l \
+            | awk '
+              $2 == "DeepMineProbe/Shared/GameActivitySurfaceContent.swift" && $1 > 302 {
+                print
+                next
+              }
+              $2 != "total" && $2 != "DeepMineProbe/Shared/GameActivitySurfaceContent.swift" && $1 > 300 {
+                print
+              }
+            ')
+          if [ -n "$offenders" ]; then
+            echo "Swift files over the accepted line-count baseline:"
+            echo "$offenders"
+            exit 1
+          fi
+
+  web:
+    name: Web prototype
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build and test
+        run: npm test

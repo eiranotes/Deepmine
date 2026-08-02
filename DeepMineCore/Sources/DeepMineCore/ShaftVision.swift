@@ -117,13 +117,20 @@ public enum ShaftSceneEngine {
     }
 
     private static func strata(from top: Double, through bottom: Double) -> [ShaftStratum] {
-        let ranges: [(MineRegion, Double, Double)] = [
-            (.entry, 0, Double(Balance.crystalRegionDepth)),
-            (.crystal, Double(Balance.crystalRegionDepth), Double(Balance.ruinsRegionDepth)),
-            (.ruins, Double(Balance.ruinsRegionDepth), Double(Balance.abyssRegionDepth)),
-            (.abyss, Double(Balance.abyssRegionDepth), .greatestFiniteMagnitude)
+        // Deep geology is visual progression inside the abyss, not a new economic
+        // region. Splitting the visible body at the exact art thresholds lets a scene
+        // spanning 5/20/100km show both sides of the boundary instead of switching only
+        // after the viewport's top edge has crossed it.
+        let ranges: [(MineRegion, Double, Double, Bool)] = [
+            (.entry, 0, Double(Balance.crystalRegionDepth), true),
+            (.crystal, Double(Balance.crystalRegionDepth), Double(Balance.ruinsRegionDepth), true),
+            (.ruins, Double(Balance.ruinsRegionDepth), Double(Balance.abyssRegionDepth), true),
+            (.abyss, Double(Balance.abyssRegionDepth), 5_000, true),
+            (.abyss, 5_000, 20_000, false),
+            (.abyss, 20_000, 100_000, false),
+            (.abyss, 100_000, .greatestFiniteMagnitude, false)
         ]
-        return ranges.compactMap { region, start, end in
+        return ranges.compactMap { region, start, end, isEconomicEntrance in
             let visibleStart = max(top, start)
             let visibleEnd = min(bottom, end)
             guard visibleStart < visibleEnd else { return nil }
@@ -131,7 +138,7 @@ public enum ShaftSceneEngine {
                 region: region,
                 startDepthMeters: visibleStart,
                 endDepthMeters: visibleEnd,
-                isRegionEntrance: visibleStart == start && start >= top
+                isRegionEntrance: isEconomicEntrance && visibleStart == start && start >= top
             )
         }
     }

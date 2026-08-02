@@ -48,7 +48,11 @@ final class OnboardingEngineTests: XCTestCase {
 
         XCTAssertEqual(
             OnboardingEngine.purchaseRecommendedUpgrade(commandID: purchaseID, in: &state),
-            .purchased(equipment: .drill, newLevel: 2, cost: Balance.drillBasePrice)
+            .purchased(
+                equipment: .drill,
+                newLevel: 2,
+                cost: BigNumber(Balance.drillBasePrice)
+            )
         )
         XCTAssertEqual(state.equipment.drill, 2)
         XCTAssertEqual(state.resources.ore.doubleValue, 0)

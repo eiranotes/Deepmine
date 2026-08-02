@@ -214,9 +214,10 @@ extension Balance {
     /// rather than paying out a fabricated haul.
     public static let maximumPlausibleOfflineSeconds: TimeInterval = 60 * 60 * 24 * 30
 
-    /// How many times one call may re-drive a truncated resolution. Each pass walks up to
-    /// `maximumSegmentsPerResolution` segments, so this bounds the work while still letting
-    /// an extreme offline haul finish instead of losing its tail.
+    /// How many resolution passes one call may execute. The first walks
+    /// `maximumSegmentsPerResolution`; each carried pass gets that limit multiplied by
+    /// this count. A finite pass count still bounds work while a large offline haul can
+    /// finish instead of losing its tail.
     public static let maximumResolutionPasses = 12
 
     /// A single resolution never breaks more than this many segments. Offline catch-up

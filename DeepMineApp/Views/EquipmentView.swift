@@ -5,8 +5,9 @@ import SwiftUI
 struct EquipmentView: View {
     enum Notice: Equatable {
         case success
-        case crewGrew(Int)
-        case insufficient(required: Double, available: Double)
+        case purchase(equipment: EquipmentKind, impact: PurchaseImpact?, crewSize: Int?)
+        case refinement(RefinementImpact)
+        case insufficient(required: BigNumber, available: BigNumber)
         case storageFailure
     }
 
@@ -16,8 +17,10 @@ struct EquipmentView: View {
     @State var player: PlayerState
     @State var recommendation: UpgradeRecommendation?
     @State var notice: Notice?
-    @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID)?
-    @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID)?
+    @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID, before: PlayerState)?
+    @State var pendingBulk: (equipment: EquipmentKind, maximum: Int?, remembered: Bool, commandID: UUID, before: PlayerState)?
+    @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID, before: PlayerState)?
+    @State var pendingRefinement: (equipment: EquipmentKind, commandID: UUID, before: PlayerState)?
     @State var handoffConsumed = false
     @State var isLoading = false
 
@@ -40,7 +43,7 @@ struct EquipmentView: View {
                 handoffPanel
                 if notice == .storageFailure { recoveryPanel }
                 if notice != nil, notice != .storageFailure { noticePanel }
-                if !maximumEquipment.isEmpty { maximumPanel }
+                refinementPanel
                 ForEach(EquipmentKind.allCases, id: \.self) { equipmentRow($0) }
                 modificationPanel
             }
@@ -60,8 +63,7 @@ struct EquipmentView: View {
         DeepMineRivetedPanel {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(DeepMineStrings.text(.navigationEquipment))
-                        .font(.caption.weight(.bold))
+                    Text(DeepMineStrings.text(.navigationEquipment)).font(.caption.weight(.bold))
                     Label(DeepMineStrings.text(.gameOre), systemImage: "shippingbox.fill")
                         .font(.headline)
                 }
@@ -88,9 +90,7 @@ struct EquipmentView: View {
                     .accessibilityIdentifier("equipment-recommendation")
                     Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(highlightedEquipment)))
                         .font(.subheadline.weight(.bold))
-                        .accessibilityIdentifier(
-                            "equipment-recommendation-kind-\(highlightedEquipment.rawValue)"
-                        )
+                        .accessibilityIdentifier("equipment-recommendation-kind-\(highlightedEquipment.rawValue)")
                     if let handoffRecommendation, !handoffConsumed {
                         Text(DeepMineStrings.text(
                             handoffRecommendation.isAffordable
@@ -109,6 +109,7 @@ struct EquipmentView: View {
             }
         }
     }
+
 }
 
 @MainActor
@@ -137,9 +138,7 @@ extension EquipmentView {
     private func modificationRow(_ equipment: EquipmentKind) -> some View {
         let level = EquipmentEngine.level(of: equipment, in: player.equipment)
         let selected = player.equipmentModifications.selected(for: equipment)
-        let options = EquipmentModificationKind.allCases.filter {
-            $0.equipment == equipment
-        }
+        let options = EquipmentModificationKind.allCases.filter { $0.equipment == equipment }
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(equipment)))
@@ -152,11 +151,9 @@ extension EquipmentView {
                     )
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(DeepMinePalette.brass.color)
-                    .accessibilityLabel(
-                        DeepMineStrings.text(
-                            DeepMineProgressLabels.modificationTitleKey(selected)
-                        )
-                    )
+                    .accessibilityLabel(DeepMineStrings.text(
+                        DeepMineProgressLabels.modificationTitleKey(selected)
+                    ))
                 } else if level < Balance.equipmentModificationUnlockLevel {
                     Text(String(
                         format: DeepMineStrings.text(.equipmentModificationLocked),
@@ -168,11 +165,7 @@ extension EquipmentView {
             }
             HStack(alignment: .top, spacing: 8) {
                 ForEach(options, id: \.self) { option in
-                    modificationButton(
-                        option,
-                        selected: selected,
-                        level: level
-                    )
+                    modificationButton(option, selected: selected, level: level)
                 }
             }
         }
@@ -193,18 +186,14 @@ extension EquipmentView {
         return Button { purchaseModification(option) } label: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
-                    Text(DeepMineStrings.text(
-                        DeepMineProgressLabels.modificationTitleKey(option)
-                    ))
-                    .font(.caption.weight(.bold))
+                    Text(DeepMineStrings.text(DeepMineProgressLabels.modificationTitleKey(option)))
+                        .font(.caption.weight(.bold))
                     if isSelected { Image(systemName: "checkmark.circle.fill") }
                 }
-                Text(DeepMineStrings.text(
-                    DeepMineProgressLabels.modificationEffectKey(option)
-                ))
-                .font(.caption2)
-                .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
-                .fixedSize(horizontal: false, vertical: true)
+                Text(DeepMineStrings.text(DeepMineProgressLabels.modificationEffectKey(option)))
+                    .font(.caption2)
+                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(DeepMineNumberFormatter.string(
                     EquipmentModificationEngine.cost(for: option.equipment)
                 ))
@@ -214,9 +203,7 @@ extension EquipmentView {
             .frame(maxWidth: .infinity, minHeight: 78, alignment: .topLeading)
             .padding(9)
             .background(
-                isSelected
-                    ? DeepMinePalette.shale.color
-                    : DeepMinePalette.coal.color,
+                isSelected ? DeepMinePalette.shale.color : DeepMinePalette.coal.color,
                 in: RoundedRectangle(cornerRadius: DeepMineMetrics.badgeCornerRadius)
             )
             .overlay {
@@ -241,20 +228,39 @@ extension EquipmentView {
     ) {
         guard let gameStore else { notice = .storageFailure; return }
         let commandID = commandID ?? UUID()
+        let retryBaseline = pendingModification.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
-        pendingModification = (modification, commandID)
+        pendingModification = (modification, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipmentModification(
                 modification,
                 commandID: commandID
             ) {
-            case .purchased, .duplicate, .alreadySelected:
+            case .purchased, .duplicate:
+                let after = try gameStore.playerState()
+                player = after
+                notice = purchaseNotice(
+                    equipment: modification.equipment,
+                    before: before,
+                    after: after
+                )
+                pendingModification = nil
+            case .alreadySelected:
                 player = try gameStore.playerState()
                 notice = .success
                 pendingModification = nil
             case let .insufficientOre(required, available):
-                notice = .insufficient(required: required, available: available)
+                notice = .insufficient(
+                    required: BigNumber(required),
+                    available: BigNumber(available)
+                )
                 pendingModification = nil
             case .levelLocked:
                 notice = nil

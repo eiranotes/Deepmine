@@ -25,7 +25,11 @@ final class GameStoreOnboardingTests: XCTestCase {
         XCTAssertEqual(vein, Balance.demoGuaranteedVein)
         XCTAssertEqual(
             try store.purchaseDemoUpgrade(commandID: purchaseID),
-            .purchased(equipment: .drill, newLevel: 2, cost: Balance.drillBasePrice)
+            .purchased(
+                equipment: .drill,
+                newLevel: 2,
+                cost: BigNumber(Balance.drillBasePrice)
+            )
         )
         XCTAssertEqual(repository.player.completedSessionCount, 0)
         XCTAssertEqual(repository.player.equipment.drill, 2)

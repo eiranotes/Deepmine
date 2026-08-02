@@ -79,8 +79,8 @@ public enum OnboardingEngine {
     ) -> UpgradePurchaseResult {
         guard state.demoRewardReceiptID != nil else {
             return .insufficientOre(
-                required: Balance.drillBasePrice,
-                available: state.resources.ore.doubleValue
+                required: BigNumber(Balance.drillBasePrice),
+                available: state.resources.ore
             )
         }
         if state.demoUpgradePurchaseID != nil { return .duplicate }
