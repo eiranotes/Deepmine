@@ -2,9 +2,6 @@ import Foundation
 import DeepMineCore
 
 extension BalanceSimulator {
-    /// Runs a day's worth of real strikes. Tapping is simulated tap by tap rather than as
-    /// an averaged damage figure so criticals, weak points and the impact meter land in
-    /// the model exactly as they land in the game.
     static func tapForADay(
         persona: PersonaDefinition,
         state: inout PlayerState,
@@ -21,8 +18,6 @@ extension BalanceSimulator {
         return ore
     }
 
-    /// Spends the day's ore. A player with ore in hand and an affordable upgrade buys it,
-    /// so leftover ore in the summary means the ladder is gated, not that nobody shopped.
     static func buyEverythingAffordable(
         persona: PersonaDefinition,
         day: Int,
@@ -31,12 +26,7 @@ extension BalanceSimulator {
         totalSessions: Int
     ) {
         var event = 300
-        while true {
-            let affordable = EquipmentKind.allCases
-                .compactMap { EquipmentEngine.quote(for: $0, in: state) }
-                .filter { state.resources.ore >= $0.cost }
-                .min { $0.cost < $1.cost }
-            guard let target = affordable else { return }
+        while let target = UpgradeAdvisor.recommendForMining(for: state) {
             let purchase = EquipmentEngine.purchase(
                 UpgradePurchaseCommand(
                     id: stableID(persona: offsetID(persona.id), day: day, event: event),
@@ -51,9 +41,6 @@ extension BalanceSimulator {
         }
     }
 
-    /// Refinement is the second axis, so a simulated player who ignores it models a game
-    /// nobody plays. Crystals have no competing sink, so buying every unlocked tier is
-    /// also the obvious policy rather than an optimistic one.
     static func buyRefinementWhereverUnlocked(state: inout PlayerState) {
         var guardrail = 0
         while guardrail < 512 {
@@ -66,20 +53,83 @@ extension BalanceSimulator {
         }
     }
 
-    static func nextRecommendation(
+    static func buyPermanentUpgrades(
         persona: PersonaDefinition,
-        after index: Int,
-        dailyMinutes: Int,
+        day: Int,
+        eventBase: Int,
+        state: inout PlayerState
+    ) {
+        let order: [PermanentUpgradeKind] = [
+            .excavationMemory,
+            .resonanceDetection,
+            .compressedTime
+        ]
+        var event = eventBase
+        var guardrail = 0
+        while guardrail < 128 {
+            guardrail += 1
+            var purchased = false
+            for upgrade in order {
+                let result = PrestigeEngine.purchase(
+                    PermanentUpgradeCommand(
+                        id: stableID(
+                            persona: offsetID(persona.id),
+                            day: day,
+                            event: event
+                        ),
+                        upgrade: upgrade
+                    ),
+                    in: &state
+                )
+                event += 1
+                if case .purchased = result {
+                    purchased = true
+                    break
+                }
+            }
+            if !purchased { return }
+        }
+    }
+
+    static func nextRecommendation(
+        persona _: PersonaDefinition,
+        after _: Int,
+        dailyMinutes _: Int,
         state: PlayerState
     ) throws -> UpgradeRecommendation? {
-        let length = persona.lengths[(index + 1) % persona.lengths.count]
-        let input = makeInput(
-            id: stableID(persona: offsetID(persona.id), day: 0, event: index),
-            outcome: .completed, length: length, plan: persona.plan,
-            dailySession: index + 2, dailyMinutes: dailyMinutes,
-            resonance: state.resonanceBoostPending, vein: nil, state: state
+        UpgradeAdvisor.recommendForMining(for: state)
+    }
+
+    static func settleSessionMining(
+        projectedReward: RewardResult,
+        completedAt: Date,
+        state: inout PlayerState
+    ) -> (reward: RewardResult, ore: Double) {
+        let creditedSeconds = TimeInterval(projectedReward.focusedMinutes * 60)
+            * sessionMiningRate(projectedReward)
+        let update = creditedSeconds > 0
+            ? MiningLoop.advance(seconds: creditedSeconds, at: completedAt, in: &state)
+            : .empty(face: state.mineFace)
+        let minedOre = update.oreGained.doubleValue
+        let ore = minedOre.isFinite ? max(0, minedOre) : Double.greatestFiniteMagnitude
+        return (
+            RewardResult(
+                completionID: projectedReward.completionID,
+                focusedMinutes: projectedReward.focusedMinutes,
+                focusCredits: projectedReward.focusCredits,
+                ore: ore,
+                breakdown: projectedReward.breakdown,
+                wasDuplicate: projectedReward.wasDuplicate
+            ),
+            ore
         )
-        return try UpgradeAdvisor.recommend(for: state, nextSession: input)
+    }
+
+    static func sessionMiningRate(_ reward: RewardResult) -> Double {
+        let equipment = max(1, reward.breakdown.equipment)
+        let vein = max(1, reward.breakdown.vein)
+        let rate = reward.breakdown.combinedMultiplier / equipment / vein
+        return rate.isFinite ? max(0, rate) : Double.greatestFiniteMagnitude
     }
 
     static func makeInput(
