@@ -57,9 +57,12 @@ struct PrestigeView: View {
         if let preview {
             DeepMineRivetedPanel {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label(DeepMineStrings.text(.prestigeIntro), systemImage: "arrow.down.to.line.compact")
-                        .font(.headline)
-                        .accessibilityIdentifier("prestige-preview")
+                    Label(
+                        DeepMineStrings.text(.prestigeIntro),
+                        systemImage: "arrow.down.to.line.compact"
+                    )
+                    .font(.headline)
+                    .accessibilityIdentifier("prestige-preview")
                     DeepMineProgressRail(
                         value: Double(preview.currentRunSegments),
                         total: Double(preview.targetRunSegments),
@@ -67,19 +70,33 @@ struct PrestigeView: View {
                     )
                     Text("\(preview.currentRunSegments) / \(preview.targetRunSegments) \(DeepMineStrings.text(.prestigeSegments))")
                         .font(.subheadline.monospacedDigit().weight(.heavy))
-                    Text(DeepMineStrings.text(preview.isEligible ? .prestigeEligible : .prestigeIneligible))
-                        .font(.subheadline)
-                        .foregroundStyle(preview.isEligible ? DeepMinePalette.limestone.color : DeepMinePalette.brass.color)
-                        .accessibilityIdentifier(preview.isEligible ? "prestige-eligible" : "prestige-ineligible")
+                    Text(DeepMineStrings.text(
+                        preview.isEligible ? .prestigeEligible : .prestigeIneligible
+                    ))
+                    .font(.subheadline)
+                    .foregroundStyle(
+                        preview.isEligible
+                            ? DeepMinePalette.limestone.color
+                            : DeepMinePalette.brass.color
+                    )
+                    .accessibilityIdentifier(
+                        preview.isEligible ? "prestige-eligible" : "prestige-ineligible"
+                    )
                 }
             }
             Button { phase = .confirming } label: {
-                DeepMineActionLabel(titleKey: .prestigeConfirm, detailKey: .prestigeLossBody, symbol: "arrow.down.to.line.compact")
+                DeepMineActionLabel(
+                    titleKey: .prestigeConfirm,
+                    detailKey: .prestigeLossBody,
+                    symbol: "arrow.down.to.line.compact"
+                )
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
             .disabled(!preview.isEligible || gameStore == nil)
             .accessibilityIdentifier("prestige-open-confirmation")
-        } else { failurePanel }
+        } else {
+            failurePanel
+        }
     }
 
     @ViewBuilder
@@ -87,17 +104,35 @@ struct PrestigeView: View {
         if let preview {
             DeepMineRivetedPanel {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label(DeepMineStrings.text(.prestigeLossTitle), systemImage: "exclamationmark.triangle.fill")
-                        .font(.headline)
-                        .foregroundStyle(DeepMinePalette.brass.color)
+                    Label(
+                        DeepMineStrings.text(.prestigeLossTitle),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.headline)
+                    .foregroundStyle(DeepMinePalette.brass.color)
                     Text(DeepMineStrings.text(.prestigeLossBody)).font(.subheadline)
-                    lossRow(.gameOre, value: DeepMineNumberFormatter.string(preview.losses.ore))
+                    lossRow(
+                        .gameOre,
+                        value: DeepMineNumberFormatter.string(big: preview.losses.ore)
+                    )
                     lossRow(.prestigeSegments, value: "\(preview.losses.runSegmentsBroken)")
                     lossRow(.gameDepth, value: DeepMineStrings.text(.prestigeDepthReset))
-                    lossRow(.gameDrill, value: "Lv. \(preview.losses.equipment.drill) · R\(preview.losses.refinementTiers.drill)")
-                    lossRow(.gameCart, value: "Lv. \(preview.losses.equipment.cart) · R\(preview.losses.refinementTiers.cart)")
-                    lossRow(.gameLamp, value: "Lv. \(preview.losses.equipment.lamp) · R\(preview.losses.refinementTiers.lamp)")
-                    lossRow(.equipmentModificationTitle, value: "\(preview.losses.modificationCount)")
+                    lossRow(
+                        .gameDrill,
+                        value: "Lv. \(preview.losses.equipment.drill) · R\(preview.losses.refinementTiers.drill)"
+                    )
+                    lossRow(
+                        .gameCart,
+                        value: "Lv. \(preview.losses.equipment.cart) · R\(preview.losses.refinementTiers.cart)"
+                    )
+                    lossRow(
+                        .gameLamp,
+                        value: "Lv. \(preview.losses.equipment.lamp) · R\(preview.losses.refinementTiers.lamp)"
+                    )
+                    lossRow(
+                        .equipmentModificationTitle,
+                        value: "\(preview.losses.modificationCount)"
+                    )
                 }
             }
             .accessibilityElement(children: .combine)
@@ -125,7 +160,11 @@ struct PrestigeView: View {
                 }
             }
             Button { confirmPrestige() } label: {
-                DeepMineActionLabel(titleKey: .prestigeConfirm, detailKey: nil, symbol: "checkmark.shield")
+                DeepMineActionLabel(
+                    titleKey: .prestigeConfirm,
+                    detailKey: nil,
+                    symbol: "checkmark.shield"
+                )
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
             .disabled(isApplying)
@@ -166,11 +205,18 @@ struct PrestigeView: View {
             if let notice {
                 Text(DeepMineStrings.text(notice))
                     .font(.caption)
-                    .accessibilityIdentifier(notice == .prestigeUpgradeSuccess
-                        ? "prestige-upgrade-success" : "prestige-upgrade-notice")
+                    .accessibilityIdentifier(
+                        notice == .prestigeUpgradeSuccess
+                            ? "prestige-upgrade-success"
+                            : "prestige-upgrade-notice"
+                    )
             }
             Button(action: onFinish) {
-                DeepMineActionLabel(titleKey: .actionFinish, detailKey: nil, symbol: "house.fill")
+                DeepMineActionLabel(
+                    titleKey: .actionFinish,
+                    detailKey: nil,
+                    symbol: "house.fill"
+                )
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
             .accessibilityIdentifier("prestige-finish")
@@ -181,16 +227,24 @@ struct PrestigeView: View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    DeepMinePixelImage(name: DeepMineArt.permanentUpgrade(option.upgrade), size: 36)
-                        .accessibilityHidden(true)
-                    Text(DeepMineStrings.text(DeepMinePrestigeLabels.title(option.upgrade))).font(.headline)
+                    DeepMinePixelImage(
+                        name: DeepMineArt.permanentUpgrade(option.upgrade),
+                        size: 36
+                    )
+                    .accessibilityHidden(true)
+                    Text(DeepMineStrings.text(DeepMinePrestigeLabels.title(option.upgrade)))
+                        .font(.headline)
                     Spacer()
-                    Text("Lv. \(option.currentLevel)").font(.subheadline.monospacedDigit().weight(.bold))
+                    Text("Lv. \(option.currentLevel)")
+                        .font(.subheadline.monospacedDigit().weight(.bold))
                 }
-                Text(DeepMineStrings.text(DeepMinePrestigeLabels.effect(option.upgrade))).font(.subheadline)
+                Text(DeepMineStrings.text(DeepMinePrestigeLabels.effect(option.upgrade)))
+                    .font(.subheadline)
                 Button { purchase(option.upgrade) } label: {
                     HStack {
-                        Text(DeepMineStrings.text(option.isMaximum ? .equipmentMaximum : .actionBuy))
+                        Text(DeepMineStrings.text(
+                            option.isMaximum ? .equipmentMaximum : .actionBuy
+                        ))
                         Spacer()
                         if let cost = option.nextCost { Text("\(cost) ◆") }
                     }
@@ -207,7 +261,11 @@ struct PrestigeView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text(DeepMineStrings.text(.prestigeFailed))
                 Button { load() } label: {
-                    DeepMineActionLabel(titleKey: .actionRetry, detailKey: nil, symbol: "arrow.clockwise")
+                    DeepMineActionLabel(
+                        titleKey: .actionRetry,
+                        detailKey: nil,
+                        symbol: "arrow.clockwise"
+                    )
                 }
                 .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
             }
@@ -237,13 +295,18 @@ struct PrestigeView: View {
                 player = try gameStore.playerState()
             } else {
                 var updated = player
-                guard case .prestiged = PrestigeEngine.prestige(PrestigeCommand(id: prestigeCommandID), in: &updated) else { return }
+                guard case .prestiged = PrestigeEngine.prestige(
+                    PrestigeCommand(id: prestigeCommandID),
+                    in: &updated
+                ) else { return }
                 player = updated
             }
             onPlayerChange(player)
             upgrades = presentations()
             phase = .allocation
-        } catch { notice = .prestigeFailed }
+        } catch {
+            notice = .prestigeFailed
+        }
     }
 
     private func purchase(_ kind: PermanentUpgradeKind) {
@@ -259,7 +322,8 @@ struct PrestigeView: View {
             } else {
                 var updated = player
                 result = PrestigeEngine.purchase(
-                    PermanentUpgradeCommand(id: commandID, upgrade: kind), in: &updated
+                    PermanentUpgradeCommand(id: commandID, upgrade: kind),
+                    in: &updated
                 )
                 player = updated
             }
@@ -272,7 +336,9 @@ struct PrestigeView: View {
             }
             onPlayerChange(player)
             upgrades = presentations()
-        } catch { notice = .prestigeFailed }
+        } catch {
+            notice = .prestigeFailed
+        }
     }
 
     private func load() {
@@ -280,10 +346,14 @@ struct PrestigeView: View {
             player = try gameStore?.playerState() ?? initialPlayer
             preview = try gameStore?.prestigePreview() ?? PrestigeEngine.preview(for: player)
             upgrades = presentations()
-            if player.prestigeIndex > 0, player.runFocusCredits == 0, player.resources.coreShards > 0 {
+            if player.prestigeIndex > 0,
+               player.runFocusCredits == 0,
+               player.resources.coreShards > 0 {
                 phase = .allocation
             }
-        } catch { preview = nil }
+        } catch {
+            preview = nil
+        }
     }
 
     private func presentations() -> [PermanentUpgradePresentation] {
