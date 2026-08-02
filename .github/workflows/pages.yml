@@ -31,7 +31,7 @@ jobs:
       - name: Bundle shared gameplay logic
         run: |
           mkdir -p pages-dist
-          cp pages/index.html pages/styles.css pages/app.js pages-dist/
+          cp pages-static/index.html pages-static/styles.css pages-static/app.js pages-dist/
           npx esbuild app/coreBalance.ts \
             --bundle \
             --format=esm \
