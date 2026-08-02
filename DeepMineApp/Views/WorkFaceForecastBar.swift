@@ -41,7 +41,7 @@ struct WorkFaceForecastBar: View {
     }
 
     private var oreText: String {
-        DeepMineNumberFormatter.string(forecast.expectedOre.doubleValue)
+        DeepMineNumberFormatter.string(big: forecast.expectedOre)
     }
 
     /// Automation is the headline once it exists, because that is the number that keeps
