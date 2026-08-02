@@ -880,9 +880,26 @@
   - `갱도 내실 N단계`는 갱도 접근성 이름으로 노출한다. 보이는 설비와 같은 상태를 말로 옮긴 것이다
 - 경계: 새 에셋을 만들지 않았다. 기존 광부·램프·광차 스프라이트와 네 안료 도형만 사용한다.
 
-## D-065 — 남은 정렬 작업
+## D-065 — 설비 파생도 웹이 Core에서 읽는다
 
-- 상태: 열림
-- 웹 프로토타입의 `cartFleetSize`·`cartCargoSlots`·`serviceLampCount`·`supportCrewSize`는
-  아직 프로토타입 안에 있다. D-064에서 Core로 옮긴 파생과 값이 같도록 맞췄으나, D-061과 같은
-  방식으로 `coreBalance.ts`로 옮기고 패리티 테스트로 묶어야 드리프트가 다시 열리지 않는다.
+- 상태: 완료 (2026-08-02)
+- 웹의 `cartFleetSize`·`cartCargoSlots`·`serviceLampCount`·`supportCrewSize`를
+  `coreBalance.ts`로 옮기고 `MineInfrastructureEngine`과 같은 상수·같은 구조를 쓰게 했다.
+  패리티 테스트에 상한 6개를 추가하고, 프로토타입이 같은 이름의 로컬 함수를 다시 만들면
+  실패하도록 `doesNotMatch`를 걸었다. 이제 경제와 설비 양쪽에 계약이 있다.
+
+## D-066 — 절단된 해석의 잔여 데미지를 다시 적용한다
+
+- 상태: 승인됨 (2026-08-02, 코드 분석에서 확인한 결함)
+- 문제: `RockEngine.resolve`는 한 번에 512세그먼트까지만 걷는다. 무한 루프를 막는 상한이지만,
+  넘친 데미지를 버렸다. 호출부는 `wasTruncated`만 전달받고 남은 양은 알 수 없었으므로
+  **긴 오프라인 정산이 실제로 부순 것보다 적게 지급**했다. 앱 어디에서도 이 플래그를 읽지
+  않아 사용자에게 알려지지도 않았다.
+- 결정:
+  - `StrikeResolution.unspentDamage`와 `MineFaceUpdate.unspentDamage`로 잔여를 전달한다
+  - `MiningLoop.advance`가 절단되면 잔여를 다시 적용한다. 각 패스가 최대 512세그먼트를
+    걷고 패스 수를 `maximumResolutionPasses`(12)로 제한하므로 종료가 보장된다
+  - 여러 패스의 결과는 하나의 `MineFaceUpdate`로 합산해 반환한다. 한 틱이 실제로 만든
+    광석과 세그먼트를 보고해야 UI와 저장이 같은 값을 본다
+- 경계: 상한 자체는 유지한다. 상한을 없애면 극단적 입력에서 한 호출이 무한히 걷는다.
+  12패스(6,144세그먼트, 24,576m)를 넘는 정산은 여전히 절단되며 그때는 `wasTruncated`가 참이다.

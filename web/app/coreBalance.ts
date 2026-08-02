@@ -212,3 +212,48 @@ export function equipmentTier(level: number) {
   if (clamped <= 14) return 2;
   return 3;
 }
+
+// MARK: Infrastructure
+
+/// Mirror of `MineInfrastructureEngine`. Counts are deliberately small: four carts on a
+/// rail read as an operation, twelve read as clutter (D-059).
+export const MAXIMUM_SUPPORT_CREW = 4;
+export const SUPPORT_CREW_LEVEL_OFFSET = 10;
+export const MAXIMUM_CARTS = 4;
+export const MAXIMUM_CARGO_SLOTS = 3;
+export const MAXIMUM_SERVICE_LAMPS = 5;
+const CART_GROWTH_LEVEL_STEP = 2;
+
+function clampedLevel(level: number) {
+  return Math.min(MAXIMUM_EQUIPMENT_LEVEL, Math.max(MINIMUM_EQUIPMENT_LEVEL, level));
+}
+
+/// Crew follows total investment rather than any single tool, so no upgrade path leaves
+/// the passage empty.
+export function supportCrewSize(drill: number, cart: number, lamp: number) {
+  const total = clampedLevel(drill) + clampedLevel(cart) + clampedLevel(lamp);
+  return Math.min(MAXIMUM_SUPPORT_CREW, Math.max(1, total - SUPPORT_CREW_LEVEL_OFFSET));
+}
+
+export function cartFleetSize(level: number, fleetModification: boolean) {
+  const clamped = clampedLevel(level);
+  if (clamped <= MINIMUM_EQUIPMENT_LEVEL) return 0;
+  const earned = 1
+    + Math.floor((clamped - MINIMUM_EQUIPMENT_LEVEL - 1) / CART_GROWTH_LEVEL_STEP);
+  return Math.min(MAXIMUM_CARTS, earned + (fleetModification ? 1 : 0));
+}
+
+export function cartCargoSlots(level: number, freightModification: boolean) {
+  const clamped = clampedLevel(level);
+  if (clamped <= MINIMUM_EQUIPMENT_LEVEL) return 0;
+  const earned = 1
+    + Math.floor((clamped - MINIMUM_EQUIPMENT_LEVEL - 1) / CART_GROWTH_LEVEL_STEP);
+  return Math.min(MAXIMUM_CARGO_SLOTS, earned + (freightModification ? 1 : 0));
+}
+
+export function serviceLampCount(level: number, reachModification: boolean) {
+  return Math.min(
+    MAXIMUM_SERVICE_LAMPS,
+    Math.max(1, clampedLevel(level)) + (reachModification ? 1 : 0),
+  );
+}

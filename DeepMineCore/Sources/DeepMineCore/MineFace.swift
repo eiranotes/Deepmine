@@ -145,6 +145,9 @@ public struct MineFaceUpdate: Equatable, Sendable {
     public let hitWeakPoint: Bool
     public let regionChanged: Bool
     public let wasTruncated: Bool
+    /// Damage that did not fit in this resolution. `MiningLoop` re-drives it; a caller that
+    /// applies `MineFaceEngine` directly has to decide what to do with it.
+    public let unspentDamage: BigNumber
 
     public var brokeSomething: Bool { segmentsBroken > 0 }
 
@@ -157,7 +160,8 @@ public struct MineFaceUpdate: Equatable, Sendable {
         wasCritical: Bool,
         hitWeakPoint: Bool,
         regionChanged: Bool,
-        wasTruncated: Bool
+        wasTruncated: Bool,
+        unspentDamage: BigNumber = .zero
     ) {
         self.face = face
         self.damage = damage
@@ -168,6 +172,7 @@ public struct MineFaceUpdate: Equatable, Sendable {
         self.hitWeakPoint = hitWeakPoint
         self.regionChanged = regionChanged
         self.wasTruncated = wasTruncated
+        self.unspentDamage = unspentDamage
     }
 }
 
@@ -225,6 +230,29 @@ public enum MineFaceEngine {
         )
     }
 
+    /// Applies an explicit amount of damage. `MiningLoop` uses this to re-drive the
+    /// remainder of a truncated resolution; nothing else should need it.
+    public static func applyCarriedDamage(
+        _ damage: BigNumber,
+        to face: MineFaceState,
+        equipment: EquipmentLevels = EquipmentLevels(),
+        modifications: EquipmentModifications = .empty,
+        oreMultiplier: Double = 1,
+        maximumSegments: Int = Balance.maximumSegmentsPerResolution
+    ) -> MineFaceUpdate {
+        apply(
+            damage: damage,
+            to: face,
+            impact: face.impact,
+            wasCritical: false,
+            hitWeakPoint: false,
+            equipment: equipment,
+            modifications: modifications,
+            oreMultiplier: oreMultiplier,
+            maximumSegments: maximumSegments
+        )
+    }
+
     private static func apply(
         damage: BigNumber,
         to face: MineFaceState,
@@ -268,7 +296,8 @@ public enum MineFaceEngine {
             wasCritical: wasCritical,
             hitWeakPoint: hitWeakPoint,
             regionChanged: updated.region != face.region,
-            wasTruncated: resolution.wasTruncated
+            wasTruncated: resolution.wasTruncated,
+            unspentDamage: resolution.unspentDamage
         )
     }
 }

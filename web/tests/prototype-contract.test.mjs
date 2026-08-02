@@ -107,10 +107,13 @@ test("each equipment owns a visible scene effect and a branch choice", () => {
 });
 
 test("equipment upgrades accumulate visible production infrastructure", () => {
-  assert.match(prototype, /function cartFleetSize/);
-  assert.match(prototype, /function cartCargoSlots/);
-  assert.match(prototype, /function serviceLampCount/);
-  assert.match(prototype, /function supportCrewSize/);
+  // The derivations moved into coreBalance so the app and the web build the same rig
+  // from the same levels (D-065); the prototype must not grow private copies again.
+  assert.doesNotMatch(prototype, /function (cartFleetSize|cartCargoSlots|serviceLampCount|supportCrewSize)/);
+  assert.match(prototype, /cartFleetSize\(/);
+  assert.match(prototype, /cartCargoSlots\(/);
+  assert.match(prototype, /serviceLampCount\(/);
+  assert.match(prototype, /supportCrewSize\(/);
   assert.match(prototype, /data-cart-count=\{cartCount\}/);
   assert.match(prototype, /data-cart-load=\{cartLoad\}/);
   assert.match(prototype, /data-crew-count=\{crewCount\}/);

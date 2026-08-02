@@ -78,6 +78,13 @@ const mirroredConstants = {
   cartBasePrice: "CART_BASE_PRICE",
   lampBasePrice: "LAMP_BASE_PRICE",
 
+  maximumSupportCrew: "MAXIMUM_SUPPORT_CREW",
+  supportCrewLevelOffset: "SUPPORT_CREW_LEVEL_OFFSET",
+  maximumCarts: "MAXIMUM_CARTS",
+  maximumCargoSlots: "MAXIMUM_CARGO_SLOTS",
+  maximumServiceLamps: "MAXIMUM_SERVICE_LAMPS",
+  cartGrowthLevelStep: "CART_GROWTH_LEVEL_STEP",
+
   equipmentModificationUnlockLevel: "EQUIPMENT_MODIFICATION_UNLOCK_LEVEL",
   drillModificationCost: "DRILL_MODIFICATION_COST",
   cartModificationCost: "CART_MODIFICATION_COST",
@@ -108,6 +115,19 @@ test("equipment sprite tiers use the same boundaries as EquipmentEngine.visualTi
     Number(match[1]),
   );
   assert.deepEqual(webBoundaries, boundaries.slice(0, 2));
+});
+
+test("infrastructure counts are derived in one place for both surfaces", () => {
+  const engine = readFileSync(
+    join(coreSources, "MineInfrastructure.swift"),
+    "utf8",
+  );
+  // Same shape in both: carts and cargo start at zero below level 2 and step by the same
+  // level interval, crew follows the summed level minus the offset.
+  assert.match(engine, /guard level > Balance\.minimumEquipmentLevel else \{ return 0 \}/);
+  assert.match(web, /if \(clamped <= MINIMUM_EQUIPMENT_LEVEL\) return 0;/);
+  assert.match(engine, /total - Balance\.supportCrewLevelOffset/);
+  assert.match(web, /total - SUPPORT_CREW_LEVEL_OFFSET/);
 });
 
 test("the prototype reads the economy from coreBalance rather than its own numbers", () => {

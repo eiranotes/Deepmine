@@ -21,6 +21,10 @@ import {
   segmentIndexForDepth,
   segmentIntegrity,
   segmentOre,
+  serviceLampCount,
+  supportCrewSize,
+  cartCargoSlots,
+  cartFleetSize,
   tapDamage,
   upgradeCost as coreUpgradeCost,
 } from "./coreBalance";
@@ -119,24 +123,9 @@ function upgradeCost(kind: EquipmentKind, level: number) {
   return coreUpgradeCost(kind, level) ?? Number.POSITIVE_INFINITY;
 }
 
-function cartFleetSize(level: number, fleetSpecialization: boolean) {
-  if (level <= 1) return 0;
-  return Math.min(4, 1 + Math.floor((level - 2) / 2) + (fleetSpecialization ? 1 : 0));
-}
 
-function cartCargoSlots(level: number, freightSpecialization: boolean) {
-  if (level <= 1) return 0;
-  return Math.min(3, 1 + Math.floor((level - 2) / 2) + (freightSpecialization ? 1 : 0));
-}
 
-function serviceLampCount(level: number, reachSpecialization: boolean) {
-  return Math.min(5, Math.max(1, level) + (reachSpecialization ? 1 : 0));
-}
 
-function supportCrewSize(equipment: EquipmentState) {
-  const totalLevel = equipment.drill + equipment.cart + equipment.lamp;
-  return Math.min(4, Math.max(1, totalLevel - 10));
-}
 
 function installationDetail(
   kind: EquipmentKind,
@@ -144,7 +133,7 @@ function installationDetail(
   specializations: Specializations,
 ) {
   if (kind === "drill") {
-    return `작업조 ${supportCrewSize(equipment)}명 · 비트 티어 ${equipmentTier(equipment.drill)}`;
+    return `작업조 ${supportCrewSize(equipment.drill, equipment.cart, equipment.lamp)}명 · 비트 티어 ${equipmentTier(equipment.drill)}`;
   }
   if (kind === "cart") {
     return `운행 ${cartFleetSize(equipment.cart, specializations.cart === "fleet")}대 · 적재 ${cartCargoSlots(equipment.cart, specializations.cart === "freight")}칸`;
@@ -290,7 +279,7 @@ export function MinePrototype() {
     equipment.lamp,
     specializations.lamp === "reach",
   );
-  const crewCount = supportCrewSize(equipment);
+  const crewCount = supportCrewSize(equipment.drill, equipment.cart, equipment.lamp);
   const installedLampCount = Math.min(
     7,
     Math.max(1, equipmentTier(equipment.lamp) + 1)

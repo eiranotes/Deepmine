@@ -1,6 +1,21 @@
 # Build Report
 
-업데이트: 2026-08-02 (D-064 설비 누적·면 단위 충격 앱 포팅)
+업데이트: 2026-08-02 (D-066 절단 재적용 · D-065 설비 패리티)
+
+## 2026-08-02 truncated-resolution fix and infrastructure parity
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 절단 손실 결함 | 검증됨 | `RockEngine.resolve`가 512세그먼트에서 멈추면 남은 데미지를 버렸다. 잔여를 `unspentDamage`로 전달하고 `MiningLoop.advance`가 최대 12패스까지 재적용한다. 같은 총 데미지를 한 번에 넣은 경우와 16회로 나눈 경우의 도달 세그먼트 차이가 2 이하임을 테스트로 고정 |
+| 재적용 종료 보장 | 검증됨 | 상한을 넘는 입력(드릴·광차 200, 8시간)에서도 `segmentsBroken ≤ 512 × 12`로 끝난다 |
+| 합산 보고 | 검증됨 | 여러 패스를 하나의 `MineFaceUpdate`로 합쳐, 한 틱이 실제로 만든 광석·세그먼트를 보고한다. `update.face.segmentIndex`가 커밋된 상태와 일치함을 확인 |
+| 설비 파생 패리티 | 검증됨 | 웹 설비 함수 4종을 `coreBalance.ts`로 옮기고 상한 6개를 상수 대조에 추가. 프로토타입이 같은 이름의 로컬 함수를 다시 만들면 실패하는 `doesNotMatch`도 걸었다 |
+| Core 회귀 | 검증됨 | `swift test --package-path DeepMineCore` → **238/238**, 실패 0 (232 + 절단 6) |
+| 웹 회귀 | 검증됨 | `npm run lint` 통과, `npm test` → **12/12**(패리티 4 + 계약 8) |
+| 웹 브라우저 확인 | 검증됨 | Core 파생으로 작업조 1·광차 1·조명 1을 표시하고 console error 0 |
+| 앱 회귀 | 검증됨 | `xcodebuild test -only-testing:DeepMineAppTests -only-testing:DeepMineAppUITests/OnboardingHomeUITests` → **142/142**, 실패·skip 0 |
+| generic iOS build | 검증됨 | `CODE_SIGNING_ALLOWED=NO build` → exit 0, error 0 |
+
 
 ## 2026-08-02 porting D-059 and D-060 into the app
 

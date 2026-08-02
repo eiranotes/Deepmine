@@ -49,16 +49,55 @@ public enum MiningLoop {
         outputMultiplier: Double = 1,
         in state: inout PlayerState
     ) -> MineFaceUpdate {
-        let update = MineFaceEngine.advance(
+        let power = power(for: state).scaled(by: outputMultiplier)
+        var update = MineFaceEngine.advance(
             face: state.mineFace,
-            power: power(for: state).scaled(by: outputMultiplier),
+            power: power,
             seconds: seconds,
             equipment: state.equipment,
             modifications: state.equipmentModifications
         )
         commit(update, to: &state)
+
+        // A resolution stops after a fixed number of segments so one call cannot loop
+        // unbounded. Without re-driving what it left behind, that cap silently deleted
+        // production: a long offline haul would break 512 segments, drop the rest of its
+        // damage, and pay the player for less rock than they actually broke.
+        var passes = 1
+        while update.wasTruncated,
+              update.unspentDamage > .zero,
+              passes < Balance.maximumResolutionPasses {
+            let next = MineFaceEngine.applyCarriedDamage(
+                update.unspentDamage,
+                to: state.mineFace,
+                equipment: state.equipment,
+                modifications: state.equipmentModifications,
+                oreMultiplier: power.oreMultiplier
+            )
+            commit(next, to: &state)
+            update = merged(update, next)
+            passes += 1
+        }
+
         if let now { state.lastSettledAt = now }
         return update
+    }
+
+    /// Folds a re-driven pass into the update the caller sees, so one tick reports the ore
+    /// and segments it actually produced rather than only its first 512 segments.
+    private static func merged(_ first: MineFaceUpdate, _ next: MineFaceUpdate) -> MineFaceUpdate {
+        MineFaceUpdate(
+            face: next.face,
+            damage: first.damage,
+            oreGained: first.oreGained + next.oreGained,
+            segmentsBroken: first.segmentsBroken + next.segmentsBroken,
+            seamsBroken: first.seamsBroken + next.seamsBroken,
+            wasCritical: first.wasCritical,
+            hitWeakPoint: first.hitWeakPoint,
+            regionChanged: first.regionChanged || next.regionChanged,
+            wasTruncated: next.wasTruncated,
+            unspentDamage: next.unspentDamage
+        )
     }
 
     public static func power(for state: PlayerState) -> StrikePower {

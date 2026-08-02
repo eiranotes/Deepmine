@@ -8,10 +8,13 @@ public struct StrikeResolution: Equatable, Sendable {
     public let segmentsBroken: Int
     public let oreGained: BigNumber
     public let seamsBroken: Int
-    /// True when the damage exceeded what one resolution is allowed to walk. The unspent
-    /// remainder is dropped, and the caller is expected to surface or re-drive it rather
-    /// than assume the whole amount landed.
+    /// True when the damage exceeded what one resolution is allowed to walk.
     public let wasTruncated: Bool
+    /// Damage left over when a resolution was truncated. Returning it is what lets the
+    /// caller re-drive the remainder instead of silently losing production: a large
+    /// offline haul can imply thousands of segments, and dropping the tail would pay the
+    /// player for less rock than they actually broke.
+    public let unspentDamage: BigNumber
 
     public init(
         segmentIndex: Int,
@@ -19,7 +22,8 @@ public struct StrikeResolution: Equatable, Sendable {
         segmentsBroken: Int,
         oreGained: BigNumber,
         seamsBroken: Int,
-        wasTruncated: Bool
+        wasTruncated: Bool,
+        unspentDamage: BigNumber = .zero
     ) {
         self.segmentIndex = segmentIndex
         self.remainingIntegrity = remainingIntegrity
@@ -27,6 +31,7 @@ public struct StrikeResolution: Equatable, Sendable {
         self.oreGained = oreGained
         self.seamsBroken = seamsBroken
         self.wasTruncated = wasTruncated
+        self.unspentDamage = unspentDamage
     }
 }
 
@@ -79,7 +84,8 @@ public enum RockEngine {
                     segmentsBroken: broken,
                     oreGained: ore,
                     seamsBroken: seams,
-                    wasTruncated: true
+                    wasTruncated: true,
+                    unspentDamage: unspent
                 )
             }
         }
