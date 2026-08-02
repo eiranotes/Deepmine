@@ -234,7 +234,7 @@ struct ShaftView: View {
             showGroundCollapse(region: struckRegion)
             showDebris(isLarge: update.seamsBroken > 0)
             show(FloatingGain(
-                text: "+\(DeepMineNumberFormatter.string(update.oreGained.doubleValue))",
+                text: "+\(DeepMineNumberFormatter.string(big: update.oreGained))",
                 kind: .ore,
                 offsetX: Double.random(in: -34...34)
             ))
@@ -244,7 +244,7 @@ struct ShaftView: View {
                 densityOverride: update.wasCritical ? 4 : 2
             )
             show(FloatingGain(
-                text: "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))",
+                text: DeepMineNumberFormatter.string(big: update.damage),
                 kind: update.wasCritical ? .critical : .damage,
                 offsetX: Double.random(in: -42...42)
             ))
