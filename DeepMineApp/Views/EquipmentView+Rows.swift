@@ -5,8 +5,7 @@ extension EquipmentView {
     func equipmentRow(_ kind: EquipmentKind) -> some View {
         let level = EquipmentEngine.level(of: kind, in: player.equipment)
         let quote = EquipmentEngine.quote(for: kind, in: player)
-        // There is no level ceiling any more, so depth is the only thing that can gate a
-        // purchase and "maxed out" is not a state the player can reach (D-069).
+        // With no level ceiling, depth is the only player-facing purchase gate (D-069).
         let depthLocked = level >= player.unlockedEquipmentLevel
         let cost = depthLocked ? nil : quote?.cost
         let recommended = highlightedEquipment == kind
@@ -47,9 +46,7 @@ extension EquipmentView {
                         .accessibilityIdentifier("equipment-remembered-\(kind.rawValue)")
                 }
                 if kind == .drill, let preview = drillPreview(currentLevel: level) {
-                    // The compounding curve is invisible one level at a time. Naming a
-                    // level far above the current one is the only place a player can see
-                    // where the ladder actually goes.
+                    // A distant milestone makes the otherwise incremental compound curve visible.
                     Text(preview)
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.62))
@@ -145,10 +142,8 @@ extension EquipmentView {
     }
 
     /// Ore a milestone drill level would pay for the plan the player last used, so the
-    /// number is comparable to what they just earned. Nil once the milestone is behind
-    /// them or a projection cannot be made.
+    /// number is comparable to what they just earned. Nil once the milestone is behind.
     func drillPreview(currentLevel: Int) -> String? {
-        // Open-ended: the last milestone is a waypoint, not a ceiling.
         let milestones = [10, 20, 30, 40, 60, 100, 150, 200]
         guard let milestone = milestones.first(where: { $0 > currentLevel + 1 }) else {
             return nil
@@ -221,13 +216,14 @@ extension EquipmentView {
         }
     }
 
-    func purchaseRefinement(_ kind: EquipmentKind) {
+    func purchaseRefinement(_ kind: EquipmentKind, commandID: UUID? = nil) {
         guard let gameStore else { notice = .storageFailure; return }
+        let commandID = commandID ?? UUID()
         isLoading = true
-        pendingRefinement = kind
+        pendingRefinement = (kind, commandID)
         defer { isLoading = false }
         do {
-            switch try gameStore.purchaseRefinement(kind) {
+            switch try gameStore.purchaseRefinement(kind, commandID: commandID) {
             case .refined, .duplicate:
                 player = try gameStore.playerState()
                 recommendation = try gameStore.recommendedUpgrade()
@@ -254,8 +250,6 @@ extension EquipmentView {
         do {
             switch try gameStore.purchaseEquipment(kind, commandID: commandID) {
             case let .purchased(equipment, newLevel, _):
-                // Crossing a crew threshold only ever happens here, so this is where the
-                // new miner gets named.
                 notice = equipment == .drill
                     && MineCrew.size(drillLevel: newLevel) > MineCrew.size(drillLevel: newLevel - 1)
                     ? .crewGrew(MineCrew.size(drillLevel: newLevel))
@@ -268,7 +262,6 @@ extension EquipmentView {
                 notice = .insufficient(required: required, available: available)
                 pendingPurchase = nil
             case .maximumLevel, .depthLocked:
-                // The row already explains why, so no banner is needed.
                 notice = nil
                 pendingPurchase = nil
             case .duplicate:
@@ -288,7 +281,10 @@ extension EquipmentView {
     func retry() {
         notice = nil
         if let pendingRefinement {
-            purchaseRefinement(pendingRefinement)
+            purchaseRefinement(
+                pendingRefinement.equipment,
+                commandID: pendingRefinement.commandID
+            )
         } else if let pendingModification {
             purchaseModification(pendingModification.kind, commandID: pendingModification.commandID)
         } else if let pendingPurchase {
