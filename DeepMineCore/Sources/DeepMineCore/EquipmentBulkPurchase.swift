@@ -36,7 +36,7 @@ extension EquipmentEngine {
         let limit = max(1, command.maximumPurchases ?? 100_000)
         let remembered = level(of: command.equipment, in: state.rememberedEquipment)
         var bought = 0
-        var total = 0.0
+        var total = BigNumber.zero
 
         while bought < limit {
             let current = level(of: command.equipment, in: state.equipment)
@@ -53,16 +53,14 @@ extension EquipmentEngine {
                 break
             }
             guard let quote = quote(for: command.equipment, in: state),
-                  state.resources.ore >= quote.cost else { break }
-            state.resources.ore -= quote.cost
+                  state.resources.ore >= quote.bigCost else { break }
+            state.resources.ore -= quote.bigCost
+            total += quote.bigCost
             let next = current + 1
             setBulkLevel(next, for: command.equipment, in: &state.equipment)
             if next > remembered {
                 setBulkLevel(next, for: command.equipment, in: &state.rememberedEquipment)
             }
-            total = total <= Double.greatestFiniteMagnitude - quote.cost
-                ? total + quote.cost
-                : Double.greatestFiniteMagnitude
             bought += 1
         }
 
@@ -72,7 +70,7 @@ extension EquipmentEngine {
             equipment: command.equipment,
             newLevel: level(of: command.equipment, in: state.equipment),
             levelsBought: bought,
-            totalCost: total
+            totalCost: total.doubleValue
         )
     }
 
