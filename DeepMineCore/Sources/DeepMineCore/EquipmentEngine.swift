@@ -29,12 +29,20 @@ public struct UpgradeQuote: Codable, Equatable, Sendable {
     public let equipment: EquipmentKind
     public let currentLevel: Int
     public let cost: Double
+    public let bigCost: BigNumber
     public let isRemembered: Bool
 
-    public init(equipment: EquipmentKind, currentLevel: Int, cost: Double, isRemembered: Bool) {
+    public init(
+        equipment: EquipmentKind,
+        currentLevel: Int,
+        cost: Double,
+        bigCost: BigNumber? = nil,
+        isRemembered: Bool
+    ) {
         self.equipment = equipment
         self.currentLevel = currentLevel
         self.cost = cost
+        self.bigCost = bigCost ?? BigNumber(cost)
         self.isRemembered = isRemembered
     }
 }
@@ -68,8 +76,6 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
 }
 
 public enum EquipmentEngine {
-    /// The three current sprite families change early enough that an upgrade is seen in
-    /// play, not only in the workbench number.
     public static func visualTier(level: Int) -> Int {
         switch max(Balance.minimumEquipmentLevel, level) {
         case ...4: 1
@@ -86,22 +92,32 @@ public enum EquipmentEngine {
         }
     }
 
+    public static func upgradeCostBig(
+        for equipment: EquipmentKind,
+        currentLevel: Int,
+        rememberedLevel: Int = Balance.minimumEquipmentLevel
+    ) -> BigNumber? {
+        guard currentLevel >= Balance.minimumEquipmentLevel,
+              currentLevel < Balance.equipmentLevelArithmeticBound else { return nil }
+        var value = BigNumber(Balance.equipmentBasePrice(for: equipment))
+            * BigNumber(Balance.equipmentPriceGrowthRate)
+                .raised(to: Double(currentLevel - Balance.minimumEquipmentLevel))
+        if currentLevel < rememberedLevel {
+            value *= Balance.rememberedRebuyDiscount
+        }
+        return value
+    }
+
     public static func upgradeCost(
         for equipment: EquipmentKind,
         currentLevel: Int,
         rememberedLevel: Int = Balance.minimumEquipmentLevel
     ) -> Double? {
-        guard currentLevel >= Balance.minimumEquipmentLevel,
-              currentLevel < Balance.equipmentLevelArithmeticBound else { return nil }
-        let unrounded = Balance.equipmentBasePrice(for: equipment)
-            * Balance.compounded(
-                Balance.equipmentPriceGrowthRate,
-                currentLevel - Balance.minimumEquipmentLevel
-            )
-        let discounted = currentLevel < rememberedLevel
-            ? unrounded * Balance.rememberedRebuyDiscount
-            : unrounded
-        return ceil(discounted)
+        upgradeCostBig(
+            for: equipment,
+            currentLevel: currentLevel,
+            rememberedLevel: rememberedLevel
+        )?.doubleValue
     }
 
     public static func quote(
@@ -110,7 +126,7 @@ public enum EquipmentEngine {
     ) -> UpgradeQuote? {
         let currentLevel = level(of: equipment, in: state.equipment)
         let remembered = level(of: equipment, in: state.rememberedEquipment)
-        guard let cost = upgradeCost(
+        guard let bigCost = upgradeCostBig(
             for: equipment,
             currentLevel: currentLevel,
             rememberedLevel: remembered
@@ -118,7 +134,8 @@ public enum EquipmentEngine {
         return UpgradeQuote(
             equipment: equipment,
             currentLevel: currentLevel,
-            cost: cost,
+            cost: bigCost.doubleValue,
+            bigCost: bigCost,
             isRemembered: currentLevel < remembered
         )
     }
@@ -127,7 +144,6 @@ public enum EquipmentEngine {
         state.unlockedEquipmentLevel
     }
 
-    /// Depth required before `level` becomes purchasable, for the locked-state copy.
     public static func requiredDepth(forLevel level: Int) -> Int {
         max(0, level - Balance.equipmentLevelUnlockBase) * Balance.equipmentLevelUnlockDepthStep
     }
@@ -160,15 +176,16 @@ public enum EquipmentEngine {
             )
         }
         let remembered = level(of: command.equipment, in: state.rememberedEquipment)
-        guard let cost = upgradeCost(
+        guard let cost = upgradeCostBig(
             for: command.equipment,
             currentLevel: currentLevel,
             rememberedLevel: remembered
-        ) else {
-            return .invalidLevel
-        }
+        ) else { return .invalidLevel }
         guard state.resources.ore >= cost else {
-            return .insufficientOre(required: cost, available: state.resources.ore.doubleValue)
+            return .insufficientOre(
+                required: cost.doubleValue,
+                available: state.resources.ore.doubleValue
+            )
         }
 
         state.resources.ore -= cost
@@ -181,7 +198,7 @@ public enum EquipmentEngine {
         return .purchased(
             equipment: command.equipment,
             newLevel: newLevel,
-            cost: cost
+            cost: cost.doubleValue
         )
     }
 
