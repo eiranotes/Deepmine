@@ -79,9 +79,7 @@ struct PrestigeView: View {
             .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
             .disabled(!preview.isEligible || gameStore == nil)
             .accessibilityIdentifier("prestige-open-confirmation")
-        } else {
-            failurePanel
-        }
+        } else { failurePanel }
     }
 
     @ViewBuilder
@@ -94,13 +92,12 @@ struct PrestigeView: View {
                         .foregroundStyle(DeepMinePalette.brass.color)
                     Text(DeepMineStrings.text(.prestigeLossBody)).font(.subheadline)
                     lossRow(.gameOre, value: DeepMineNumberFormatter.string(preview.losses.ore))
-                    // The position goes back to the surface too, which is the loss a
-                    // player most needs to see before confirming (D-046).
                     lossRow(.prestigeSegments, value: "\(preview.losses.runSegmentsBroken)")
                     lossRow(.gameDepth, value: DeepMineStrings.text(.prestigeDepthReset))
-                    lossRow(.gameDrill, value: "Lv. \(preview.losses.equipment.drill)")
-                    lossRow(.gameCart, value: "Lv. \(preview.losses.equipment.cart)")
-                    lossRow(.gameLamp, value: "Lv. \(preview.losses.equipment.lamp)")
+                    lossRow(.gameDrill, value: "Lv. \(preview.losses.equipment.drill) · R\(preview.losses.refinementTiers.drill)")
+                    lossRow(.gameCart, value: "Lv. \(preview.losses.equipment.cart) · R\(preview.losses.refinementTiers.cart)")
+                    lossRow(.gameLamp, value: "Lv. \(preview.losses.equipment.lamp) · R\(preview.losses.refinementTiers.lamp)")
+                    lossRow(.equipmentModificationTitle, value: "\(preview.losses.modificationCount)")
                 }
             }
             .accessibilityElement(children: .combine)
@@ -155,8 +152,7 @@ struct PrestigeView: View {
                     HStack(spacing: 8) {
                         DeepMinePixelImage(name: DeepMineArt.coreShard, size: 28)
                             .accessibilityHidden(true)
-                        Text(DeepMineStrings.text(.prestigeAllocationTitle))
-                            .font(.headline)
+                        Text(DeepMineStrings.text(.prestigeAllocationTitle)).font(.headline)
                     }
                     Text(DeepMineStrings.text(.prestigeAllocationBody)).font(.subheadline)
                     Text("\(DeepMineStrings.text(.gameCoreShards)) · \(player.resources.coreShards)")
@@ -185,11 +181,8 @@ struct PrestigeView: View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    DeepMinePixelImage(
-                        name: DeepMineArt.permanentUpgrade(option.upgrade),
-                        size: 36
-                    )
-                    .accessibilityHidden(true)
+                    DeepMinePixelImage(name: DeepMineArt.permanentUpgrade(option.upgrade), size: 36)
+                        .accessibilityHidden(true)
                     Text(DeepMineStrings.text(DeepMinePrestigeLabels.title(option.upgrade))).font(.headline)
                     Spacer()
                     Text("Lv. \(option.currentLevel)").font(.subheadline.monospacedDigit().weight(.bold))
