@@ -1,12 +1,11 @@
 import Foundation
 
-/// How hard the player hits, from both sources. Derived from equipment, so it never has
-/// to be stored — the same levels always produce the same power.
 public struct StrikePower: Equatable, Sendable {
     public let tapDamage: BigNumber
     public let damagePerSecond: BigNumber
     public let criticalChance: Double
     public let criticalMultiplier: Double
+    public let criticalDamageMultiplier: BigNumber
     public let oreMultiplier: Double
 
     public init(
@@ -14,21 +13,19 @@ public struct StrikePower: Equatable, Sendable {
         damagePerSecond: BigNumber,
         criticalChance: Double,
         criticalMultiplier: Double,
+        criticalDamageMultiplier: BigNumber? = nil,
         oreMultiplier: Double = 1
     ) {
         self.tapDamage = tapDamage
         self.damagePerSecond = damagePerSecond
         self.criticalChance = criticalChance
         self.criticalMultiplier = criticalMultiplier
+        self.criticalDamageMultiplier = criticalDamageMultiplier ?? BigNumber(criticalMultiplier)
         self.oreMultiplier = oreMultiplier
     }
 
     public var isAutomated: Bool { !damagePerSecond.isZero }
 
-    /// Temporary output multipliers — a claimed resonance node, for one — scale what the
-    /// equipment already produces rather than adding a flat amount, so the reward keeps
-    /// its meaning at every depth (D-057). Critical odds are untouched: doubling luck as
-    /// well would make the boost read as a different game rather than a faster one.
     public func scaled(by multiplier: Double) -> StrikePower {
         guard multiplier.isFinite, multiplier > 1 else { return self }
         return StrikePower(
@@ -36,6 +33,7 @@ public struct StrikePower: Equatable, Sendable {
             damagePerSecond: damagePerSecond * multiplier,
             criticalChance: criticalChance,
             criticalMultiplier: criticalMultiplier,
+            criticalDamageMultiplier: criticalDamageMultiplier,
             oreMultiplier: oreMultiplier
         )
     }
@@ -55,9 +53,6 @@ public struct TapOutcome: Equatable, Sendable {
     }
 }
 
-/// Fills as taps land, drains when they stop. Sustained tapping beats the same number of
-/// taps spread thin, which is what makes active play worth doing without making idle play
-/// insufficient.
 public struct ImpactMeter: Codable, Equatable, Sendable {
     public private(set) var value: Double
 
@@ -100,9 +95,6 @@ public enum StrikeEngine {
             ? prestigeMultiplier
             : 1
 
-        // Compounded through `BigNumber` rather than `Double`: with no level ceiling the
-        // drill multiplier passes 1.8e308 around level 6,264, and a saturated Double would
-        // silently flatten the very growth the ceiling was removed to allow.
         let tap = BigNumber(Balance.baseTapDamage)
             * BigNumber(Balance.drillRewardGrowthRate)
                 .raised(to: Double(Balance.levelsAboveBase(equipment.drill)))
@@ -132,21 +124,22 @@ public enum StrikeEngine {
                     ? Balance.fortuneModificationCriticalChance
                     : 0)
         )
-        // Lamp refinement raises the critical multiplier rather than the chance: chance is
-        // capped at 0.6, so tiers poured into it would stop meaning anything.
-        let multiplier = Balance.baseCriticalMultiplier
-            * pow(
-                Balance.refinementDamageMultiplier,
-                Double(refinement.tier(for: .lamp)) * 0.5
-            )
-            + Double(lampSteps) * Balance.lampCriticalMultiplierIncreasePerLevel
-            + Double(max(0, permanent.resonanceDetection)) * Balance.lampCriticalMultiplierIncreasePerLevel
+        let refinementCritical = BigNumber(Balance.refinementDamageMultiplier)
+            .raised(to: Double(refinement.tier(for: .lamp)) * 0.5)
+        let additiveCritical = Double(lampSteps) * Balance.lampCriticalMultiplierIncreasePerLevel
+            + Double(max(0, permanent.resonanceDetection))
+                * Balance.lampCriticalMultiplierIncreasePerLevel
+        let criticalBig = BigNumber(Balance.baseCriticalMultiplier)
+            * refinementCritical
+            + additiveCritical
+        let criticalDisplay = criticalBig.doubleValue
 
         return StrikePower(
             tapDamage: tap,
             damagePerSecond: automation,
             criticalChance: chance,
-            criticalMultiplier: multiplier,
+            criticalMultiplier: criticalDisplay,
+            criticalDamageMultiplier: criticalBig,
             oreMultiplier: modifications.cart == .cartFreight
                 ? Balance.freightModificationOreMultiplier
                 : 1
@@ -164,8 +157,8 @@ public enum StrikeEngine {
         let critical = roll < power.criticalChance
 
         var damage = power.tapDamage * impact.damageMultiplier
-        if critical { damage = damage * power.criticalMultiplier }
-        if hitWeakPoint { damage = damage * max(1, weakPointMultiplier) }
+        if critical { damage *= power.criticalDamageMultiplier }
+        if hitWeakPoint { damage *= max(1, weakPointMultiplier) }
 
         return TapOutcome(
             damage: damage,
@@ -175,9 +168,6 @@ public enum StrikeEngine {
         )
     }
 
-    /// Automation damage for an elapsed span. Separated from `tap` because it must be
-    /// callable for a quarter second on screen and for eight hours after a relaunch,
-    /// with the same arithmetic in both cases.
     public static func automationDamage(
         power: StrikePower,
         seconds: TimeInterval
