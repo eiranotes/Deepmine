@@ -41,13 +41,17 @@ extension GameStore {
 
     /// Refinement is an explicit purchase, not a value derived from level. Keep the write
     /// behind `GameStore` like equipment and modifications so the UI never owns a state
-    /// that persistence has not accepted.
+    /// that persistence has not accepted. The command ID makes an ambiguous retry safe.
     @discardableResult
     func purchaseRefinement(
-        _ equipment: EquipmentKind
+        _ equipment: EquipmentKind,
+        commandID: UUID = UUID()
     ) throws -> RefinementPurchaseResult {
         var player = try repository.loadPlayer()
-        let result = RefinementEngine.purchase(equipment, in: &player)
+        let result = RefinementEngine.purchase(
+            RefinementPurchaseCommand(id: commandID, equipment: equipment),
+            in: &player
+        )
         if case .refined = result { try repository.savePlayer(player) }
         return result
     }
