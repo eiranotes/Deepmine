@@ -32,8 +32,7 @@ final class GameStoreTests: XCTestCase {
             try await fixture.store.start(length: .minutes15, plan: .safe)
             XCTAssertEqual(fixture.store.visibleReason, reason)
             fixture.clock.advance(seconds: 900)
-            let completed = try await fixture.store.completeIfNeeded()
-            let report = try XCTUnwrap(completed)
+            let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
             XCTAssertEqual(report.verificationGrade, .open)
         }
     }
@@ -74,8 +73,7 @@ final class GameStoreTests: XCTestCase {
         XCTAssertTrue(fixture.repository.active?.forcedRemovalPending == false)
         XCTAssertTrue(fixture.store.visibleReason?.contains("강제로 해제") == true)
         fixture.clock.advance(seconds: 900)
-        let completed = try await fixture.store.completeIfNeeded()
-        let report = try XCTUnwrap(completed)
+        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
         XCTAssertEqual(report.verificationGrade, .collapsed)
         XCTAssertEqual(fixture.system.forceRemoveCount, 2)
     }
@@ -85,8 +83,7 @@ final class GameStoreTests: XCTestCase {
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.wall = fixture.clock.wall.addingTimeInterval(900)
         fixture.clock.monotonic += 30 * 1_000_000_000
-        let completed = try await fixture.store.completeIfNeeded()
-        let report = try XCTUnwrap(completed)
+        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
         XCTAssertEqual(report.clockAssessment, .tampered)
         XCTAssertEqual(report.verificationGrade, .open)
     }
@@ -96,58 +93,59 @@ final class GameStoreTests: XCTestCase {
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.wall = fixture.clock.wall.addingTimeInterval(900)
         fixture.clock.monotonic = 1
-        let completed = try await fixture.store.completeIfNeeded()
-        let report = try XCTUnwrap(completed)
+        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
         XCTAssertEqual(report.clockAssessment, .rebooted)
         XCTAssertEqual(report.verificationGrade, .sealed)
         XCTAssertEqual(report.focusedMinutes, 15)
     }
 
-    func testSafeAndSurveyAbandonmentEarnPartialReward() async throws {
+    func testSafeAndSurveyAbandonmentEarnPartialLiveMineReward() async throws {
         for plan in [MinePlan.safe, .survey] {
             let fixture = makeFixture()
+            fixture.repository.player = PlayerState(equipment: EquipmentLevels(cart: 2))
             try await fixture.store.start(length: .minutes15, plan: plan)
             fixture.clock.advance(seconds: 300)
             let report = try await fixture.store.abandon()
             XCTAssertEqual(report.outcome, .abandoned(elapsedMinutes: 5))
             XCTAssertGreaterThan(report.oreEarned, 0)
+            XCTAssertGreaterThan(report.depthGainedMeters, 0)
         }
     }
 
-    func testDeepAbandonmentEarnsZero() async throws {
+    func testDeepAbandonmentEarnsZeroWithWorkingAutomation() async throws {
         let fixture = makeFixture()
+        fixture.repository.player = PlayerState(equipment: EquipmentLevels(cart: 2))
         try await fixture.store.start(length: .minutes15, plan: .deep)
         fixture.clock.advance(seconds: 300)
         let report = try await fixture.store.abandon()
         XCTAssertEqual(report.oreEarned, 0)
+        XCTAssertEqual(report.depthGainedMeters, 0)
     }
 
-    func testPostPrestigeRunUsesCappedLifetimeGrowth() async throws {
+    func testPostPrestigeRunUsesCappedLifetimeGrowthInTheLiveMine() async throws {
         let fixture = makeFixture()
-        fixture.repository.player = PlayerState(
+        let starting = PlayerState(
+            equipment: EquipmentLevels(cart: 2),
             runFocusCredits: 0,
             lifetimeFocusCredits: 20
         )
+        fixture.repository.player = starting
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.advance(seconds: 900)
-        let completed = try await fixture.store.completeIfNeeded()
-        let report = try XCTUnwrap(completed)
-        let cappedInput = RewardInput(
-            completionID: report.completionID, outcome: .completed,
-            sessionLength: .minutes15, plan: .safe, verificationGrade: .sealed,
-            growthFocusCredits: 20, streakDays: 0, dailySessionNumber: 1,
-            equipment: EquipmentLevels(), vein: report.vein,
-            resonanceBoostActive: false
+        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+
+        let capped = try projectedOre(
+            from: starting,
+            growthFocusCredits: 20,
+            vein: report.vein,
+            completionID: report.completionID
         )
-        let baselineInput = RewardInput(
-            completionID: report.completionID, outcome: .completed,
-            sessionLength: .minutes15, plan: .safe, verificationGrade: .sealed,
-            growthFocusCredits: 0, streakDays: 0, dailySessionNumber: 1,
-            equipment: EquipmentLevels(), vein: report.vein,
-            resonanceBoostActive: false
+        let baseline = try projectedOre(
+            from: starting,
+            growthFocusCredits: 0,
+            vein: report.vein,
+            completionID: report.completionID
         )
-        let capped = try RewardCalculator.calculate(cappedInput).ore
-        let baseline = try RewardCalculator.calculate(baselineInput).ore
         XCTAssertEqual(report.oreEarned, capped, accuracy: 0.000_001)
         XCTAssertGreaterThan(report.oreEarned, baseline)
     }
@@ -254,6 +252,37 @@ final class GameStoreTests: XCTestCase {
         XCTAssertNil(store.activeSession)
         XCTAssertNotNil(store.returnReport)
         XCTAssertTrue(try queue.pendingCommands().isEmpty)
+    }
+
+    private func projectedOre(
+        from player: PlayerState,
+        growthFocusCredits: Double,
+        vein: VeinKind?,
+        completionID: UUID
+    ) throws -> Double {
+        let input = RewardInput(
+            completionID: completionID,
+            outcome: .completed,
+            sessionLength: .minutes15,
+            plan: .safe,
+            verificationGrade: .sealed,
+            growthFocusCredits: growthFocusCredits,
+            streakDays: 0,
+            dailySessionNumber: 1,
+            equipment: player.equipment,
+            vein: vein,
+            resonanceBoostActive: false,
+            permanentUpgrades: player.permanentUpgrades
+        )
+        let basis = try RewardCalculator.calculate(input)
+        let rate = basis.breakdown.combinedMultiplier
+            / max(1, basis.breakdown.equipment)
+            / max(1, basis.breakdown.permanent)
+        var projected = player
+        return MiningLoop.advance(
+            seconds: TimeInterval(basis.focusedMinutes * 60) * rate,
+            in: &projected
+        ).oreGained.doubleValue
     }
 
     private func makeFixture(
