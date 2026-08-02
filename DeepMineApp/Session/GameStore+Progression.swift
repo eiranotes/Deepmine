@@ -39,6 +39,19 @@ extension GameStore {
         return result
     }
 
+    /// Refinement is an explicit purchase, not a value derived from level. Keep the write
+    /// behind `GameStore` like equipment and modifications so the UI never owns a state
+    /// that persistence has not accepted.
+    @discardableResult
+    func purchaseRefinement(
+        _ equipment: EquipmentKind
+    ) throws -> RefinementPurchaseResult {
+        var player = try repository.loadPlayer()
+        let result = RefinementEngine.purchase(equipment, in: &player)
+        if case .refined = result { try repository.savePlayer(player) }
+        return result
+    }
+
     func recommendedUpgrade(
         verificationGrade: VerificationGrade = .sealed
     ) throws -> UpgradeRecommendation? {
