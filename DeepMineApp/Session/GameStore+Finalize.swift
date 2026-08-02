@@ -127,8 +127,8 @@ extension GameStore {
 
     private func sessionMiningRate(_ reward: RewardResult) -> Double {
         let equipment = max(1, reward.breakdown.equipment)
-        let vein = max(1, reward.breakdown.vein)
-        let rate = reward.breakdown.combinedMultiplier / equipment / vein
+        let permanent = max(1, reward.breakdown.permanent)
+        let rate = reward.breakdown.combinedMultiplier / equipment / permanent
         return rate.isFinite ? max(0, rate) : 0
     }
 
