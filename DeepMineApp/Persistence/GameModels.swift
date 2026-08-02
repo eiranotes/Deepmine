@@ -22,7 +22,13 @@ enum GameSchemaV1 {
 final class PlayerStateEntity {
     @Attribute(.unique) var id: UUID
     var schemaVersion: Int
+    /// Legacy column, kept so a store written before unbounded growth still opens. New
+    /// writes also fill it with a saturating value for anything that still reads it.
     var ore: Double
+    /// The wallet as a `BigNumber`. Split into two columns rather than encoded, so the
+    /// value stays queryable and a zero pair reads as "this row predates the migration".
+    var oreMantissa: Double = 0
+    var oreExponent: Int = 0
     var crystals: Int
     var coreShards: Int
     var runFocusCredits: Double
@@ -81,6 +87,8 @@ final class PlayerStateEntity {
         id = GameSchemaV1.singletonID
         self.schemaVersion = schemaVersion
         ore = 0
+        oreMantissa = 0
+        oreExponent = 0
         crystals = 0
         coreShards = 0
         runFocusCredits = 0

@@ -66,7 +66,7 @@ struct EquipmentView: View {
                         .font(.headline)
                 }
                 Spacer()
-                Text(DeepMineNumberFormatter.string(player.resources.ore))
+                Text(DeepMineNumberFormatter.string(big: player.resources.ore))
                     .font(.title3.monospacedDigit().weight(.heavy))
                     .foregroundStyle(DeepMinePalette.brass.color)
                     .accessibilityIdentifier("equipment-ore")

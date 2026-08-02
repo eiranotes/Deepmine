@@ -7,10 +7,11 @@ extension EquipmentView {
     func equipmentRow(_ kind: EquipmentKind) -> some View {
         let level = EquipmentEngine.level(of: kind, in: player.equipment)
         let quote = EquipmentEngine.quote(for: kind, in: player)
+        // There is no level ceiling any more, so depth is the only thing that can gate a
+        // purchase and "maxed out" is not a state the player can reach (D-069).
         let depthLocked = level >= player.unlockedEquipmentLevel
-            && level < Balance.maximumEquipmentLevel
         let cost = depthLocked ? nil : quote?.cost
-        let maximum = level >= Balance.maximumEquipmentLevel
+        let maximum = false
         let recommended = highlightedEquipment == kind
         return DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -150,7 +151,8 @@ extension EquipmentView {
     /// number is comparable to what they just earned. Nil once the milestone is behind
     /// them or a projection cannot be made.
     func drillPreview(currentLevel: Int) -> String? {
-        let milestones = [10, 20, 30, 40, 60, 100, 150, Balance.maximumEquipmentLevel]
+        // Open-ended: the last milestone is a waypoint, not a ceiling.
+        let milestones = [10, 20, 30, 40, 60, 100, 150, 200]
         guard let milestone = milestones.first(where: { $0 > currentLevel + 1 }) else {
             return nil
         }

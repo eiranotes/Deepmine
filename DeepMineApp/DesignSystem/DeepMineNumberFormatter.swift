@@ -1,6 +1,23 @@
+import DeepMineCore
 import Foundation
 
 enum DeepMineNumberFormatter {
+    /// Unbounded growth means the wallet routinely passes the largest named unit, so the
+    /// formatter falls back to scientific notation rather than printing a number nobody
+    /// can read — or, worse, `—` because a `Double` conversion saturated (D-069).
+    ///
+    /// Korean has no everyday word above 조, so that is where the fallback starts.
+    /// Deliberately not an overload of `string(_:)`. `BigNumber` is `ExpressibleBy*Literal`,
+    /// so an overload makes every literal call site ambiguous — the same trap that made
+    /// `Resources(ore:)` and `BigNumber`'s own comparisons ambiguous during this migration.
+    static func string(big value: BigNumber, locale: Locale = .current) -> String {
+        let plain = value.doubleValue
+        if plain.isFinite, abs(plain) < 1e15 {
+            return string(plain, locale: locale)
+        }
+        return value.scientificDescription
+    }
+
     static func string(_ value: Double, locale: Locale = .current) -> String {
         guard value.isFinite else { return "—" }
         let korean = locale.identifier.lowercased().hasPrefix("ko")

@@ -22,7 +22,7 @@ extension GameFixtures {
     static var onboardingDemoCompleted: GameFixtureState {
         let rewardID = UUID(uuidString: "44454550-4D49-4E45-0000-000000000090")!
         let player = PlayerState(
-            resources: Resources(ore: Balance.demoOreGrant),
+            resources: Resources(ore: BigNumber(Balance.demoOreGrant)),
             onboardingStage: .demoReward,
             demoStartedAt: referenceDate,
             demoCompletedAt: referenceDate,

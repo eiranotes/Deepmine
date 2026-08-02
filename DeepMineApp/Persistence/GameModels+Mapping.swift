@@ -3,7 +3,9 @@ import Foundation
 
 extension PlayerStateEntity {
     func apply(_ state: PlayerState) {
-        ore = state.resources.ore
+        ore = state.resources.ore.doubleValue
+        oreMantissa = state.resources.ore.mantissa
+        oreExponent = state.resources.ore.exponent
         crystals = state.resources.crystals
         coreShards = state.resources.coreShards
         runFocusCredits = state.runFocusCredits
@@ -134,5 +136,14 @@ extension SessionRecordEntity {
             depthAfter: depthAfter,
             completed: completed
         )
+    }
+}
+
+extension PlayerStateEntity {
+    /// Reads the wallet, preferring the `BigNumber` columns and falling back to the legacy
+    /// `Double` for stores written before unbounded growth (D-069).
+    var storedOre: BigNumber {
+        guard oreMantissa != 0 || oreExponent != 0 else { return BigNumber(ore) }
+        return BigNumber(mantissa: oreMantissa, exponent: oreExponent)
     }
 }

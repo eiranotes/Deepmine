@@ -245,7 +245,7 @@ extension GameStore {
                     currentLevel: level,
                     nextLevel: level + 1,
                     cost: cost,
-                    availableOre: player.resources.ore,
+                    availableOre: player.resources.ore.doubleValue,
                     marginalExpectedOre: gain
                 )
             }

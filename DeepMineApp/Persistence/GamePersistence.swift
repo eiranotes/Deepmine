@@ -200,7 +200,11 @@ final class GameRepository {
         purchases: PurchaseStateEntity
     ) throws -> PlayerState {
         PlayerState(
-            resources: Resources(ore: root.ore, crystals: root.crystals, coreShards: root.coreShards),
+            resources: Resources(
+                ore: root.storedOre,
+                crystals: root.crystals,
+                coreShards: root.coreShards
+            ),
             equipment: EquipmentLevels(drill: equipment.drillLevel, cart: equipment.cartLevel, lamp: equipment.lampLevel),
             equipmentModifications: root.storedEquipmentModifications(),
             runFocusCredits: root.runFocusCredits,

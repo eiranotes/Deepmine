@@ -40,10 +40,12 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
-    func testMaximumLevelDoesNotSave() throws {
+    /// There is no game ceiling any more; this pins the arithmetic bound, which a real
+    /// player cannot reach because depth gates the ladder at one level per 15m (D-069).
+    func testArithmeticBoundDoesNotSave() throws {
         let fixture = makeFixture(player: PlayerState(
             resources: Resources(ore: 10_000),
-            equipment: EquipmentLevels(drill: Balance.maximumEquipmentLevel)
+            equipment: EquipmentLevels(drill: Balance.equipmentLevelArithmeticBound)
         ))
 
         XCTAssertEqual(try fixture.store.purchaseEquipment(.drill), .maximumLevel)

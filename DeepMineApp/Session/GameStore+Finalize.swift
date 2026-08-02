@@ -194,6 +194,9 @@ extension GameStore {
         case .decorationUnlocked: .decorationUnlocked
         case .resonanceArmed: .nextSessionDoubled
         case let .bonusDepth(meters): .bonusDepth(meters)
+        // Abyss veins pay crystals now; the case remains for saves and reports written
+        // before that change (D-068).
+        case let .bonusOre(amount): .oreMultiplier(amount)
         case .duplicate: nil
         }
     }

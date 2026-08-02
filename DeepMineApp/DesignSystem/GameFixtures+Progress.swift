@@ -87,9 +87,9 @@ extension GameFixtures {
         case "equipment-maximum": equipmentPlayer(
             ore: .greatestFiniteMagnitude,
             equipment: EquipmentLevels(
-                drill: Balance.maximumEquipmentLevel,
-                cart: Balance.maximumEquipmentLevel,
-                lamp: Balance.maximumEquipmentLevel
+                drill: 200,
+                cart: 200,
+                lamp: 200
             ),
             lifetimeFocusCredits: 200
         )
@@ -141,7 +141,7 @@ extension GameFixtures {
         lifetimeFocusCredits: Double = 0
     ) -> PlayerState {
         PlayerState(
-            resources: Resources(ore: ore),
+            resources: Resources(ore: BigNumber(ore)),
             equipment: equipment,
             lifetimeFocusCredits: lifetimeFocusCredits,
             completedSessionCount: 3,

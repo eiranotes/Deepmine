@@ -126,7 +126,7 @@ final class DesignSystemContractTests: XCTestCase {
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 5), 2)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 14), 2)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 15), 3)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: Balance.maximumEquipmentLevel), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: Balance.equipmentLevelArithmeticBound), 3)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 600), 3)
         XCTAssertEqual(
             DeepMineArt.equipment(.drill, level: 5),

@@ -134,7 +134,7 @@ extension GameFixtures {
         if vein == .vault { themes.insert(.ruins) }
         return PlayerState(
             resources: Resources(
-                ore: ore,
+                ore: BigNumber(ore),
                 crystals: vein == .crystal ? 7 : 4,
                 coreShards: 0
             ),

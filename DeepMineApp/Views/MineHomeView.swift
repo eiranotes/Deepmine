@@ -58,13 +58,13 @@ struct MineHomeView: View {
             }
             Spacer()
             Label(
-                DeepMineNumberFormatter.string(player.resources.ore),
+                DeepMineNumberFormatter.string(big: player.resources.ore),
                 systemImage: "shippingbox.fill"
             )
             .font(.headline.monospacedDigit())
             .foregroundStyle(DeepMinePalette.brass.color)
             .accessibilityLabel(
-                "\(DeepMineStrings.text(.gameOre)) \(DeepMineNumberFormatter.string(player.resources.ore))"
+                "\(DeepMineStrings.text(.gameOre)) \(DeepMineNumberFormatter.string(big: player.resources.ore))"
             )
             Button(action: onOpenSettings) {
                 Image(systemName: "gearshape")
