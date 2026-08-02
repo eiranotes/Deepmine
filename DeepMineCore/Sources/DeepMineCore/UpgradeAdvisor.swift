@@ -6,40 +6,38 @@ public enum UpgradeAdvisor {
         marginalExpectedOre: [EquipmentKind: Double]
     ) -> UpgradeRecommendation? {
         let unlocked = EquipmentEngine.unlockedMaximumLevel(in: state)
-        var best: UpgradeRecommendation?
+        var best: (score: Double, recommendation: UpgradeRecommendation)?
         for equipment in EquipmentKind.allCases {
             guard let quote = EquipmentEngine.quote(for: equipment, in: state),
                   quote.currentLevel < unlocked,
-                  state.resources.ore >= quote.cost,
+                  state.resources.ore >= quote.bigCost,
                   let marginal = marginalExpectedOre[equipment],
                   marginal.isFinite, marginal > 0 else { continue }
+            let score = logEfficiency(marginal: marginal, cost: quote.bigCost)
             let candidate = UpgradeRecommendation(
                 equipment: equipment,
                 currentLevel: quote.currentLevel,
                 nextLevel: quote.currentLevel + 1,
                 cost: quote.cost,
                 marginalExpectedOre: marginal,
-                efficiency: marginal / quote.cost,
+                efficiency: displayEfficiency(logScore: score),
                 isRemembered: quote.isRemembered
             )
-            if best == nil || candidate.efficiency > best!.efficiency {
-                best = candidate
+            if best == nil || score > best!.score {
+                best = (score, candidate)
             }
         }
-        return best
+        return best?.recommendation
     }
 
     public static func recommendForMining(for state: PlayerState) -> UpgradeRecommendation? {
         let unlocked = EquipmentEngine.unlockedMaximumLevel(in: state)
         let current = MiningLoop.power(for: state)
 
-        // The first cart level that produces non-zero DPS is not an incremental purchase;
-        // it changes the product from a manual clicker into an idle mine. Once affordable,
-        // it must not lose to a slightly better tap-efficiency ratio.
         if !current.isAutomated,
            let cart = EquipmentEngine.quote(for: .cart, in: state),
            cart.currentLevel < unlocked,
-           state.resources.ore >= cart.cost {
+           state.resources.ore >= cart.bigCost {
             var automated = state
             automated.equipment.cart += 1
             if MiningLoop.power(for: automated).isAutomated {
@@ -56,11 +54,11 @@ public enum UpgradeAdvisor {
         }
 
         let currentTap = expectedTapDamage(current)
-        var best: UpgradeRecommendation?
+        var best: (score: Double, recommendation: UpgradeRecommendation)?
         for equipment in EquipmentKind.allCases {
             guard let quote = EquipmentEngine.quote(for: equipment, in: state),
                   quote.currentLevel < unlocked,
-                  state.resources.ore >= quote.cost else { continue }
+                  state.resources.ore >= quote.bigCost else { continue }
 
             var upgraded = state
             switch equipment {
@@ -78,20 +76,21 @@ public enum UpgradeAdvisor {
             let marginal = tapGain + automaticGain * 1.5 + oreGain * 0.75
             guard marginal.isFinite, marginal > 0 else { continue }
 
+            let score = logEfficiency(marginal: marginal, cost: quote.bigCost)
             let candidate = UpgradeRecommendation(
                 equipment: equipment,
                 currentLevel: quote.currentLevel,
                 nextLevel: quote.currentLevel + 1,
                 cost: quote.cost,
                 marginalExpectedOre: marginal,
-                efficiency: marginal / quote.cost,
+                efficiency: displayEfficiency(logScore: score),
                 isRemembered: quote.isRemembered
             )
-            if best == nil || candidate.efficiency > best!.efficiency {
-                best = candidate
+            if best == nil || score > best!.score {
+                best = (score, candidate)
             }
         }
-        return best
+        return best?.recommendation
     }
 
     public static func recommend(
@@ -160,6 +159,20 @@ public enum UpgradeAdvisor {
         guard projected > current else { return 0 }
         if current.isZero { return 10 }
         return relativeGain(from: current, to: projected)
+    }
+
+    private static func logEfficiency(marginal: Double, cost: BigNumber) -> Double {
+        guard marginal > 0, let costLog = cost.log10Value else { return -.infinity }
+        return log10(marginal) - costLog
+    }
+
+    private static func displayEfficiency(logScore: Double) -> Double {
+        guard logScore.isFinite else {
+            return logScore > 0 ? Double.greatestFiniteMagnitude : 0
+        }
+        if logScore > 308 { return Double.greatestFiniteMagnitude }
+        if logScore < -308 { return 0 }
+        return pow(10, logScore)
     }
 
     private static func expectedOre(
