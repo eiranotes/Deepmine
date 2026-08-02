@@ -15,7 +15,7 @@
 
 ## Checkpoint 2 — 큰 수 UI와 잠금 상태 수정
 
-상태: 구현 완료, Xcode 실행 미검증
+상태: 구현·원격 Xcode 검증 완료
 
 변경:
 
@@ -28,7 +28,7 @@
 
 ## Checkpoint 3 — 정련 구매 경로와 UI
 
-상태: 구현 완료, Xcode 실행 미검증
+상태: 구현·원격 Xcode 검증 완료, 렌더 캡처 미완료
 
 변경:
 
@@ -41,43 +41,95 @@
 - 부족 광석·저장 실패·재시도 경로 연결
 - 정련 영속화 및 잠금 회귀 테스트 추가
 
-## Static validation
+## Checkpoint 4 — 전체 게임플레이 흐름 재감사
 
-현재 도구 환경에는 Xcode와 iOS Simulator가 없으므로 앱 빌드·렌더 검증은 실행하지 않았다.
-대신 다음을 수행했다.
+상태: 완료, 문서 저장
+
+문서:
+
+- `docs/GAMEPLAY_FLOW_REVIEW.md`
+
+범위:
+
+- 실제 `main`에 반영된 Claude Opus 5 공동작성 커밋 재검토
+- 최초 실행 → 첫 암반 → 홈 → 자동화 → 장비 분기 → 정련 → 집중 → 귀환 → 오프라인 → 메타 → 프레스티지 → 장기 게임 전 흐름
+- 오래된 `claude/deepmine-repo-upload-plan-f0nivi` 브랜치를 현재 제품 기준에서 제외
+- 실제 UI 추천과 밸런스 시뮬레이터 구매 정책 차이 확인
+- 첫 자동화가 현재 홈 추천으로 늦어지는 구조 확인
+- 집중 증폭기가 실제 갱도 배수가 아니라 별도 광석 지급 경제라는 점 확인
+- 세션 귀환의 심도 증가, 스트릭, 통계, 도전과제가 클리커 피벗과 완전히 통합되지 않은 점 확인
+- 수정 통화의 현재 소비처 부재 확인
+- 프레스티지 손실 고지에서 정련·장비 분기가 빠진 점 확인
+- 홈이 가려진 화면에서 자동 채굴이 계속되는지 E2E가 없음을 확인
+
+## Validation
+
+### 정적 검증
 
 - Swift 6.2.1 `swiftc -parse`:
   - `EquipmentView.swift` 통과
   - `EquipmentView+Rows.swift` 통과
   - `GameStore+Progression.swift` 통과
   - 추가 테스트 구문 통과
-- 파일 크기:
+- 변경 파일 크기:
   - `EquipmentView.swift`: 299줄
   - `EquipmentView+Rows.swift`: 300줄
-- 변경 범위는 리뷰 문서, UI, GameStore, 관련 테스트로 제한
+
+### GitHub Actions 원격 검증
+
+PR #3의 macOS 26 / Xcode 26.5 실행에서:
+
+- `DeepMineCore`: **256/256 통과**
+- `DeepMineAppTests`: 통과
+- generic iOS unsigned build: 통과
+- 웹 `npm ci`: 통과
+- 웹 lint: 통과
+
+전체 워크플로가 빨간 이유는 기능 코드 빌드 실패가 아니다.
+
+1. Swift 줄 수 검사가 `DeepMineCore/.build` 생성 파일까지 검사하고,
+   기존 `ProgressionTests.swift` 301줄·`MineFace.swift` 303줄을 잡음
+2. 웹 `vite.config.ts`가 저장소에 없는 `./build/sites-vite-plugin`을 import함
 
 ## 아직 검증하지 않은 것
 
-- `xcodebuild test -only-testing:DeepMineAppTests`
-- generic iOS unsigned build
-- 정련 잠금/구매/부족 광석 화면의 시뮬레이터 캡처
+- 정련 잠금/구매 가능/부족 광석/구매 완료 시뮬레이터 캡처
 - VoiceOver 정련 행 판독 순서
-- Dynamic Type에서 긴 비용·심도 문자열의 줄바꿈
+- Dynamic Type에서 긴 비용·심도 문자열 줄바꿈
 - 실제 정련 구매 직후 갱도 출력 변화의 시각 체감
+- 홈이 장비·통계·집중 화면에 가려진 동안 자동 생산 유지 여부
+- 집중 세션과 실제 `MiningLoop`의 통합 동작
+- 40km·150km·500km 비용·크리티컬·표기 회귀
 
 ## 남은 P0
 
+- [ ] 홈 추천을 실제 암반 ETA/광석·초 기준으로 교체
+- [ ] 첫 자동화 미보유 시 광차를 최우선 마일스톤으로 처리
+- [ ] 집중 세션을 실제 `MiningLoop` 출력 배수로 통합
+- [ ] 귀환 보고·스트릭·통계·도전과제를 클리커 지표 중심으로 재편
+- [ ] 수정 통화 소비처 정의 또는 제거
+- [ ] 프레스티지 손실에 정련·장비 분기 표시
 - [ ] 장비·정련 광석 비용 전체 `BigNumber`화
 - [ ] 램프 정련 크리티컬 배수 `BigNumber`화
-- [ ] ×10/×100/MAX 구매
-- [ ] 클리커 전용 추천 엔진
+- [ ] ×10/×100/MAX 및 기억 장비 재설치
+- [ ] OfflineReturnSheet·온보딩 등 남은 `doubleValue` UI 경로 정리
+- [ ] 홈이 가려진 화면의 자동 생산 E2E
+
+## 남은 P1
+
 - [ ] 광석/초·층/초 및 구매 전후 변화율 표시
 - [ ] 정련 전용 도약 연출과 장비 외형 단계
+- [ ] 5km·20km·100km 이후 장기 지질 세대
+- [ ] 장식 보상 실제 갱도 연결 확인
+- [ ] km 이상 심도 단위 포맷
 
 ## 재개 순서
 
-1. macOS/Xcode 환경에서 앱 테스트와 generic build 실행
-2. 장비 화면 정련 4상태 캡처: 잠금, 구매 가능, 부족 광석, 구매 완료
-3. 발견된 빌드·레이아웃 결함 수정
-4. 비용 타입의 `BigNumber` 마이그레이션 설계 및 단계별 적용
-5. 대량 구매와 클리커 추천 엔진 구현
+1. GitHub Actions 줄 수 검사에서 `.build` 제외 및 기존 기준선 정리
+2. Sites 전용 Vite 플러그인의 CI 대체 경로 정리
+3. 홈이 가려진 화면의 자동 생산 E2E 추가
+4. 홈 추천을 클리커 효율로 교체하고 첫 광차 우선 정책 추가
+5. 집중 세션을 같은 `MiningLoop` 배수로 통합하는 설계·구현
+6. 비용 타입의 `BigNumber` 마이그레이션
+7. 대량 구매·프레스티지 재설치
+8. 정련·오프라인·프레스티지 화면 캡처와 접근성 검증
