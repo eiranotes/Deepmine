@@ -44,6 +44,8 @@ jobs:
           node -e "import('./pages-dist/coreBalance.js').then(m => { if (m.automationDamagePerSecond(1) !== 0 || m.automationDamagePerSecond(2) <= 0 || m.upgradeCost('drill', 201) == null) process.exit(1) })"
         working-directory: web
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/pages-dist
