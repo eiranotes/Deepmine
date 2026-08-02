@@ -30,14 +30,20 @@ public enum UpgradeAdvisor {
         return best?.recommendation
     }
 
-    public static func recommendForMining(for state: PlayerState) -> UpgradeRecommendation? {
+    /// Recommends against the live mine. Home uses affordable-only recommendations so its
+    /// action is immediately executable; return reports set that flag to false so they can
+    /// name the next target honestly even when the haul did not quite pay for it.
+    public static func recommendForMining(
+        for state: PlayerState,
+        affordableOnly: Bool = true
+    ) -> UpgradeRecommendation? {
         let unlocked = EquipmentEngine.unlockedMaximumLevel(in: state)
         let current = MiningLoop.power(for: state)
 
         if !current.isAutomated,
            let cart = EquipmentEngine.quote(for: .cart, in: state),
            cart.currentLevel < unlocked,
-           state.resources.ore >= cart.bigCost {
+           (!affordableOnly || state.resources.ore >= cart.bigCost) {
             var automated = state
             automated.equipment.cart += 1
             if MiningLoop.power(for: automated).isAutomated {
@@ -58,7 +64,7 @@ public enum UpgradeAdvisor {
         for equipment in EquipmentKind.allCases {
             guard let quote = EquipmentEngine.quote(for: equipment, in: state),
                   quote.currentLevel < unlocked,
-                  state.resources.ore >= quote.bigCost else { continue }
+                  !affordableOnly || state.resources.ore >= quote.bigCost else { continue }
 
             var upgraded = state
             switch equipment {
