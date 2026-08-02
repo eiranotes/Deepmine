@@ -11,13 +11,10 @@ const SEAM_ORE_MULTIPLIER = 15;
 export const CRYSTAL_REGION_DEPTH = 240;
 export const RUINS_REGION_DEPTH = 800;
 export const ABYSS_REGION_DEPTH = 1_600;
-
-const REGION_ORE_MULTIPLIERS = {
-  entry: 1,
-  crystal: 1.35,
-  ruins: 1.8,
-  abyss: 2.4,
-} as const;
+const ENTRY_REGION_ORE_MULTIPLIER = 1;
+const CRYSTAL_REGION_ORE_MULTIPLIER = 1.35;
+const RUINS_REGION_ORE_MULTIPLIER = 1.8;
+const ABYSS_REGION_ORE_MULTIPLIER = 2.4;
 
 const BASE_TAP_DAMAGE = 1;
 const DRILL_REWARD_GROWTH_RATE = 1.12;
@@ -36,12 +33,14 @@ const AUTOMATION_DAMAGE_PER_LEVEL = 0.5;
 const AUTOMATION_GROWTH_RATE = 1.12;
 
 export const MINIMUM_EQUIPMENT_LEVEL = 1;
-export const EQUIPMENT_LEVEL_ARITHMETIC_BOUND = Number.MAX_SAFE_INTEGER;
+export const EQUIPMENT_LEVEL_ARITHMETIC_BOUND = 100_000;
 export const EQUIPMENT_PRICE_GROWTH_RATE = 1.34;
-const EQUIPMENT_BASE_PRICE = { drill: 100, cart: 180, lamp: 200 } as const;
-export const EQUIPMENT_LEVEL_UNLOCK_BASE = 1;
+const DRILL_BASE_PRICE = 100;
+const CART_BASE_PRICE = 180;
+const LAMP_BASE_PRICE = 200;
+export const EQUIPMENT_LEVEL_UNLOCK_BASE = 5;
 export const EQUIPMENT_LEVEL_UNLOCK_DEPTH_STEP = 15;
-export const REMEMBERED_REBUY_DISCOUNT = 0.35;
+export const REMEMBERED_REBUY_DISCOUNT = 0.5;
 
 export const EQUIPMENT_MODIFICATION_UNLOCK_LEVEL = 5;
 export const DRILL_MODIFICATION_COST = 460;
@@ -86,6 +85,15 @@ export function regionForDepth(depth: number): MineRegion {
   return "entry";
 }
 
+function regionOreMultiplier(region: MineRegion) {
+  switch (region) {
+    case "abyss": return ABYSS_REGION_ORE_MULTIPLIER;
+    case "ruins": return RUINS_REGION_ORE_MULTIPLIER;
+    case "crystal": return CRYSTAL_REGION_ORE_MULTIPLIER;
+    default: return ENTRY_REGION_ORE_MULTIPLIER;
+  }
+}
+
 export function isSeamSegment(index: number) {
   return index > 0 && index % SEAM_SEGMENT_INTERVAL === 0;
 }
@@ -103,7 +111,7 @@ export function segmentOre(index: number) {
   return BASE_SEGMENT_ORE
     * Math.pow(SEGMENT_ORE_GROWTH_RATE, safeIndex)
     * (isSeamSegment(safeIndex) ? SEAM_ORE_MULTIPLIER : 1)
-    * REGION_ORE_MULTIPLIERS[region];
+    * regionOreMultiplier(region);
 }
 
 export function refinementTiersUnlocked(level: number) {
@@ -114,11 +122,7 @@ export function refinementMultiplier(tier: number) {
   return Math.pow(REFINEMENT_DAMAGE_MULTIPLIER, Math.max(0, Math.floor(tier)));
 }
 
-export function tapDamage(
-  drillLevel: number,
-  impactModification = false,
-  refinementTier = 0,
-) {
+export function tapDamage(drillLevel: number, impactModification = false, refinementTier = 0) {
   return BASE_TAP_DAMAGE
     * Math.pow(DRILL_REWARD_GROWTH_RATE, levelsAboveBase(drillLevel))
     * refinementMultiplier(refinementTier)
@@ -180,6 +184,14 @@ export function unlockedMaximumLevel(depthMeters: number) {
     + Math.floor(Math.max(0, depthMeters) / EQUIPMENT_LEVEL_UNLOCK_DEPTH_STEP);
 }
 
+function equipmentBasePrice(kind: EquipmentKind) {
+  switch (kind) {
+    case "drill": return DRILL_BASE_PRICE;
+    case "cart": return CART_BASE_PRICE;
+    case "lamp": return LAMP_BASE_PRICE;
+  }
+}
+
 export function upgradeCost(
   kind: EquipmentKind,
   currentLevel: number,
@@ -187,7 +199,7 @@ export function upgradeCost(
 ) {
   if (currentLevel < MINIMUM_EQUIPMENT_LEVEL
       || currentLevel >= EQUIPMENT_LEVEL_ARITHMETIC_BOUND) return null;
-  const unrounded = EQUIPMENT_BASE_PRICE[kind]
+  const unrounded = equipmentBasePrice(kind)
     * Math.pow(EQUIPMENT_PRICE_GROWTH_RATE, currentLevel - MINIMUM_EQUIPMENT_LEVEL);
   const discounted = currentLevel < rememberedLevel
     ? unrounded * REMEMBERED_REBUY_DISCOUNT
@@ -199,7 +211,9 @@ export function refinementCost(kind: EquipmentKind, tier: number) {
   const unlockLevel = MINIMUM_EQUIPMENT_LEVEL
     + Math.max(1, tier) * REFINEMENT_LEVEL_INTERVAL;
   const levelCost = upgradeCost(kind, unlockLevel);
-  return levelCost == null ? Number.POSITIVE_INFINITY : Math.ceil(levelCost * REFINEMENT_COST_MULTIPLIER);
+  return levelCost == null
+    ? Number.POSITIVE_INFINITY
+    : Math.ceil(levelCost * REFINEMENT_COST_MULTIPLIER);
 }
 
 export function recommendMiningUpgrade(
@@ -210,22 +224,24 @@ export function recommendMiningUpgrade(
   const unlocked = unlockedMaximumLevel(depthMeters);
   const currentDps = automationDamagePerSecond(levels.cart);
   const cartCost = upgradeCost("cart", levels.cart);
-  if (currentDps === 0 && levels.cart < unlocked && cartCost != null && cartCost <= ore
+  if (currentDps === 0
+      && levels.cart < unlocked
+      && cartCost != null
+      && cartCost <= ore
       && automationDamagePerSecond(levels.cart + 1) > 0) return "cart";
 
   const currentTap = expectedTapDamage(levels);
-  const candidates = (["drill", "cart", "lamp"] as EquipmentKind[])
-    .flatMap((kind) => {
-      const cost = upgradeCost(kind, levels[kind]);
-      if (cost == null || cost > ore || levels[kind] >= unlocked) return [];
-      const projected = { ...levels, [kind]: levels[kind] + 1 };
-      const tapGain = Math.max(0, expectedTapDamage(projected) / currentTap - 1);
-      const projectedDps = automationDamagePerSecond(projected.cart);
-      const dpsGain = currentDps === 0
-        ? (projectedDps > 0 ? 10 : 0)
-        : Math.max(0, projectedDps / currentDps - 1);
-      return [{ kind, score: (tapGain + dpsGain * 1.5) / cost }];
-    });
+  const candidates = (["drill", "cart", "lamp"] as EquipmentKind[]).flatMap((kind) => {
+    const cost = upgradeCost(kind, levels[kind]);
+    if (cost == null || cost > ore || levels[kind] >= unlocked) return [];
+    const projected = { ...levels, [kind]: levels[kind] + 1 };
+    const tapGain = Math.max(0, expectedTapDamage(projected) / currentTap - 1);
+    const projectedDps = automationDamagePerSecond(projected.cart);
+    const dpsGain = currentDps === 0
+      ? (projectedDps > 0 ? 10 : 0)
+      : Math.max(0, projectedDps / currentDps - 1);
+    return [{ kind, score: (tapGain + dpsGain * 1.5) / cost }];
+  });
   candidates.sort((a, b) => b.score - a.score);
   return candidates[0]?.kind ?? null;
 }
@@ -238,20 +254,21 @@ export function equipmentTier(level: number) {
 }
 
 export function supportCrewSize(drill: number, cart: number, lamp: number) {
-  return Math.min(MAXIMUM_SUPPORT_CREW, Math.max(1, drill + cart + lamp - SUPPORT_CREW_LEVEL_OFFSET));
+  const total = safeLevel(drill) + safeLevel(cart) + safeLevel(lamp);
+  return Math.min(MAXIMUM_SUPPORT_CREW, Math.max(1, total - SUPPORT_CREW_LEVEL_OFFSET));
 }
 
 export function cartFleetSize(level: number, fleetModification: boolean) {
   const clamped = safeLevel(level);
   if (clamped <= MINIMUM_EQUIPMENT_LEVEL) return 0;
-  const earned = 1 + Math.floor((clamped - 2) / CART_GROWTH_LEVEL_STEP);
+  const earned = 1 + Math.floor((clamped - MINIMUM_EQUIPMENT_LEVEL - 1) / CART_GROWTH_LEVEL_STEP);
   return Math.min(MAXIMUM_CARTS, earned + (fleetModification ? 1 : 0));
 }
 
 export function cartCargoSlots(level: number, freightModification: boolean) {
   const clamped = safeLevel(level);
   if (clamped <= MINIMUM_EQUIPMENT_LEVEL) return 0;
-  const earned = 1 + Math.floor((clamped - 2) / CART_GROWTH_LEVEL_STEP);
+  const earned = 1 + Math.floor((clamped - MINIMUM_EQUIPMENT_LEVEL - 1) / CART_GROWTH_LEVEL_STEP);
   return Math.min(MAXIMUM_CARGO_SLOTS, earned + (freightModification ? 1 : 0));
 }
 
