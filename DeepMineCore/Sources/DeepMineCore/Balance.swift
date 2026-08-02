@@ -54,10 +54,16 @@ public enum Balance {
     public static let laterDailySessionMultiplier = 1.10
 
     public static let minimumEquipmentLevel = 1
-    // A clicker's ladder has to outlast the rock. At 60 the ceiling bound before the
-    // abyss and froze both tap and automation damage while the rock kept hardening,
-    // which is what stalled the descent (D-044).
-    public static let maximumEquipmentLevel = 200
+    /// There is no game ceiling on equipment level. 60 bound before the abyss (D-044) and
+    /// 200 bound at 2,925m, where damage stopped growing while integrity kept compounding —
+    /// the same wall, deeper. What remains is an arithmetic guard: depth still gates the
+    /// ladder at one level per 15m, so reaching this bound would take a shaft far deeper
+    /// than ore can be represented in.
+    ///
+    /// Growth past the ladder is carried by refinement tiers rather than by raising this
+    /// number again, because a level axis alone trails integrity by 3.064% per segment at
+    /// any ceiling.
+    public static let equipmentLevelArithmeticBound = 100_000
     // Compounding effects keep every level worth the same relative gain. Linear
     // per-level bonuses decayed to +3.6% at the top while price kept multiplying,
     // which stalled the economy well before the level cap.
@@ -115,7 +121,11 @@ public enum Balance {
     public static let unlockVeinAdvisorWeight = 0.5
     public static let crystalRegionBaseQuantity = 1
     public static let vaultCrystalConversionQuantity = 2
+    /// Kept for save compatibility and the return-report copy; no longer granted.
     public static let abyssBonusDepthMeters = 60
+    /// The abyss vein's payout. Larger than a crystal vein because it is rarer, and in
+    /// crystals because a session reward must not compound with depth (D-068).
+    public static let abyssVeinCrystals = 4
     // Region gates are set against how fast the rock is actually broken, not against the
     // old focus-derived depth. Entry lasts a first sitting, the crystal seam a few days,
     // and the abyss stays a month or two out for a player who mostly idles (D-044).
@@ -213,14 +223,16 @@ public enum Balance {
         }
     }
 
+    /// Depth is the only limit on the ladder now. The arithmetic bound is not a design
+    /// value and is never reached in a representable shaft.
     public static func maximumEquipmentLevel(forDepth depth: Int) -> Int {
         let unlocked = equipmentLevelUnlockBase
             + max(0, depth) / equipmentLevelUnlockDepthStep
-        return min(maximumEquipmentLevel, max(minimumEquipmentLevel, unlocked))
+        return min(equipmentLevelArithmeticBound, max(minimumEquipmentLevel, unlocked))
     }
 
     static func levelsAboveBase(_ level: Int) -> Int {
-        max(0, min(maximumEquipmentLevel, level) - minimumEquipmentLevel)
+        max(0, min(equipmentLevelArithmeticBound, level) - minimumEquipmentLevel)
     }
 
     static func compounded(_ rate: Double, _ exponent: Int) -> Double {

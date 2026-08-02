@@ -79,7 +79,7 @@ final class TruncatedResolutionTests: XCTestCase {
 
         XCTAssertTrue(single.wasTruncated)
         XCTAssertGreaterThan(carried.mineFace.segmentIndex, single.face.segmentIndex)
-        XCTAssertGreaterThan(carried.resources.ore, single.oreGained.doubleValue)
+        XCTAssertGreaterThan(carried.resources.ore.doubleValue, single.oreGained.doubleValue)
     }
 
     /// Re-driving must terminate. Damage large enough to exceed every pass still returns.

@@ -67,7 +67,7 @@ final class MiningLoopTests: XCTestCase {
         var generator = SeededGenerator(seed: 3)
         let update = MiningLoop.strike(using: &generator, in: &state)
         XCTAssertFalse(update.brokeSomething)
-        XCTAssertEqual(state.resources.ore, 0)
+        XCTAssertEqual(state.resources.ore.doubleValue, 0)
     }
 
     func testStrikeIsDeterministicForTheSameSeed() {
@@ -116,7 +116,7 @@ final class MiningLoopTests: XCTestCase {
         var state = player(cart: 1)
         let update = MiningLoop.advance(seconds: 86_400, in: &state)
         XCTAssertFalse(update.brokeSomething)
-        XCTAssertEqual(state.resources.ore, 0)
+        XCTAssertEqual(state.resources.ore.doubleValue, 0)
         XCTAssertEqual(state.depthMeters, 0)
     }
 
@@ -169,9 +169,9 @@ final class MiningLoopTests: XCTestCase {
 
         XCTAssertEqual(single.mineFace.segmentIndex, stepped.mineFace.segmentIndex)
         XCTAssertEqual(
-            single.resources.ore,
-            stepped.resources.ore,
-            accuracy: max(1, single.resources.ore * 1e-9)
+            single.resources.ore.doubleValue,
+            stepped.resources.ore.doubleValue,
+            accuracy: max(1, single.resources.ore.doubleValue * 1e-9)
         )
     }
 

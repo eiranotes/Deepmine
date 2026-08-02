@@ -130,13 +130,24 @@ final class VeinWorldTests: XCTestCase {
         XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &earlyVault).isEmpty)
         XCTAssertTrue(earlyVault.unlockedThemes.contains(.crystal))
 
+        // An abyss vein no longer moves the face, so it cannot cross a region boundary on
+        // its own. Reconciliation from the position itself still has to be idempotent.
         var abyssCrossing = PlayerState(bonusDepthMeters: crystal - 1)
         _ = WorldProgression.unlockThemesForCurrentDepth(in: &abyssCrossing)
         _ = WorldProgression.apply(
             vein: .abyss, effectID: UUID(), regionIndex: 0, to: &abyssCrossing
         )
-        XCTAssertTrue(abyssCrossing.unlockedThemes.contains(.crystal))
+        XCTAssertFalse(
+            abyssCrossing.unlockedThemes.contains(.crystal),
+            "a vein must not unlock a region the player has not dug to"
+        )
         XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &abyssCrossing).isEmpty)
+
+        // Reaching the boundary by breaking rock still unlocks it, once.
+        var dugThrough = PlayerState(bonusDepthMeters: crystal)
+        XCTAssertFalse(WorldProgression.unlockThemesForCurrentDepth(in: &dugThrough).isEmpty)
+        XCTAssertTrue(dugThrough.unlockedThemes.contains(.crystal))
+        XCTAssertTrue(WorldProgression.unlockThemesForCurrentDepth(in: &dugThrough).isEmpty)
     }
 
     func testBlueCrystalAndAbyssEffects() {
@@ -150,14 +161,18 @@ final class VeinWorldTests: XCTestCase {
             .crystals(3)
         )
         XCTAssertEqual(state.resources.crystals, 3)
+        // The abyss vein used to skip 60m of intact rock, which handed depth to whoever
+        // ran the most sessions and never paid ore for the skipped segments. It pays
+        // crystals now: a reward that does not compound with depth and does not bypass
+        // the rule that depth is earned by breaking rock (D-068).
+        let crystalsBefore = state.resources.crystals
         XCTAssertEqual(
             WorldProgression.apply(vein: .abyss, effectID: UUID(), regionIndex: 0, to: &state),
-            .bonusDepth(60)
+            .crystals(Balance.abyssVeinCrystals)
         )
-        XCTAssertEqual(state.bonusDepthMeters, 0)
-        XCTAssertEqual(state.mineFace.segmentIndex, 15)
-        XCTAssertEqual(state.depthMeters, 60)
-        XCTAssertEqual(state.mineFace.region, WorldProgression.region(forDepth: state.depthMeters))
+        XCTAssertEqual(state.resources.crystals, crystalsBefore + Balance.abyssVeinCrystals)
+        XCTAssertEqual(state.mineFace.segmentIndex, 0, "an abyss vein must not move the face")
+        XCTAssertEqual(state.depthMeters, 0)
     }
 
     func testVaultUnlockOrderConversionAndReplay() {

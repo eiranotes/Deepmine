@@ -65,7 +65,7 @@ public enum ProgressionEngine {
             throw ProgressionError.invalidState
         }
 
-        state.resources.ore = finiteSum(state.resources.ore, reward.ore)
+        state.resources.ore += reward.ore
         state.runFocusCredits = finiteSum(state.runFocusCredits, reward.focusCredits)
         state.lifetimeFocusCredits = finiteSum(
             state.lifetimeFocusCredits,

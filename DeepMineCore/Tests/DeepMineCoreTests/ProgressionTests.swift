@@ -22,7 +22,7 @@ final class ProgressionTests: XCTestCase {
             XCTAssertEqual(state.runFocusCredits, expectedCredits, accuracy: 1e-12)
             XCTAssertEqual(state.lifetimeFocusCredits, expectedCredits, accuracy: 1e-12)
             XCTAssertEqual(state.completedSessionCount, 1)
-            XCTAssertEqual(state.resources.ore, reward.ore, accuracy: 1e-12)
+            XCTAssertEqual(state.resources.ore.doubleValue, reward.ore, accuracy: 1e-12)
         }
     }
 
@@ -89,7 +89,7 @@ final class ProgressionTests: XCTestCase {
         XCTAssertEqual(EquipmentEngine.upgradeCost(for: .drill, currentLevel: 2), 134)
         XCTAssertEqual(EquipmentEngine.upgradeCost(for: .drill, currentLevel: 3), 180)
         XCTAssertNil(
-            EquipmentEngine.upgradeCost(for: .drill, currentLevel: Balance.maximumEquipmentLevel)
+            EquipmentEngine.upgradeCost(for: .drill, currentLevel: Balance.equipmentLevelArithmeticBound)
         )
     }
 
@@ -111,9 +111,15 @@ final class ProgressionTests: XCTestCase {
     func testDepthUnlocksTheEquipmentCeiling() {
         XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 0), Balance.equipmentLevelUnlockBase)
         XCTAssertEqual(Balance.maximumEquipmentLevel(forDepth: 600), 45)
+        // Depth is the only limit on the ladder now: even a million metres does not reach
+        // the arithmetic bound, which is a guard rather than a design value.
         XCTAssertEqual(
             Balance.maximumEquipmentLevel(forDepth: 1_000_000),
-            Balance.maximumEquipmentLevel
+            Balance.equipmentLevelUnlockBase + 1_000_000 / Balance.equipmentLevelUnlockDepthStep
+        )
+        XCTAssertLessThan(
+            Balance.maximumEquipmentLevel(forDepth: 1_000_000),
+            Balance.equipmentLevelArithmeticBound
         )
         XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 6), 15)
         XCTAssertEqual(EquipmentEngine.requiredDepth(forLevel: 45), 600)
@@ -138,18 +144,18 @@ final class ProgressionTests: XCTestCase {
             EquipmentEngine.purchase(command, in: &state),
             .purchased(equipment: .drill, newLevel: 2, cost: 100)
         )
-        XCTAssertEqual(state.resources.ore, 0)
+        XCTAssertEqual(state.resources.ore.doubleValue, 0)
         XCTAssertEqual(state.equipment.drill, 2)
 
         state.resources.ore = 1_000
         XCTAssertEqual(EquipmentEngine.purchase(command, in: &state), .duplicate)
-        XCTAssertEqual(state.resources.ore, 1_000)
+        XCTAssertEqual(state.resources.ore.doubleValue, 1_000)
         XCTAssertEqual(state.equipment.drill, 2)
 
         for equipment in EquipmentKind.allCases {
-            let ceiling = Balance.maximumEquipmentLevel
+            let ceiling = Balance.equipmentLevelArithmeticBound
             var capped = PlayerState(
-                resources: Resources(ore: .greatestFiniteMagnitude),
+                resources: Resources(ore: BigNumber(Double.greatestFiniteMagnitude)),
                 equipment: EquipmentLevels(drill: ceiling, cart: ceiling, lamp: ceiling),
                 lifetimeFocusCredits: 200,
                 // Deep enough that the depth rail is not what stops the purchase.

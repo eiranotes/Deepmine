@@ -15,7 +15,7 @@ final class RetentionEngineTests: XCTestCase {
         XCTAssertEqual(MineCrew.size(drillLevel: 6), 2)
         XCTAssertEqual(MineCrew.size(drillLevel: 30), 6)
         XCTAssertEqual(MineCrew.size(drillLevel: 56), 12)
-        XCTAssertEqual(MineCrew.size(drillLevel: Balance.maximumEquipmentLevel), 12)
+        XCTAssertEqual(MineCrew.size(drillLevel: Balance.equipmentLevelArithmeticBound), 12)
         XCTAssertEqual(MineCrew.size(drillLevel: 0), 1, "Guards against invalid input")
     }
 

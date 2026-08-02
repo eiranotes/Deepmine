@@ -77,6 +77,16 @@ struct BalanceSimulationResult: Equatable, Sendable {
         return heavy / light
     }
 
+    /// Depth is where "can a player who never focuses still play this game" is actually
+    /// visible. Cumulative ore is an exponential function of depth, so comparing wallets
+    /// measures the curve rather than the access question (D-070).
+    var heavyLightDepthGap: Double {
+        guard let heavy = summaries.first(where: { $0.persona == .heavy }),
+              let light = summaries.first(where: { $0.persona == .light }),
+              light.finalRecordDepth > 0 else { return 0 }
+        return Double(heavy.finalRecordDepth) / Double(light.finalRecordDepth)
+    }
+
     var heavyLightFocusGap: Double {
         guard let heavy = summaries.first(where: { $0.persona == .heavy })?.lifetimeFocusCredits,
               let light = summaries.first(where: { $0.persona == .light })?.lifetimeFocusCredits,

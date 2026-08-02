@@ -95,7 +95,7 @@ public enum RewardCalculator {
               validPermanentLevels.contains(input.permanentUpgrades.compressedTime) else {
             throw RewardCalculationError.invalidValue(field: "permanentUpgrades")
         }
-        let validLevels = Balance.minimumEquipmentLevel...Balance.maximumEquipmentLevel
+        let validLevels = Balance.minimumEquipmentLevel...Balance.equipmentLevelArithmeticBound
         guard validLevels.contains(input.equipment.drill),
               validLevels.contains(input.equipment.cart),
               validLevels.contains(input.equipment.lamp) else {

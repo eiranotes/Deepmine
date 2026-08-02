@@ -38,6 +38,8 @@ public enum VeinEffectResult: Codable, Equatable, Sendable {
     case vaultConvertedToCrystals(Int)
     case resonanceArmed
     case bonusDepth(Int)
+    /// Ore equal to the segments an abyss vein used to skip.
+    case bonusOre(Double)
     case duplicate
 }
 
@@ -103,11 +105,47 @@ public enum WorldProgression {
             state.resonanceBoostPending = true
             return .resonanceArmed
         case .abyss:
-            state.skipUnbrokenDepth(meters: Balance.abyssBonusDepthMeters)
-            unlockThemesForCurrentDepth(in: &state)
-            AchievementEngine.evaluate(in: &state)
-            return .bonusDepth(Balance.abyssBonusDepthMeters)
+            // Used to skip 60m of intact rock. That handed depth to whoever ran the most
+            // sessions while paying no ore for the skipped segments — and the segments
+            // stayed unpaid forever, so the richest vein in the game was a long-run loss.
+            // A heavy persona took ~108 of these over 180 days: 6,480m of its 7,408m was
+            // skipped rather than dug, which is why its depth led every persona while its
+            // ore trailed all of them.
+            //
+            // Depth is earned by breaking rock (D-045). The vein now pays what those
+            // segments would have paid, so it is a large reward that does not bypass the
+            // economy it belongs to.
+            // Paying the skipped segments' ore instead was worse: that reward scales
+            // exponentially with depth, so six sessions a day collected six times an
+            // exponent and the heavy persona ran away from every other one (4.2e11x at
+            // 180 days). A session reward must not scale with the rock, or focus stops
+            // being an amplifier and becomes the economy (D-037).
+            //
+            // Crystals do not compound. They buy refinement, which is exactly the axis a
+            // deep player wants next, and the reward stays legible at every depth.
+            let quantity = Balance.abyssVeinCrystals
+            state.resources.crystals = saturatingAdd(state.resources.crystals, quantity)
+            return .crystals(quantity)
         }
+    }
+
+    /// Ore the next `abyssBonusDepthMeters` of rock would have paid, at the player's
+    /// current position. Scales with depth exactly as digging it would.
+    static func skippedSegmentOre(from segmentIndex: Int) -> Double {
+        let segments = max(1, Balance.abyssBonusDepthMeters / Balance.metersPerSegment)
+        var total = BigNumber.zero
+        for offset in 0..<segments {
+            total += RockGenerator.segment(at: max(0, segmentIndex) + offset).oreYield
+        }
+        let value = total.doubleValue
+        return value.isFinite && value > 0 ? value : 0
+    }
+
+    private static func saturatingOre(_ current: Double, adding gained: Double) -> Double {
+        guard gained.isFinite, gained > 0 else { return current }
+        return current <= Double.greatestFiniteMagnitude - gained
+            ? current + gained
+            : Double.greatestFiniteMagnitude
     }
 
     public static func selectTheme(

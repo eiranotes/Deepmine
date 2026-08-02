@@ -41,10 +41,24 @@ final class BalanceSimulationTests: XCTestCase {
     /// baseline and does not care how disciplined anyone is, so heavy and light players
     /// converge on purpose. A gap near 1 would mean focus buys nothing; a large gap would
     /// mean the game is still gated behind Screen Time permission.
+    ///
+    /// Measured on depth rather than on cumulative ore (D-070). Ore is an exponential
+    /// function of depth — a segment at 2,000m pays astronomically more than one at 500m —
+    /// so two players a few hundred metres apart show wallets orders of magnitude apart
+    /// while playing the same game. The 1.5-20x ore band was written when sessions *were*
+    /// the economy and every wallet was a linear function of focus; against a clicker
+    /// curve it measures the exponent, not the access question it was asked to measure.
     func testFocusAmplifierIsWorthUsingButNotMandatory() throws {
         let result = try BalanceSimulator.run(seed: 260_729, days: 30)
+
+        // A player who never focuses must reach comparable depth. This is the property
+        // the gate exists for: the game cannot be gated behind Screen Time permission.
+        XCTAssertGreaterThan(result.heavyLightDepthGap, 0.5)
+        XCTAssertLessThanOrEqual(result.heavyLightDepthGap, 2)
+
+        // Focus still has to buy something, or the amplifier is decoration. It buys ore,
+        // and no upper bound is asserted on it: ore compounds with depth by design.
         XCTAssertGreaterThan(result.heavyLightOreGap, 1.5)
-        XCTAssertLessThanOrEqual(result.heavyLightOreGap, 20)
     }
 
     /// Depth must never invert against play. This is the property that run-scoped depth
@@ -79,7 +93,7 @@ final class BalanceSimulationTests: XCTestCase {
         for summary in result.summaries {
             XCTAssertLessThan(
                 summary.equipment.drill,
-                Balance.maximumEquipmentLevel,
+                Balance.equipmentLevelArithmeticBound,
                 "\(summary.persona) exhausted the drill ladder within 180 days"
             )
         }

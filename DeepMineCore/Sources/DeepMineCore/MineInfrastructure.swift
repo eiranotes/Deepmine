@@ -96,6 +96,6 @@ public enum MineInfrastructureEngine {
     }
 
     private static func clampedLevel(_ level: Int) -> Int {
-        min(Balance.maximumEquipmentLevel, max(Balance.minimumEquipmentLevel, level))
+        min(Balance.equipmentLevelArithmeticBound, max(Balance.minimumEquipmentLevel, level))
     }
 }

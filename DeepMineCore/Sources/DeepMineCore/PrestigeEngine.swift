@@ -72,7 +72,7 @@ public enum PrestigeEngine {
         let target = target(prestigeIndex: state.prestigeIndex)
         return PrestigePreview(
             losses: PrestigeLossPreview(
-                ore: state.resources.ore,
+                ore: state.resources.ore.doubleValue,
                 runSegmentsBroken: state.runSegmentsBroken,
                 equipment: state.equipment
             ),
@@ -103,6 +103,10 @@ public enum PrestigeEngine {
         )
         state.equipment = EquipmentLevels()
         state.equipmentModifications = .empty
+        // Refinement resets with the levels that unlocked it. Keeping it would make a
+        // reset pure profit and remove the decision prestige is supposed to be; the
+        // remembered-level rebuy discount already covers the cost of climbing back.
+        state.refinementTiers = .none
         state.runFocusCredits = 0
         state.runSegmentsBroken = 0
         // Back to the surface with the tools gone. Keeping the position while resetting

@@ -92,7 +92,7 @@ public enum EquipmentEngine {
         rememberedLevel: Int = Balance.minimumEquipmentLevel
     ) -> Double? {
         guard currentLevel >= Balance.minimumEquipmentLevel,
-              currentLevel < Balance.maximumEquipmentLevel else { return nil }
+              currentLevel < Balance.equipmentLevelArithmeticBound else { return nil }
         let unrounded = Balance.equipmentBasePrice(for: equipment)
             * Balance.compounded(
                 Balance.equipmentPriceGrowthRate,
@@ -151,7 +151,7 @@ public enum EquipmentEngine {
         guard !state.appliedPurchaseIDs.contains(command.id) else { return .duplicate }
         let currentLevel = level(of: command.equipment, in: state.equipment)
         guard currentLevel >= Balance.minimumEquipmentLevel else { return .invalidLevel }
-        guard currentLevel < Balance.maximumEquipmentLevel else { return .maximumLevel }
+        guard currentLevel < Balance.equipmentLevelArithmeticBound else { return .maximumLevel }
         let unlocked = unlockedMaximumLevel(in: state)
         guard currentLevel < unlocked else {
             return .depthLocked(
@@ -168,7 +168,7 @@ public enum EquipmentEngine {
             return .invalidLevel
         }
         guard state.resources.ore >= cost else {
-            return .insufficientOre(required: cost, available: state.resources.ore)
+            return .insufficientOre(required: cost, available: state.resources.ore.doubleValue)
         }
 
         state.resources.ore -= cost

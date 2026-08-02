@@ -1,15 +1,21 @@
 import Foundation
 
 public struct Resources: Codable, Equatable, Sendable {
-    public var ore: Double
+    /// The wallet is a `BigNumber` because growth is unbounded (D-069). A `Double` holds
+    /// ore to 41,881m, which was ample while the curve converged; with refinement clearing
+    /// the integrity deficit the descent accelerates instead, and the simulation runs past
+    /// 58,000m — where a Double wallet is `inf` and every comparison against it is
+    /// meaningless.
+    public var ore: BigNumber
     public var crystals: Int
     public var coreShards: Int
 
-    public init(ore: Double = 0, crystals: Int = 0, coreShards: Int = 0) {
+    public init(ore: BigNumber = .zero, crystals: Int = 0, coreShards: Int = 0) {
         self.ore = ore
         self.crystals = crystals
         self.coreShards = coreShards
     }
+
 }
 
 public struct SessionHistoryEntry: Codable, Equatable, Sendable {

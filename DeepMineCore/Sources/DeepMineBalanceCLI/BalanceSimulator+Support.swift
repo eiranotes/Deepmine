@@ -34,7 +34,7 @@ extension BalanceSimulator {
         while true {
             let affordable = EquipmentKind.allCases
                 .compactMap { EquipmentEngine.quote(for: $0, in: state) }
-                .filter { $0.cost <= state.resources.ore }
+                .filter { state.resources.ore >= $0.cost }
                 .min { $0.cost < $1.cost }
             guard let target = affordable else { return }
             let purchase = EquipmentEngine.purchase(
@@ -47,6 +47,22 @@ extension BalanceSimulator {
             event += 1
             guard case .purchased = purchase else { return }
             if firstUpgrade == nil { firstUpgrade = totalSessions }
+            buyRefinementWhereverUnlocked(state: &state)
+        }
+    }
+
+    /// Refinement is the second axis, so a simulated player who ignores it models a game
+    /// nobody plays. Crystals have no competing sink, so buying every unlocked tier is
+    /// also the obvious policy rather than an optimistic one.
+    static func buyRefinementWhereverUnlocked(state: inout PlayerState) {
+        var guardrail = 0
+        while guardrail < 512 {
+            guardrail += 1
+            let bought = EquipmentKind.allCases.contains { kind in
+                if case .refined = RefinementEngine.purchase(kind, in: &state) { return true }
+                return false
+            }
+            if !bought { return }
         }
     }
 

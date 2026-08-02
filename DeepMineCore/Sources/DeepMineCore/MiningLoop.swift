@@ -105,6 +105,7 @@ public enum MiningLoop {
             equipment: state.equipment,
             permanent: state.permanentUpgrades,
             modifications: state.equipmentModifications,
+            refinement: state.refinementTiers,
             prestigeMultiplier: PrestigeEngine.memoryMultiplier(
                 level: state.excavationMemoryLevel
             )
@@ -120,11 +121,10 @@ public enum MiningLoop {
                 ? Int.max
                 : state.runSegmentsBroken + update.segmentsBroken
         }
-        let gained = update.oreGained.doubleValue
-        if !update.oreGained.isZero, gained.isFinite, gained > 0 {
-            state.resources.ore = state.resources.ore <= Double.greatestFiniteMagnitude - gained
-                ? state.resources.ore + gained
-                : Double.greatestFiniteMagnitude
+        // No saturation guard: the wallet is a `BigNumber` now, so there is no ceiling to
+        // clamp against and the ore a strike produced is the ore the player gets (D-069).
+        if update.oreGained > .zero {
+            state.resources.ore += update.oreGained
         }
 
         // Breaking through is how depth and regions are earned now, so it is also where

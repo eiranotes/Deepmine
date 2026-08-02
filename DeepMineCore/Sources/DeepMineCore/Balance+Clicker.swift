@@ -129,6 +129,42 @@ extension Balance {
     public static let freightModificationOreMultiplier = 1.25
     public static let fortuneModificationCriticalChance = 0.08
 
+    // MARK: Refinement
+
+    /// The second multiplicative axis, and the piece the ladder alone cannot supply.
+    ///
+    /// A level costs 1.34 and returns 1.12 damage, so a segment's ore buys 0.2312 levels
+    /// and 1.0265 damage while integrity compounds at 1.058 — a 3.064% deficit per segment
+    /// at any ceiling. Cookie Clicker solves the same shape not by making levels steeper
+    /// but by adding stepped upgrades that multiply; refinement is that step.
+    ///
+    /// A segment buys 0.2312 levels, so a tier every N levels contributes 2.5^(0.2312/N)
+    /// per segment. Six levels lands the combined rate at 1.0633 against integrity's 1.058
+    /// — +0.50% of headroom, enough that the descent gently accelerates and not so much
+    /// that it trivialises itself. Seven is the exact balance point (+0.0%) and five
+    /// overshoots to +1.21%.
+    ///
+    /// Six levels is also 90m of depth at one level per 15m, which puts refinement on
+    /// roughly the same rhythm as the 100m seam the shaft already beats.
+    public static let refinementLevelInterval = 6
+    public static let refinementDamageMultiplier = 2.5
+    /// Refinement is bought with ore, and that is not a detail.
+    ///
+    /// The first draft priced it in crystals, which come from veins, which come from
+    /// sessions. That handed the multiplicative axis to whoever ran the most sessions and
+    /// x2.5^n turned a session-count difference into an exponential one — a 1.6e10x spread
+    /// at 180 days, with focus owning the economy instead of amplifying it (D-037).
+    ///
+    /// Ore comes out of rock, so every player earns it with or without focus. Competing
+    /// with levels for the same currency is the point rather than a flaw: it is the first
+    /// real spending decision in the game.
+    ///
+    /// Priced as a multiple of the level that unlocks it, so the cost rides the same
+    /// 1.34^n curve the ladder does. A tier is worth about eight levels of damage
+    /// (1.12^8 = 2.48 against x2.5) and eight levels cost roughly 29x one level, so 20x
+    /// keeps refinement attractive without making it strictly better than climbing.
+    public static let refinementCostMultiplier = 20.0
+
     // MARK: Infrastructure
 
     /// Equipment levels become visible plant in the passage, not just larger numbers

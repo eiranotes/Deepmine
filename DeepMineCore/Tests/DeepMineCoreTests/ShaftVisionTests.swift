@@ -37,7 +37,7 @@ final class ShaftVisionTests: XCTestCase {
         XCTAssertGreaterThan(bright, dim)
         XCTAssertGreaterThan(reach, dim)
         XCTAssertEqual(
-            ShaftSceneEngine.visibleMetersBelow(lampLevel: Balance.maximumEquipmentLevel),
+            ShaftSceneEngine.visibleMetersBelow(lampLevel: Balance.equipmentLevelArithmeticBound),
             Balance.maximumVisibleMetersBelow
         )
     }

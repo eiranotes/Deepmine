@@ -93,14 +93,20 @@ public enum StrikeEngine {
         equipment: EquipmentLevels,
         permanent: PermanentUpgradeLevels,
         modifications: EquipmentModifications = .empty,
+        refinement: RefinementTiers = .none,
         prestigeMultiplier: Double = 1
     ) -> StrikePower {
         let safeMultiplier = prestigeMultiplier.isFinite && prestigeMultiplier > 0
             ? prestigeMultiplier
             : 1
 
+        // Compounded through `BigNumber` rather than `Double`: with no level ceiling the
+        // drill multiplier passes 1.8e308 around level 6,264, and a saturated Double would
+        // silently flatten the very growth the ceiling was removed to allow.
         let tap = BigNumber(Balance.baseTapDamage)
-            * BigNumber(Balance.drillMultiplier(level: equipment.drill))
+            * BigNumber(Balance.drillRewardGrowthRate)
+                .raised(to: Double(Balance.levelsAboveBase(equipment.drill)))
+            * RefinementEngine.multiplier(for: .drill, in: refinement)
             * (modifications.drill == .drillImpact
                 ? Balance.impactModificationDamageMultiplier
                 : 1)
@@ -111,6 +117,7 @@ public enum StrikeEngine {
             ? BigNumber.zero
             : BigNumber(Balance.automationDamagePerLevel * Double(cartSteps))
                 * BigNumber(Balance.automationGrowthRate).raised(to: Double(cartSteps))
+                * RefinementEngine.multiplier(for: .cart, in: refinement)
                 * (modifications.cart == .cartFleet
                     ? Balance.fleetModificationAutomationMultiplier
                     : 1)
@@ -125,7 +132,13 @@ public enum StrikeEngine {
                     ? Balance.fortuneModificationCriticalChance
                     : 0)
         )
+        // Lamp refinement raises the critical multiplier rather than the chance: chance is
+        // capped at 0.6, so tiers poured into it would stop meaning anything.
         let multiplier = Balance.baseCriticalMultiplier
+            * pow(
+                Balance.refinementDamageMultiplier,
+                Double(refinement.tier(for: .lamp)) * 0.5
+            )
             + Double(lampSteps) * Balance.lampCriticalMultiplierIncreasePerLevel
             + Double(max(0, permanent.resonanceDetection)) * Balance.lampCriticalMultiplierIncreasePerLevel
 

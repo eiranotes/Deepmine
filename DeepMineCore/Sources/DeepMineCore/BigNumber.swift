@@ -104,6 +104,33 @@ extension BigNumber {
         lhs / BigNumber(rhs)
     }
 
+    /// Mixed arithmetic with `Double`, one-sided on purpose.
+    ///
+    /// Overloads taking `Double` on the *left* are not defined, and must not be: this
+    /// type's own initialiser compares `abs(scaled) < 1`, and an integer literal there
+    /// would then resolve to `BigNumber` rather than `Double`, calling the initialiser
+    /// again. That recursion overflows the stack on the first value constructed.
+    ///
+    /// Mixed arithmetic with `Double`.
+    ///
+    /// Prices, costs and rewards are still ordinary numbers — a drill costs 100, not
+    /// 1.0e2 — and the wallet is the only value that has to survive unbounded growth
+    /// (D-069). Keeping these overloads means the economy reads the same as before
+    /// instead of wrapping every literal at the call site.
+    public static func + (lhs: Self, rhs: Double) -> Self { lhs + BigNumber(rhs) }
+    public static func - (lhs: Self, rhs: Double) -> Self { lhs - BigNumber(rhs) }
+    public static func += (lhs: inout Self, rhs: Double) { lhs = lhs + rhs }
+    public static func -= (lhs: inout Self, rhs: Double) { lhs = lhs - rhs }
+
+    public static func < (lhs: Self, rhs: Double) -> Bool { lhs < BigNumber(rhs) }
+    public static func > (lhs: Self, rhs: Double) -> Bool { lhs > BigNumber(rhs) }
+    public static func <= (lhs: Self, rhs: Double) -> Bool { lhs <= BigNumber(rhs) }
+    public static func >= (lhs: Self, rhs: Double) -> Bool { lhs >= BigNumber(rhs) }
+
+    /// Always true: a `BigNumber` cannot be infinite or NaN by construction, which is the
+    /// property the wallet was migrated to get.
+    public var isFinite: Bool { true }
+
     public static func += (lhs: inout Self, rhs: Self) { lhs = lhs + rhs }
     public static func -= (lhs: inout Self, rhs: Self) { lhs = lhs - rhs }
     public static func *= (lhs: inout Self, rhs: Self) { lhs = lhs * rhs }
@@ -118,10 +145,23 @@ extension BigNumber {
     public func raised(to power: Double) -> Self {
         guard let log = log10Value else { return .zero }
         let resultLog = log * power
+        guard resultLog.isFinite else {
+            return resultLog < 0 ? .zero : Self(mantissa: 1, exponent: Self.exponentLimit)
+        }
         let wholePart = floor(resultLog)
+        // `Int(wholePart)` traps once the exponent leaves `Int`'s range, which unbounded
+        // compounding reaches. Clamping the exponent keeps the number a number: the value
+        // is already beyond anything the game compares against (D-069).
+        guard abs(wholePart) < Double(Self.exponentLimit) else {
+            return wholePart < 0 ? .zero : Self(mantissa: 1, exponent: Self.exponentLimit)
+        }
         let fraction = resultLog - wholePart
         return BigNumber(mantissa: pow(10, fraction), exponent: Int(wholePart))
     }
+
+    /// Far past any quantity the game produces, and small enough that exponent arithmetic
+    /// cannot overflow `Int` by adding two of them.
+    static let exponentLimit = 1_000_000_000
 
     public static func < (lhs: Self, rhs: Self) -> Bool {
         if lhs.isZero || rhs.isZero || (lhs.isNegative != rhs.isNegative) {

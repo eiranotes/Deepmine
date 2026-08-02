@@ -7,6 +7,10 @@ public struct PlayerState: Codable, Equatable, Sendable {
     /// discounted — the mine remembers the shaft it already dug.
     public internal(set) var rememberedEquipment: EquipmentLevels
     public internal(set) var equipmentModifications: EquipmentModifications
+    /// Bought multiplicative tiers, one axis per tool. Reset by prestige like levels are,
+    /// so a run is a run; the rebuy discount covers them for the same reason it covers
+    /// levels (D-067).
+    public internal(set) var refinementTiers: RefinementTiers
     public internal(set) var runFocusCredits: Double
     public internal(set) var lifetimeFocusCredits: Double
     /// Segments broken since the last prestige. This is what a reset is measured in: the
@@ -70,6 +74,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         equipment: EquipmentLevels = EquipmentLevels(),
         rememberedEquipment: EquipmentLevels? = nil,
         equipmentModifications: EquipmentModifications = .empty,
+        refinementTiers: RefinementTiers = .none,
         runFocusCredits: Double = 0,
         lifetimeFocusCredits: Double = 0,
         runSegmentsBroken: Int = 0,
@@ -114,6 +119,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
         self.equipment = equipment
         self.rememberedEquipment = Self.mergedRemembered(rememberedEquipment, equipment)
         self.equipmentModifications = equipmentModifications
+        self.refinementTiers = refinementTiers
         self.runFocusCredits = runFocusCredits
         self.lifetimeFocusCredits = lifetimeFocusCredits
         self.runSegmentsBroken = max(0, runSegmentsBroken)
@@ -170,6 +176,12 @@ public struct PlayerState: Codable, Equatable, Sendable {
             EquipmentModifications.self,
             forKey: .equipmentModifications
         ) ?? .empty
+        // Saves written before refinement existed have no tiers; zero is the correct
+        // reading of "never bought one", so they open unchanged.
+        refinementTiers = try container.decodeIfPresent(
+            RefinementTiers.self,
+            forKey: .refinementTiers
+        ) ?? .none
         runFocusCredits = try container.decode(Double.self, forKey: .runFocusCredits)
         lifetimeFocusCredits = try container.decode(Double.self, forKey: .lifetimeFocusCredits)
         // Saves written before prestige was measured in rock have no run counter. Seeding

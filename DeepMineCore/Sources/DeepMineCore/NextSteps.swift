@@ -76,11 +76,11 @@ public enum NextStepPlanner {
         }
         guard let cheapest = candidates.min(by: { $0.0.cost < $1.0.cost }) else { return nil }
         let quote = cheapest.0
-        let missing = max(0, quote.cost - state.resources.ore)
+        let missing = max(0, quote.cost - state.resources.ore.doubleValue)
         return NextStep(
             kind: .equipment,
-            current: Int(min(Double(Int.max), state.resources.ore)),
-            target: Int(min(Double(Int.max), quote.cost)),
+            current: clampedToInt(state.resources.ore.doubleValue),
+            target: clampedToInt(quote.cost),
             remainingSessions: sessions(forMissingOre: missing, perSession: expectedOrePerSession),
             detail: quote.equipment.rawValue
         )
@@ -130,4 +130,20 @@ public enum NextStepPlanner {
         guard value.isFinite, value < Double(Int.max) else { return nil }
         return Int(value)
     }
+}
+
+/// `Int(min(Double(Int.max), x))` looks safe and is not: `Double(Int.max)` rounds *up* to
+/// 9223372036854775808, one past `Int.max`, so the conversion traps on exactly the values
+/// the clamp was meant to catch. Latent since the wallet could not get that large; the
+/// unbounded curve reaches it every run (D-069).
+func clampedToInt(_ value: Double) -> Int {
+    // Bounds are annotated rather than left to literal inference: `BigNumber` is
+    // `ExpressibleBy*Literal`, so an un-annotated literal next to a mixed-type operator
+    // can resolve to it instead of `Double`.
+    let upper: Double = 9.0e18
+    let lower: Double = -9.0e18
+    guard value.isFinite else { return value < lower ? Int.min : Int.max }
+    if value >= upper { return Int.max }
+    if value <= lower { return Int.min }
+    return Int(value)
 }

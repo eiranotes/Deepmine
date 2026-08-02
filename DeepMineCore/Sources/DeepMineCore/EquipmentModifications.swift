@@ -96,7 +96,7 @@ public enum EquipmentModificationEngine {
         }
         let cost = cost(for: equipment)
         guard state.resources.ore >= cost else {
-            return .insufficientOre(required: cost, available: state.resources.ore)
+            return .insufficientOre(required: cost, available: state.resources.ore.doubleValue)
         }
         state.resources.ore -= cost
         state.equipmentModifications.select(command.modification)

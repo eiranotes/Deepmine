@@ -53,7 +53,7 @@ public enum OnboardingEngine {
         // The normal first rock pays four ore. Top the wallet up to one exact drill
         // upgrade so the tutorial teaches the real break path without changing the
         // established first-purchase contract.
-        state.resources.ore = max(state.resources.ore, Balance.demoOreGrant)
+        state.resources.ore = max(state.resources.ore, BigNumber(Balance.demoOreGrant))
         state.demoCompletedAt = date
         state.demoRewardReceiptID = receiptID
         state.onboardingStage = .demoReward
@@ -80,7 +80,7 @@ public enum OnboardingEngine {
         guard state.demoRewardReceiptID != nil else {
             return .insufficientOre(
                 required: Balance.drillBasePrice,
-                available: state.resources.ore
+                available: state.resources.ore.doubleValue
             )
         }
         if state.demoUpgradePurchaseID != nil { return .duplicate }
