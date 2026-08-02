@@ -109,7 +109,11 @@ final class GameStoreProgressionTests: XCTestCase {
 
         XCTAssertEqual(result, .refined(equipment: .drill, newTier: 1, cost: cost))
         XCTAssertEqual(fixture.repository.player.refinementTiers.drill, 1)
-        XCTAssertEqual(fixture.repository.player.resources.ore, BigNumber(100))
+        XCTAssertEqual(
+            fixture.repository.player.resources.ore.doubleValue,
+            100,
+            accuracy: 0.000_001
+        )
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
     }
 
