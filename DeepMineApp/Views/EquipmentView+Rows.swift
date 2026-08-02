@@ -11,7 +11,6 @@ extension EquipmentView {
         // purchase and "maxed out" is not a state the player can reach (D-069).
         let depthLocked = level >= player.unlockedEquipmentLevel
         let cost = depthLocked ? nil : quote?.cost
-        let maximum = false
         let recommended = highlightedEquipment == kind
         return DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -22,7 +21,7 @@ extension EquipmentView {
                         assetName: DeepMineArt.equipment(kind, level: level),
                         level: level,
                         detail: DeepMineStrings.text(DeepMineProgressLabels.equipmentEffectKey(kind)),
-                        status: maximum ? .completed : (recommended ? .attention : .notStarted)
+                        status: recommended ? .attention : .notStarted
                     ),
                     accessory: AnyView(levelAccessory(
                         kind: kind,
@@ -143,23 +142,6 @@ extension EquipmentView {
         }
     }
 
-    var maximumPanel: some View {
-        DeepMineRivetedPanel {
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(maximumEquipment, id: \.self) { kind in
-                    Label(
-                        "\(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))) · "
-                            + DeepMineStrings.text(.equipmentMaximum),
-                        systemImage: DeepMineProgressLabels.equipmentSymbol(kind)
-                    )
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(DeepMinePalette.brass.color)
-                    .accessibilityIdentifier("equipment-maximum-\(kind.rawValue)")
-                }
-            }
-        }
-    }
-
     var highlightedEquipment: EquipmentKind? {
         (!handoffConsumed ? handoffRecommendation?.equipment : nil) ?? recommendation?.equipment
     }
@@ -197,15 +179,6 @@ extension EquipmentView {
     }
 
     static let previewCompletionID = UUID(uuidString: "44454550-4D49-4E45-0000-000000000160")!
-
-    var maximumEquipment: [EquipmentKind] {
-        EquipmentKind.allCases.filter {
-            EquipmentEngine.upgradeCost(
-                for: $0,
-                currentLevel: EquipmentEngine.level(of: $0, in: player.equipment)
-            ) == nil
-        }
-    }
 
     func buttonTitle(cost: Double?, requiredDepth: Int? = nil) -> String {
         if let requiredDepth {
@@ -245,6 +218,30 @@ extension EquipmentView {
             player = try gameStore.playerState()
             recommendation = try gameStore.recommendedUpgrade()
             notice = nil
+        } catch {
+            notice = .storageFailure
+        }
+    }
+
+    func purchaseRefinement(_ kind: EquipmentKind) {
+        guard let gameStore else { notice = .storageFailure; return }
+        isLoading = true
+        pendingRefinement = kind
+        defer { isLoading = false }
+        do {
+            switch try gameStore.purchaseRefinement(kind) {
+            case .refined, .duplicate:
+                player = try gameStore.playerState()
+                recommendation = try gameStore.recommendedUpgrade()
+                notice = .success
+                pendingRefinement = nil
+            case let .insufficientOre(required, available):
+                notice = .insufficient(required: required, available: available)
+                pendingRefinement = nil
+            case .locked:
+                notice = nil
+                pendingRefinement = nil
+            }
         } catch {
             notice = .storageFailure
         }
@@ -292,7 +289,9 @@ extension EquipmentView {
 
     func retry() {
         notice = nil
-        if let pendingModification {
+        if let pendingRefinement {
+            purchaseRefinement(pendingRefinement)
+        } else if let pendingModification {
             purchaseModification(pendingModification.kind, commandID: pendingModification.commandID)
         } else if let pendingPurchase {
             purchase(pendingPurchase.equipment, commandID: pendingPurchase.commandID)
