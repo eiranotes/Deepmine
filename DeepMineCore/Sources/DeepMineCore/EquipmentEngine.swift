@@ -105,7 +105,7 @@ public enum EquipmentEngine {
         if currentLevel < rememberedLevel {
             value *= Balance.rememberedRebuyDiscount
         }
-        return value
+        return roundedPrice(value)
     }
 
     public static func upgradeCost(
@@ -200,6 +200,14 @@ public enum EquipmentEngine {
             newLevel: newLevel,
             cost: cost.doubleValue
         )
+    }
+
+    private static func roundedPrice(_ value: BigNumber) -> BigNumber {
+        guard !value.isZero else { return .zero }
+        guard !value.isNegative else { return value }
+        if value.exponent < 0 { return .one }
+        if value.exponent <= 15 { return BigNumber(ceil(value.doubleValue)) }
+        return value
     }
 
     private static func setLevel(
