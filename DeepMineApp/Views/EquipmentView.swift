@@ -132,6 +132,7 @@ struct EquipmentView: View {
         let cost = RefinementEngine.oreCost(for: kind, tier: nextTier)
         return Button { purchaseRefinement(kind) } label: {
             HStack {
+                DeepMinePixelImage(name: GameArtCatalog.refinementBadgeName(kind: kind.rawValue), size: 28).accessibilityHidden(true)
                 Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind)))
                     .font(.subheadline.weight(.bold))
                 Spacer()
