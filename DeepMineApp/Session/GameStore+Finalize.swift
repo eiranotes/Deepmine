@@ -1,7 +1,6 @@
 import DeepMineCore
 import Foundation
 
-/// Everything the outcome of one session resolves to before it is written.
 private struct GameOutcomeContext {
     let outcome: SessionOutcome
     let grade: VerificationGrade
@@ -26,7 +25,6 @@ extension GameStore {
 
         var player = try repository.loadPlayer()
         let context = outcomeContext(for: session, completed: completed)
-
         let vein = rollVein(for: session, context: context, player: &player)
         let depthBefore = player.depthMeters
         let input = try rewardInput(
@@ -35,11 +33,35 @@ extension GameStore {
             vein: vein,
             player: player
         )
-        let reward = try RewardCalculator.calculate(input)
+        let projectedReward = try RewardCalculator.calculate(input)
+
+        // A focus session now advances the same rock face as taps, foreground automation
+        // and offline settlement. Session multipliers scale credited mining time; the
+        // equipment multiplier is excluded because `MiningLoop` already reads the actual
+        // drill, cart, lamp, modifications and refinement from the player.
+        let creditedSeconds = TimeInterval(projectedReward.focusedMinutes * 60)
+            * sessionMiningRate(projectedReward)
+        let miningUpdate = creditedSeconds > 0
+            ? MiningLoop.advance(
+                seconds: creditedSeconds,
+                at: context.completedAt,
+                in: &player
+            )
+            : .empty(face: player.mineFace)
+        let minedOre = miningUpdate.oreGained.doubleValue
+        let reward = RewardResult(
+            completionID: projectedReward.completionID,
+            focusedMinutes: projectedReward.focusedMinutes,
+            focusCredits: projectedReward.focusCredits,
+            ore: minedOre.isFinite ? max(0, minedOre) : Double.greatestFiniteMagnitude,
+            breakdown: projectedReward.breakdown,
+            wasDuplicate: projectedReward.wasDuplicate
+        )
         let applied = try ProgressionEngine.apply(
             reward: reward,
             input: input,
             completedAt: context.completedAt,
+            creditOre: false,
             to: &player
         )
 
@@ -54,8 +76,6 @@ extension GameStore {
                 timeZone: timeZone
             )
             streakEarnedToday = streak.grewToday
-            // A boost is only spent on a session that actually paid out, so a
-            // mid-session return never burns the doubled reward it was saved for.
             if case .completed = context.outcome {
                 _ = WorldProgression.consumeResonanceBoost(in: &player)
             }
@@ -68,8 +88,6 @@ extension GameStore {
                 ))
             }
             _ = WorldProgression.unlockThemesForCurrentDepth(in: &player)
-            // Evaluated last so depth, streak and vein counts from this session are all
-            // settled before anything is awarded.
             earnedAchievements = AchievementEngine.evaluate(in: &player)
                 .map(\.definition.id)
         }
@@ -111,6 +129,13 @@ extension GameStore {
         activeSession = cleanupSession
         returnReport = report
         return try await finishCleanup(session: cleanupSession, report: report)
+    }
+
+    private func sessionMiningRate(_ reward: RewardResult) -> Double {
+        let equipment = max(1, reward.breakdown.equipment)
+        let vein = max(1, reward.breakdown.vein)
+        let rate = reward.breakdown.combinedMultiplier / equipment / vein
+        return rate.isFinite ? max(0, rate) : Double.greatestFiniteMagnitude
     }
 
     private func outcomeContext(
@@ -194,8 +219,6 @@ extension GameStore {
         case .decorationUnlocked: .decorationUnlocked
         case .resonanceArmed: .nextSessionDoubled
         case let .bonusDepth(meters): .bonusDepth(meters)
-        // Abyss veins pay crystals now; the case remains for saves and reports written
-        // before that change (D-068).
         case let .bonusOre(amount): .oreMultiplier(amount)
         case .duplicate: nil
         }
