@@ -1,7 +1,5 @@
 import DeepMineCore
 import SwiftUI
-
-/// Rows, notices and the purchase path for the workbench.
 @MainActor
 extension EquipmentView {
     func equipmentRow(_ kind: EquipmentKind) -> some View {
