@@ -1,14 +1,13 @@
+import { existsSync } from "node:fs";
 import vinext from "vinext";
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import hostingConfig from "./.openai/hosting.json";
-import { sites } from "./build/sites-vite-plugin";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
+const sitesPluginPath = "./build/sites-vite-plugin";
 
 const { d1, r2 } = hostingConfig;
-
-// macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
@@ -33,15 +32,22 @@ const localBindingConfig = {
     : [],
 };
 
+async function optionalSitesPlugin(): Promise<PluginOption[]> {
+  const sourceExists = existsSync(new URL(`${sitesPluginPath}.ts`, import.meta.url));
+  const javascriptExists = existsSync(new URL(`${sitesPluginPath}.js`, import.meta.url));
+  if (!sourceExists && !javascriptExists) return [];
+
+  const module = await import(/* @vite-ignore */ sitesPluginPath);
+  return typeof module.sites === "function" ? [module.sites()] : [];
+}
+
 export default defineConfig(async () => {
-  // Keep Wrangler and Miniflare state project-local. These are non-secret tool
-  // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
   process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";
 
-  // Wrangler snapshots its log path while the Cloudflare plugin is imported.
   const { cloudflare } = await import("@cloudflare/vite-plugin");
+  const sitesPlugins = await optionalSitesPlugin();
 
   return {
     server: isCodexSeatbeltSandbox
@@ -49,7 +55,7 @@ export default defineConfig(async () => {
       : undefined,
     plugins: [
       vinext(),
-      sites(),
+      ...sitesPlugins,
       cloudflare({
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
         config: localBindingConfig,
