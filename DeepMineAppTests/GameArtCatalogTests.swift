@@ -30,7 +30,7 @@ final class GameArtCatalogTests: XCTestCase {
 
     func testCatalogCoversTheFullPlannedSlotCount() {
         XCTAssertEqual(GameArtCatalog.allEntries.count, 24)
-        XCTAssertEqual(GameArtCatalog.shaftEntries.count, 13)
+        XCTAssertEqual(GameArtCatalog.shaftEntries.count, 16)
     }
 
     func testSlotNamesAreUnique() {
@@ -43,9 +43,6 @@ final class GameArtCatalogTests: XCTestCase {
         XCTAssertEqual(Set(ids).count, ids.count)
     }
 
-    /// The document is the only place the generation prompts live. If a slot exists in
-    /// code with no prompt behind it, the art can never actually be made — and nothing
-    /// else would catch that.
     func testEverySlotHasAPromptInTheDocument() throws {
         let document = try promptDocument
         for entry in GameArtCatalog.allEntries {
@@ -60,17 +57,18 @@ final class GameArtCatalogTests: XCTestCase {
         }
     }
 
-    /// And the reverse: a prompt written for a slot the code never asks for produces art
-    /// that ships as dead weight.
     func testDocumentDeclaresNoPromptWithoutASlot() throws {
         let document = try promptDocument
         let known = Set(GameArtCatalog.allEntries.map(\.promptID))
-        let pattern = try NSRegularExpression(pattern: "`(rockface-|fracture-|weakpoint-|debris-|resonance-)[a-z0-9-]+`")
+        let pattern = try NSRegularExpression(
+            pattern: "`(rockface-|fracture-|weakpoint-|debris-|resonance-)[a-z0-9-]+`"
+        )
         let range = NSRange(document.startIndex..., in: document)
 
         for match in pattern.matches(in: document, range: range) {
             guard let matchRange = Range(match.range, in: document) else { continue }
-            let identifier = document[matchRange].trimmingCharacters(in: CharacterSet(charactersIn: "`"))
+            let identifier = document[matchRange]
+                .trimmingCharacters(in: CharacterSet(charactersIn: "`"))
             XCTAssertTrue(
                 known.contains(identifier),
                 "문서의 `\(identifier)`에 대응하는 슬롯이 GameArtCatalog에 없다"
@@ -96,12 +94,16 @@ final class GameArtCatalogTests: XCTestCase {
     }
 
     func testStageIsClampedToTheFourDrawnStages() {
-        XCTAssertEqual(GameArtCatalog.rockFace(region: "entry", stage: 0).name, "RockFace_entry_stage1")
-        XCTAssertEqual(GameArtCatalog.rockFace(region: "entry", stage: 99).name, "RockFace_entry_stage4")
+        XCTAssertEqual(
+            GameArtCatalog.rockFace(region: "entry", stage: 0).name,
+            "RockFace_entry_stage1"
+        )
+        XCTAssertEqual(
+            GameArtCatalog.rockFace(region: "entry", stage: 99).name,
+            "RockFace_entry_stage4"
+        )
     }
 
-    /// Placeholders exist precisely so an absent asset is not a crash. Asking for a slot
-    /// that nobody has drawn must still yield something renderable.
     func testEverySlotHasAPlaceholderAndResolvesWithoutTheAsset() {
         for entry in GameArtCatalog.installedEntries {
             XCTAssertNotNil(entry.placeholder)
@@ -112,25 +114,57 @@ final class GameArtCatalogTests: XCTestCase {
     func testEveryShaftSlotHasAPromptInItsDocument() throws {
         let document = try shaftPromptDocument
         for entry in GameArtCatalog.shaftEntries {
-            XCTAssertTrue(document.contains("`\(entry.promptID)`"))
-            XCTAssertTrue(document.contains("`\(entry.name)`"))
+            XCTAssertTrue(
+                document.contains("`\(entry.promptID)`"),
+                "missing prompt \(entry.promptID)"
+            )
+            XCTAssertTrue(
+                document.contains("`\(entry.name)`"),
+                "missing asset name \(entry.name)"
+            )
         }
     }
 
-    /// The swap hinges entirely on this predicate telling the truth in both directions.
-    /// `MinerSprite` is a real shipped asset and the random name cannot exist, so this
-    /// fails if availability ever answers unconditionally.
     func testAvailabilityDistinguishesInstalledFromAbsent() {
         GameArtAvailability.resetCache()
         XCTAssertTrue(GameArtAvailability.isInstalled("MinerSprite"))
         XCTAssertFalse(GameArtAvailability.isInstalled("NotAnAsset_\(UUID().uuidString)"))
     }
 
-    /// The generated set is only complete when every declared clicker slot resolves to
-    /// a real catalog image. The placeholder path remains covered by the random-name
-    /// availability assertion above.
     func testEveryClickerSlotHasInstalledArt() {
         GameArtAvailability.resetCache()
         XCTAssertTrue(GameArtAvailability.missingEntries.isEmpty)
+    }
+
+    func testGeneratedProgressionMarksAreInstalled() {
+        GameArtAvailability.resetCache()
+        let names = [
+            GameArtCatalog.refinementBadgeName(kind: "drill"),
+            GameArtCatalog.refinementBadgeName(kind: "cart"),
+            GameArtCatalog.refinementBadgeName(kind: "lamp"),
+            GameArtCatalog.prestigeMemoryRingName
+        ]
+        for name in names {
+            XCTAssertTrue(GameArtAvailability.isInstalled(name), "missing installed art \(name)")
+        }
+    }
+
+    func testDeepGeologyChangesAtTheThreeLongRunThresholds() {
+        XCTAssertEqual(
+            GameArtCatalog.shaftRock(region: "abyss", depthMeters: 4_999).name,
+            "ShaftRock_abyss"
+        )
+        XCTAssertEqual(
+            GameArtCatalog.shaftRock(region: "abyss", depthMeters: 5_000).name,
+            "ShaftRock_pressure"
+        )
+        XCTAssertEqual(
+            GameArtCatalog.shaftRock(region: "abyss", depthMeters: 20_000).name,
+            "ShaftRock_fault"
+        )
+        XCTAssertEqual(
+            GameArtCatalog.shaftRock(region: "abyss", depthMeters: 100_000).name,
+            "ShaftRock_core"
+        )
     }
 }
