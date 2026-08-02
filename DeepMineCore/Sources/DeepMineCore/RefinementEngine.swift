@@ -3,7 +3,7 @@ import Foundation
 /// Refinement tiers, per equipment.
 ///
 /// Stored rather than derived, because a tier is bought: the level unlocks the option and
-/// crystals pay for it. Two players at the same level can have different rigs.
+/// ore pays for it. Two players at the same level can have different rigs.
 public struct RefinementTiers: Codable, Equatable, Sendable {
     public var drill: Int
     public var cart: Int
@@ -26,6 +26,18 @@ public struct RefinementTiers: Codable, Equatable, Sendable {
     }
 
     public var total: Int { max(0, drill) + max(0, cart) + max(0, lamp) }
+}
+
+/// A user-originated refinement purchase. Its receipt shares the global purchase ID set
+/// with ordinary equipment purchases, so retries cannot buy the same tier twice.
+public struct RefinementPurchaseCommand: Codable, Equatable, Sendable {
+    public let id: UUID
+    public let equipment: EquipmentKind
+
+    public init(id: UUID, equipment: EquipmentKind) {
+        self.id = id
+        self.equipment = equipment
+    }
 }
 
 public enum RefinementPurchaseResult: Equatable, Sendable {
@@ -79,6 +91,20 @@ public enum RefinementEngine {
         multiplier(forTier: tiers.tier(for: equipment))
     }
 
+    /// Idempotent app/write-path purchase. Failed or locked attempts do not consume the ID;
+    /// only a committed economic mutation becomes a replayable receipt.
+    public static func purchase(
+        _ command: RefinementPurchaseCommand,
+        in state: inout PlayerState
+    ) -> RefinementPurchaseResult {
+        guard !state.appliedPurchaseIDs.contains(command.id) else { return .duplicate }
+        let result = purchase(command.equipment, in: &state)
+        if case .refined = result { state.appliedPurchaseIDs.insert(command.id) }
+        return result
+    }
+
+    /// Pure economy operation used by the deterministic balance simulator and focused Core
+    /// tests. User-facing writes must use the command overload above.
     public static func purchase(
         _ equipment: EquipmentKind,
         in state: inout PlayerState
