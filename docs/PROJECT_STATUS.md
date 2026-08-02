@@ -4,6 +4,9 @@
 
 ## Current state
 
+- 단계: **웹 기준 D-055~D-060을 앱에 전량 포팅 완료.** 웹과 앱이 같은 Core 경제를 돌리고,
+  갱도 연출·행동대·공명 결절·타격 변주·설비 누적이 양쪽에 모두 있다. 남은 정렬은 웹 설비
+  파생을 `coreBalance.ts`로 옮기는 것 하나다 (D-065)
 - 단계: **아이들 클리커 P4 구현 완료, focused 통합 검증 완료.**
   탭→파괴→광석→구매→방치→프레스티지의 코어 루프가 실제 저장·진행 곡선과 함께
   플레이 가능하다. 기본 홈에서 세션 중심 약속·연속 일수 위계를 제거했고, 집중은 접힌
@@ -194,6 +197,33 @@
 - 광맥 8회 드라이 스펠 보호와 무료 주간 회고
 - `마치기`와 `다음 출정 준비` 동등 위계, 강제 재시작/소급 스트릭 파괴 없음
 - 상세 설계: `docs/GAME_IMPLEMENTATION.md`, `docs/GAME_DESIGN_REVIEW.md`
+
+## Verification state (2026-08-02 web parity and the app port)
+
+이 세션의 최종 코드 기준 실측이다. 아래 이전 단계 기록은 그 시점의 값으로 남긴다.
+
+- `swift test --package-path DeepMineCore`: **232/232 통과**, 실패 0
+  (이전 195에서 37건 추가: `StrikeTimelineTests` 10, `WorkFaceForecastTests` 7,
+  `ResonanceNodeTests` 13, `MineInfrastructureTests` 7)
+- `DeepMineAppTests` + `DeepMineAppUITests/OnboardingHomeUITests`: **142/142 통과**,
+  실패·skip 0 (iPhone 17 Pro / iOS 26.5 시뮬레이터)
+- 웹 `npm run lint && npm test && npm run build`: **11/11 통과**
+  (Core 패리티 3 + 기존 계약 8), production build 통과
+- 패리티 테스트 실효성 확인: `SEGMENT_INTEGRITY_GROWTH_RATE`를 1.058→1.06으로 변조하면
+  해당 상수를 지목하며 실패하고, 복구하면 통과한다
+- generic iOS unsigned build: **통과** (exit 0, error 0)
+- 웹 게임필 에셋 validator: **2/2 통과**. 앱 imageset 1x가 processed 원본과 SHA 동일
+- Swift 파일 300줄 규칙: 초과 1건(`GameActivitySurfaceContent.swift` 302줄, 기존 파일)
+- 시뮬레이터 육안 확인 (한국어·다크·medium):
+  - `ShaftFrontierLip`이 열린 통로와 현재 암반을 잇고, 광부·양손·곡괭이가 한 액터로 선다
+  - 행동대가 `파쇄 시 ◆4 / 9탭 남음`을 읽는다
+  - 공명 결절이 실행 9초 뒤 출현하고, 실제 포인터 수령 뒤 심도가 0m→28m로 급증한다
+  - 자동 굴착 중 6프레임 판독에서 ready→anticipation→contact→복귀가 재생된다
+  - 작업조가 데크 위에 서고 작업등이 통로를 따라 설치된다
+  - 캡처: `artifacts/imagegen/web-gamefeel-v1/ui-captures/`
+- **정지 캡처로 확인하지 못한 것**: 면 단위 충격(압축대·충격파)은 72ms 창이라 스크린샷에
+  잡히지 않았다. 빌드와 타임라인 테스트로만 뒷받침된다
+- 실기기 햅틱·VoiceOver·Reduce Motion 체감: **미검증(실기기 필요)**
 
 ## Verification state (2026-08-01 breakable ground)
 
