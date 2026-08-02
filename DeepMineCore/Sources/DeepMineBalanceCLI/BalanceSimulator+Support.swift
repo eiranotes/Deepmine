@@ -107,9 +107,11 @@ extension BalanceSimulator {
     ) -> (reward: RewardResult, ore: Double) {
         let creditedSeconds = TimeInterval(projectedReward.focusedMinutes * 60)
             * sessionMiningRate(projectedReward)
-        let update = creditedSeconds > 0
-            ? MiningLoop.advance(seconds: creditedSeconds, at: completedAt, in: &state)
-            : .empty(face: state.mineFace)
+        let update = MiningLoop.advance(
+            seconds: max(0, creditedSeconds),
+            at: completedAt,
+            in: &state
+        )
         let minedOre = update.oreGained.doubleValue
         let ore = minedOre.isFinite ? max(0, minedOre) : Double.greatestFiniteMagnitude
         return (
@@ -127,8 +129,8 @@ extension BalanceSimulator {
 
     static func sessionMiningRate(_ reward: RewardResult) -> Double {
         let equipment = max(1, reward.breakdown.equipment)
-        let vein = max(1, reward.breakdown.vein)
-        let rate = reward.breakdown.combinedMultiplier / equipment / vein
+        let permanent = max(1, reward.breakdown.permanent)
+        let rate = reward.breakdown.combinedMultiplier / equipment / permanent
         return rate.isFinite ? max(0, rate) : Double.greatestFiniteMagnitude
     }
 
