@@ -18,7 +18,7 @@ struct EquipmentView: View {
     @State var notice: Notice?
     @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID)?
     @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID)?
-    @State var pendingRefinement: EquipmentKind?
+    @State var pendingRefinement: (equipment: EquipmentKind, commandID: UUID)?
     @State var handoffConsumed = false
     @State var isLoading = false
 
