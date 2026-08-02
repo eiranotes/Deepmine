@@ -24,7 +24,12 @@ extension EquipmentView {
                         detail: DeepMineStrings.text(DeepMineProgressLabels.equipmentEffectKey(kind)),
                         status: maximum ? .completed : (recommended ? .attention : .notStarted)
                     ),
-                    accessory: AnyView(levelAccessory(kind: kind, level: level, cost: cost))
+                    accessory: AnyView(levelAccessory(
+                        kind: kind,
+                        level: level,
+                        cost: cost,
+                        depthLocked: depthLocked
+                    ))
                 )
                 if depthLocked {
                     Label(
@@ -59,13 +64,21 @@ extension EquipmentView {
         .accessibilityIdentifier("equipment-row-\(kind.rawValue)")
     }
 
-    func levelAccessory(kind: EquipmentKind, level: Int, cost: Double?) -> some View {
-        VStack(alignment: .trailing, spacing: 6) {
+    func levelAccessory(
+        kind: EquipmentKind,
+        level: Int,
+        cost: Double?,
+        depthLocked: Bool
+    ) -> some View {
+        let requiredDepth = depthLocked
+            ? EquipmentEngine.requiredDepth(forLevel: level + 1)
+            : nil
+        return VStack(alignment: .trailing, spacing: 6) {
             Text("Lv. \(level)")
                 .font(.subheadline.monospacedDigit().weight(.bold))
                 .accessibilityIdentifier("equipment-level-\(kind.rawValue)")
             Button { purchase(kind) } label: {
-                Text(buttonTitle(cost: cost))
+                Text(buttonTitle(cost: cost, requiredDepth: requiredDepth))
                     .font(.caption.monospacedDigit().weight(.bold))
                     .lineLimit(2)
                     .minimumScaleFactor(0.78)
@@ -73,7 +86,11 @@ extension EquipmentView {
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: highlightedEquipment == kind ? .primary : .secondary))
             .disabled(cost == nil || isLoading || notice == .storageFailure)
-            .accessibilityLabel(equipmentButtonLabel(kind: kind, cost: cost))
+            .accessibilityLabel(equipmentButtonLabel(
+                kind: kind,
+                cost: cost,
+                requiredDepth: requiredDepth
+            ))
             .accessibilityIdentifier("equipment-upgrade-\(kind.rawValue)")
         }
         .frame(minWidth: 118)
@@ -190,13 +207,29 @@ extension EquipmentView {
         }
     }
 
-    func buttonTitle(cost: Double?) -> String {
+    func buttonTitle(cost: Double?, requiredDepth: Int? = nil) -> String {
+        if let requiredDepth {
+            return String(
+                format: DeepMineStrings.text(.equipmentDepthLocked),
+                requiredDepth
+            )
+        }
         guard let cost else { return DeepMineStrings.text(.equipmentMaximum) }
         return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(cost))"
     }
 
-    func equipmentButtonLabel(kind: EquipmentKind, cost: Double?) -> String {
+    func equipmentButtonLabel(
+        kind: EquipmentKind,
+        cost: Double?,
+        requiredDepth: Int? = nil
+    ) -> String {
         let title = DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))
+        if let requiredDepth {
+            return "\(title), " + String(
+                format: DeepMineStrings.text(.equipmentDepthLocked),
+                requiredDepth
+            )
+        }
         guard let cost else { return "\(title), \(DeepMineStrings.text(.equipmentMaximum))" }
         return "\(title), \(DeepMineStrings.text(.actionUpgrade)), "
             + "\(DeepMineStrings.text(.equipmentCost)) "
