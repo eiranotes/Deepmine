@@ -1,6 +1,5 @@
 import DeepMineCore
 import SwiftUI
-
 @MainActor
 extension EquipmentView {
     func equipmentRow(_ kind: EquipmentKind) -> some View {
@@ -21,34 +20,25 @@ extension EquipmentView {
                         status: recommended ? .attention : .notStarted
                     ),
                     accessory: AnyView(levelAccessory(
-                        kind: kind,
-                        level: level,
-                        cost: cost,
-                        depthLocked: depthLocked
+                        kind: kind, level: level, cost: cost, depthLocked: depthLocked
                     ))
                 )
                 if depthLocked {
                     Label(
-                        String(
-                            format: DeepMineStrings.text(.equipmentDepthLocked),
-                            EquipmentEngine.requiredDepth(forLevel: level + 1)
-                        ),
+                        String(format: DeepMineStrings.text(.equipmentDepthLocked),
+                               EquipmentEngine.requiredDepth(forLevel: level + 1)),
                         systemImage: "arrow.down.to.line.compact"
                     )
-                    .font(.caption)
-                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .font(.caption).foregroundStyle(DeepMinePalette.brass.color)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("equipment-depth-locked-\(kind.rawValue)")
                 } else {
                     bulkControls(kind, hasRememberedLevels: quote?.isRemembered == true)
                     if quote?.isRemembered == true {
-                        Label(
-                            DeepMineStrings.text(.equipmentRemembered),
-                            systemImage: "clock.arrow.circlepath"
-                        )
-                        .font(.caption)
-                        .foregroundStyle(DeepMinePalette.brass.color)
-                        .accessibilityIdentifier("equipment-remembered-\(kind.rawValue)")
+                        Label(DeepMineStrings.text(.equipmentRemembered),
+                              systemImage: "clock.arrow.circlepath")
+                            .font(.caption).foregroundStyle(DeepMinePalette.brass.color)
+                            .accessibilityIdentifier("equipment-remembered-\(kind.rawValue)")
                     }
                 }
             }
@@ -56,34 +46,22 @@ extension EquipmentView {
         .accessibilityIdentifier("equipment-row-\(kind.rawValue)")
     }
 
-    func levelAccessory(
-        kind: EquipmentKind,
-        level: Int,
-        cost: Double?,
-        depthLocked: Bool
-    ) -> some View {
-        let requiredDepth = depthLocked
-            ? EquipmentEngine.requiredDepth(forLevel: level + 1)
-            : nil
+    func levelAccessory(kind: EquipmentKind, level: Int, cost: Double?, depthLocked: Bool) -> some View {
+        let requiredDepth = depthLocked ? EquipmentEngine.requiredDepth(forLevel: level + 1) : nil
         return VStack(alignment: .trailing, spacing: 6) {
-            Text("Lv. \(level)")
-                .font(.subheadline.monospacedDigit().weight(.bold))
+            Text("Lv. \(level)").font(.subheadline.monospacedDigit().weight(.bold))
                 .accessibilityIdentifier("equipment-level-\(kind.rawValue)")
             Button { purchase(kind) } label: {
                 Text(buttonTitle(cost: cost, requiredDepth: requiredDepth))
-                    .font(.caption.monospacedDigit().weight(.bold))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.78)
-                    .frame(minHeight: 44)
+                    .font(.caption.monospacedDigit().weight(.bold)).lineLimit(2)
+                    .minimumScaleFactor(0.78).frame(minHeight: 44)
             }
             .buttonStyle(DeepMineMetalButtonStyle(
                 role: highlightedEquipment == kind ? .primary : .secondary
             ))
             .disabled(cost == nil || isLoading || notice == .storageFailure)
             .accessibilityLabel(equipmentButtonLabel(
-                kind: kind,
-                cost: cost,
-                requiredDepth: requiredDepth
+                kind: kind, cost: cost, requiredDepth: requiredDepth
             ))
             .accessibilityIdentifier("equipment-upgrade-\(kind.rawValue)")
         }
@@ -111,8 +89,7 @@ extension EquipmentView {
 
     func bulkButton(_ title: String, kind: EquipmentKind, maximum: Int?) -> some View {
         Button { purchaseBulk(kind, maximum: maximum) } label: {
-            Text(title)
-                .font(.caption2.monospacedDigit().weight(.bold))
+            Text(title).font(.caption2.monospacedDigit().weight(.bold))
                 .frame(maxWidth: .infinity, minHeight: 36)
         }
         .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
@@ -127,23 +104,19 @@ extension EquipmentView {
                 Label(DeepMineStrings.text(.equipmentPurchaseSuccess), systemImage: "checkmark.seal.fill")
                     .accessibilityIdentifier("equipment-notice-success")
             case let .crewGrew(size):
-                Label(
-                    String(format: DeepMineStrings.text(.returnCrewGrew), size),
-                    systemImage: "person.2.fill"
-                )
-                .accessibilityIdentifier("equipment-notice-crew")
+                Label(String(format: DeepMineStrings.text(.returnCrewGrew), size),
+                      systemImage: "person.2.fill")
+                    .accessibilityIdentifier("equipment-notice-crew")
             case let .insufficient(required, available):
                 Label(DeepMineStrings.text(.equipmentInsufficientTitle), systemImage: "shippingbox")
                     .accessibilityIdentifier("equipment-notice-insufficient")
                 Text("\(DeepMineNumberFormatter.string(available)) / \(DeepMineNumberFormatter.string(required))")
                     .font(.caption.monospacedDigit())
                 Text(DeepMineStrings.text(.equipmentInsufficientBody)).font(.caption)
-            case .storageFailure, .none:
-                EmptyView()
+            case .storageFailure, .none: EmptyView()
             }
         }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(DeepMinePalette.brass.color)
+        .font(.caption.weight(.semibold)).foregroundStyle(DeepMinePalette.brass.color)
         .fixedSize(horizontal: false, vertical: true)
     }
 
@@ -151,18 +124,15 @@ extension EquipmentView {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
                 Label(DeepMineStrings.text(.equipmentStorageTitle), systemImage: "exclamationmark.triangle")
-                    .font(.headline)
-                    .foregroundStyle(DeepMinePalette.brass.color)
+                    .font(.headline).foregroundStyle(DeepMinePalette.brass.color)
                     .accessibilityIdentifier("equipment-notice-error")
-                Text(DeepMineStrings.text(.equipmentStorageBody))
-                    .font(.subheadline)
+                Text(DeepMineStrings.text(.equipmentStorageBody)).font(.subheadline)
                     .fixedSize(horizontal: false, vertical: true)
                 Button { retry() } label: {
                     DeepMineActionLabel(titleKey: .actionRetry, detailKey: nil, symbol: "arrow.clockwise")
                 }
                 .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
-                .accessibilityIdentifier("equipment-retry")
-                .disabled(gameStore == nil)
+                .accessibilityIdentifier("equipment-retry").disabled(gameStore == nil)
             }
         }
     }
@@ -173,26 +143,16 @@ extension EquipmentView {
 
     func buttonTitle(cost: Double?, requiredDepth: Int? = nil) -> String {
         if let requiredDepth {
-            return String(
-                format: DeepMineStrings.text(.equipmentDepthLocked),
-                requiredDepth
-            )
+            return String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
         }
         guard let cost else { return DeepMineStrings.text(.equipmentMaximum) }
         return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(cost))"
     }
 
-    func equipmentButtonLabel(
-        kind: EquipmentKind,
-        cost: Double?,
-        requiredDepth: Int? = nil
-    ) -> String {
+    func equipmentButtonLabel(kind: EquipmentKind, cost: Double?, requiredDepth: Int? = nil) -> String {
         let title = DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))
         if let requiredDepth {
-            return "\(title), " + String(
-                format: DeepMineStrings.text(.equipmentDepthLocked),
-                requiredDepth
-            )
+            return "\(title), " + String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
         }
         guard let cost else { return "\(title), \(DeepMineStrings.text(.equipmentMaximum))" }
         return "\(title), \(DeepMineStrings.text(.actionUpgrade)), "
@@ -206,37 +166,25 @@ extension EquipmentView {
             player = try gameStore.playerState()
             recommendation = try gameStore.recommendedUpgrade()
             notice = nil
-        } catch {
-            notice = .storageFailure
-        }
+        } catch { notice = .storageFailure }
     }
 
-    func purchaseBulk(
-        _ kind: EquipmentKind,
-        maximum: Int? = nil,
-        remembered: Bool = false
-    ) {
+    func purchaseBulk(_ kind: EquipmentKind, maximum: Int? = nil, remembered: Bool = false) {
         guard let gameStore else { notice = .storageFailure; return }
         isLoading = true
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipmentBulk(
-                kind,
-                maximumPurchases: maximum,
-                stopAtRememberedLevel: remembered
+                kind, maximumPurchases: maximum, stopAtRememberedLevel: remembered
             ) {
             case .purchased, .duplicate:
                 player = try gameStore.playerState()
                 recommendation = try gameStore.recommendedUpgrade()
                 notice = .success
-            case .nothingAffordable, .depthLocked:
-                notice = nil
-            case .invalidLevel:
-                notice = .storageFailure
+            case .nothingAffordable, .depthLocked: notice = nil
+            case .invalidLevel: notice = .storageFailure
             }
-        } catch {
-            notice = .storageFailure
-        }
+        } catch { notice = .storageFailure }
     }
 
     func purchaseRefinement(_ kind: EquipmentKind, commandID: UUID? = nil) {
@@ -250,18 +198,13 @@ extension EquipmentView {
             case .refined, .duplicate:
                 player = try gameStore.playerState()
                 recommendation = try gameStore.recommendedUpgrade()
-                notice = .success
-                pendingRefinement = nil
+                notice = .success; pendingRefinement = nil
             case let .insufficientOre(required, available):
                 notice = .insufficient(required: required, available: available)
                 pendingRefinement = nil
-            case .locked:
-                notice = nil
-                pendingRefinement = nil
+            case .locked: notice = nil; pendingRefinement = nil
             }
-        } catch {
-            notice = .storageFailure
-        }
+        } catch { notice = .storageFailure }
     }
 
     func purchase(_ kind: EquipmentKind, commandID: UUID? = nil) {
@@ -275,8 +218,7 @@ extension EquipmentView {
             case let .purchased(equipment, newLevel, _):
                 notice = equipment == .drill
                     && MineCrew.size(drillLevel: newLevel) > MineCrew.size(drillLevel: newLevel - 1)
-                    ? .crewGrew(MineCrew.size(drillLevel: newLevel))
-                    : .success
+                    ? .crewGrew(MineCrew.size(drillLevel: newLevel)) : .success
                 player = try gameStore.playerState()
                 recommendation = try gameStore.recommendedUpgrade()
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
@@ -284,32 +226,21 @@ extension EquipmentView {
             case let .insufficientOre(required, available):
                 notice = .insufficient(required: required, available: available)
                 pendingPurchase = nil
-            case .maximumLevel, .depthLocked:
-                notice = nil
-                pendingPurchase = nil
+            case .maximumLevel, .depthLocked: notice = nil; pendingPurchase = nil
             case .duplicate:
-                refresh()
-                notice = .success
+                refresh(); notice = .success
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
                 pendingPurchase = nil
-            case .invalidLevel:
-                notice = .storageFailure
+            case .invalidLevel: notice = .storageFailure
             }
-        } catch {
-            notice = .storageFailure
-        }
+        } catch { notice = .storageFailure }
     }
 
     func retry() {
         notice = nil
-        if let pendingRefinement {
-            purchaseRefinement(pendingRefinement.equipment, commandID: pendingRefinement.commandID)
-        } else if let pendingModification {
-            purchaseModification(pendingModification.kind, commandID: pendingModification.commandID)
-        } else if let pendingPurchase {
-            purchase(pendingPurchase.equipment, commandID: pendingPurchase.commandID)
-        } else {
-            refresh()
-        }
+        if let value = pendingRefinement { purchaseRefinement(value.equipment, commandID: value.commandID) }
+        else if let value = pendingModification { purchaseModification(value.kind, commandID: value.commandID) }
+        else if let value = pendingPurchase { purchase(value.equipment, commandID: value.commandID) }
+        else { refresh() }
     }
 }
