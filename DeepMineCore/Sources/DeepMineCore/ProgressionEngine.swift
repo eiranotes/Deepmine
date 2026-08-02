@@ -29,10 +29,6 @@ public enum ProgressionEngine {
         return safeBase > Int.max - bonus ? Int.max : safeBase + bonus
     }
 
-    /// Segment index to metres. This is coordinate geometry for the rock generator, not
-    /// a second source of truth for the player's depth — `PlayerState.depthMeters` still
-    /// owns that. The two converge in P2-1, when breaking segments becomes the thing that
-    /// actually moves the player down.
     public static func depthMeters(forSegmentIndex index: Int) -> Int {
         max(0, index) * Balance.metersPerSegment
     }
@@ -41,11 +37,16 @@ public enum ProgressionEngine {
         max(0, depth) / Balance.metersPerSegment
     }
 
+    /// Applies a completed or abandoned session to the non-spatial progression ledger.
+    /// `creditOre` is false when the reward was produced by `MiningLoop`, which has already
+    /// committed the same ore to the wallet while breaking real rock. The history still
+    /// records the haul, but the currency is never paid twice.
     @discardableResult
     public static func apply(
         reward: RewardResult,
         input: RewardInput,
         completedAt: Date,
+        creditOre: Bool = true,
         to state: inout PlayerState
     ) throws -> ProgressionApplicationResult {
         guard reward.completionID == input.completionID else {
@@ -65,7 +66,7 @@ public enum ProgressionEngine {
             throw ProgressionError.invalidState
         }
 
-        state.resources.ore += reward.ore
+        if creditOre { state.resources.ore += reward.ore }
         state.runFocusCredits = finiteSum(state.runFocusCredits, reward.focusCredits)
         state.lifetimeFocusCredits = finiteSum(
             state.lifetimeFocusCredits,
