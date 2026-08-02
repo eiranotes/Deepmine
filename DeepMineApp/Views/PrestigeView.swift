@@ -55,8 +55,7 @@ struct PrestigeView: View {
         if let preview {
             DeepMineRivetedPanel {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label(DeepMineStrings.text(.prestigeIntro), systemImage: "arrow.down.to.line.compact")
-                        .font(.headline).accessibilityIdentifier("prestige-preview")
+                    HStack { DeepMinePixelImage(name: GameArtCatalog.prestigeMemoryRingName, size: 34).accessibilityHidden(true); Text(DeepMineStrings.text(.prestigeIntro)).font(.headline).accessibilityIdentifier("prestige-preview") }
                     DeepMineProgressRail(
                         value: Double(preview.currentRunSegments),
                         total: Double(preview.targetRunSegments),
