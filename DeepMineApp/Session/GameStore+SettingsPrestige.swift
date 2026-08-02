@@ -4,6 +4,8 @@ import Foundation
 struct ThemePresentation: Equatable, Sendable {
     let theme: MineTheme
     let unlockDepthMeters: Int
+    let crystalCost: Int
+    let canAfford: Bool
     let isUnlocked: Bool
     let isSelected: Bool
 }
@@ -32,9 +34,12 @@ extension GameStore {
 
     static func themePresentations(for player: PlayerState) -> [ThemePresentation] {
         MineTheme.allCases.map { theme in
-            ThemePresentation(
+            let cost = WorldProgression.crystalCost(for: theme)
+            return ThemePresentation(
                 theme: theme,
                 unlockDepthMeters: unlockDepth(for: theme),
+                crystalCost: cost,
+                canAfford: player.resources.crystals >= cost,
                 isUnlocked: player.unlockedThemes.contains(theme),
                 isSelected: player.selectedTheme == theme
             )
@@ -62,9 +67,21 @@ extension GameStore {
     func selectTheme(_ theme: MineTheme) throws -> ThemeSelectionResult {
         var player = try repository.loadPlayer()
         let result = WorldProgression.selectTheme(theme, in: &player)
-        if result == .selected {
-            try repository.savePlayer(player)
-        }
+        if result == .selected { try repository.savePlayer(player) }
+        return result
+    }
+
+    @discardableResult
+    func purchaseTheme(
+        _ theme: MineTheme,
+        commandID: UUID = UUID()
+    ) throws -> ThemePurchaseResult {
+        var player = try repository.loadPlayer()
+        let result = WorldProgression.purchaseTheme(
+            ThemePurchaseCommand(id: commandID, theme: theme),
+            in: &player
+        )
+        if case .purchased = result { try repository.savePlayer(player) }
         return result
     }
 
@@ -93,9 +110,7 @@ extension GameStore {
             PermanentUpgradeCommand(id: commandID, upgrade: upgrade),
             in: &player
         )
-        if case .purchased = result {
-            try repository.savePlayer(player)
-        }
+        if case .purchased = result { try repository.savePlayer(player) }
         return result
     }
 
