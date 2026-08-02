@@ -35,19 +35,13 @@ extension GameStore {
         )
         let projectedReward = try RewardCalculator.calculate(input)
 
-        // A focus session now advances the same rock face as taps, foreground automation
-        // and offline settlement. Session multipliers scale credited mining time; the
-        // equipment multiplier is excluded because `MiningLoop` already reads the actual
-        // drill, cart, lamp, modifications and refinement from the player.
         let creditedSeconds = TimeInterval(projectedReward.focusedMinutes * 60)
             * sessionMiningRate(projectedReward)
-        let miningUpdate = creditedSeconds > 0
-            ? MiningLoop.advance(
-                seconds: creditedSeconds,
-                at: context.completedAt,
-                in: &player
-            )
-            : .empty(face: player.mineFace)
+        let miningUpdate = MiningLoop.advance(
+            seconds: max(0, creditedSeconds),
+            at: context.completedAt,
+            in: &player
+        )
         let minedOre = miningUpdate.oreGained.doubleValue
         let reward = RewardResult(
             completionID: projectedReward.completionID,
@@ -135,7 +129,7 @@ extension GameStore {
         let equipment = max(1, reward.breakdown.equipment)
         let vein = max(1, reward.breakdown.vein)
         let rate = reward.breakdown.combinedMultiplier / equipment / vein
-        return rate.isFinite ? max(0, rate) : Double.greatestFiniteMagnitude
+        return rate.isFinite ? max(0, rate) : 0
     }
 
     private func outcomeContext(
