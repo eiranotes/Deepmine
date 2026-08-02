@@ -212,7 +212,10 @@ struct PrestigeView: View {
         defer { isApplying = false }
         do {
             let result = try gameStore.confirmPrestige(commandID: prestigeCommandID)
-            guard case .prestiged = result || result == .duplicate else { return }
+            switch result {
+            case .prestiged, .duplicate: break
+            default: return
+            }
             player = try gameStore.playerState()
             onPlayerChange(player)
             upgrades = presentations()
