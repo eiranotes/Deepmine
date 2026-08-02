@@ -199,8 +199,8 @@ extension GameStore {
     private func mineProjection(input: RewardInput, player: PlayerState) throws -> RewardResult {
         let basis = try RewardCalculator.calculate(input)
         let equipment = max(1, basis.breakdown.equipment)
-        let vein = max(1, basis.breakdown.vein)
-        let rate = basis.breakdown.combinedMultiplier / equipment / vein
+        let permanent = max(1, basis.breakdown.permanent)
+        let rate = basis.breakdown.combinedMultiplier / equipment / permanent
         var projected = player
         let update = MiningLoop.advance(
             seconds: TimeInterval(basis.focusedMinutes * 60) * (rate.isFinite ? max(0, rate) : 0),
@@ -218,7 +218,10 @@ extension GameStore {
     }
 
     private func returnRecommendation(player: PlayerState) throws -> ReturnUpgradeRecommendation? {
-        guard let value = UpgradeAdvisor.recommendForMining(for: player) else { return nil }
+        guard let value = UpgradeAdvisor.recommendForMining(
+            for: player,
+            affordableOnly: false
+        ) else { return nil }
         return ReturnUpgradeRecommendation(
             equipment: value.equipment,
             currentLevel: value.currentLevel,
