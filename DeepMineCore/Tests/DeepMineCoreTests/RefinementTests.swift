@@ -62,6 +62,21 @@ final class RefinementTests: XCTestCase {
         XCTAssertEqual(player.resources.ore.doubleValue, 500, accuracy: 0.001)
     }
 
+    func testCommandReplayDoesNotSpendOreOrRaiseTheTierTwice() {
+        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let command = RefinementPurchaseCommand(id: UUID(), equipment: .drill)
+        var player = state(drill: 30, ore: cost + 500)
+
+        XCTAssertEqual(
+            RefinementEngine.purchase(command, in: &player),
+            .refined(equipment: .drill, newTier: 1, cost: cost)
+        )
+        XCTAssertEqual(RefinementEngine.purchase(command, in: &player), .duplicate)
+        XCTAssertEqual(player.refinementTiers.drill, 1)
+        XCTAssertEqual(player.resources.ore.doubleValue, 500, accuracy: 0.001)
+        XCTAssertTrue(player.appliedPurchaseIDs.contains(command.id))
+    }
+
     func testOreShortfallReportsBothSides() {
         var player = state(drill: 30, ore: 1)
         XCTAssertEqual(
