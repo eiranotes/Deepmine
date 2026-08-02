@@ -79,7 +79,7 @@ final class GameplayFlowIntegrationTests: XCTestCase {
     func testLampRefinementCriticalMultiplierSurvivesDoubleRange() {
         let power = StrikeEngine.power(
             equipment: EquipmentLevels(drill: 1, cart: 1, lamp: 100_000),
-            permanent: .none,
+            permanent: PermanentUpgradeLevels(),
             refinement: RefinementTiers(lamp: 10_000)
         )
         XCTAssertGreaterThan(power.criticalDamageMultiplier.exponent, 308)
