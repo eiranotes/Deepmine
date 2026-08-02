@@ -18,6 +18,7 @@ struct EquipmentView: View {
     @State var notice: Notice?
     @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID)?
     @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID)?
+    @State var pendingRefinement: EquipmentKind?
     @State var handoffConsumed = false
     @State var isLoading = false
 
@@ -40,8 +41,8 @@ struct EquipmentView: View {
                 handoffPanel
                 if notice == .storageFailure { recoveryPanel }
                 if notice != nil, notice != .storageFailure { noticePanel }
-                if !maximumEquipment.isEmpty { maximumPanel }
                 ForEach(EquipmentKind.allCases, id: \.self) { equipmentRow($0) }
+                refinementPanel
                 modificationPanel
             }
             .padding(17)
@@ -108,6 +109,52 @@ struct EquipmentView: View {
                 }
             }
         }
+    }
+
+    private var refinementPanel: some View {
+        DeepMineRivetedPanel {
+            VStack(alignment: .leading, spacing: 10) {
+                Label(
+                    "\(DeepMineStrings.text(.actionUpgrade)) ×\(DeepMineNumberFormatter.string(Balance.refinementDamageMultiplier))",
+                    systemImage: "sparkles"
+                )
+                .font(.headline)
+                .foregroundStyle(DeepMinePalette.brass.color)
+                ForEach(EquipmentKind.allCases, id: \.self) { refinementRow($0) }
+            }
+        }
+        .accessibilityIdentifier("equipment-refinement")
+    }
+
+    private func refinementRow(_ kind: EquipmentKind) -> some View {
+        let level = EquipmentEngine.level(of: kind, in: player.equipment)
+        let tier = player.refinementTiers.tier(for: kind)
+        let nextTier = tier + 1
+        let unlocked = tier < RefinementEngine.unlockedTiers(forLevel: level)
+        let required = RefinementEngine.requiredLevel(forTier: nextTier)
+        let cost = RefinementEngine.oreCost(for: kind, tier: nextTier)
+        return Button { purchaseRefinement(kind) } label: {
+            HStack {
+                Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind)))
+                    .font(.subheadline.weight(.bold))
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("R\(tier) → R\(nextTier)")
+                    Text(unlocked ? "◆\(DeepMineNumberFormatter.string(cost))" : "Lv. \(required)")
+                        .foregroundStyle(unlocked ? DeepMinePalette.brass.color : DeepMinePalette.limestone.color.opacity(0.58))
+                }
+                .font(.caption.monospacedDigit().weight(.bold))
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
+        .disabled(!unlocked || isLoading || notice == .storageFailure)
+        .accessibilityLabel(
+            "\(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))), "
+                + "\(DeepMineStrings.text(.actionUpgrade)), R\(nextTier), "
+                + (unlocked ? DeepMineNumberFormatter.string(cost) : "Lv. \(required)")
+        )
+        .accessibilityIdentifier("equipment-refinement-\(kind.rawValue)")
     }
 }
 
