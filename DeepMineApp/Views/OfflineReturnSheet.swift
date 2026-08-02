@@ -1,9 +1,6 @@
 import DeepMineCore
 import SwiftUI
 
-/// Shown when the player comes back to a mine that kept working. This is the strongest
-/// retention beat an idle game has, so it states what was earned plainly rather than
-/// making the player infer it from a changed number.
 struct OfflineReturnSheet: View {
     let settlement: OfflineSettlement
     let onCollect: () -> Void
@@ -14,17 +11,15 @@ struct OfflineReturnSheet: View {
                 .font(.title2.weight(.heavy))
                 .foregroundStyle(DeepMinePalette.limestone.color)
                 .accessibilityIdentifier("offline-title")
-
             Text(awayText)
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
                 .accessibilityIdentifier("offline-away")
-
             DeepMineRivetedPanel {
                 VStack(spacing: 12) {
                     row(
                         label: DeepMineStrings.text(.offlineOre),
-                        value: DeepMineNumberFormatter.string(settlement.oreGained.doubleValue),
+                        value: DeepMineNumberFormatter.string(big: settlement.oreGained),
                         identifier: "offline-ore"
                     )
                     row(
@@ -41,17 +36,13 @@ struct OfflineReturnSheet: View {
                     }
                 }
             }
-
             if settlement.wasCapped {
-                // A silent cap reads as a bug the first time someone returns after a
-                // weekend and the number looks smaller than they expected.
                 Text(cappedText)
                     .font(.caption)
                     .foregroundStyle(DeepMinePalette.brass.color)
                     .multilineTextAlignment(.center)
                     .accessibilityIdentifier("offline-capped")
             }
-
             Button(action: onCollect) {
                 DeepMineActionLabel(titleKey: .offlineCollect, detailKey: nil, symbol: "tray.full")
             }
@@ -65,8 +56,7 @@ struct OfflineReturnSheet: View {
 
     private func row(label: String, value: String, identifier: String) -> some View {
         HStack {
-            Text(label)
-                .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.8))
+            Text(label).foregroundStyle(DeepMinePalette.limestone.color.opacity(0.8))
             Spacer()
             Text(value)
                 .font(.headline.monospacedDigit())
