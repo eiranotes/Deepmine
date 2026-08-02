@@ -1,14 +1,14 @@
 # Build Report
 
-업데이트: 2026-08-02 (현재 코드·PR·Pro 교차 감사 closeout)
+업데이트: 2026-08-03 (현재 코드·원격 배포 closeout)
 
-## 2026-08-02 current-audit closeout
+## 2026-08-03 current-audit and remote-deployment closeout
 
 **판정: 계획 전체 완료가 아니다.** 이번 closeout은 single-clock, 장시간 정산, 첫 자동화
 저축, 주요 `BigNumber` 구매 표면, 생산률/구매·정련 피드백, 장기 지질/에셋과 Pages 로컬
 계약을 구현·검증했다. 실제 UI 정책 장기 시뮬레이션, 집중 경제 통합, 정련 재설치,
-`NextStepPlanner` 극후반 진행도, Lv.100,000 산술 안전 천장 이후 성장, 전체 UI/실기기/원격
-배포 게이트는 열린 상태다.
+`NextStepPlanner` 극후반 진행도, Lv.100,000 산술 안전 천장 이후 성장과 전체 UI/실기기
+게이트는 열린 상태다.
 
 | 항목 | 현재 결과 | 근거/경계 |
 |---|---|---|
@@ -24,7 +24,9 @@
 | 장기 진행 에셋 | **7/7 통과** | strict PNG/SHA/정확한 ID 집합/카탈로그/웹 복사본과 provenance ID·raw-source 대응 검사 |
 | Swift 파일 크기 | **통과** | 이번 변경 파일은 모두 300줄 이하. 기존 baseline `GameActivitySurfaceContent.swift` 302줄만 남음 |
 | 웹 개발 서버 | **HTTP 200** | `http://127.0.0.1:4173`. 첫 로컬 이동 실패 뒤 인앱 Browser 보안 정책이 재시도를 막아 최종 화면 육안 판독은 수행하지 못함 |
-| 원격/실기기 | **미검증** | push 전 GitHub Actions/Pages, FamilyControls·AlarmKit·Live Activity, 실제 VoiceOver/Reduce Motion/햅틱은 출시 차단 게이트 |
+| 원격 `main` 검증 | **통과** | merge commit `228f31d`; Actions run `30770681257`에서 Core·App 단위·unsigned iOS build·Swift 파일 크기·웹·에셋 job 전부 성공 |
+| GitHub Pages | **배포·HTTP 200** | Actions source를 활성화하고 run `30770681254` attempt 2의 build/deploy 성공. `https://eiranotes.github.io/Deepmine/`과 배포 `coreBalance.js` 응답·스모크 확인 |
+| 실기기 | **미검증** | FamilyControls·AlarmKit·Live Activity, 실제 VoiceOver/Reduce Motion/햅틱은 출시 차단 게이트 |
 
 ## Historical verification log
 

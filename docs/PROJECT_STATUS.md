@@ -1,8 +1,8 @@
 # Project Status
 
-업데이트: 2026-08-02 (현재 코드·PR·Pro 교차 감사 closeout)
+업데이트: 2026-08-03 (현재 코드·원격 배포 closeout)
 
-## Current truth — 2026-08-02 current audit
+## Current truth — 2026-08-03 current audit
 
 계획 전체가 완료된 것은 아니다. 최신 실제 구현은 오래된 `SPEC_v0.2`보다 앞서 있으며,
 이 섹션과 `DECISIONS.md`의 D-067~D-079가 아래의 역사적 기록과 충돌할 때 우선한다.
@@ -25,8 +25,10 @@
   경계다. 앱과 웹은 같은 versioned v2 텍스처를 깊이에 맞춰 소비한다.
 - 장기 진행 PNG 7종은 CRC/zlib·크기·네 안료·알파·SHA·카탈로그/웹 복사 계약으로 검증한다.
   pressure와 cart 2종은 이번 ImageGen 원본, 나머지 5종은 이전 PR 원본 정규화다.
-- Pages PR은 build/smoke만 수행하고 main push만 배포한다. 로컬 계약은 검증했지만 원격
-  Actions/Pages 성공은 push 전이므로 미검증이다.
+- Pages PR은 build/smoke만 수행하고 main push만 배포한다. PR #3을 merge commit
+  `228f31d`로 병합한 뒤 `main` validation run `30770681257`이 전부 통과했고, Pages
+  Actions source를 활성화한 뒤 deploy run `30770681254` attempt 2가 성공했다. 공개 URL은
+  `https://eiranotes.github.io/Deepmine/`이며 문서와 배포 모듈 응답을 확인했다.
 
 계속 열린 핵심은 실제 UI 구매 정책 30/90/180일 시뮬레이션, 집중 보상을 실제
 `MiningLoop` 가속으로 통합하는 구조, 정련 MAX/기억 정련 재설치, `NextStepPlanner`의
@@ -38,8 +40,9 @@
 현재 검증은 Core **282/282**, App 단위 **150/150**, 최종 persistence/명령 큐 **23/23**,
 정련 focused XCUITest **1/1**,
 웹 **15/15**, 장기 진행 에셋 **7/7**, generic iOS device build 통과다. 정적 Pages 로컬
-DOM 계약은 **11/11**이지만 원격 Actions/Pages와 실기기 시스템 표면은 미검증이다. 자세한
-명령·xcresult·경계는 `BUILD_REPORT.md` 최상단 current-audit closeout을 따른다.
+DOM 계약은 **11/11**이며 원격 `main` validation과 Pages 배포도 성공했다. 실기기 시스템
+표면은 여전히 미검증이다. 자세한 명령·xcresult·경계는 `BUILD_REPORT.md` 최상단
+current-audit closeout을 따른다.
 
 ## Current state
 

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Deployed
+
+- PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. `main` validation과
+  Pages build/deploy가 모두 성공했으며 공개 formula harness는
+  `https://eiranotes.github.io/Deepmine/`에서 제공된다
+
 ### Changed
 
 - 집중 세션 복구 전, 시작 버튼의 비동기 준비 구간과 활성 집중 중에는 홈 자동 채굴과

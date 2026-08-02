@@ -4,6 +4,8 @@ DeepMine은 플레이어가 실제 암반을 깨고, 광차 자동 굴착과 오
 누적해 내려가는 iOS 방치형 클리커다. 집중 차단은 게임의 입장권이 아니라 선택형 증폭기이며,
 권한 없이도 채굴·정련·프레스티지까지 진행할 수 있다.
 
+웹 formula harness: <https://eiranotes.github.io/Deepmine/>
+
 ## 현재 플레이 루프
 
 ```text
@@ -28,7 +30,7 @@ DeepMine은 플레이어가 실제 암반을 깨고, 광차 자동 굴착과 오
 - `docs/`: 최신 상태, 결정, 작업, 검증과 제품 사양
 - `artifacts/imagegen/`: 생성 에셋 원본·처리본·provenance·검증 보고서
 
-현재 제품 계약은 `docs/SPEC_v0.2.md`의 2026-08-02 amendment와 `docs/DECISIONS.md` D-067~D-079,
+현재 제품 계약은 `docs/SPEC_v0.2.md`의 2026-08-03 amendment와 `docs/DECISIONS.md` D-067~D-079,
 실측 상태는 `docs/PROJECT_STATUS.md`와 `BUILD_REPORT.md`를 따른다. 각 문서의 명시적 역사적
 스냅샷은 현재 판정에 사용하지 않는다.
 
@@ -78,4 +80,3 @@ ImageGen으로 새로 만들었고, 나머지 5종은 이전 PR 원본을 네 �
 - 정련 MAX와 프레스티지 뒤 기억 정련 일괄 재설치
 - `NextStepPlanner` 극후반 진행도의 `BigNumber` 전환
 - 전체 XCUITest, 실제 VoiceOver·Reduce Motion·햅틱과 FamilyControls/AlarmKit 실기기 게이트
-- main push 뒤 GitHub Actions와 Pages 실제 원격 배포 확인

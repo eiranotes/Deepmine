@@ -1,6 +1,6 @@
 # Tasks
 
-업데이트: 2026-08-02 (current audit closeout)
+업데이트: 2026-08-03 (current audit and remote deployment closeout)
 
 ## 2026-08-02 current audit closeout
 
@@ -19,6 +19,7 @@
 - [x] 5km·20km·100km 시각 지질 경계와 앱/웹 v2 텍스처 소비
 - [x] 장기 진행 PNG 7종 strict validator와 CI job
 - [x] PR build/main deploy 분리 및 Pages 권한 축소
+- [x] PR #3 병합 뒤 `main` validation 성공 및 GitHub Pages Actions 배포·공개 URL 확인
 - [x] Vinext Sites 플러그인을 clean checkout에도 존재하는 추적 소스로 이동
 - [x] 변경 Swift 파일을 모두 300줄 이하로 분리하고 persistence/명령 큐 23/23 재검증
 
@@ -32,7 +33,6 @@
 - [ ] Lv.100,000 산술 안전 천장 이후에도 유한 정수 순회와 저장 계약을 보존하는 true-uncapped 성장
 - [ ] JavaScript `number` 범위를 넘는 앱 경제는 웹이 아닌 Core 회귀로 계속 검증
 - [ ] 프레스티지의 정련 손실 고지와 홈 진입/재구축 UX 실화면 회귀
-- [ ] main push 뒤 Pages와 validation workflow의 실제 원격 성공
 - [ ] 전체 `DeepMineAppUITests`와 FamilyControls/AlarmKit/Live Activity 실기기 릴리스 게이트
 
 ## Gameplay-complete MVP — implemented

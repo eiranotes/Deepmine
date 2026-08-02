@@ -996,11 +996,15 @@
 
 ## D-077 — PR은 Pages 배포 권한을 갖지 않는다
 
-- 상태: 승인됨·로컬 정의 구현, 원격 검증 대기 (2026-08-02 current audit)
+- 상태: 승인됨·구현됨·원격 검증됨 (2026-08-03 deployment closeout)
 - 결정: PR은 정적 번들·smoke·artifact 계약까지만 실행한다. artifact 업로드와 배포는 main
   push에만 열고, `pages: write`와 `id-token: write`는 deploy job에만 부여한다.
 - 이유: 코드 검증과 외부 배포 권한을 분리하고, PR이 Pages 설정을 변경하거나 배포를 시도해
-  실패하는 구조를 제거한다. 실제 원격 성공은 push 전까지 검증됨으로 표시하지 않는다.
+  실패하는 구조를 제거한다.
+- 원격 증거: GitHub Pages를 Actions source로 활성화했다. PR #3 병합 뒤 validation run
+  `30770681257`과 Pages run `30770681254` attempt 2가 성공했고,
+  `https://eiranotes.github.io/Deepmine/` 및 배포 `coreBalance.js`의 HTTP 200과 모듈 스모크를
+  확인했다.
 
 ## D-078 — 장기 성장 필드는 모든 SwiftData 쓰기 경로에서 같은 계약으로 저장한다
 

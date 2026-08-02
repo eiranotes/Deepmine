@@ -2,16 +2,16 @@
 
 ## 방치형 세로 갱도 채굴 게임 기획서
 
-- 문서 버전: **v0.2 + 2026-08-02 current implementation amendment**
+- 문서 버전: **v0.2 + 2026-08-03 current implementation amendment**
 - 플랫폼: iPhone / **iOS 26 이상 전용**
 - 핵심 기술: FamilyControls, ManagedSettings, DeviceActivity, ActivityKit, AlarmKit, WidgetKit, App Intents, SwiftUI, SwiftData
 - 제품 유형: 방치형 클리커 + 선택적 집중 증폭기
 
 ---
 
-# 0. 2026-08-02 current implementation amendment
+# 0. 2026-08-03 current implementation amendment
 
-이 절은 2026-08-02 현재 코드, `DECISIONS.md` D-067~D-079, `PROJECT_STATUS.md`와
+이 절은 2026-08-03 현재 코드, `DECISIONS.md` D-067~D-079, `PROJECT_STATUS.md`와
 `BUILD_REPORT.md`의 검증 사실을 스펙에 반영한다. 아래 옛 절과 충돌하면 이 amendment가
 우선한다. 날짜가 붙은 역사적 검증 스냅샷은 제품 계약이 아니다.
 
@@ -59,8 +59,9 @@
 - 시뮬레이터 병합 증거와 실기기 출시 증거를 구분한다. Core/App 테스트와 generic build 성공은
   FamilyControls, AlarmKit, Live Activity, 실제 VoiceOver/Reduce Motion/햅틱을 증명하지 않는다.
 - 2026-08-02 로컬 closeout은 Core 282/282, App 단위 150/150, 정련 XCUITest 1/1,
-  웹 15/15, 에셋 7/7과 generic iOS device build 통과다. 원격 Actions/Pages는 push 전,
-  시스템 표면은 실기기 전이므로 미검증이다.
+  웹 15/15, 에셋 7/7과 generic iOS device build 통과다. 2026-08-03에는 merge commit
+  `228f31d`의 `main` validation과 Pages Actions 배포가 성공했고 공개 harness와 배포 모듈의
+  HTTP 200·스모크를 확인했다. 시스템 표면은 실기기 전이므로 미검증이다.
 
 ## 0.4 아직 열린 제품 계약
 
@@ -70,7 +71,7 @@
 4. `NextStepPlanner` 극후반 진행도의 `BigNumber` 전환과 호환용 `cost: Double` 제거 계획
 5. 통계·도전과제의 세션 중심 잔여 비중과 첫 수정의 명확한 소비처
 6. Lv.100,000 뒤에도 유한 연산·저장을 보존하는 true-uncapped 성장 계약
-7. 전체 XCUITest, 원격 Pages/Actions, 실기기 시스템 표면 릴리스 게이트
+7. 전체 XCUITest와 실기기 시스템 표면 릴리스 게이트
 
 ---
 
