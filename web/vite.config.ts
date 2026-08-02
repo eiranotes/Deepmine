@@ -37,8 +37,8 @@ async function optionalSitesPlugin(): Promise<PluginOption[]> {
   const javascriptExists = existsSync(new URL(`${sitesPluginPath}.js`, import.meta.url));
   if (!sourceExists && !javascriptExists) return [];
 
-  const module = await import(/* @vite-ignore */ sitesPluginPath);
-  return typeof module.sites === "function" ? [module.sites()] : [];
+  const sitesModule = await import(/* @vite-ignore */ sitesPluginPath);
+  return typeof sitesModule.sites === "function" ? [sitesModule.sites()] : [];
 }
 
 export default defineConfig(async () => {
