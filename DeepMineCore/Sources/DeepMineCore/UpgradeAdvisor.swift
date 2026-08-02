@@ -29,19 +29,34 @@ public enum UpgradeAdvisor {
         return best
     }
 
-    /// Recommends the purchase that most improves the mine the player is looking at.
-    ///
-    /// The previous home recommendation optimized the next focus-session payout. That
-    /// regularly pointed at the drill while the cart still produced zero automatic
-    /// damage, delaying the idle game's defining unlock. This score uses the same
-    /// `StrikePower` that drives taps and automation, so the home button now answers the
-    /// question shown on screen: which affordable purchase makes this rock move faster?
     public static func recommendForMining(for state: PlayerState) -> UpgradeRecommendation? {
         let unlocked = EquipmentEngine.unlockedMaximumLevel(in: state)
         let current = MiningLoop.power(for: state)
+
+        // The first cart level that produces non-zero DPS is not an incremental purchase;
+        // it changes the product from a manual clicker into an idle mine. Once affordable,
+        // it must not lose to a slightly better tap-efficiency ratio.
+        if !current.isAutomated,
+           let cart = EquipmentEngine.quote(for: .cart, in: state),
+           cart.currentLevel < unlocked,
+           state.resources.ore >= cart.cost {
+            var automated = state
+            automated.equipment.cart += 1
+            if MiningLoop.power(for: automated).isAutomated {
+                return UpgradeRecommendation(
+                    equipment: .cart,
+                    currentLevel: cart.currentLevel,
+                    nextLevel: cart.currentLevel + 1,
+                    cost: cart.cost,
+                    marginalExpectedOre: 10,
+                    efficiency: Double.greatestFiniteMagnitude,
+                    isRemembered: cart.isRemembered
+                )
+            }
+        }
+
         let currentTap = expectedTapDamage(current)
         var best: UpgradeRecommendation?
-
         for equipment in EquipmentKind.allCases {
             guard let quote = EquipmentEngine.quote(for: equipment, in: state),
                   quote.currentLevel < unlocked,
@@ -60,10 +75,6 @@ public enum UpgradeAdvisor {
                 to: projected.damagePerSecond
             )
             let oreGain = max(0, projected.oreMultiplier / max(1, current.oreMultiplier) - 1)
-
-            // Automatic output receives the largest weight because it advances the same
-            // mine while the app is open and while it is closed. Tap output remains the
-            // primary active-play axis; ore multipliers are valuable but secondary.
             let marginal = tapGain + automaticGain * 1.5 + oreGain * 0.75
             guard marginal.isFinite, marginal > 0 else { continue }
 
@@ -147,8 +158,6 @@ public enum UpgradeAdvisor {
         to projected: BigNumber
     ) -> Double {
         guard projected > current else { return 0 }
-        // Moving from no automation to any automation is a categorical unlock. A finite
-        // score keeps ordering deterministic while making it dominate incremental gains.
         if current.isZero { return 10 }
         return relativeGain(from: current, to: projected)
     }
