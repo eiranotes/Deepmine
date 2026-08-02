@@ -27,7 +27,8 @@ final class GameStoreTests: XCTestCase {
             try await fixture.store.start(length: .minutes15, plan: .safe)
             XCTAssertEqual(fixture.store.visibleReason, reason)
             fixture.clock.advance(seconds: 900)
-            let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+            let completed = try await fixture.store.completeIfNeeded()
+            let report = try XCTUnwrap(completed)
             XCTAssertEqual(report.verificationGrade, .open)
         }
     }
@@ -59,7 +60,8 @@ final class GameStoreTests: XCTestCase {
         XCTAssertTrue(fixture.repository.active?.forcedRemovalPending == false)
         XCTAssertTrue(fixture.store.visibleReason?.contains("강제로 해제") == true)
         fixture.clock.advance(seconds: 900)
-        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+        let completed = try await fixture.store.completeIfNeeded()
+        let report = try XCTUnwrap(completed)
         XCTAssertEqual(report.verificationGrade, .collapsed)
         XCTAssertEqual(fixture.system.forceRemoveCount, 2)
     }
@@ -68,7 +70,8 @@ final class GameStoreTests: XCTestCase {
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.wall = fixture.clock.wall.addingTimeInterval(900)
         fixture.clock.monotonic += 30 * 1_000_000_000
-        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+        let completed = try await fixture.store.completeIfNeeded()
+        let report = try XCTUnwrap(completed)
         XCTAssertEqual(report.clockAssessment, .tampered)
         XCTAssertEqual(report.verificationGrade, .open)
     }
@@ -77,7 +80,8 @@ final class GameStoreTests: XCTestCase {
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.wall = fixture.clock.wall.addingTimeInterval(900)
         fixture.clock.monotonic = 1
-        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+        let completed = try await fixture.store.completeIfNeeded()
+        let report = try XCTUnwrap(completed)
         XCTAssertEqual(report.clockAssessment, .rebooted)
         XCTAssertEqual(report.verificationGrade, .sealed)
         XCTAssertEqual(report.focusedMinutes, 15)
@@ -111,7 +115,8 @@ final class GameStoreTests: XCTestCase {
         fixture.repository.player = starting
         try await fixture.store.start(length: .minutes15, plan: .safe)
         fixture.clock.advance(seconds: 900)
-        let report = try XCTUnwrap(try await fixture.store.completeIfNeeded())
+        let completed = try await fixture.store.completeIfNeeded()
+        let report = try XCTUnwrap(completed)
         let capped = try projectedOre(
             from: starting, growthFocusCredits: 20,
             vein: report.vein, completionID: report.completionID
