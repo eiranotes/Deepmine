@@ -31,12 +31,12 @@ struct ShaftHUDView: View {
             VStack(alignment: .trailing, spacing: 1) {
                 Text(String(
                     format: DeepMineStrings.text(.shaftTapDamage),
-                    DeepMineNumberFormatter.string(power.tapDamage.doubleValue)
+                    DeepMineNumberFormatter.string(big: power.tapDamage)
                 ))
                 Text(String(
                     format: DeepMineStrings.text(.shaftAutomationDamage),
                     power.isAutomated
-                        ? DeepMineNumberFormatter.string(power.damagePerSecond.doubleValue)
+                        ? DeepMineNumberFormatter.string(big: power.damagePerSecond)
                         : "—"
                 ))
             }
