@@ -14,17 +14,7 @@ public struct MiningStreakUpdate: Equatable, Sendable {
     }
 }
 
-/// Consecutive days on which the player mined at all.
-///
-/// Replaces the focus-era `StreakEngine`, which needed a daily minute goal, weekly rest
-/// grants and fractional decay because it was measuring whether a human kept a promise.
-/// An idle game only needs to know whether they came back, so this is roughly a fifth of
-/// the size and has one rule: mine on consecutive days.
-///
-/// One missed day is forgiven. That is retention design, not a fairness guardrail — the
-/// removed guardrails were about limiting play, this is about not punishing a gap.
 public enum MiningStreak {
-    /// Days that may be skipped without losing the streak.
     public static let graceDays = 1
 
     public static func multiplier(days: Int) -> Double {
@@ -45,20 +35,21 @@ public enum MiningStreak {
         return DayKey(year: year, month: month, day: day)
     }
 
+    /// Records a day on which the mine actually advanced. Session completion passes
+    /// `incrementSessionCount: true`; taps and offline production pass false so breaking
+    /// several rocks in one day cannot masquerade as several focus sessions.
     @discardableResult
     public static func record(
         at date: Date,
         in state: inout PlayerState,
         calendar: Calendar,
-        timeZone: TimeZone
+        timeZone: TimeZone,
+        incrementSessionCount: Bool = true
     ) throws -> MiningStreakUpdate {
         var local = calendar
         local.timeZone = timeZone
         let today = try dayKey(for: date, calendar: local, timeZone: timeZone)
-
-        // The daily record is still the only place "how many runs today" lives, which
-        // the daily-order multiplier and the mining-days achievements both read.
-        recordDay(today, in: &state)
+        recordDay(today, incrementSessionCount: incrementSessionCount, in: &state)
 
         guard let last = state.latestDayKey else {
             state.latestDayKey = today
@@ -77,8 +68,6 @@ public enum MiningStreak {
         }
 
         let gap = try elapsedDays(from: last, to: today, calendar: local, timeZone: timeZone)
-        // A negative gap means the device clock moved backwards. Hold the streak rather
-        // than rewarding or punishing it.
         guard gap > 0 else {
             return MiningStreakUpdate(
                 dayKey: last,
@@ -99,10 +88,13 @@ public enum MiningStreak {
         )
     }
 
-    /// Appends or increments today's record, trimming the oldest days so a multi-year
-    /// player does not re-encode an unbounded array on every save.
-    private static func recordDay(_ day: DayKey, in state: inout PlayerState) {
+    private static func recordDay(
+        _ day: DayKey,
+        incrementSessionCount: Bool,
+        in state: inout PlayerState
+    ) {
         if let index = state.dailyRecords.firstIndex(where: { $0.dayKey == day }) {
+            guard incrementSessionCount else { return }
             var record = state.dailyRecords[index]
             if record.sessionCount < Int.max { record.sessionCount += 1 }
             state.dailyRecords[index] = record
@@ -117,7 +109,7 @@ public enum MiningStreak {
             dayKey: day,
             focusedMinutes: 0,
             goalMinutes: 0,
-            sessionCount: 1,
+            sessionCount: incrementSessionCount ? 1 : 0,
             goalEarned: false,
             streakApplied: false,
             wasRestDay: false,
@@ -139,8 +131,7 @@ public enum MiningStreak {
         return days
     }
 
-    /// Noon anchoring keeps DST transitions from shifting a day boundary.
-    private static func noonDate(
+    static func noonDate(
         for key: DayKey,
         calendar: Calendar,
         timeZone: TimeZone
