@@ -1,7 +1,6 @@
 import DeepMineCore
 import SwiftUI
 
-/// The first-rock reward, legacy permission recovery and home hand-off steps.
 @MainActor
 extension OnboardingFlowView {
     var reward: some View {
@@ -16,8 +15,6 @@ extension OnboardingFlowView {
                     Text(DeepMineStrings.text(.onboardingDemoRewardBody))
                         .multilineTextAlignment(.center)
                     Divider().overlay(DeepMinePalette.limestone.color.opacity(0.25))
-                    // The first rock always finds a vein, so every new player sees the
-                    // mechanic the loop is built around.
                     Label(
                         DeepMineStrings.text(
                             DeepMineProgressLabels.veinKey(Balance.demoGuaranteedVein)
@@ -32,8 +29,11 @@ extension OnboardingFlowView {
                         .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.74))
                         .multilineTextAlignment(.center)
                     Divider().overlay(DeepMinePalette.limestone.color.opacity(0.25))
-                    Label(DeepMineStrings.text(.onboardingUpgradeTitle), systemImage: "gearshape.2.fill")
-                        .font(.headline)
+                    Label(
+                        DeepMineStrings.text(.onboardingUpgradeTitle),
+                        systemImage: "gearshape.2.fill"
+                    )
+                    .font(.headline)
                     Text(DeepMineStrings.text(.onboardingUpgradeBody))
                         .font(.subheadline)
                         .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.74))
@@ -43,12 +43,17 @@ extension OnboardingFlowView {
             }
             Spacer()
             Button { installUpgrade() } label: {
-                DeepMineActionLabel(titleKey: .actionInstallUpgrade, detailKey: .onboardingUpgradeTitle, symbol: "wrench.and.screwdriver.fill")
+                DeepMineActionLabel(
+                    titleKey: .actionInstallUpgrade,
+                    detailKey: .onboardingUpgradeTitle,
+                    symbol: "wrench.and.screwdriver.fill"
+                )
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: .primary))
             .accessibilityIdentifier("onboarding-demo-upgrade")
         }
     }
+
     var permission: some View {
         let kind = nextPermission
         return VStack(spacing: 17) {
@@ -112,7 +117,7 @@ extension OnboardingFlowView {
             )
             feedback.play(update.wasCritical ? .criticalStrike : .strike)
             if update.brokeSomething { feedback.play(.segmentBroken) }
-            lastStrikeText = "−\(DeepMineNumberFormatter.string(update.damage.doubleValue))"
+            lastStrikeText = DeepMineNumberFormatter.string(big: update.damage)
         case .alreadyRewarded:
             break
         }
