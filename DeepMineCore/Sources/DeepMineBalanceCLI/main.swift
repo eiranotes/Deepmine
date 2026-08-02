@@ -1,7 +1,25 @@
 import Foundation
 import DeepMineCore
 
+/// When a simulated player takes a reset.
+///
+/// Prestige returns the player to the surface, so how eagerly it is taken decides which
+/// segments they spend the run on — and segment ore compounds with depth. Comparing the
+/// two policies is what separates "heavy players earn less" from "the reset policy the
+/// simulation assumes earns less".
+enum PrestigePolicy: String {
+    /// Reset the moment it is available. What the simulation has always modelled.
+    case immediate
+    /// Never reset. An upper bound on staying deep.
+    case never
+
+    var takesPrestige: Bool { self == .immediate }
+}
+
 enum BalanceSimulator {
+    /// Set from the command line before `run`.
+    nonisolated(unsafe) static var prestigePolicy: PrestigePolicy = .immediate
+
     static let personas: [PersonaDefinition] = [
         PersonaDefinition(id: .light, lengths: [.minutes25], abandonRate: 0.20, activeEveryDays: 1, dailyGoalMinutes: 25, plan: .safe, dailyTapMinutes: 5, dailyOpenHours: 0.5),
         PersonaDefinition(id: .standard, lengths: [.minutes25, .minutes25, .minutes50], abandonRate: 0.10, activeEveryDays: 1, dailyGoalMinutes: 100, plan: .safe, dailyTapMinutes: 15, dailyOpenHours: 1),
@@ -100,7 +118,8 @@ enum BalanceSimulator {
                         )
                         if case .purchased = purchase, firstUpgrade == nil { firstUpgrade = totalSessions }
                     }
-                    if PrestigeEngine.preview(for: state).isEligible {
+                    if prestigePolicy.takesPrestige,
+                       PrestigeEngine.preview(for: state).isEligible {
                         let prestige = PrestigeEngine.prestige(
                             PrestigeCommand(id: stableID(
                                 persona: offsetID(persona.id), day: day, event: 200 + sessionIndex
@@ -145,7 +164,8 @@ enum BalanceSimulator {
             // A reset is now earned by breaking rock, so it can come due on a day with no
             // session at all. Checking only after a session would model a game where
             // prestige still belongs to focus (D-045).
-            if PrestigeEngine.preview(for: state).isEligible {
+            if prestigePolicy.takesPrestige,
+               PrestigeEngine.preview(for: state).isEligible {
                 let prestige = PrestigeEngine.prestige(
                     PrestigeCommand(id: stableID(
                         persona: offsetID(persona.id), day: day, event: 900
@@ -188,6 +208,9 @@ private func cliValue(_ name: String, arguments: [String]) -> String? {
 let arguments = CommandLine.arguments
 let seed = UInt64(cliValue("--seed", arguments: arguments) ?? "260729") ?? 260_729
 let days = Int(cliValue("--days", arguments: arguments) ?? "30") ?? 30
+BalanceSimulator.prestigePolicy =
+    PrestigePolicy(rawValue: cliValue("--prestige", arguments: arguments) ?? "immediate")
+    ?? .immediate
 let output = cliValue("--output", arguments: arguments) ?? "/tmp/deepmine-balance.csv"
 do {
     let result = try BalanceSimulator.run(seed: seed, days: days)
@@ -195,6 +218,7 @@ do {
     for summary in result.summaries {
         print("\(summary.persona.koreanName): firstUpgrade=\(summary.firstUpgradeSession.map(String.init) ?? "-") firstPrestigeDay=\(summary.firstPrestigeDay.map(String.init) ?? "-") currentDepth=\(summary.finalCurrentDepth) recordDepth=\(summary.finalRecordDepth) ore=\(decimal(summary.totalOreEarned)) fatigue=\(summary.fatiguedMinutes)")
     }
+    print("prestige policy: \(BalanceSimulator.prestigePolicy.rawValue)")
     print("heavy/light ore gap: \(decimal(result.heavyLightOreGap))x")
     print("heavy/light focus gap: \(decimal(result.heavyLightFocusGap))x")
     for row in result.equalTime {
