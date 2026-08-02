@@ -97,6 +97,34 @@ final class GameStoreProgressionTests: XCTestCase {
         XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
     }
 
+    func testRefinementPurchasePersistsTierAndOreDebit() throws {
+        let level = RefinementEngine.requiredLevel(forTier: 1)
+        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let fixture = makeFixture(player: PlayerState(
+            resources: Resources(ore: BigNumber(cost + 100)),
+            equipment: EquipmentLevels(drill: level)
+        ))
+
+        let result = try fixture.store.purchaseRefinement(.drill)
+
+        XCTAssertEqual(result, .refined(equipment: .drill, newTier: 1, cost: cost))
+        XCTAssertEqual(fixture.repository.player.refinementTiers.drill, 1)
+        XCTAssertEqual(fixture.repository.player.resources.ore, BigNumber(100))
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 1)
+    }
+
+    func testLockedRefinementDoesNotSaveOrMutatePlayer() throws {
+        let player = PlayerState(resources: Resources(ore: 10_000))
+        let fixture = makeFixture(player: player)
+
+        XCTAssertEqual(
+            try fixture.store.purchaseRefinement(.drill),
+            .locked(requiredLevel: RefinementEngine.requiredLevel(forTier: 1))
+        )
+        XCTAssertEqual(fixture.repository.player, player)
+        XCTAssertEqual(fixture.repository.playerSaveAttempts, 0)
+    }
+
     func testMineLedgerSummarisesTheWholeRetainedHistory() throws {
         let timeZone = TimeZone(secondsFromGMT: 0)!
         var calendar = Calendar(identifier: .iso8601)
