@@ -61,8 +61,7 @@ struct EquipmentView: View {
         DeepMineRivetedPanel {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(DeepMineStrings.text(.navigationEquipment))
-                        .font(.caption.weight(.bold))
+                    Text(DeepMineStrings.text(.navigationEquipment)).font(.caption.weight(.bold))
                     Label(DeepMineStrings.text(.gameOre), systemImage: "shippingbox.fill")
                         .font(.headline)
                 }
@@ -89,9 +88,7 @@ struct EquipmentView: View {
                     .accessibilityIdentifier("equipment-recommendation")
                     Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(highlightedEquipment)))
                         .font(.subheadline.weight(.bold))
-                        .accessibilityIdentifier(
-                            "equipment-recommendation-kind-\(highlightedEquipment.rawValue)"
-                        )
+                        .accessibilityIdentifier("equipment-recommendation-kind-\(highlightedEquipment.rawValue)")
                     if let handoffRecommendation, !handoffConsumed {
                         Text(DeepMineStrings.text(
                             handoffRecommendation.isAffordable
@@ -141,7 +138,9 @@ struct EquipmentView: View {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("R\(tier) → R\(nextTier)")
                     Text(unlocked ? "◆\(DeepMineNumberFormatter.string(cost))" : "Lv. \(required)")
-                        .foregroundStyle(unlocked ? DeepMinePalette.brass.color : DeepMinePalette.limestone.color.opacity(0.58))
+                        .foregroundStyle(unlocked
+                            ? DeepMinePalette.brass.color
+                            : DeepMinePalette.limestone.color.opacity(0.58))
                 }
                 .font(.caption.monospacedDigit().weight(.bold))
             }
@@ -184,9 +183,7 @@ extension EquipmentView {
     private func modificationRow(_ equipment: EquipmentKind) -> some View {
         let level = EquipmentEngine.level(of: equipment, in: player.equipment)
         let selected = player.equipmentModifications.selected(for: equipment)
-        let options = EquipmentModificationKind.allCases.filter {
-            $0.equipment == equipment
-        }
+        let options = EquipmentModificationKind.allCases.filter { $0.equipment == equipment }
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(equipment)))
@@ -199,11 +196,9 @@ extension EquipmentView {
                     )
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(DeepMinePalette.brass.color)
-                    .accessibilityLabel(
-                        DeepMineStrings.text(
-                            DeepMineProgressLabels.modificationTitleKey(selected)
-                        )
-                    )
+                    .accessibilityLabel(DeepMineStrings.text(
+                        DeepMineProgressLabels.modificationTitleKey(selected)
+                    ))
                 } else if level < Balance.equipmentModificationUnlockLevel {
                     Text(String(
                         format: DeepMineStrings.text(.equipmentModificationLocked),
@@ -215,11 +210,7 @@ extension EquipmentView {
             }
             HStack(alignment: .top, spacing: 8) {
                 ForEach(options, id: \.self) { option in
-                    modificationButton(
-                        option,
-                        selected: selected,
-                        level: level
-                    )
+                    modificationButton(option, selected: selected, level: level)
                 }
             }
         }
@@ -240,18 +231,14 @@ extension EquipmentView {
         return Button { purchaseModification(option) } label: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
-                    Text(DeepMineStrings.text(
-                        DeepMineProgressLabels.modificationTitleKey(option)
-                    ))
-                    .font(.caption.weight(.bold))
+                    Text(DeepMineStrings.text(DeepMineProgressLabels.modificationTitleKey(option)))
+                        .font(.caption.weight(.bold))
                     if isSelected { Image(systemName: "checkmark.circle.fill") }
                 }
-                Text(DeepMineStrings.text(
-                    DeepMineProgressLabels.modificationEffectKey(option)
-                ))
-                .font(.caption2)
-                .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
-                .fixedSize(horizontal: false, vertical: true)
+                Text(DeepMineStrings.text(DeepMineProgressLabels.modificationEffectKey(option)))
+                    .font(.caption2)
+                    .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(DeepMineNumberFormatter.string(
                     EquipmentModificationEngine.cost(for: option.equipment)
                 ))
@@ -261,9 +248,7 @@ extension EquipmentView {
             .frame(maxWidth: .infinity, minHeight: 78, alignment: .topLeading)
             .padding(9)
             .background(
-                isSelected
-                    ? DeepMinePalette.shale.color
-                    : DeepMinePalette.coal.color,
+                isSelected ? DeepMinePalette.shale.color : DeepMinePalette.coal.color,
                 in: RoundedRectangle(cornerRadius: DeepMineMetrics.badgeCornerRadius)
             )
             .overlay {
