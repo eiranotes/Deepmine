@@ -60,7 +60,7 @@ const checks = [
   ["정련은 6레벨마다 해금되고 ×2.5", () => refinementMultiplier(1) === 2.5],
   ["정련 비용은 해금 레벨 장비 비용의 20배", () => refinementCost("drill", 1) === Math.ceil(upgradeCost("drill", 7) * 20)],
   ["램프 정련은 크리티컬 배수에 적용", () => criticalMultiplier(1, 2) > criticalMultiplier(1, 0)],
-  ["심도 240m에서 구매 가능 레벨 17", () => unlockedMaximumLevel(240) === 17],
+  ["심도 240m에서 구매 가능 레벨 21", () => unlockedMaximumLevel(240) === 21],
   ["초기 크리티컬 확률은 5%", () => criticalChance(1) === 0.05],
 ];
 const results = checks.map(([name, run]) => ({ name, passed: Boolean(run()) }));
