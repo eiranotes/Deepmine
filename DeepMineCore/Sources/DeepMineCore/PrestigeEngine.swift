@@ -1,7 +1,7 @@
 import Foundation
 
 public struct PrestigeLossPreview: Codable, Equatable, Sendable {
-    public let ore: Double
+    public let ore: BigNumber
     public let runSegmentsBroken: Int
     public let equipment: EquipmentLevels
     public let refinementTiers: RefinementTiers
@@ -72,7 +72,7 @@ public enum PrestigeEngine {
         let target = target(prestigeIndex: state.prestigeIndex)
         return PrestigePreview(
             losses: PrestigeLossPreview(
-                ore: state.resources.ore.doubleValue,
+                ore: state.resources.ore,
                 runSegmentsBroken: state.runSegmentsBroken,
                 equipment: state.equipment,
                 refinementTiers: state.refinementTiers,
