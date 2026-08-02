@@ -1,5 +1,4 @@
 import Foundation
-
 /// Visual state captured when a segment is opened. Rendering old passage from these
 /// records makes equipment purchases accumulate in the world instead of changing only
 /// the next damage number.
@@ -9,9 +8,7 @@ public struct BoreRecord: Codable, Equatable, Identifiable, Sendable {
     public let cartLevel: Int
     public let lampLevel: Int
     public let drillModification: EquipmentModificationKind?
-
     public var id: Int { segmentIndex }
-
     public init(
         segmentIndex: Int,
         drillLevel: Int,

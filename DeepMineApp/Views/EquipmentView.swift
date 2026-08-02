@@ -5,8 +5,9 @@ import SwiftUI
 struct EquipmentView: View {
     enum Notice: Equatable {
         case success
-        case crewGrew(Int)
-        case insufficient(required: Double, available: Double)
+        case purchase(equipment: EquipmentKind, impact: PurchaseImpact?, crewSize: Int?)
+        case refinement(RefinementImpact)
+        case insufficient(required: BigNumber, available: BigNumber)
         case storageFailure
     }
 
@@ -16,9 +17,10 @@ struct EquipmentView: View {
     @State var player: PlayerState
     @State var recommendation: UpgradeRecommendation?
     @State var notice: Notice?
-    @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID)?
-    @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID)?
-    @State var pendingRefinement: (equipment: EquipmentKind, commandID: UUID)?
+    @State var pendingPurchase: (equipment: EquipmentKind, commandID: UUID, before: PlayerState)?
+    @State var pendingBulk: (equipment: EquipmentKind, maximum: Int?, remembered: Bool, commandID: UUID, before: PlayerState)?
+    @State var pendingModification: (kind: EquipmentModificationKind, commandID: UUID, before: PlayerState)?
+    @State var pendingRefinement: (equipment: EquipmentKind, commandID: UUID, before: PlayerState)?
     @State var handoffConsumed = false
     @State var isLoading = false
 
@@ -41,8 +43,8 @@ struct EquipmentView: View {
                 handoffPanel
                 if notice == .storageFailure { recoveryPanel }
                 if notice != nil, notice != .storageFailure { noticePanel }
-                ForEach(EquipmentKind.allCases, id: \.self) { equipmentRow($0) }
                 refinementPanel
+                ForEach(EquipmentKind.allCases, id: \.self) { equipmentRow($0) }
                 modificationPanel
             }
             .padding(17)
@@ -108,54 +110,6 @@ struct EquipmentView: View {
         }
     }
 
-    private var refinementPanel: some View {
-        DeepMineRivetedPanel {
-            VStack(alignment: .leading, spacing: 10) {
-                Label(
-                    "\(DeepMineStrings.text(.actionUpgrade)) ×\(DeepMineNumberFormatter.string(Balance.refinementDamageMultiplier))",
-                    systemImage: "sparkles"
-                )
-                .font(.headline)
-                .foregroundStyle(DeepMinePalette.brass.color)
-                ForEach(EquipmentKind.allCases, id: \.self) { refinementRow($0) }
-            }
-        }
-        .accessibilityIdentifier("equipment-refinement")
-    }
-
-    private func refinementRow(_ kind: EquipmentKind) -> some View {
-        let level = EquipmentEngine.level(of: kind, in: player.equipment)
-        let tier = player.refinementTiers.tier(for: kind)
-        let nextTier = tier + 1
-        let unlocked = tier < RefinementEngine.unlockedTiers(forLevel: level)
-        let required = RefinementEngine.requiredLevel(forTier: nextTier)
-        let cost = RefinementEngine.oreCost(for: kind, tier: nextTier)
-        return Button { purchaseRefinement(kind) } label: {
-            HStack {
-                DeepMinePixelImage(name: GameArtCatalog.refinementBadgeName(kind: kind.rawValue), size: 28).accessibilityHidden(true)
-                Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind)))
-                    .font(.subheadline.weight(.bold))
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("R\(tier) → R\(nextTier)")
-                    Text(unlocked ? "◆\(DeepMineNumberFormatter.string(cost))" : "Lv. \(required)")
-                        .foregroundStyle(unlocked
-                            ? DeepMinePalette.brass.color
-                            : DeepMinePalette.limestone.color.opacity(0.58))
-                }
-                .font(.caption.monospacedDigit().weight(.bold))
-            }
-            .frame(maxWidth: .infinity, minHeight: 44)
-        }
-        .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
-        .disabled(!unlocked || isLoading || notice == .storageFailure)
-        .accessibilityLabel(
-            "\(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))), "
-                + "\(DeepMineStrings.text(.actionUpgrade)), R\(nextTier), "
-                + (unlocked ? DeepMineNumberFormatter.string(cost) : "Lv. \(required)")
-        )
-        .accessibilityIdentifier("equipment-refinement-\(kind.rawValue)")
-    }
 }
 
 @MainActor
@@ -274,20 +228,39 @@ extension EquipmentView {
     ) {
         guard let gameStore else { notice = .storageFailure; return }
         let commandID = commandID ?? UUID()
+        let retryBaseline = pendingModification.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
-        pendingModification = (modification, commandID)
+        pendingModification = (modification, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipmentModification(
                 modification,
                 commandID: commandID
             ) {
-            case .purchased, .duplicate, .alreadySelected:
+            case .purchased, .duplicate:
+                let after = try gameStore.playerState()
+                player = after
+                notice = purchaseNotice(
+                    equipment: modification.equipment,
+                    before: before,
+                    after: after
+                )
+                pendingModification = nil
+            case .alreadySelected:
                 player = try gameStore.playerState()
                 notice = .success
                 pendingModification = nil
             case let .insufficientOre(required, available):
-                notice = .insufficient(required: required, available: available)
+                notice = .insufficient(
+                    required: BigNumber(required),
+                    available: BigNumber(available)
+                )
                 pendingModification = nil
             case .levelLocked:
                 notice = nil

@@ -137,45 +137,42 @@ final class GameRepository {
     }
     func save(_ state: PlayerState) throws {
         let context = ModelContext(modelContainer)
-        let commandReceipts = try context.fetch(FetchDescriptor<PurchaseStateEntity>())
-            .first?.appliedGameCommandIDsData ?? Data("[]".utf8)
-        try deleteAll(from: context)
-        let root = PlayerStateEntity()
-        root.apply(state)
-        root.appliedCompletionIDsData = try encodeSet(state.appliedCompletionIDs)
-        root.usedRestWeeksData = try encodeSet(state.usedRestWeeks)
-        root.unlockedThemesData = try encodeSet(state.unlockedThemes)
-        root.unlockedDecorationsData = try encodeSet(state.unlockedDecorations)
-        root.appliedVeinEffectIDsData = try encodeSet(state.appliedVeinEffectIDs)
-        root.appliedPrestigeCommandIDsData = try encodeSet(state.appliedPrestigeCommandIDs)
-        context.insert(root)
-        let equipment = EquipmentStateEntity()
-        equipment.drillLevel = state.equipment.drill
-        equipment.cartLevel = state.equipment.cart
-        equipment.lampLevel = state.equipment.lamp
-        context.insert(equipment)
-        for (index, record) in state.history.enumerated() {
-            let entity = SessionRecordEntity(completionID: record.completionID)
-            entity.apply(record, sortIndex: index)
-            context.insert(entity)
-        }
-        for (index, record) in state.dailyRecords.enumerated() {
-            let entity = DailyRecordEntity(
-                year: record.dayKey.year,
-                month: record.dayKey.month,
-                day: record.dayKey.day
-            )
-            entity.apply(record, sortIndex: index)
-            context.insert(entity)
-        }
-        let purchases = PurchaseStateEntity()
-        purchases.appliedPurchaseIDsData = try encodeSet(state.appliedPurchaseIDs)
-        purchases.appliedPermanentUpgradeCommandIDsData = try encodeSet(
-            state.appliedPermanentUpgradeCommandIDs
+        let commandReceipts = try decodeUUIDs(
+            context.fetch(FetchDescriptor<PurchaseStateEntity>())
+                .first?.appliedGameCommandIDsData
         )
-        purchases.appliedGameCommandIDsData = commandReceipts
-        context.insert(purchases)
+        try replaceState(state, commandReceipts: commandReceipts, in: context)
         try context.save()
+    }
+    func appliedCommandIDs() throws -> Set<UUID> {
+        let context = ModelContext(modelContainer)
+        return try decodeUUIDs(context.fetch(
+            FetchDescriptor<PurchaseStateEntity>()
+        ).first?.appliedGameCommandIDsData)
+    }
+    func applyAtomically(_ command: GameCommand) throws -> Bool {
+        let context = ModelContext(modelContainer)
+        let existing = try context.fetch(FetchDescriptor<PurchaseStateEntity>()).first
+        var receipts = try decodeUUIDs(existing?.appliedGameCommandIDsData)
+        guard receipts.insert(command.id).inserted else { return false }
+        var state = try load()
+        switch command.action {
+        case let .upgradeEquipment(kind):
+            _ = EquipmentEngine.purchase(
+                UpgradePurchaseCommand(id: command.id, equipment: kind), in: &state
+            )
+        case let .purchasePermanentUpgrade(kind):
+            _ = PrestigeEngine.purchase(
+                PermanentUpgradeCommand(id: command.id, upgrade: kind), in: &state
+            )
+        case .prestige:
+            _ = PrestigeEngine.prestige(PrestigeCommand(id: command.id), in: &state)
+        case .startSession, .abandonSession, .open:
+            return false
+        }
+        try replaceState(state, commandReceipts: receipts, in: context)
+        try context.save()
+        return true
     }
     private static func configuredRepository(
         storeURL: URL, recoveryNotice: GameRecoveryNotice? = nil
@@ -206,7 +203,17 @@ final class GameRepository {
                 coreShards: root.coreShards
             ),
             equipment: EquipmentLevels(drill: equipment.drillLevel, cart: equipment.cartLevel, lamp: equipment.lampLevel),
+            rememberedEquipment: EquipmentLevels(
+                drill: equipment.rememberedDrillLevel,
+                cart: equipment.rememberedCartLevel,
+                lamp: equipment.rememberedLampLevel
+            ),
             equipmentModifications: root.storedEquipmentModifications(),
+            refinementTiers: RefinementTiers(
+                drill: equipment.drillRefinementTier,
+                cart: equipment.cartRefinementTier,
+                lamp: equipment.lampRefinementTier
+            ),
             runFocusCredits: root.runFocusCredits,
             lifetimeFocusCredits: root.lifetimeFocusCredits,
             runSegmentsBroken: root.runSegmentsBroken,
@@ -227,6 +234,9 @@ final class GameRepository {
             unlockedDecorations: try decodeSet(root.unlockedDecorationsData),
             resonanceBoostPending: root.resonanceBoostPending,
             appliedVeinEffectIDs: try decodeSet(root.appliedVeinEffectIDsData),
+            earnedAchievementIDs: root.earnedAchievementIDsData.isEmpty
+                ? []
+                : try decodeSet(root.earnedAchievementIDsData),
             excavationMemoryLevel: root.excavationMemoryLevel,
             compressedTimeLevel: root.compressedTimeLevel,
             prestigeIndex: root.prestigeIndex,
@@ -270,13 +280,6 @@ final class GameRepository {
             deepestSegmentIndex: root.deepestSegmentIndex,
             lastSettledAt: root.lastSettledAt
         )
-    }
-    private func deleteAll(from context: ModelContext) throws {
-        try context.delete(model: PlayerStateEntity.self)
-        try context.delete(model: EquipmentStateEntity.self)
-        try context.delete(model: SessionRecordEntity.self)
-        try context.delete(model: DailyRecordEntity.self)
-        try context.delete(model: PurchaseStateEntity.self)
     }
     private func requireOne<T>(_ values: [T], named name: String) throws -> T {
         guard values.count == 1, let value = values.first else {

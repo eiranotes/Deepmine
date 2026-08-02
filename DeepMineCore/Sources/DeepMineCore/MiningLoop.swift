@@ -60,9 +60,12 @@ public enum MiningLoop {
         commit(update, to: &state)
 
         // A resolution stops after a fixed number of segments so one call cannot loop
-        // unbounded. Without re-driving what it left behind, that cap silently deleted
-        // production: a long offline haul would break 512 segments, drop the rest of its
-        // damage, and pay the player for less rock than they actually broke.
+        // unbounded. Late-game offline damage needs more than twelve 512-segment passes,
+        // though, so carried passes get a larger (still finite) resolution window. The
+        // pass count remains bounded while an eight-hour haul at the supported late-game
+        // depths can spend its damage instead of returning a silently short payout.
+        let carriedResolutionSegmentLimit = Balance.maximumSegmentsPerResolution
+            * Balance.maximumResolutionPasses
         var passes = 1
         while update.wasTruncated,
               update.unspentDamage > .zero,
@@ -72,7 +75,8 @@ public enum MiningLoop {
                 to: state.mineFace,
                 equipment: state.equipment,
                 modifications: state.equipmentModifications,
-                oreMultiplier: power.oreMultiplier
+                oreMultiplier: power.oreMultiplier,
+                maximumSegments: carriedResolutionSegmentLimit
             )
             commit(next, to: &state)
             update = merged(update, next)

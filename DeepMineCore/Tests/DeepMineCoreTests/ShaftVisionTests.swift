@@ -53,6 +53,21 @@ final class ShaftVisionTests: XCTestCase {
         XCTAssertTrue(scene.strata.last?.isRegionEntrance == true)
     }
 
+    func testVisibleGeologySplitsAtExactLongDepthThresholds() {
+        for threshold in [5_000, 20_000, 100_000] {
+            let segment = ProgressionEngine.segmentIndex(forDepth: threshold)
+            let scene = ShaftSceneEngine.scene(for: PlayerState(
+                mineFace: MineFaceState(segmentIndex: segment)
+            ))
+
+            XCTAssertTrue(scene.strata.contains {
+                $0.startDepthMeters == Double(threshold)
+                    && $0.region == .abyss
+                    && !$0.isRegionEntrance
+            }, "missing visual geology boundary at \(threshold)m")
+        }
+    }
+
     func testBoreHistoryPreservesTheWidthUsedWhenRockBroke() {
         let narrow = BoreRecord(segmentIndex: 10, drillLevel: 1, cartLevel: 1, lampLevel: 1)
         let wide = BoreRecord(

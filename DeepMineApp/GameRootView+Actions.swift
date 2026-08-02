@@ -1,14 +1,39 @@
 import DeepMineCore
 import SwiftUI
 
+enum HomeMiningClockPolicy {
+    static func isLive(
+        isFixture: Bool,
+        isSessionRecoveryComplete: Bool,
+        isSessionStartInFlight: Bool,
+        hasActiveSession: Bool
+    ) -> Bool {
+        !isFixture
+            && isSessionRecoveryComplete
+            && !isSessionStartInFlight
+            && !hasActiveSession
+    }
+}
+
 /// Navigation and store actions behind the root scene.
 @MainActor
 extension GameRootView {
+    /// Visible automation and offline catch-up are one economic clock. Keeping their
+    /// gate identical prevents a focus session from being paid here and again at return.
+    var isHomeMiningClockLive: Bool {
+        HomeMiningClockPolicy.isLive(
+            isFixture: fixtureState != nil,
+            isSessionRecoveryComplete: isSessionRecoveryComplete,
+            isSessionStartInFlight: isSessionStartInFlight,
+            hasActiveSession: gameStore?.activeSession != nil
+        )
+    }
+
     /// Recomputed only when the player changes. Deriving it inside `body` re-read the
     /// repository on every pass, which is both wasted I/O and a visible side effect.
     func refreshRecommendation() {
         guard let gameStore else { return }
-        homeRecommendation = try? gameStore.recommendedUpgrade(for: player)
+        homeRecommendation = gameStore.recommendedUpgrade(for: player)
         homeProjectedOre = try? gameStore.rewardProjection(
             for: player,
             length: player.lastSelectedDuration,
@@ -60,9 +85,13 @@ extension GameRootView {
         refreshRecommendation()
     }
 
-    func recoverSession() async {
-        guard let gameStore else { return }
-        try? await gameStore.resume()
+    func recoverSession() async -> Bool {
+        guard let gameStore else { return false }
+        do {
+            try await gameStore.resume()
+        } catch {
+            return false
+        }
         refreshLivePlayer()
         if gameStore.activeSession != nil, path.last != .activeMine {
             path.append(.activeMine)
@@ -71,6 +100,7 @@ extension GameRootView {
                   path.isEmpty {
             path.append(.returnReport)
         }
+        return true
     }
 
     func receive(_ report: GameReturnReport) {

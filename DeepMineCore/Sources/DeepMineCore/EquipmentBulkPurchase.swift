@@ -20,7 +20,12 @@ public struct BulkUpgradePurchaseCommand: Codable, Equatable, Sendable {
 }
 
 public enum BulkUpgradePurchaseResult: Codable, Equatable, Sendable {
-    case purchased(equipment: EquipmentKind, newLevel: Int, levelsBought: Int, totalCost: Double)
+    case purchased(
+        equipment: EquipmentKind,
+        newLevel: Int,
+        levelsBought: Int,
+        totalCost: BigNumber
+    )
     case nothingAffordable
     case depthLocked(unlockedLevel: Int, requiredDepthMeters: Int)
     case duplicate
@@ -70,7 +75,7 @@ extension EquipmentEngine {
             equipment: command.equipment,
             newLevel: level(of: command.equipment, in: state.equipment),
             levelsBought: bought,
-            totalCost: total.doubleValue
+            totalCost: total
         )
     }
 

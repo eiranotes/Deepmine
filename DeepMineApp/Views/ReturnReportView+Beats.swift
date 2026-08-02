@@ -136,7 +136,7 @@ extension ReturnReportView {
                 systemImage: equipmentSymbol(value.equipment)
             )
             .font(.subheadline.weight(.semibold))
-            Text("\(DeepMineStrings.text(.returnRecommendationCost)) \(DeepMineNumberFormatter.string(value.cost)) · \(DeepMineStrings.text(.returnRecommendationOwned)) \(DeepMineNumberFormatter.string(value.availableOre))")
+            Text("\(DeepMineStrings.text(.returnRecommendationCost)) \(DeepMineNumberFormatter.string(big: value.cost)) · \(DeepMineStrings.text(.returnRecommendationOwned)) \(DeepMineNumberFormatter.string(big: value.availableOre))")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.72))
             Text(DeepMineStrings.text(

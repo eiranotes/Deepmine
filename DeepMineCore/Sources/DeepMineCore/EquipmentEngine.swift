@@ -17,8 +17,10 @@ public struct UpgradePurchaseCommand: Codable, Equatable, Sendable {
 }
 
 public enum UpgradePurchaseResult: Codable, Equatable, Sendable {
-    case purchased(equipment: EquipmentKind, newLevel: Int, cost: Double)
-    case insufficientOre(required: Double, available: Double)
+    /// Purchase results are an economy boundary. Keeping the exact values here prevents
+    /// a successful late-game purchase from being reported as `Double.greatestFiniteMagnitude`.
+    case purchased(equipment: EquipmentKind, newLevel: Int, cost: BigNumber)
+    case insufficientOre(required: BigNumber, available: BigNumber)
     case maximumLevel
     case depthLocked(unlockedLevel: Int, requiredDepthMeters: Int)
     case duplicate
@@ -52,6 +54,9 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
     public let currentLevel: Int
     public let nextLevel: Int
     public let cost: Double
+    /// Canonical cost for comparisons and player-facing notation. `cost` remains as a
+    /// source-compatible legacy projection for older callers, but may saturate above 1e308.
+    public let bigCost: BigNumber
     public let marginalExpectedOre: Double
     public let efficiency: Double
     public let isRemembered: Bool
@@ -61,6 +66,7 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
         currentLevel: Int,
         nextLevel: Int,
         cost: Double,
+        bigCost: BigNumber? = nil,
         marginalExpectedOre: Double,
         efficiency: Double,
         isRemembered: Bool = false
@@ -69,9 +75,49 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
         self.currentLevel = currentLevel
         self.nextLevel = nextLevel
         self.cost = cost
+        self.bigCost = bigCost ?? BigNumber(cost)
         self.marginalExpectedOre = marginalExpectedOre
         self.efficiency = efficiency
         self.isRemembered = isRemembered
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case equipment
+        case currentLevel
+        case nextLevel
+        case cost
+        case bigCost
+        case marginalExpectedOre
+        case efficiency
+        case isRemembered
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let legacyCost = try container.decode(Double.self, forKey: .cost)
+        self.init(
+            equipment: try container.decode(EquipmentKind.self, forKey: .equipment),
+            currentLevel: try container.decode(Int.self, forKey: .currentLevel),
+            nextLevel: try container.decode(Int.self, forKey: .nextLevel),
+            cost: legacyCost,
+            bigCost: try container.decodeIfPresent(BigNumber.self, forKey: .bigCost)
+                ?? BigNumber(legacyCost),
+            marginalExpectedOre: try container.decode(Double.self, forKey: .marginalExpectedOre),
+            efficiency: try container.decode(Double.self, forKey: .efficiency),
+            isRemembered: try container.decodeIfPresent(Bool.self, forKey: .isRemembered) ?? false
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(equipment, forKey: .equipment)
+        try container.encode(currentLevel, forKey: .currentLevel)
+        try container.encode(nextLevel, forKey: .nextLevel)
+        try container.encode(cost, forKey: .cost)
+        try container.encode(bigCost, forKey: .bigCost)
+        try container.encode(marginalExpectedOre, forKey: .marginalExpectedOre)
+        try container.encode(efficiency, forKey: .efficiency)
+        try container.encode(isRemembered, forKey: .isRemembered)
     }
 }
 
@@ -183,8 +229,8 @@ public enum EquipmentEngine {
         ) else { return .invalidLevel }
         guard state.resources.ore >= cost else {
             return .insufficientOre(
-                required: cost.doubleValue,
-                available: state.resources.ore.doubleValue
+                required: cost,
+                available: state.resources.ore
             )
         }
 
@@ -198,7 +244,7 @@ public enum EquipmentEngine {
         return .purchased(
             equipment: command.equipment,
             newLevel: newLevel,
-            cost: cost.doubleValue
+            cost: cost
         )
     }
 

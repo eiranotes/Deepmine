@@ -35,9 +35,9 @@ public struct RefinementPurchaseCommand: Codable, Equatable, Sendable {
 }
 
 public enum RefinementPurchaseResult: Equatable, Sendable {
-    case refined(equipment: EquipmentKind, newTier: Int, cost: Double)
+    case refined(equipment: EquipmentKind, newTier: Int, cost: BigNumber)
     case locked(requiredLevel: Int)
-    case insufficientOre(required: Double, available: Double)
+    case insufficientOre(required: BigNumber, available: BigNumber)
     case duplicate
 }
 
@@ -103,8 +103,8 @@ public enum RefinementEngine {
         let cost = oreCostBig(for: equipment, tier: current + 1)
         guard state.resources.ore >= cost else {
             return .insufficientOre(
-                required: cost.doubleValue,
-                available: state.resources.ore.doubleValue
+                required: cost,
+                available: state.resources.ore
             )
         }
 
@@ -117,7 +117,7 @@ public enum RefinementEngine {
         return .refined(
             equipment: equipment,
             newTier: current + 1,
-            cost: cost.doubleValue
+            cost: cost
         )
     }
 }

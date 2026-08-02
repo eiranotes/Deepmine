@@ -236,6 +236,7 @@ enum GameSurfaceSnapshotMapper {
             currentLevel: value.currentLevel,
             nextLevel: value.nextLevel,
             cost: finiteNonnegative(value.cost),
+            bigCost: value.bigCost,
             marginalExpectedOre: finiteNonnegative(value.marginalExpectedOre)
         )
     }
@@ -247,9 +248,15 @@ enum GameSurfaceSnapshotMapper {
             equipmentID: value.equipment.rawValue,
             currentLevel: value.currentLevel,
             nextLevel: value.nextLevel,
-            cost: finiteNonnegative(value.cost),
+            cost: legacyProjection(value.cost),
+            bigCost: value.cost,
             marginalExpectedOre: finiteNonnegative(value.marginalExpectedOre)
         )
+    }
+
+    private static func legacyProjection(_ value: BigNumber) -> Double {
+        let projection = value.doubleValue
+        return projection.isFinite ? max(0, projection) : .greatestFiniteMagnitude
     }
 
     private static func finiteNonnegative(_ value: Double) -> Double {

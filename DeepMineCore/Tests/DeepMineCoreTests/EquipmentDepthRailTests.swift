@@ -29,7 +29,7 @@ final class EquipmentDepthRailTests: XCTestCase {
                 .purchased(
                     equipment: .drill,
                     newLevel: expectedLevel,
-                    cost: EquipmentEngine.upgradeCost(
+                    cost: EquipmentEngine.upgradeCostBig(
                         for: .drill,
                         currentLevel: expectedLevel - 1,
                         rememberedLevel: 20

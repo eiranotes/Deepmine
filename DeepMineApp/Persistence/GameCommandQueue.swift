@@ -221,35 +221,6 @@ private extension GameCommandAction {
 
 @MainActor
 extension GameRepository {
-    func appliedCommandIDs() throws -> Set<UUID> {
-        let context = ModelContext(modelContainer)
-        return try decodeUUIDs(context.fetch(
-            FetchDescriptor<PurchaseStateEntity>()
-        ).first?.appliedGameCommandIDsData) }
-    func applyAtomically(_ command: GameCommand) throws -> Bool {
-        let context = ModelContext(modelContainer)
-        let existing = try context.fetch(FetchDescriptor<PurchaseStateEntity>()).first
-        var receipts = try decodeUUIDs(existing?.appliedGameCommandIDsData)
-        guard receipts.insert(command.id).inserted else { return false }
-        var state = try load()
-        switch command.action {
-        case let .upgradeEquipment(kind):
-            _ = EquipmentEngine.purchase(
-                UpgradePurchaseCommand(id: command.id, equipment: kind), in: &state
-            )
-        case let .purchasePermanentUpgrade(kind):
-            _ = PrestigeEngine.purchase(
-                PermanentUpgradeCommand(id: command.id, upgrade: kind), in: &state
-            )
-        case .prestige:
-            _ = PrestigeEngine.prestige(PrestigeCommand(id: command.id), in: &state)
-        case .startSession, .abandonSession, .open:
-            return false
-        }
-        try replaceState(state, commandReceipts: receipts, in: context)
-        try context.save()
-        return true
-    }
     func replaceState(
         _ state: PlayerState, commandReceipts: Set<UUID>, in context: ModelContext
     ) throws {
@@ -266,11 +237,18 @@ extension GameRepository {
         root.unlockedDecorationsData = try JSONEncoder().encode(Array(state.unlockedDecorations))
         root.appliedVeinEffectIDsData = try encodeUUIDs(state.appliedVeinEffectIDs)
         root.appliedPrestigeCommandIDsData = try encodeUUIDs(state.appliedPrestigeCommandIDs)
+        root.earnedAchievementIDsData = try encodeSet(state.earnedAchievementIDs)
         context.insert(root)
         let equipment = EquipmentStateEntity()
         equipment.drillLevel = state.equipment.drill
         equipment.cartLevel = state.equipment.cart
         equipment.lampLevel = state.equipment.lamp
+        equipment.rememberedDrillLevel = state.rememberedEquipment.drill
+        equipment.rememberedCartLevel = state.rememberedEquipment.cart
+        equipment.rememberedLampLevel = state.rememberedEquipment.lamp
+        equipment.drillRefinementTier = state.refinementTiers.drill
+        equipment.cartRefinementTier = state.refinementTiers.cart
+        equipment.lampRefinementTier = state.refinementTiers.lamp
         context.insert(equipment)
         for (index, record) in state.history.enumerated() {
             let entity = SessionRecordEntity(completionID: record.completionID)

@@ -78,6 +78,7 @@ extension MineHomeView {
     @ViewBuilder
     var upgradeAffordance: some View {
         if let recommendation {
+            let isAffordable = player.resources.ore >= recommendation.bigCost
             Button { onUpgrade(recommendation.equipment) } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "arrow.up.circle.fill")
@@ -85,14 +86,14 @@ extension MineHomeView {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("\(equipmentTitle(recommendation.equipment)) Lv. \(recommendation.currentLevel) → \(recommendation.nextLevel)")
                             .font(.subheadline.weight(.bold))
-                        Text(DeepMineStrings.text(
-                            recommendation.isRemembered ? .equipmentRemembered : .homeUpgradeReady
-                        ))
+                        Text(DeepMineStrings.text(isAffordable
+                            ? (recommendation.isRemembered ? .equipmentRemembered : .homeUpgradeReady)
+                            : .homeUpgradeSaving))
                         .font(.caption2)
                         .foregroundStyle(DeepMinePalette.limestone.color.opacity(0.7))
                     }
                     Spacer(minLength: 0)
-                    Text(DeepMineNumberFormatter.string(recommendation.cost))
+                    Text(DeepMineNumberFormatter.string(big: recommendation.bigCost))
                         .font(.caption.monospacedDigit().weight(.bold))
                         .foregroundStyle(DeepMinePalette.brass.color)
                 }
@@ -101,6 +102,7 @@ extension MineHomeView {
                 .padding(.vertical, 8)
             }
             .buttonStyle(DeepMineMetalButtonStyle(role: .secondary))
+            .disabled(!isAffordable)
             .accessibilityIdentifier("mine-home-upgrade")
         } else {
             Label(

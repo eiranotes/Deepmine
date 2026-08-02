@@ -18,11 +18,13 @@ final class GamePersistenceTests: XCTestCase {
         let state = PlayerState(
             resources: Resources(ore: 12_345.5, crystals: 17, coreShards: 4),
             equipment: EquipmentLevels(drill: 8, cart: 6, lamp: 5),
+            rememberedEquipment: EquipmentLevels(drill: 18, cart: 16, lamp: 15),
             equipmentModifications: EquipmentModifications(
                 drill: .drillWide,
                 cart: .cartFreight,
                 lamp: .lampReach
             ),
+            refinementTiers: RefinementTiers(drill: 2, cart: 1, lamp: 3),
             runFocusCredits: 31.5,
             lifetimeFocusCredits: 94.25,
             runSegmentsBroken: 88,
@@ -67,6 +69,7 @@ final class GamePersistenceTests: XCTestCase {
             unlockedDecorations: [.marker, .rail],
             resonanceBoostPending: true,
             appliedVeinEffectIDs: [veinEffectID],
+            earnedAchievementIDs: ["first-rock", "deep-500"],
             excavationMemoryLevel: 3,
             compressedTimeLevel: 1,
             prestigeIndex: 2,
@@ -131,6 +134,30 @@ final class GamePersistenceTests: XCTestCase {
         )
     }
 
+    func testLegacyEmptyGrowthFieldsLoadWithSafeDefaults() throws {
+        let repository = try GameRepository.inMemory()
+        let current = EquipmentLevels(drill: 8, cart: 6, lamp: 5)
+        try repository.save(PlayerState(equipment: current))
+        let context = repository.modelContainer.mainContext
+        let root = try XCTUnwrap(context.fetch(FetchDescriptor<PlayerStateEntity>()).first)
+        let equipment = try XCTUnwrap(
+            context.fetch(FetchDescriptor<EquipmentStateEntity>()).first
+        )
+        root.earnedAchievementIDsData = Data()
+        equipment.rememberedDrillLevel = 0
+        equipment.rememberedCartLevel = 0
+        equipment.rememberedLampLevel = 0
+        equipment.drillRefinementTier = 0
+        equipment.cartRefinementTier = 0
+        equipment.lampRefinementTier = 0
+        try context.save()
+
+        let loaded = try repository.load()
+        XCTAssertEqual(loaded.rememberedEquipment, current)
+        XCTAssertEqual(loaded.refinementTiers, .none)
+        XCTAssertTrue(loaded.earnedAchievementIDs.isEmpty)
+    }
+
     func testOnboardingSchemaFieldsHaveSafeV1Defaults() {
         let entity = PlayerStateEntity()
 
@@ -146,6 +173,44 @@ final class GamePersistenceTests: XCTestCase {
         XCTAssertEqual(entity.lastSelectedDurationRawValue, SessionLength.minutes25.rawValue)
         XCTAssertTrue(entity.equipmentModificationsData.isEmpty)
         XCTAssertTrue(entity.mineFaceBoreHistoryData.isEmpty)
+        XCTAssertTrue(entity.earnedAchievementIDsData.isEmpty)
+        let equipment = EquipmentStateEntity()
+        XCTAssertEqual(equipment.rememberedDrillLevel, 0)
+        XCTAssertEqual(equipment.rememberedCartLevel, 0)
+        XCTAssertEqual(equipment.rememberedLampLevel, 0)
+        XCTAssertEqual(equipment.drillRefinementTier, 0)
+        XCTAssertEqual(equipment.cartRefinementTier, 0)
+        XCTAssertEqual(equipment.lampRefinementTier, 0)
+    }
+
+    func testCommandDrainPreservesLongGrowthState() throws {
+        let directory = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let repository = try GameRepository.open(
+            storeURL: directory.appending(path: GameRepository.storeFilename)
+        )
+        let queue = GameCommandQueue(directoryURL: directory)
+        let achievementIDs: Set<String> = ["first-rock", "deep-500"]
+        try repository.save(PlayerState(
+            resources: Resources(ore: 100_000),
+            equipment: EquipmentLevels(drill: 7, cart: 7, lamp: 7),
+            rememberedEquipment: EquipmentLevels(drill: 18, cart: 16, lamp: 15),
+            refinementTiers: RefinementTiers(drill: 1, cart: 2, lamp: 3),
+            earnedAchievementIDs: achievementIDs,
+            deepestSegmentIndex: 10_000
+        ))
+        try queue.enqueue(GameCommand(action: .upgradeEquipment(.drill)))
+
+        XCTAssertEqual(try queue.drain(into: repository).applied, 1)
+
+        let loaded = try repository.load()
+        XCTAssertEqual(loaded.equipment.drill, 8)
+        XCTAssertEqual(
+            loaded.rememberedEquipment,
+            EquipmentLevels(drill: 18, cart: 16, lamp: 15)
+        )
+        XCTAssertEqual(loaded.refinementTiers, RefinementTiers(drill: 1, cart: 2, lamp: 3))
+        XCTAssertEqual(loaded.earnedAchievementIDs, achievementIDs)
     }
 
     func testUnsupportedSchemaVersionFailsClosed() throws {

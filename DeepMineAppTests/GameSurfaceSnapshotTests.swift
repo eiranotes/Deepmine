@@ -13,6 +13,25 @@ final class GameSurfaceSnapshotTests: XCTestCase {
         XCTAssertEqual(Set([snapshot]).count, 1)
     }
 
+    func testLegacyRecommendationWithoutBigCostStillDecodes() throws {
+        let snapshot = Self.makeSnapshot()
+        var object = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: JSONEncoder().encode(snapshot))
+                as? [String: Any]
+        )
+        var recommendation = try XCTUnwrap(
+            object["upgradeRecommendation"] as? [String: Any]
+        )
+        recommendation.removeValue(forKey: "bigCost")
+        object["upgradeRecommendation"] = recommendation
+
+        let legacy = try JSONSerialization.data(withJSONObject: object)
+        let decoded = try JSONDecoder().decode(GameSurfaceSnapshot.self, from: legacy)
+
+        XCTAssertNil(decoded.upgradeRecommendation?.bigCost)
+        XCTAssertEqual(decoded.upgradeRecommendation?.cost, 138)
+    }
+
     func testStoreReadsMissingFreshAndStaleSnapshots() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }

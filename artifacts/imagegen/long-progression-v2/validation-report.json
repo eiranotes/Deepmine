@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ShaftRock_pressure",
+    "valid": true,
+    "size": [
+      320,
+      128
+    ],
+    "opaque_colors": 4,
+    "transparent": false
+  },
+  {
+    "id": "ShaftRock_fault",
+    "valid": true,
+    "size": [
+      320,
+      128
+    ],
+    "opaque_colors": 4,
+    "transparent": false
+  },
+  {
+    "id": "ShaftRock_core",
+    "valid": true,
+    "size": [
+      320,
+      128
+    ],
+    "opaque_colors": 4,
+    "transparent": false
+  },
+  {
+    "id": "RefinementBadge_drill",
+    "valid": true,
+    "size": [
+      32,
+      32
+    ],
+    "opaque_colors": 4,
+    "transparent": true
+  },
+  {
+    "id": "RefinementBadge_cart",
+    "valid": true,
+    "size": [
+      32,
+      32
+    ],
+    "opaque_colors": 4,
+    "transparent": true
+  },
+  {
+    "id": "RefinementBadge_lamp",
+    "valid": true,
+    "size": [
+      32,
+      32
+    ],
+    "opaque_colors": 4,
+    "transparent": true
+  },
+  {
+    "id": "PrestigeMemoryRing",
+    "valid": true,
+    "size": [
+      48,
+      48
+    ],
+    "opaque_colors": 4,
+    "transparent": true
+  }
+]

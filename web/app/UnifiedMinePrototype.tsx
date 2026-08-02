@@ -35,6 +35,13 @@ function format(value: number) {
   return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: value < 100 ? 2 : 0 }).format(value);
 }
 
+function deepGeologyTexture(depth: number) {
+  if (depth >= 100_000) return "/assets/shaft/ShaftRock_core-v2.png";
+  if (depth >= 20_000) return "/assets/shaft/ShaftRock_fault-v2.png";
+  if (depth >= 5_000) return "/assets/shaft/ShaftRock_pressure-v2.png";
+  return null;
+}
+
 export function UnifiedMinePrototype() {
   const [mine, setMine] = useState(initialMine);
   const [equipment, setEquipment] = useState<EquipmentLevels>(initialEquipment);
@@ -47,7 +54,18 @@ export function UnifiedMinePrototype() {
   const criticalPower = criticalMultiplier(equipment.lamp, refinement.lamp);
   const unlocked = unlockedMaximumLevel(mine.depth);
   const recommended = recommendMiningUpgrade(equipment, mine.ore, mine.depth);
+  const recommendedCost = recommended == null
+    ? null
+    : upgradeCost(recommended, equipment[recommended]);
+  const recommendationShortfall = recommendedCost == null
+    ? 0
+    : Math.max(0, recommendedCost - mine.ore);
+  const canBuyRecommendation = recommended != null
+    && recommendedCost != null
+    && recommendationShortfall === 0
+    && equipment[recommended] < unlocked;
   const progress = Math.min(1, mine.damage / integrity);
+  const geologyTexture = deepGeologyTexture(mine.depth);
 
   const stats = useMemo(() => [
     ["심도", `${mine.depth}m`], ["광석", format(mine.ore)],
@@ -118,7 +136,13 @@ export function UnifiedMinePrototype() {
         {stats.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}
       </section>
       <section className={styles.face} onClick={() => applyDamage(tap)}>
-        <div className={styles.rock} style={{ opacity: 1 - progress * 0.35 }} />
+        <div className={styles.rock} style={{
+          opacity: 1 - progress * 0.35,
+          backgroundImage: geologyTexture ? `url(${geologyTexture})` : undefined,
+          backgroundRepeat: geologyTexture ? "repeat" : undefined,
+          backgroundSize: geologyTexture ? "320px 128px" : undefined,
+          imageRendering: geologyTexture ? "pixelated" : undefined,
+        }} />
         <div className={styles.faceCopy}>
           <span>암반 #{index}</span><strong>{Math.round(progress * 100)}%</strong>
           <small>눌러서 타격 · 파괴 보상 {format(segmentOre(index))}</small>
@@ -126,8 +150,16 @@ export function UnifiedMinePrototype() {
       </section>
       <section className={styles.recommendation}>
         <span>현재 추천</span>
-        <strong>{recommended ? `${labels[recommended]} Lv.${equipment[recommended] + 1}` : "구매 가능 장비 없음"}</strong>
-        {recommended && <button onClick={() => buy(recommended)}>추천 구매</button>}
+        <strong>
+          {recommended
+            ? `${labels[recommended]} Lv.${equipment[recommended] + 1}${recommendationShortfall > 0 ? ` · ◆${format(recommendationShortfall)} 더 저축` : ""}`
+            : "구매 가능 장비 없음"}
+        </strong>
+        {recommended && (
+          <button disabled={!canBuyRecommendation} onClick={() => buy(recommended)}>
+            {canBuyRecommendation ? "추천 구매" : "저축 중"}
+          </button>
+        )}
       </section>
       <section className={styles.equipment}>
         {kinds.map((kind) => {

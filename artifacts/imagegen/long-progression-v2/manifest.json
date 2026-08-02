@@ -1,0 +1,89 @@
+[
+  {
+    "id": "ShaftRock_pressure",
+    "prompt_id": "shaft-rock-pressure",
+    "prompt": "Create the 5km pressure-stratum texture as an edge-to-edge opaque 2D pixel rock wall: horizontally compressed thick plates, short repeated compression cracks, and sparse limestone shear lines. No central object, gradient, glow, perspective, text, or colors outside the DeepMine four pigments.",
+    "transparent": false,
+    "logical_size": [320, 128],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-pressure-imagegen.png",
+    "raw_sha256": "3bdc4b50e3f9f976a4341d825ea2f5d7883edae3573c61de999fc0c09b566790",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/shaftrock-pressure-v2.png",
+    "processed_sha256": "e8c407984f8520edd76d9ea1cd039bf7bf57021c4834c754cd33b3831735f6df",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_pressure.imageset/shaftrock-pressure-v2.png",
+    "web_source": "web/public/assets/shaft/ShaftRock_pressure-v2.png"
+  },
+  {
+    "id": "ShaftRock_fault",
+    "prompt_id": "shaft-rock-fault",
+    "prompt": "A wide 20km fault stratum with one or two irregular diagonal shear zones and offset rock plates; brass appears only as sparse exposed friction faces.",
+    "transparent": false,
+    "logical_size": [320, 128],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-fault-legacy.png",
+    "raw_sha256": "b840ef6a837f086802c11c519f38a76e05fc61bbc879964e4dabe74dac1bcee1",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/shaftrock-fault-v2.png",
+    "processed_sha256": "6e7614d693fd6a2bcbe99d9493f2c1c0beb746246bc6239dc9e97cec6a0e9ac3",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_fault.imageset/shaftrock-fault-v2.png",
+    "web_source": "web/public/assets/shaft/ShaftRock_fault-v2.png"
+  },
+  {
+    "id": "ShaftRock_core",
+    "prompt_id": "shaft-rock-core",
+    "prompt": "A wide 100km core stratum: dense near-black rock, thick limestone pressure veins, and limited brass melt traces, expressed only with flat four-pigment pixel planes.",
+    "transparent": false,
+    "logical_size": [320, 128],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-core-legacy.png",
+    "raw_sha256": "2eeea21fdc0bd4f1487a321ef89b2d40a1dbae5e93370fb9c747802ce4794d6b",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/shaftrock-core-v2.png",
+    "processed_sha256": "c52c1d504e5fe5e44b459c4d731cd41400469dd4050bc61298d4a99b7e202d91",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/ShaftRock_core.imageset/shaftrock-core-v2.png",
+    "web_source": "web/public/assets/shaft/ShaftRock_core-v2.png"
+  },
+  {
+    "id": "RefinementBadge_drill",
+    "prompt_id": "refinement-badge-drill",
+    "prompt": "A 32x32 transparent pixel badge with a circular brass riveted rim, drill bit, and compression ring; no text or number.",
+    "transparent": true,
+    "logical_size": [32, 32],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-drill-legacy.png",
+    "raw_sha256": "0eec6500ecf5e6ad41073a3e5d0711496b83e2d59e80e922d1bde12f85feffa0",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/refinement-drill-v2.png",
+    "processed_sha256": "10a6b99a97678199589cb4380324cdad28758f5e96ed29a244a089a61bf34ae3",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/RefinementBadge_drill.imageset/refinement-drill-v2.png"
+  },
+  {
+    "id": "RefinementBadge_cart",
+    "prompt_id": "refinement-badge-cart",
+    "prompt": "Create a 32x32 transparent pixel badge with a strong circular brass riveted rim containing an unmistakable mine-cart hopper above a short double rail. Keep it readable at icon size and distinct from drill and lamp badges; no text, number, glow, gradient, or shadow.",
+    "transparent": true,
+    "logical_size": [32, 32],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-cart-imagegen.png",
+    "raw_sha256": "96b0c212d67e56fe7ea61b1a2ddcba6d554df06a1ffcb866fa70cee9397183c4",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/refinement-cart-v2.png",
+    "processed_sha256": "aa1ba50609ee68ddcc1912b594edf790e932424e8dfc67f46ca235cca39e98b1",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/RefinementBadge_cart.imageset/refinement-cart-v2.png"
+  },
+  {
+    "id": "RefinementBadge_lamp",
+    "prompt_id": "refinement-badge-lamp",
+    "prompt": "A 32x32 transparent pixel badge with a circular brass riveted rim, work lamp, and reflector; imply light through limestone contrast without glow.",
+    "transparent": true,
+    "logical_size": [32, 32],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-lamp-legacy.png",
+    "raw_sha256": "7aee4850e81b8121c4e157248a20f9f0282a0bf4fe43da4481d6153812831ff6",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/refinement-lamp-v2.png",
+    "processed_sha256": "b2546b3668a56d004e214d1decb8549d0bb6b45012ca2c3d736293d13c51cfee",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/RefinementBadge_lamp.imageset/refinement-lamp-v2.png"
+  },
+  {
+    "id": "PrestigeMemoryRing",
+    "prompt_id": "prestige-memory-ring",
+    "prompt": "A 48x48 transparent pixel mark with concentric brass descent rings, a coal-black shaft opening, and limestone depth ticks; no arrow, text, or number.",
+    "transparent": true,
+    "logical_size": [48, 48],
+    "raw_source": "artifacts/imagegen/long-progression-v2/raw/prestige-memory-ring-legacy.png",
+    "raw_sha256": "fc208ecbdeece5f51bbfc03277dd29601b11b0166b88a6577263ab4d604179c9",
+    "processed_source": "artifacts/imagegen/long-progression-v2/processed/prestige-memory-ring-v2.png",
+    "processed_sha256": "68bccdf12ebd888da38eefc0b56aca3da844d08690aea70d9495a8858215b5cf",
+    "catalog_source": "DeepMineProbe/Shared/SharedAssets.xcassets/PrestigeMemoryRing.imageset/prestige-memory-ring-v2.png"
+  }
+]

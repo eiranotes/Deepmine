@@ -1,4 +1,6 @@
+import DeepMineCore
 import Foundation
+import SwiftUI
 import XCTest
 @testable import DeepMine
 
@@ -80,3 +82,79 @@ private extension GameWidgetSnapshotFixtures {
 }
 
 private enum FixtureSnapshotError: Error { case notFresh }
+
+@MainActor
+final class GameRootMiningClockTests: XCTestCase {
+    func testActiveSessionSkipsOfflineSettlement() async throws {
+        let fixture = try await makeActiveRoot()
+        let before = try fixture.repository.load()
+
+        fixture.root.settleOfflineProduction()
+
+        XCTAssertFalse(fixture.root.isHomeMiningClockLive)
+        XCTAssertEqual(try fixture.repository.load(), before)
+        XCTAssertNil(fixture.root.offlineSettlement)
+    }
+
+    func testActiveSessionPassesFalseToShaftLiveContract() async throws {
+        let fixture = try await makeActiveRoot()
+        let player = try fixture.repository.load()
+
+        XCTAssertTrue(fixture.root.isSessionRecoveryComplete)
+        XCTAssertFalse(fixture.root.clickerSectionView(player: .constant(player)).isLive)
+    }
+
+    func testHomeMiningClockPolicyRequiresResolvedSessionWithoutActiveFocus() {
+        XCTAssertTrue(HomeMiningClockPolicy.isLive(
+            isFixture: false,
+            isSessionRecoveryComplete: true,
+            isSessionStartInFlight: false,
+            hasActiveSession: false
+        ))
+        XCTAssertFalse(HomeMiningClockPolicy.isLive(
+            isFixture: false,
+            isSessionRecoveryComplete: true,
+            isSessionStartInFlight: false,
+            hasActiveSession: true
+        ))
+        XCTAssertFalse(HomeMiningClockPolicy.isLive(
+            isFixture: false,
+            isSessionRecoveryComplete: false,
+            isSessionStartInFlight: false,
+            hasActiveSession: false
+        ))
+        XCTAssertFalse(HomeMiningClockPolicy.isLive(
+            isFixture: false,
+            isSessionRecoveryComplete: true,
+            isSessionStartInFlight: true,
+            hasActiveSession: false
+        ))
+    }
+
+    private func makeActiveRoot() async throws -> ActiveRootFixture {
+        let repository = try GameRepository.inMemory()
+        try repository.save(PlayerState(
+            onboardingStage: .complete,
+            lastSettledAt: Date().addingTimeInterval(-3_600)
+        ))
+        let store = GameStore(
+            repository: repository,
+            coordinator: FakeSystemCoordinator()
+        )
+        try await store.start(length: .minutes15, plan: .safe)
+        let root = GameRootView(
+            repository: repository,
+            gameStore: store,
+            settingsCoordinator: DeterministicSettingsSystemCoordinator(),
+            readinessProvider: FixedSessionReadinessProvider(.sealed),
+            hasRecoveryNotice: false
+        )
+        return ActiveRootFixture(root: root, repository: repository)
+    }
+}
+
+@MainActor
+private struct ActiveRootFixture {
+    let root: GameRootView
+    let repository: GameRepository
+}

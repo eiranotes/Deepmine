@@ -42,19 +42,28 @@ function buyRecommended() {
 function render() {
   const dps = automationDamagePerSecond(state.equipment.cart);
   const recommendation = recommendMiningUpgrade(state.equipment, state.ore, state.depth);
+  const recommendationCost = recommendation == null
+    ? null
+    : upgradeCost(recommendation, state.equipment[recommendation]);
+  const recommendationShortfall = recommendationCost == null
+    ? null
+    : Math.max(0, recommendationCost - state.ore);
   document.querySelector("#readout").innerHTML = [
     `심도: ${state.depth}m`, `광석: ${format(state.ore)}`,
     `장비: 드릴 ${state.equipment.drill} / 광차 ${state.equipment.cart} / 램프 ${state.equipment.lamp}`,
     `탭: ${format(tapDamage(state.equipment.drill))}`, `자동 DPS: ${format(dps)}`,
-    `추천: ${recommendation ?? "구매 가능 장비 없음"}`,
+    `추천: ${recommendation ?? "구매 가능 장비 없음"}${recommendationShortfall > 0 ? ` (◆${format(recommendationShortfall)} 더 저축)` : ""}`,
   ].join("<br>");
+  const upgradeButton = document.querySelector("#upgrade");
+  upgradeButton.disabled = recommendation == null || recommendationShortfall > 0;
+  upgradeButton.textContent = recommendationShortfall > 0 ? "첫 광차 저축 중" : "추천 장비 구매";
 }
 
 const checks = [
   ["모든 장비는 Lv.1에서 시작", () => initial().equipment.cart === 1],
   ["광차 Lv.1은 자동 DPS 0", () => automationDamagePerSecond(1) === 0],
   ["광차 Lv.2부터 자동화 시작", () => automationDamagePerSecond(2) > 0],
-  ["초기 100 광석에서는 드릴만 구매 가능", () => recommendMiningUpgrade(initial().equipment, 100, 8) === "drill"],
+  ["초기 100 광석에서도 첫 광차를 저축 목표로 유지", () => recommendMiningUpgrade(initial().equipment, 100, 8) === "cart" && upgradeCost("cart", 1) > 100],
   ["광차 비용 확보 시 첫 자동화를 최우선 추천", () => recommendMiningUpgrade(initial().equipment, 180, 15) === "cart"],
   ["장비 상한 200 제거", () => upgradeCost("drill", 201) !== null],
   ["정련은 6레벨마다 해금되고 ×2.5", () => refinementMultiplier(1) === 2.5],

@@ -13,8 +13,37 @@ struct GameSurfaceUpgradeRecommendation: Codable, Hashable, Sendable {
     let equipmentID: String
     let currentLevel: Int
     let nextLevel: Int
+    /// Legacy projection retained so existing widget/activity payloads keep decoding.
     let cost: Double
+    /// Exact economy value. Older payloads omit it; newer readers prefer it whenever set.
+    let bigCost: BigNumber?
     let marginalExpectedOre: Double
+
+    init(
+        equipmentID: String,
+        currentLevel: Int,
+        nextLevel: Int,
+        cost: Double,
+        bigCost: BigNumber? = nil,
+        marginalExpectedOre: Double
+    ) {
+        self.equipmentID = equipmentID
+        self.currentLevel = currentLevel
+        self.nextLevel = nextLevel
+        self.cost = cost
+        self.bigCost = bigCost
+        self.marginalExpectedOre = marginalExpectedOre
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(equipmentID)
+        hasher.combine(currentLevel)
+        hasher.combine(nextLevel)
+        hasher.combine(cost)
+        hasher.combine(bigCost?.mantissa)
+        hasher.combine(bigCost?.exponent)
+        hasher.combine(marginalExpectedOre)
+    }
 }
 
 struct GameSurfaceSnapshot: Codable, Hashable, Sendable {

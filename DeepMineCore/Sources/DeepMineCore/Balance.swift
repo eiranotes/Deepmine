@@ -54,11 +54,10 @@ public enum Balance {
     public static let laterDailySessionMultiplier = 1.10
 
     public static let minimumEquipmentLevel = 1
-    /// There is no game ceiling on equipment level. 60 bound before the abyss (D-044) and
-    /// 200 bound at 2,925m, where damage stopped growing while integrity kept compounding —
-    /// the same wall, deeper. What remains is an arithmetic guard: depth still gates the
-    /// ladder at one level per 15m, so reaching this bound would take a shaft far deeper
-    /// than ore can be represented in.
+    /// The old product ceilings at 60 and 200 are gone. A separate arithmetic safety
+    /// ceiling remains so level-derived integer work is bounded. The 15m depth gate reaches
+    /// level 100,000 at 1,499,925m, outside the currently verified 500km horizon but still
+    /// representable by the BigNumber economy.
     ///
     /// Growth past the ladder is carried by refinement tiers rather than by raising this
     /// number again, because a level axis alone trails integrity by 3.064% per segment at
@@ -223,8 +222,8 @@ public enum Balance {
         }
     }
 
-    /// Depth is the only limit on the ladder now. The arithmetic bound is not a design
-    /// value and is never reached in a representable shaft.
+    /// Depth opens the ladder until the explicit arithmetic safety ceiling. This is not a
+    /// tuned progression milestone; purchases return `maximumLevel` when it is reached.
     public static func maximumEquipmentLevel(forDepth depth: Int) -> Int {
         let unlocked = equipmentLevelUnlockBase
             + max(0, depth) / equipmentLevelUnlockDepthStep

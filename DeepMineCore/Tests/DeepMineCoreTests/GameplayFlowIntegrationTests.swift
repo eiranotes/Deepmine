@@ -15,6 +15,22 @@ final class GameplayFlowIntegrationTests: XCTestCase {
         XCTAssertTrue(MiningLoop.power(for: player).isAutomated)
     }
 
+    func testAffordableHomeRecommendationKeepsTheFirstCartAsTheSavingsGoal() {
+        let player = PlayerState(
+            resources: Resources(ore: 134),
+            equipment: EquipmentLevels(drill: 2, cart: 1, lamp: 1)
+        )
+
+        let recommendation = UpgradeAdvisor.recommendForMining(
+            for: player,
+            affordableOnly: true
+        )
+
+        XCTAssertEqual(recommendation?.equipment, .cart)
+        XCTAssertEqual(recommendation?.cost, 180)
+        XCTAssertLessThan(player.resources.ore.doubleValue, recommendation?.cost ?? 0)
+    }
+
     func testBulkPurchaseStopsAtRememberedLevel() {
         var player = PlayerState(
             resources: Resources(ore: 1_000_000),

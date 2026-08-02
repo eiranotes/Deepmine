@@ -14,6 +14,26 @@ final class TruncatedResolutionTests: XCTestCase {
         return total
     }
 
+    private func lateGameState(atDepthMeters depthMeters: Int) -> PlayerState {
+        let segmentIndex = depthMeters / Balance.metersPerSegment
+        let equipmentLevel = Balance.maximumEquipmentLevel(forDepth: depthMeters)
+        let refinementTier = RefinementEngine.unlockedTiers(forLevel: equipmentLevel)
+        return PlayerState(
+            equipment: EquipmentLevels(
+                drill: equipmentLevel,
+                cart: equipmentLevel,
+                lamp: equipmentLevel
+            ),
+            refinementTiers: RefinementTiers(
+                drill: refinementTier,
+                cart: refinementTier,
+                lamp: refinementTier
+            ),
+            mineFace: MineFaceState(segmentIndex: segmentIndex),
+            deepestSegmentIndex: segmentIndex
+        )
+    }
+
     func testTruncationReportsTheDamageItCouldNotSpend() {
         let resolution = RockEngine.resolve(
             damage: hugeDamage(),
@@ -63,7 +83,7 @@ final class TruncatedResolutionTests: XCTestCase {
     func testCarriedDamageIsAppliedRatherThanDropped() {
         var carried = PlayerState()
         carried.equipment = EquipmentLevels(drill: 1, cart: 190, lamp: 1)
-        var capped = carried
+        let capped = carried
 
         MiningLoop.advance(seconds: 8 * 60 * 60, in: &carried)
 
@@ -89,7 +109,9 @@ final class TruncatedResolutionTests: XCTestCase {
         let update = MiningLoop.advance(seconds: 8 * 60 * 60, in: &state)
         XCTAssertLessThanOrEqual(
             update.segmentsBroken,
-            Balance.maximumSegmentsPerResolution * Balance.maximumResolutionPasses
+            Balance.maximumSegmentsPerResolution
+                * Balance.maximumResolutionPasses
+                * Balance.maximumResolutionPasses
         )
     }
 
@@ -102,5 +124,35 @@ final class TruncatedResolutionTests: XCTestCase {
         XCTAssertGreaterThan(update.segmentsBroken, Balance.maximumSegmentsPerResolution)
         XCTAssertEqual(update.face.segmentIndex, state.mineFace.segmentIndex)
         XCTAssertGreaterThan(update.oreGained, .zero)
+    }
+
+    func testEightHourSettlementConsumesAllDamageAt150Kilometres() {
+        var state = lateGameState(atDepthMeters: 150_000)
+        let creditedSeconds = Balance.maximumOfflineHours * 3_600
+            * Balance.offlineEfficiency
+
+        let update = MiningLoop.advance(seconds: creditedSeconds, in: &state)
+
+        XCTAssertFalse(update.wasTruncated)
+        XCTAssertEqual(update.unspentDamage, .zero)
+        XCTAssertGreaterThan(
+            update.segmentsBroken,
+            Balance.maximumSegmentsPerResolution * Balance.maximumResolutionPasses
+        )
+    }
+
+    func testEightHourSettlementConsumesAllDamageAt500Kilometres() {
+        var state = lateGameState(atDepthMeters: 500_000)
+        let creditedSeconds = Balance.maximumOfflineHours * 3_600
+            * Balance.offlineEfficiency
+
+        let update = MiningLoop.advance(seconds: creditedSeconds, in: &state)
+
+        XCTAssertFalse(update.wasTruncated)
+        XCTAssertEqual(update.unspentDamage, .zero)
+        XCTAssertGreaterThan(
+            update.segmentsBroken,
+            Balance.maximumSegmentsPerResolution * Balance.maximumResolutionPasses
+        )
     }
 }

@@ -10,12 +10,10 @@ struct ShaftWorkFaceView: View {
     let strikeSignal: Int
     let strikeVariant: StrikeVariant
     let onStrike: (Bool) -> Void
-
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var impactOffset: CGFloat = 0
     @State private var impactCompression: CGFloat = 1
     @State private var impactFlash = false
-
     private var groundWidth: CGFloat { max(180, width - 18) }
     private let groundHeight: CGFloat = 134
     private let groundTop: CGFloat = 100
@@ -25,7 +23,6 @@ struct ShaftWorkFaceView: View {
     /// D-055 overlaps the lip's underside with the cutting notch so the passage and the
     /// face read as one body rather than two stacked objects.
     private let lipOverlap: CGFloat = 3
-
     var body: some View {
         ZStack(alignment: .topLeading) {
             // The gantry is overhead support for the passage, not a thing the miner stands
@@ -68,15 +65,25 @@ struct ShaftWorkFaceView: View {
         .task(id: strikeSignal) {
             guard strikeSignal > 0 else { return }
             let timeline = StrikeTimeline.timeline(for: strikeVariant, reduceMotion: reduceMotion)
-            try? await Task.sleep(for: .seconds(timeline.contact))
-            impactOffset = (strikeSignal.isMultiple(of: 2) ? -1 : 1) * recoil
+            do { try await Task.sleep(for: .seconds(timeline.contact)) }
+            catch { return }
+            impactOffset = reduceMotion
+                ? 0
+                : (strikeSignal.isMultiple(of: 2) ? -1 : 1) * recoil
             impactCompression = reduceMotion ? 1 : compression
             impactFlash = true
-            try? await Task.sleep(for: .milliseconds(72))
-            withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.76)) {
+            do { try await Task.sleep(for: .milliseconds(140)) }
+            catch { return }
+            if reduceMotion {
                 impactOffset = 0
                 impactCompression = 1
                 impactFlash = false
+            } else {
+                withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.76)) {
+                    impactOffset = 0
+                    impactCompression = 1
+                    impactFlash = false
+                }
             }
         }
     }
@@ -187,7 +194,8 @@ private struct ShaftBreakableGroundView: View {
             ZStack(alignment: .top) {
                 GameArtView(
                     entry: GameArtCatalog.shaftRock(
-                        region: player.mineFace.segment.region.rawValue
+                        region: player.mineFace.segment.region.rawValue,
+                        depthMeters: Double(player.depthMeters)
                     ),
                     fill: proxy.size
                 )

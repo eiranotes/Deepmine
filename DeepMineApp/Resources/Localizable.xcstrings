@@ -1132,6 +1132,74 @@
         }
       }
     },
+    "equipment.impact.automatic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ore/sec"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광석/초"
+          }
+        }
+      }
+    },
+    "equipment.impact.eta": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic ETA"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 완료"
+          }
+        }
+      }
+    },
+    "equipment.impact.started": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automation started"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동화 시작"
+          }
+        }
+      }
+    },
+    "equipment.impact.tap": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap output"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "탭 출력"
+          }
+        }
+      }
+    },
     "equipment.insufficient.body": {
       "extractionState": "stale",
       "localizations": {
@@ -1519,6 +1587,91 @@
           "stringUnit": {
             "state": "translated",
             "value": "기억된 레벨 · 비용 절반"
+          }
+        }
+      }
+    },
+    "equipment.refinement.criticalMultiplier": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical multiplier"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "치명타 배율"
+          }
+        }
+      }
+    },
+    "equipment.refinement.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every 6 levels unlocks a major output leap for that tool."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6레벨마다 해당 장비의 큰 출력 도약이 열립니다."
+          }
+        }
+      }
+    },
+    "equipment.refinement.outputMultiplier": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output multiplier"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력 배율"
+          }
+        }
+      }
+    },
+    "equipment.refinement.success": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refinement complete"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정련 완료"
+          }
+        }
+      }
+    },
+    "equipment.refinement.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refinement"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정련"
           }
         }
       }
@@ -5532,6 +5685,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "다음 광맥층 %lld층"
+          }
+        }
+      }
+    },
+    "shaft.rate.layers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layers/sec"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "층/초"
+          }
+        }
+      }
+    },
+    "shaft.rate.manual": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual mining"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수동 채굴"
+          }
+        }
+      }
+    },
+    "shaft.rate.ore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ore/sec"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광석/초"
           }
         }
       }

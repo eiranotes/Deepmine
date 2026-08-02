@@ -6,7 +6,7 @@ extension EquipmentView {
         let level = EquipmentEngine.level(of: kind, in: player.equipment)
         let quote = EquipmentEngine.quote(for: kind, in: player)
         let depthLocked = level >= player.unlockedEquipmentLevel
-        let cost = depthLocked ? nil : quote?.cost
+        let cost = depthLocked ? nil : quote?.bigCost
         let recommended = highlightedEquipment == kind
         return DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -46,7 +46,7 @@ extension EquipmentView {
         .accessibilityIdentifier("equipment-row-\(kind.rawValue)")
     }
 
-    func levelAccessory(kind: EquipmentKind, level: Int, cost: Double?, depthLocked: Bool) -> some View {
+    func levelAccessory(kind: EquipmentKind, level: Int, cost: BigNumber?, depthLocked: Bool) -> some View {
         let requiredDepth = depthLocked ? EquipmentEngine.requiredDepth(forLevel: level + 1) : nil
         return VStack(alignment: .trailing, spacing: 6) {
             Text("Lv. \(level)").font(.subheadline.monospacedDigit().weight(.bold))
@@ -97,29 +97,6 @@ extension EquipmentView {
         .accessibilityIdentifier("equipment-bulk-\(kind.rawValue)-\(title)")
     }
 
-    var noticePanel: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            switch notice {
-            case .success:
-                Label(DeepMineStrings.text(.equipmentPurchaseSuccess), systemImage: "checkmark.seal.fill")
-                    .accessibilityIdentifier("equipment-notice-success")
-            case let .crewGrew(size):
-                Label(String(format: DeepMineStrings.text(.returnCrewGrew), size),
-                      systemImage: "person.2.fill")
-                    .accessibilityIdentifier("equipment-notice-crew")
-            case let .insufficient(required, available):
-                Label(DeepMineStrings.text(.equipmentInsufficientTitle), systemImage: "shippingbox")
-                    .accessibilityIdentifier("equipment-notice-insufficient")
-                Text("\(DeepMineNumberFormatter.string(available)) / \(DeepMineNumberFormatter.string(required))")
-                    .font(.caption.monospacedDigit())
-                Text(DeepMineStrings.text(.equipmentInsufficientBody)).font(.caption)
-            case .storageFailure, .none: EmptyView()
-            }
-        }
-        .font(.caption.weight(.semibold)).foregroundStyle(DeepMinePalette.brass.color)
-        .fixedSize(horizontal: false, vertical: true)
-    }
-
     var recoveryPanel: some View {
         DeepMineRivetedPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -141,15 +118,15 @@ extension EquipmentView {
         (!handoffConsumed ? handoffRecommendation?.equipment : nil) ?? recommendation?.equipment
     }
 
-    func buttonTitle(cost: Double?, requiredDepth: Int? = nil) -> String {
+    func buttonTitle(cost: BigNumber?, requiredDepth: Int? = nil) -> String {
         if let requiredDepth {
             return String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
         }
         guard let cost else { return DeepMineStrings.text(.equipmentMaximum) }
-        return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(cost))"
+        return "\(DeepMineStrings.text(.actionUpgrade)) · \(DeepMineNumberFormatter.string(big: cost))"
     }
 
-    func equipmentButtonLabel(kind: EquipmentKind, cost: Double?, requiredDepth: Int? = nil) -> String {
+    func equipmentButtonLabel(kind: EquipmentKind, cost: BigNumber?, requiredDepth: Int? = nil) -> String {
         let title = DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(kind))
         if let requiredDepth {
             return "\(title), " + String(format: DeepMineStrings.text(.equipmentDepthLocked), requiredDepth)
@@ -157,7 +134,7 @@ extension EquipmentView {
         guard let cost else { return "\(title), \(DeepMineStrings.text(.equipmentMaximum))" }
         return "\(title), \(DeepMineStrings.text(.actionUpgrade)), "
             + "\(DeepMineStrings.text(.equipmentCost)) "
-            + "\(DeepMineNumberFormatter.string(cost)) \(DeepMineStrings.text(.gameOre))"
+            + "\(DeepMineNumberFormatter.string(big: cost)) \(DeepMineStrings.text(.gameOre))"
     }
 
     func refresh() {
@@ -169,19 +146,40 @@ extension EquipmentView {
         } catch { notice = .storageFailure }
     }
 
-    func purchaseBulk(_ kind: EquipmentKind, maximum: Int? = nil, remembered: Bool = false) {
+    func purchaseBulk(
+        _ kind: EquipmentKind,
+        maximum: Int? = nil,
+        remembered: Bool = false,
+        commandID: UUID? = nil
+    ) {
         guard let gameStore else { notice = .storageFailure; return }
+        let commandID = commandID ?? UUID()
+        let retryBaseline = pendingBulk.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
+        pendingBulk = (kind, maximum, remembered, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipmentBulk(
-                kind, maximumPurchases: maximum, stopAtRememberedLevel: remembered
+                kind,
+                maximumPurchases: maximum,
+                stopAtRememberedLevel: remembered,
+                commandID: commandID
             ) {
             case .purchased, .duplicate:
-                player = try gameStore.playerState()
+                let after = try gameStore.playerState()
+                player = after
                 recommendation = try gameStore.recommendedUpgrade()
-                notice = .success
-            case .nothingAffordable, .depthLocked: notice = nil
+                notice = purchaseNotice(equipment: kind, before: before, after: after)
+                pendingBulk = nil
+            case .nothingAffordable, .depthLocked:
+                notice = nil
+                pendingBulk = nil
             case .invalidLevel: notice = .storageFailure
             }
         } catch { notice = .storageFailure }
@@ -190,15 +188,28 @@ extension EquipmentView {
     func purchaseRefinement(_ kind: EquipmentKind, commandID: UUID? = nil) {
         guard let gameStore else { notice = .storageFailure; return }
         let commandID = commandID ?? UUID()
+        let retryBaseline = pendingRefinement.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
-        pendingRefinement = (kind, commandID)
+        pendingRefinement = (kind, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseRefinement(kind, commandID: commandID) {
             case .refined, .duplicate:
-                player = try gameStore.playerState()
+                let after = try gameStore.playerState()
+                player = after
                 recommendation = try gameStore.recommendedUpgrade()
-                notice = .success; pendingRefinement = nil
+                if let impact = RefinementImpact(before: before, after: after, equipment: kind) {
+                    notice = .refinement(impact)
+                } else {
+                    notice = .success
+                }
+                pendingRefinement = nil
             case let .insufficientOre(required, available):
                 notice = .insufficient(required: required, available: available)
                 pendingRefinement = nil
@@ -210,17 +221,23 @@ extension EquipmentView {
     func purchase(_ kind: EquipmentKind, commandID: UUID? = nil) {
         guard let gameStore else { notice = .storageFailure; return }
         let commandID = commandID ?? UUID()
+        let retryBaseline = pendingPurchase.flatMap {
+            $0.commandID == commandID ? $0.before : nil
+        }
+        guard let before = retryBaseline ?? (try? gameStore.playerState()) else {
+            notice = .storageFailure
+            return
+        }
         isLoading = true
-        pendingPurchase = (kind, commandID)
+        pendingPurchase = (kind, commandID, before)
         defer { isLoading = false }
         do {
             switch try gameStore.purchaseEquipment(kind, commandID: commandID) {
-            case let .purchased(equipment, newLevel, _):
-                notice = equipment == .drill
-                    && MineCrew.size(drillLevel: newLevel) > MineCrew.size(drillLevel: newLevel - 1)
-                    ? .crewGrew(MineCrew.size(drillLevel: newLevel)) : .success
-                player = try gameStore.playerState()
+            case let .purchased(equipment, _, _):
+                let after = try gameStore.playerState()
+                player = after
                 recommendation = try gameStore.recommendedUpgrade()
+                notice = purchaseNotice(equipment: equipment, before: before, after: after)
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
                 pendingPurchase = nil
             case let .insufficientOre(required, available):
@@ -228,7 +245,10 @@ extension EquipmentView {
                 pendingPurchase = nil
             case .maximumLevel, .depthLocked: notice = nil; pendingPurchase = nil
             case .duplicate:
-                refresh(); notice = .success
+                let after = try gameStore.playerState()
+                player = after
+                recommendation = try gameStore.recommendedUpgrade()
+                notice = purchaseNotice(equipment: kind, before: before, after: after)
                 if handoffRecommendation?.equipment == kind { handoffConsumed = true }
                 pendingPurchase = nil
             case .invalidLevel: notice = .storageFailure
@@ -240,7 +260,29 @@ extension EquipmentView {
         notice = nil
         if let value = pendingRefinement { purchaseRefinement(value.equipment, commandID: value.commandID) }
         else if let value = pendingModification { purchaseModification(value.kind, commandID: value.commandID) }
+        else if let value = pendingBulk {
+            purchaseBulk(
+                value.equipment,
+                maximum: value.maximum,
+                remembered: value.remembered,
+                commandID: value.commandID
+            )
+        }
         else if let value = pendingPurchase { purchase(value.equipment, commandID: value.commandID) }
         else { refresh() }
+    }
+
+    func purchaseNotice(
+        equipment: EquipmentKind,
+        before: PlayerState,
+        after: PlayerState
+    ) -> Notice {
+        let beforeCrew = MineCrew.size(drillLevel: before.equipment.drill)
+        let afterCrew = MineCrew.size(drillLevel: after.equipment.drill)
+        return .purchase(
+            equipment: equipment,
+            impact: PurchaseImpact(before: before, after: after, equipment: equipment),
+            crewSize: equipment == .drill && afterCrew > beforeCrew ? afterCrew : nil
+        )
     }
 }

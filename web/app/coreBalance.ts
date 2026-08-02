@@ -153,10 +153,12 @@ export function criticalChance(lampLevel: number, fortuneModification = false) {
 }
 
 export function criticalMultiplier(lampLevel: number, refinementTier = 0) {
-  return (
-    BASE_CRITICAL_MULTIPLIER
-    + levelsAboveBase(lampLevel) * LAMP_CRITICAL_MULTIPLIER_INCREASE_PER_LEVEL
-  ) * Math.pow(REFINEMENT_DAMAGE_MULTIPLIER, Math.max(0, refinementTier) * 0.5);
+  const refinementMultiplier = Math.pow(
+    REFINEMENT_DAMAGE_MULTIPLIER,
+    Math.max(0, refinementTier) * 0.5,
+  );
+  return BASE_CRITICAL_MULTIPLIER * refinementMultiplier
+    + levelsAboveBase(lampLevel) * LAMP_CRITICAL_MULTIPLIER_INCREASE_PER_LEVEL;
 }
 
 export function expectedTapDamage(levels: EquipmentLevels, lampRefinement = 0) {
@@ -227,7 +229,6 @@ export function recommendMiningUpgrade(
   if (currentDps === 0
       && levels.cart < unlocked
       && cartCost != null
-      && cartCost <= ore
       && automationDamagePerSecond(levels.cart + 1) > 0) return "cart";
 
   const currentTap = expectedTapDamage(levels);

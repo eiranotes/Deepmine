@@ -86,9 +86,9 @@ final class GameStoreProgressionTests: XCTestCase {
 
     func testRefinementPurchasePersistsTierAndOreDebit() throws {
         let level = RefinementEngine.requiredLevel(forTier: 1)
-        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
         let fixture = makeFixture(player: PlayerState(
-            resources: Resources(ore: BigNumber(cost + 100)),
+            resources: Resources(ore: cost + Double(100)),
             equipment: EquipmentLevels(drill: level)
         ))
         let result = try fixture.store.purchaseRefinement(.drill)
@@ -104,10 +104,10 @@ final class GameStoreProgressionTests: XCTestCase {
 
     func testRepeatedRefinementCommandDoesNotSpendOrSaveTwice() throws {
         let level = RefinementEngine.requiredLevel(forTier: 1)
-        let cost = RefinementEngine.oreCost(for: .drill, tier: 1)
+        let cost = RefinementEngine.oreCostBig(for: .drill, tier: 1)
         let commandID = UUID()
         let fixture = makeFixture(player: PlayerState(
-            resources: Resources(ore: BigNumber(cost + 100)),
+            resources: Resources(ore: cost + Double(100)),
             equipment: EquipmentLevels(drill: level)
         ))
         _ = try fixture.store.purchaseRefinement(.drill, commandID: commandID)

@@ -82,6 +82,10 @@ extension GameFixtures {
         case "equipment-success": equipmentPlayer(ore: 500)
         case "equipment-retry-ambiguous": equipmentPlayer(ore: 500)
         case "equipment-insufficient": equipmentPlayer(ore: 0)
+        case "equipment-refinement": equipmentPlayer(
+            ore: 1_000_000,
+            equipment: EquipmentLevels(drill: 7, cart: 7, lamp: 7)
+        )
         // Depth has to reach the ceiling too, otherwise the row shows the depth lock
         // instead of the true maximum.
         case "equipment-maximum": equipmentPlayer(

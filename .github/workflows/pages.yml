@@ -3,17 +3,15 @@ name: DeepMine Pages
 on:
   push:
     branches:
-      - agent/exponential-growth-ui-review
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -41,16 +39,25 @@ jobs:
         working-directory: web
       - name: Browser module smoke test
         run: |
-          node -e "import('./pages-dist/coreBalance.js').then(m => { if (m.automationDamagePerSecond(1) !== 0 || m.automationDamagePerSecond(2) <= 0 || m.upgradeCost('drill', 201) == null) process.exit(1) })"
+          node -e "import('./pages-dist/coreBalance.js').then(m => { const base = { drill: 1, cart: 1, lamp: 1 }; if (m.automationDamagePerSecond(1) !== 0 || m.automationDamagePerSecond(2) <= 0 || m.upgradeCost('drill', 201) == null || m.recommendMiningUpgrade(base, 100, 8) !== 'cart') process.exit(1) })"
         working-directory: web
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
+      - name: Static artifact contract
+        run: |
+          test -s pages-dist/index.html
+          test -s pages-dist/styles.css
+          test -s pages-dist/app.js
+          test -s pages-dist/coreBalance.js
+        working-directory: web
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           path: web/pages-dist
 
   deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

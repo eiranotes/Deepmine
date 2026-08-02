@@ -114,3 +114,25 @@ test("the prototype reads the economy from coreBalance rather than its own numbe
   assert.doesNotMatch(prototype, /1\.018|1\.16|1\.22|1\.31/);
   assert.doesNotMatch(prototype, /190|270|340/);
 });
+
+test("the first cart remains the savings target before it is affordable", () => {
+  assert.match(
+    web,
+    /currentDps === 0[\s\S]*cartCost != null[\s\S]*return "cart";/,
+  );
+  assert.doesNotMatch(web, /cartCost <= ore/);
+});
+
+test("lamp refinement multiplies the base critical value before additive levels", () => {
+  assert.match(
+    web,
+    /BASE_CRITICAL_MULTIPLIER \* refinementMultiplier\s*\+\s*levelsAboveBase\(lampLevel\)/,
+  );
+});
+
+test("the prototype consumes every long-depth geology asset at its exact threshold", () => {
+  const prototype = readFileSync(join(projectRoot, "app/UnifiedMinePrototype.tsx"), "utf8");
+  assert.match(prototype, /depth >= 5_000.*ShaftRock_pressure-v2\.png/);
+  assert.match(prototype, /depth >= 20_000.*ShaftRock_fault-v2\.png/);
+  assert.match(prototype, /depth >= 100_000.*ShaftRock_core-v2\.png/);
+});

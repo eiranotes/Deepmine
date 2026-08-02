@@ -40,7 +40,10 @@ final class ProgressViewsUITests: XCTestCase {
         open("mine-home-equipment")
         XCTAssertTrue(element("equipment-upgrade-drill").waitForExistence(timeout: 3))
         element("equipment-upgrade-drill").tap()
-        XCTAssertTrue(element("equipment-notice-success").waitForExistence(timeout: 3))
+        let notice = element("equipment-notice-success")
+        XCTAssertTrue(notice.waitForExistence(timeout: 3))
+        XCTAssertTrue(notice.label.contains("→"))
+        XCTAssertTrue(notice.label.contains("%"))
         app.terminate()
 
         launch("equipment-success", reset: false, storeID: storeID)
@@ -57,6 +60,21 @@ final class ProgressViewsUITests: XCTestCase {
         XCTAssertTrue(element("equipment-notice-success").waitForExistence(timeout: 3))
         XCTAssertTrue(element("equipment-level-drill").label.contains("2"))
         XCTAssertTrue(element("equipment-ore").label.contains("400"))
+    }
+
+    func testRefinementExplainsTierLeapAndActualOutputImpact() {
+        launch("equipment-refinement")
+        open("mine-home-equipment")
+        reveal("equipment-refinement-drill").tap()
+
+        let notice = element("equipment-notice-refinement")
+        XCTAssertTrue(notice.waitForExistence(timeout: 3))
+        XCTAssertTrue(notice.label.contains("R0"))
+        XCTAssertTrue(notice.label.contains("R1"))
+        XCTAssertTrue(notice.label.contains("2.5"))
+        XCTAssertTrue(notice.label.contains("탭 출력"))
+        XCTAssertTrue(notice.label.contains("→"))
+        XCTAssertTrue(notice.label.contains("%"))
     }
 
     func testBulkPurchaseControlsAreAvailableAndMutateLevel() {

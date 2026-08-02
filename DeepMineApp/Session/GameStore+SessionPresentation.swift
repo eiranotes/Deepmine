@@ -20,11 +20,22 @@ struct ReturnUpgradeRecommendation: Equatable, Hashable, Sendable {
     let equipment: EquipmentKind
     let currentLevel: Int
     let nextLevel: Int
-    let cost: Double
-    let availableOre: Double
+    let cost: BigNumber
+    let availableOre: BigNumber
     let marginalExpectedOre: Double
 
     var isAffordable: Bool { availableOre >= cost }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(equipment)
+        hasher.combine(currentLevel)
+        hasher.combine(nextLevel)
+        hasher.combine(cost.mantissa)
+        hasher.combine(cost.exponent)
+        hasher.combine(availableOre.mantissa)
+        hasher.combine(availableOre.exponent)
+        hasher.combine(marginalExpectedOre)
+    }
 }
 
 struct ReturnDepthGoal: Equatable, Sendable {
@@ -226,8 +237,8 @@ extension GameStore {
             equipment: value.equipment,
             currentLevel: value.currentLevel,
             nextLevel: value.nextLevel,
-            cost: value.cost,
-            availableOre: player.resources.ore.doubleValue,
+            cost: value.bigCost,
+            availableOre: player.resources.ore,
             marginalExpectedOre: value.marginalExpectedOre
         )
     }

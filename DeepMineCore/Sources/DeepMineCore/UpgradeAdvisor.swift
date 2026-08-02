@@ -19,6 +19,7 @@ public enum UpgradeAdvisor {
                 currentLevel: quote.currentLevel,
                 nextLevel: quote.currentLevel + 1,
                 cost: quote.cost,
+                bigCost: quote.bigCost,
                 marginalExpectedOre: marginal,
                 efficiency: displayEfficiency(logScore: score),
                 isRemembered: quote.isRemembered
@@ -30,9 +31,9 @@ public enum UpgradeAdvisor {
         return best?.recommendation
     }
 
-    /// Recommends against the live mine. Home uses affordable-only recommendations so its
-    /// action is immediately executable; return reports set that flag to false so they can
-    /// name the next target honestly even when the haul did not quite pay for it.
+    /// Recommends against the live mine. Home filters ordinary efficiency purchases to
+    /// affordable ones, but the first automation unlock remains a savings goal; return
+    /// reports set the flag to false so every recommendation may name the next target.
     public static func recommendForMining(
         for state: PlayerState,
         affordableOnly: Bool = true
@@ -40,10 +41,12 @@ public enum UpgradeAdvisor {
         let unlocked = EquipmentEngine.unlockedMaximumLevel(in: state)
         let current = MiningLoop.power(for: state)
 
+        // The first cart is a milestone, not an efficiency purchase. Home must keep it as
+        // the savings goal even when a cheaper drill is already affordable; otherwise the
+        // recommendation spends the player's 180-ore automation fund before it can exist.
         if !current.isAutomated,
            let cart = EquipmentEngine.quote(for: .cart, in: state),
-           cart.currentLevel < unlocked,
-           (!affordableOnly || state.resources.ore >= cart.bigCost) {
+           cart.currentLevel < unlocked {
             var automated = state
             automated.equipment.cart += 1
             if MiningLoop.power(for: automated).isAutomated {
@@ -52,6 +55,7 @@ public enum UpgradeAdvisor {
                     currentLevel: cart.currentLevel,
                     nextLevel: cart.currentLevel + 1,
                     cost: cart.cost,
+                    bigCost: cart.bigCost,
                     marginalExpectedOre: 10,
                     efficiency: Double.greatestFiniteMagnitude,
                     isRemembered: cart.isRemembered
@@ -88,6 +92,7 @@ public enum UpgradeAdvisor {
                 currentLevel: quote.currentLevel,
                 nextLevel: quote.currentLevel + 1,
                 cost: quote.cost,
+                bigCost: quote.bigCost,
                 marginalExpectedOre: marginal,
                 efficiency: displayEfficiency(logScore: score),
                 isRemembered: quote.isRemembered

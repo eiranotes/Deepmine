@@ -26,6 +26,8 @@ struct GameRootView: View {
     @State var offlineSettlement: OfflineSettlement?
     @State var lastPersistedSegment = -1
     @State var lastPersistedAt = Date.distantPast
+    @State var isSessionRecoveryComplete: Bool
+    @State var isSessionStartInFlight = false
     @Environment(\.scenePhase) private var scenePhase
 
     /// Long enough that tapping does not become a write loop, short enough that what a
@@ -57,6 +59,7 @@ struct GameRootView: View {
         let player = (try? repository.load()) ?? PlayerState()
         _player = State(initialValue: player)
         _savedGoalMinutes = State(initialValue: nil)
+        _isSessionRecoveryComplete = State(initialValue: gameStore.activeSession != nil)
     }
 
     init(fixture: GameFixtureState) {
@@ -70,6 +73,7 @@ struct GameRootView: View {
         feedback = GameFeedback()
         _player = State(initialValue: fixture.player)
         _savedGoalMinutes = State(initialValue: nil)
+        _isSessionRecoveryComplete = State(initialValue: true)
     }
 
     var body: some View {
@@ -112,8 +116,10 @@ struct GameRootView: View {
         .sheet(item: $offlineSettlement) { settlement in
             OfflineReturnSheet(settlement: settlement) { offlineSettlement = nil }
         }
-        .task { await recoverSession() }
-        .task { settleOfflineProduction() }
+        .task {
+            isSessionRecoveryComplete = await recoverSession()
+            settleOfflineProduction()
+        }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the background is the same event as launching, as far as
             // the mine is concerned: time passed and it was working.
@@ -130,9 +136,9 @@ struct GameRootView: View {
     }
 
     /// Pays out the time the app was closed, and offers the result if it is worth
-    /// interrupting for. Fixtures are excluded so screen tests stay deterministic.
+    /// interrupting for. It shares the visible clock's session-integrity gate.
     func settleOfflineProduction() {
-        guard showsClickerRoot, let repository else { return }
+        guard isHomeMiningClockLive, let repository else { return }
         var updated = player
         let settlement = MiningLoop.settleOffline(
             since: updated.lastSettledAt,
@@ -151,19 +157,12 @@ struct GameRootView: View {
         !forceHome && player.onboardingStage != .complete
     }
 
-    /// Fixtures render deterministic screens for capture tests, so the live mine — which
-    /// mutates on a timer — is excluded from them.
-    var showsClickerRoot: Bool {
-        fixtureState == nil
-    }
-
-    @ViewBuilder
-    var clickerSectionView: some View {
+    func clickerSectionView(player: Binding<PlayerState>) -> ShaftView {
         ShaftView(
-            player: $player,
+            player: player,
             feedback: feedback,
             onPersist: persistMineFace,
-            isLive: showsClickerRoot
+            isLive: isHomeMiningClockLive
         )
     }
 
@@ -171,7 +170,7 @@ struct GameRootView: View {
     /// meant the one screen the game is built around was the one screen no capture test
     /// ever looked at; `isLive` holds the clock instead.
     var clickerSection: AnyView? {
-        AnyView(clickerSectionView)
+        AnyView(clickerSectionView(player: $player))
     }
 
     /// The clicker mutates the player on a timer, and writing every tick would be a write
@@ -278,6 +277,7 @@ struct GameRootView: View {
                 readiness: readiness,
                 projection: projection,
                 feedback: feedback,
+                onStartStateChange: { isSessionStartInFlight = $0 },
                 onStarted: { session in
                     showingPreflight = false
                     path.append(.activeMine)

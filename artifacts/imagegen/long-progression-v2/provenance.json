@@ -1,0 +1,53 @@
+[
+  {
+    "asset": "ShaftRock_pressure",
+    "generator": "OpenAI built-in ImageGen",
+    "generated_on": "2026-08-02",
+    "source_reference": "generated_images/019fc27d-6dbb-70c2-8ae9-e460bc6e9b91/exec-261d7a06-a66e-4ac6-b4a3-cd9bf567d09e.png",
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-pressure-imagegen.png",
+    "derivation": "new generation, nearest-neighbor resize, exact four-pigment remap"
+  },
+  {
+    "asset": "RefinementBadge_cart",
+    "generator": "OpenAI built-in ImageGen",
+    "generated_on": "2026-08-02",
+    "source_reference": "generated_images/019fc27d-6dbb-70c2-8ae9-e460bc6e9b91/exec-9687da66-b38e-4e38-ae9e-a15bd870811b.png",
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-cart-imagegen.png",
+    "derivation": "new generation on chroma key, official local key removal, binary alpha, nearest-neighbor resize, exact four-pigment remap"
+  },
+  {
+    "asset": "ShaftRock_fault",
+    "generator": "unverified prior PR source",
+    "generated_on": null,
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-fault-legacy.png",
+    "derivation": "lossless re-encode and exact design-token palette normalization"
+  },
+  {
+    "asset": "ShaftRock_core",
+    "generator": "unverified prior PR source",
+    "generated_on": null,
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/shaft-rock-core-legacy.png",
+    "derivation": "lossless re-encode and exact design-token palette normalization"
+  },
+  {
+    "asset": "RefinementBadge_drill",
+    "generator": "unverified prior PR source",
+    "generated_on": null,
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-drill-legacy.png",
+    "derivation": "lossless re-encode and exact design-token palette normalization"
+  },
+  {
+    "asset": "RefinementBadge_lamp",
+    "generator": "unverified prior PR source",
+    "generated_on": null,
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/refinement-badge-lamp-legacy.png",
+    "derivation": "lossless re-encode and exact design-token palette normalization"
+  },
+  {
+    "asset": "PrestigeMemoryRing",
+    "generator": "unverified prior PR source",
+    "generated_on": null,
+    "project_raw_copy": "artifacts/imagegen/long-progression-v2/raw/prestige-memory-ring-legacy.png",
+    "derivation": "lossless re-encode and exact design-token palette normalization"
+  }
+]
