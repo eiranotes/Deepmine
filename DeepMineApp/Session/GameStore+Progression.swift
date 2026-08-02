@@ -25,6 +25,30 @@ extension GameStore {
     }
 
     @discardableResult
+    func purchaseEquipmentBulk(
+        _ equipment: EquipmentKind,
+        maximumPurchases: Int? = nil,
+        stopAtRememberedLevel: Bool = false,
+        commandID: UUID = UUID()
+    ) throws -> BulkUpgradePurchaseResult {
+        var player = try repository.loadPlayer()
+        let result = EquipmentEngine.purchaseBulk(
+            BulkUpgradePurchaseCommand(
+                id: commandID,
+                equipment: equipment,
+                maximumPurchases: maximumPurchases,
+                stopAtRememberedLevel: stopAtRememberedLevel
+            ),
+            in: &player
+        )
+        if case .purchased = result {
+            AchievementEngine.evaluate(in: &player)
+            try repository.savePlayer(player)
+        }
+        return result
+    }
+
+    @discardableResult
     func purchaseEquipmentModification(
         _ modification: EquipmentModificationKind,
         commandID: UUID = UUID()
@@ -58,9 +82,6 @@ extension GameStore {
         recommendedUpgrade(for: try repository.loadPlayer())
     }
 
-    /// Home and equipment recommendations optimize the live mine, not a hypothetical
-    /// focus payout. The verification parameter remains only on the repository-loading
-    /// overload for source compatibility with older callers.
     func recommendedUpgrade(
         for player: PlayerState,
         verificationGrade _: VerificationGrade = .sealed
