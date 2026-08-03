@@ -36,9 +36,10 @@ function format(value: number) {
 }
 
 function deepGeologyTexture(depth: number) {
-  if (depth >= 100_000) return "/assets/shaft/ShaftRock_core-v2.png";
-  if (depth >= 20_000) return "/assets/shaft/ShaftRock_fault-v2.png";
-  if (depth >= 5_000) return "/assets/shaft/ShaftRock_pressure-v2.png";
+  const assets = `${import.meta.env.BASE_URL}assets/shaft`;
+  if (depth >= 100_000) return `${assets}/ShaftRock_core-v2.png`;
+  if (depth >= 20_000) return `${assets}/ShaftRock_fault-v2.png`;
+  if (depth >= 5_000) return `${assets}/ShaftRock_pressure-v2.png`;
   return null;
 }
 
@@ -128,9 +129,9 @@ export function UnifiedMinePrototype() {
   return (
     <main className={styles.shell}>
       <header className={styles.header}>
-        <p>DEEPMINE · UNIFIED CORE</p>
+        <p>DEEPMINE · PLAYABLE WEB</p>
         <h1>연속 갱도</h1>
-        <span>웹과 iOS가 같은 암반·장비·정련 규칙을 사용합니다.</span>
+        <span>암반을 직접 깨고, 광차 자동화를 열고, 장비를 정련하세요.</span>
       </header>
       <section className={styles.stats}>
         {stats.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}

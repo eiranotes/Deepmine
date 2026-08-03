@@ -4,7 +4,7 @@ DeepMine은 플레이어가 실제 암반을 깨고, 광차 자동 굴착과 오
 누적해 내려가는 iOS 방치형 클리커다. 집중 차단은 게임의 입장권이 아니라 선택형 증폭기이며,
 권한 없이도 채굴·정련·프레스티지까지 진행할 수 있다.
 
-웹 formula harness: <https://eiranotes.github.io/Deepmine/>
+플레이어블 웹 데모: <https://eiranotes.github.io/Deepmine/>
 
 ## 현재 플레이 루프
 
@@ -25,8 +25,8 @@ DeepMine은 플레이어가 실제 암반을 깨고, 광차 자동 굴착과 오
 - `DeepMineCore/`: Foundation-only 경제, 채굴, 정련, 프레스티지와 밸런스 시뮬레이터
 - `DeepMineApp/`: SwiftUI 앱, 저장소, 세션·오프라인·장비 화면
 - `DeepMineProbe/`: Widget/Live Activity 공유 모델과 Asset Catalog
-- `web/`: Core 공식을 미러링하는 Vinext/Pages 조기·중기 formula harness. JavaScript
-  `number` 범위를 iOS `BigNumber`와 동일하게 보장하지 않는다
+- `web/`: 광부·갱도·타격·장비를 직접 플레이하는 Vinext/Pages 데모와 Core 공식 패리티
+  테스트. JavaScript `number` 범위를 iOS `BigNumber`와 동일하게 보장하지 않는다
 - `docs/`: 최신 상태, 결정, 작업, 검증과 제품 사양
 - `artifacts/imagegen/`: 생성 에셋 원본·처리본·provenance·검증 보고서
 

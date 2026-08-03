@@ -10,6 +10,23 @@ const resonance = readFileSync(join(projectRoot, "app/useResonanceEvent.ts"), "u
 const resonanceView = readFileSync(join(projectRoot, "app/ResonanceEvent.tsx"), "utf8");
 const strikeFeedback = readFileSync(join(projectRoot, "app/strikeFeedback.ts"), "utf8");
 const miningAudio = readFileSync(join(projectRoot, "app/useMiningAudio.ts"), "utf8");
+const pagesEntry = readFileSync(join(projectRoot, "pages-game/main.tsx"), "utf8");
+const pagesConfig = readFileSync(join(projectRoot, "vite.pages.config.ts"), "utf8");
+const pagesWorkflow = readFileSync(join(projectRoot, "../.github/workflows/pages.yml"), "utf8");
+
+test("GitHub Pages ships the playable React game instead of the logic report", () => {
+  assert.match(pagesEntry, /MinePrototype/);
+  assert.match(pagesConfig, /\/Deepmine\//);
+  assert.match(pagesWorkflow, /npm run build:pages/);
+  assert.match(pagesWorkflow, /DEEPMINE \/ PLAYABLE WEB/);
+  assert.doesNotMatch(pagesWorkflow, /cp pages-static/);
+});
+
+test("the playable web game begins before automation and follows the Core recommendation", () => {
+  assert.match(prototype, /initialEquipment: EquipmentState = \{ drill: 1, cart: 1, lamp: 1 \}/);
+  assert.match(prototype, /recommendMiningUpgrade\(equipment, mine\.ore, mine\.depth\)/);
+  assert.match(prototype, /automation > 0 \? "자동 굴착 중" : "직접 타격"/);
+});
 
 test("continuous shaft contract remains explicit", () => {
   assert.match(prototype, /boreHistory/);

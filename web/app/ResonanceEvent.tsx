@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import type { ResonancePhase, ResonancePosition } from "./useResonanceEvent";
 import styles from "./mine.module.css";
+import { assetPath } from "./assetPath";
 
 type ResonanceEventProps = {
   phase: ResonancePhase;
@@ -39,7 +40,7 @@ export function ResonanceEvent({
           <span className={styles.resonanceUrgency}>한정 신호</span>
           <span className={styles.resonanceOrbit} aria-hidden="true" />
           <img
-            src="/assets/events/ResonanceNode.png"
+            src={assetPath("assets/events/ResonanceNode.png")}
             width={96}
             height={96}
             alt=""

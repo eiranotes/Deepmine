@@ -1023,3 +1023,15 @@
   UX를 확인한다. `number`의 표현 범위를 앱 `BigNumber`와 같다고 주장하지 않는다.
 - 검증 경계: exponent 383 이상의 구매·지갑·생산률 정확성은 Swift Core/App 테스트가
   소유한다. 웹 패리티 성공은 수식 드리프트가 없다는 뜻이며 극후반 수 범위 동등성 증거가 아니다.
+
+## D-080 — Pages의 사용자 표면은 검증 보고서가 아니라 플레이 가능한 게임이다
+
+- 상태: 승인됨·로컬 구현 및 브라우저 검증, 원격 배포 대기 (2026-08-03)
+- 결정: `pages-static`의 11개 로직 결과 화면은 Pages artifact로 배포하지 않는다. CI의 공식
+  패리티 테스트는 유지하되, 공개 URL은 `MinePrototype`을 Vite 정적 build로 패키징해 광부,
+  연속 갱도, 직접 타격, 광석 보상, 장비 구매와 자동 굴착을 실제로 조작하게 한다.
+- 시작 계약: 웹도 장비 3종 Lv.1, 광차 0대, 자동 DPS 0에서 시작한다. 첫 추천은 Core의
+  `recommendMiningUpgrade`를 사용해 광차 Lv.2 ◆180을 저축 목표로 유지한다.
+- 배포 경계: GitHub project Pages의 `/Deepmine/` base를 적용하고 모든 런타임 에셋 URL을
+  base-aware하게 만든다. PR은 build/contract만, `main` push만 deploy하는 D-077 권한 정책은
+  유지한다.

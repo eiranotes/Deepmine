@@ -5,7 +5,7 @@
 ## Current truth — 2026-08-03 current audit
 
 계획 전체가 완료된 것은 아니다. 최신 실제 구현은 오래된 `SPEC_v0.2`보다 앞서 있으며,
-이 섹션과 `DECISIONS.md`의 D-067~D-079가 아래의 역사적 기록과 충돌할 때 우선한다.
+이 섹션과 `DECISIONS.md`의 D-067~D-080이 아래의 역사적 기록과 충돌할 때 우선한다.
 
 - 옛 Lv.200 제품 상한은 제거됐고 장비별 정련은 6레벨마다 열린다. 다만 심도 1,499,925m에서
   닿는 Lv.100,000 산술 안전 천장은 남는다. 지갑·데미지·장비/정련 비용과 구매 결과는
@@ -28,20 +28,22 @@
 - Pages PR은 build/smoke만 수행하고 main push만 배포한다. PR #3을 merge commit
   `228f31d`로 병합한 뒤 `main` validation run `30770681257`이 전부 통과했고, Pages
   Actions source를 활성화한 뒤 deploy run `30770681254` attempt 2가 성공했다. 공개 URL은
-  `https://eiranotes.github.io/Deepmine/`이며 문서와 배포 모듈 응답을 확인했다.
+  `https://eiranotes.github.io/Deepmine/`이다. 다만 그 artifact는 플레이 화면이 아니라
+  `pages-static` 로직 보고서였다. 현재 코드는 `MinePrototype`의 광부·갱도·타격·설비 화면을
+  Pages Vite build로 바꿨고, 원격 교체는 다음 `main` push에서 검증한다 (D-080).
 
 계속 열린 핵심은 실제 UI 구매 정책 30/90/180일 시뮬레이션, 집중 보상을 실제
 `MiningLoop` 가속으로 통합하는 구조, 정련 MAX/기억 정련 재설치, `NextStepPlanner`의
 극후반 `Double`/`Int` 진행도, Lv.100,000 이후 true-uncapped 성장, 전체 XCUITest와 실기기
-릴리스 게이트다. 웹은 앱과 식을
-대조하는 조기·중기 formula harness이며 JavaScript `number` 범위를 iOS `BigNumber`와
-동일하다고 판정하지 않는다.
+릴리스 게이트다. 웹은 직접 플레이 가능한 조기·중기 데모이면서 앱과 식을 대조하는 formula
+harness다. JavaScript `number` 범위를 iOS `BigNumber`와 동일하다고 판정하지 않는다.
 
 현재 검증은 Core **282/282**, App 단위 **150/150**, 최종 persistence/명령 큐 **23/23**,
 정련 focused XCUITest **1/1**,
-웹 **15/15**, 장기 진행 에셋 **7/7**, generic iOS device build 통과다. 정적 Pages 로컬
-DOM 계약은 **11/11**이며 원격 `main` validation과 Pages 배포도 성공했다. 실기기 시스템
-표면은 여전히 미검증이다. 자세한 명령·xcresult·경계는 `BUILD_REPORT.md` 최상단
+웹 **17/17**, 장기 진행 에셋 **7/7**, generic iOS device build 통과다. 실제 Pages 게임은
+로컬 데스크톱·390px 렌더와 직접 타격→광석→광차 구매→자동 굴착을 통과했다. 기존 원격
+validation/Pages 인프라는 성공했지만 새 플레이 artifact의 원격 교체는 push 전이다. 실기기
+시스템 표면은 여전히 미검증이다. 자세한 명령·xcresult·경계는 `BUILD_REPORT.md` 최상단
 current-audit closeout을 따른다.
 
 ## Current state

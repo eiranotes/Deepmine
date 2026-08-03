@@ -19,13 +19,13 @@
 | 정련 실화면 | **1/1 통과** | `testRefinementExplainsTierLeapAndActualOutputImpact`; R0→R1 저장, 전용 notice, 실제 출력 변화. xcresult `/tmp/deepmine-growth-feedback-tests/Logs/Test/Test-DeepMineApp-2026.08.02_23-32-49-+0900.xcresult` |
 | 생산/정련 계산 집중 회귀 | **17/17 통과** | `WorkFaceForecastTests`; 잠긴 행은 최소 해금 레벨 preview, 램프는 실제 총 치명타 배율 비율 |
 | generic iOS device build | **통과** | code signing 비활성 build exit 0. 기존 `OfflineSettlement.swift`·`ShaftView.swift`의 unused `try?` warning은 남음 |
-| 웹 | **15/15 통과** | `npm test`가 production build와 패리티/계약을 실행, `npm run lint` 통과. 웹은 JavaScript `number` formula harness이며 앱의 `BigNumber` 범위 증거가 아님 |
-| 정적 Pages 로컬 계약 | **11/11 통과** | 정적 페이지 DOM 로직과 첫 광차 저축 readout, workflow bundle/module smoke 확인. PR은 build만, main push만 deploy |
+| 웹 | **17/17 통과** | Vinext production과 실제 Pages Vite 게임 build, 패리티/계약 테스트 및 `npm run lint` 통과. 웹은 JavaScript `number`이므로 앱의 `BigNumber` 범위 증거가 아님 |
+| Pages 플레이어블 로컬 | **통과** | `MinePrototype`을 `/Deepmine/` base로 정적 번들. 직접 타격으로 8.0m→63.0m·광석 100→192, 광차 Lv.2 구매 뒤 자동 0.6/초·광차 1대와 무입력 하강 확인 |
 | 장기 진행 에셋 | **7/7 통과** | strict PNG/SHA/정확한 ID 집합/카탈로그/웹 복사본과 provenance ID·raw-source 대응 검사 |
 | Swift 파일 크기 | **통과** | 이번 변경 파일은 모두 300줄 이하. 기존 baseline `GameActivitySurfaceContent.swift` 302줄만 남음 |
-| 웹 개발 서버 | **HTTP 200** | `http://127.0.0.1:4173`. 첫 로컬 이동 실패 뒤 인앱 Browser 보안 정책이 재시도를 막아 최종 화면 육안 판독은 수행하지 못함 |
+| 웹 브라우저 | **데스크톱·390px 통과** | 실제 광부/갱도/설비 렌더, 첫 타격 0→9%, 모바일 `scrollWidth=innerWidth=390`, 가로 문서 overflow 없음 |
 | 원격 `main` 검증 | **통과** | merge commit `228f31d`; Actions run `30770681257`에서 Core·App 단위·unsigned iOS build·Swift 파일 크기·웹·에셋 job 전부 성공 |
-| GitHub Pages | **배포·HTTP 200** | Actions source를 활성화하고 run `30770681254` attempt 2의 build/deploy 성공. `https://eiranotes.github.io/Deepmine/`과 배포 `coreBalance.js` 응답·스모크 확인 |
+| GitHub Pages | **기존 검증 화면 배포됨·교체 대기** | Actions source와 URL은 정상이나 공개 표면이 `pages-static` 로직 보고서였음을 재확인. 실제 게임 artifact는 로컬 완료, `main` push 뒤 원격 교체 검증 필요 |
 | 실기기 | **미검증** | FamilyControls·AlarmKit·Live Activity, 실제 VoiceOver/Reduce Motion/햅틱은 출시 차단 게이트 |
 
 ## Historical verification log

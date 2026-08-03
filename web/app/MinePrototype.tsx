@@ -25,9 +25,11 @@ import {
   supportCrewSize,
   cartCargoSlots,
   cartFleetSize,
+  recommendMiningUpgrade,
   tapDamage,
   upgradeCost as coreUpgradeCost,
 } from "./coreBalance";
+import { assetPath } from "./assetPath";
 import styles from "./mine.module.css";
 import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
 import { useMiningAudio } from "./useMiningAudio";
@@ -81,11 +83,9 @@ const equipmentCopy: Record<
   },
 };
 
-/// Core starts every player at level 1 across the board, where a cart hauls nothing at all.
-/// The prototype opens one cart level up instead: the first purchase is the beat that turns
-/// automation on, and a reference build that has to be clicked before anything moves cannot
-/// show the idle scene it exists to show. Every other level matches a fresh Core save.
-const initialEquipment: EquipmentState = { drill: 1, cart: 2, lamp: 1 };
+/// Match a fresh Core save: the player performs the real first strikes and saves for cart Lv.2
+/// before automation begins.
+const initialEquipment: EquipmentState = { drill: 1, cart: 1, lamp: 1 };
 const initialSpecializations: Specializations = { drill: null, cart: null, lamp: null };
 const equipmentKinds: EquipmentKind[] = ["drill", "cart", "lamp"];
 
@@ -192,10 +192,10 @@ function isSecondaryControl(target: EventTarget | null) {
 }
 
 function rockAssetAt(depth: number) {
-  if (depth >= 1600) return "/assets/shaft/ShaftRock_abyss.png";
-  if (depth >= 800) return "/assets/shaft/ShaftRock_ruins.png";
-  if (depth >= 240) return "/assets/shaft/ShaftRock_crystal.png";
-  return "/assets/shaft/ShaftRock_entry.png";
+  if (depth >= 1600) return assetPath("assets/shaft/ShaftRock_abyss.png");
+  if (depth >= 800) return assetPath("assets/shaft/ShaftRock_ruins.png");
+  if (depth >= 240) return assetPath("assets/shaft/ShaftRock_crystal.png");
+  return assetPath("assets/shaft/ShaftRock_entry.png");
 }
 
 export function MinePrototype() {
@@ -261,18 +261,12 @@ export function MinePrototype() {
   const remainingIntegrity = Math.max(0, integrity - mine.damage);
   const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
   const remainingPercent = Math.max(0, Math.round((1 - progress) * 100));
-  const recommendedUpgrade = equipmentKinds
-    .map((kind) => ({
-      kind,
-      level: equipment[kind],
-      cost: upgradeCost(kind, equipment[kind]),
-    }))
-    .sort((left, right) => {
-      const leftAffordable = left.cost <= mine.ore;
-      const rightAffordable = right.cost <= mine.ore;
-      if (leftAffordable !== rightAffordable) return leftAffordable ? -1 : 1;
-      return left.cost - right.cost;
-    })[0];
+  const recommendedKind = recommendMiningUpgrade(equipment, mine.ore, mine.depth) ?? "drill";
+  const recommendedUpgrade = {
+    kind: recommendedKind,
+    level: equipment[recommendedKind],
+    cost: upgradeCost(recommendedKind, equipment[recommendedKind]),
+  };
   const cartCount = cartFleetSize(equipment.cart, specializations.cart === "fleet");
   const cartLoad = cartCargoSlots(equipment.cart, specializations.cart === "freight");
   const serviceLights = serviceLampCount(
@@ -532,10 +526,10 @@ export function MinePrototype() {
 
   const fractureAsset =
     progress > 0.67
-      ? "/assets/shaft/ShaftFractureVertical_heavy.png"
+      ? assetPath("assets/shaft/ShaftFractureVertical_heavy.png")
       : progress > 0.33
-        ? "/assets/shaft/ShaftFractureVertical_medium.png"
-        : "/assets/shaft/ShaftFractureVertical_light.png";
+        ? assetPath("assets/shaft/ShaftFractureVertical_medium.png")
+        : assetPath("assets/shaft/ShaftFractureVertical_light.png");
 
   const strikeClass = {
     quick: styles.quickStrike,
@@ -587,7 +581,7 @@ export function MinePrototype() {
       <div className={styles.appFrame}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>DEEPMINE / WEB PROTOTYPE</p>
+            <p className={styles.eyebrow}>DEEPMINE / PLAYABLE WEB</p>
             <h1>오늘의 갱도</h1>
           </div>
           <div className={styles.headerActions}>
@@ -598,7 +592,7 @@ export function MinePrototype() {
             </div>
             <button className={styles.strikeAssist} type="button" onClick={strike}>
               탭 가속
-              <small>자동 굴착 중</small>
+              <small>{automation > 0 ? "자동 굴착 중" : "직접 타격"}</small>
             </button>
             <button
               className={styles.soundToggle}
@@ -651,7 +645,7 @@ export function MinePrototype() {
 
             <img
               className={styles.continuousSurface}
-              src="/assets/shaft/ShaftSurface.png"
+              src={assetPath("assets/shaft/ShaftSurface.png")}
               width={320}
               height={90}
               alt=""
@@ -677,7 +671,7 @@ export function MinePrototype() {
                 >
                   <img
                     className={`${styles.continuousCart} ${specializations.cart === "freight" ? styles.freightCart : ""} ${upgradeEvent?.kind === "cart" && index === cartCount - 1 ? styles.newestCart : ""}`}
-                    src={`/assets/equipment/Equipment_cart_tier${equipmentTier(equipment.cart)}.png`}
+                    src={assetPath(`assets/equipment/Equipment_cart_tier${equipmentTier(equipment.cart)}.png`)}
                     width={32}
                     height={32}
                     alt=""
@@ -698,7 +692,7 @@ export function MinePrototype() {
                   >
                     <i className={styles.crewDeck} />
                     <img
-                      src="/assets/miner.png"
+                      src={assetPath("assets/miner.png")}
                       width={72}
                       height={72}
                       alt=""
@@ -716,7 +710,7 @@ export function MinePrototype() {
                   >
                     <i />
                     <img
-                      src={`/assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`}
+                      src={assetPath(`assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`)}
                       width={32}
                       height={32}
                       alt=""
@@ -740,7 +734,7 @@ export function MinePrototype() {
                   {index < installedLampCount && (
                     <img
                       className={styles.continuousLamp}
-                      src={`/assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`}
+                      src={assetPath(`assets/equipment/Equipment_lamp_tier${equipmentTier(equipment.lamp)}.png`)}
                       width={32}
                       height={32}
                       alt=""
@@ -749,7 +743,7 @@ export function MinePrototype() {
                   {index % 2 === 0 && (
                     <img
                       className={styles.continuousScar}
-                      src="/assets/shaft/ShaftFractureVertical_light.png"
+                      src={assetPath("assets/shaft/ShaftFractureVertical_light.png")}
                       width={72}
                       height={160}
                       alt=""
@@ -783,7 +777,7 @@ export function MinePrototype() {
               </div>
               <img
                 className={styles.frontierLip}
-                src="/assets/shaft/ShaftFrontierLip.png"
+                src={assetPath("assets/shaft/ShaftFrontierLip.png")}
                 width={320}
                 height={128}
                 alt=""
@@ -803,7 +797,7 @@ export function MinePrototype() {
               <span className={styles.miningActor} key={`mining-actor-${hitPulse}`} />
               <img
                 className={styles.continuousDrill}
-                src={`/assets/equipment/Equipment_drill_tier${equipmentTier(equipment.drill)}.png`}
+                src={assetPath(`assets/equipment/Equipment_drill_tier${equipmentTier(equipment.drill)}.png`)}
                 width={64}
                 height={64}
                 alt=""
@@ -823,7 +817,7 @@ export function MinePrototype() {
               </div>
               <img
                 className={styles.continuousWeakPoint}
-                src={strikeVariant === "critical" ? "/assets/effects/WeakPoint_hit.png" : "/assets/effects/WeakPoint_idle.png"}
+                src={assetPath(strikeVariant === "critical" ? "assets/effects/WeakPoint_hit.png" : "assets/effects/WeakPoint_idle.png")}
                 width={64}
                 height={64}
                 alt=""
@@ -892,7 +886,7 @@ export function MinePrototype() {
                 key={upgradeEvent.id}
               >
                 <img
-                  src={`/assets/equipment/Equipment_${upgradeEvent.kind}_tier${equipmentTier(upgradeEvent.level)}.png`}
+                  src={assetPath(`assets/equipment/Equipment_${upgradeEvent.kind}_tier${equipmentTier(upgradeEvent.level)}.png`)}
                   width={32}
                   height={32}
                   alt=""
@@ -972,7 +966,7 @@ export function MinePrototype() {
                   <div className={styles.equipmentTop}>
                     <div className={styles.equipmentArt}>
                       <img
-                        src={`/assets/equipment/Equipment_${kind}_tier${equipmentTier(level)}.png`}
+                        src={assetPath(`assets/equipment/Equipment_${kind}_tier${equipmentTier(level)}.png`)}
                         width={64}
                         height={64}
                         alt=""
@@ -1047,8 +1041,8 @@ export function MinePrototype() {
         </section>
 
         <footer className={styles.footer}>
-          <p>웹 기준안 · 앱 포팅 전 검증용</p>
-          <p>핵심 루프는 채굴 기준 언어와 설비 선택만 사용합니다.</p>
+          <p>플레이어블 웹 데모 · iOS Core 경제 공식</p>
+          <p>직접 타격부터 자동화·설비 분기까지 한 화면에서 플레이합니다.</p>
         </footer>
       </div>
     </main>

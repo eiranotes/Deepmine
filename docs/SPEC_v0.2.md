@@ -11,7 +11,7 @@
 
 # 0. 2026-08-03 current implementation amendment
 
-이 절은 2026-08-03 현재 코드, `DECISIONS.md` D-067~D-079, `PROJECT_STATUS.md`와
+이 절은 2026-08-03 현재 코드, `DECISIONS.md` D-067~D-080, `PROJECT_STATUS.md`와
 `BUILD_REPORT.md`의 검증 사실을 스펙에 반영한다. 아래 옛 절과 충돌하면 이 amendment가
 우선한다. 날짜가 붙은 역사적 검증 스냅샷은 제품 계약이 아니다.
 
@@ -53,15 +53,22 @@
 ## 0.3 웹·배포·검증 경계
 
 - 웹은 Swift Core의 상수·공식·첫 광차 저축·램프 정련식을 대조하는 조기·중기 formula
-  harness다. JavaScript `number` 범위를 iOS `BigNumber`와 동등하다고 보지 않는다.
-- Pages PR은 build/module smoke/static artifact까지만 수행한다. artifact 업로드와 배포,
+  harness이면서 직접 플레이 가능한 데모다. JavaScript `number` 범위를 iOS `BigNumber`와
+  동등하다고 보지 않는다.
+- 공개 Pages는 로직 결과표가 아니라 `MinePrototype`의 광부·연속 갱도·직접 타격·광석 보상·
+  장비 구매·자동 굴착을 제공한다. 장비 3종 Lv.1, 광차 0대, 자동 DPS 0에서 시작하며 첫 추천은
+  Core의 광차 Lv.2 ◆180 저축 계약을 쓴다. project Pages의 `/Deepmine/` base에서 모든 에셋이
+  로드되어야 한다.
+- Pages PR은 playable build/static artifact 계약까지만 수행한다. artifact 업로드와 배포,
   `pages: write`/`id-token: write`는 main push의 deploy job만 가진다.
 - 시뮬레이터 병합 증거와 실기기 출시 증거를 구분한다. Core/App 테스트와 generic build 성공은
   FamilyControls, AlarmKit, Live Activity, 실제 VoiceOver/Reduce Motion/햅틱을 증명하지 않는다.
 - 2026-08-02 로컬 closeout은 Core 282/282, App 단위 150/150, 정련 XCUITest 1/1,
   웹 15/15, 에셋 7/7과 generic iOS device build 통과다. 2026-08-03에는 merge commit
   `228f31d`의 `main` validation과 Pages Actions 배포가 성공했고 공개 harness와 배포 모듈의
-  HTTP 200·스모크를 확인했다. 시스템 표면은 실기기 전이므로 미검증이다.
+  HTTP 200·스모크를 확인했다. 당시 공개 artifact가 로직 보고서였던 문제는 D-080으로 교정해
+  플레이어블 build의 로컬 직접 타격→광차 구매→자동 굴착과 390px 렌더를 확인했으며 원격
+  교체는 `main` push 전이다. 시스템 표면은 실기기 전이므로 미검증이다.
 
 ## 0.4 아직 열린 제품 계약
 

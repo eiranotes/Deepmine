@@ -5,10 +5,15 @@
 ### Deployed
 
 - PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. `main` validation과
-  Pages build/deploy가 모두 성공했으며 공개 formula harness는
-  `https://eiranotes.github.io/Deepmine/`에서 제공된다
+  Pages build/deploy 인프라가 성공했다. 기존 공개 artifact는 로직 검증 보고서였으며 아래
+  플레이어블 artifact로 교체한다
 
 ### Changed
+
+- GitHub Pages가 `pages-static` 로직 결과표 대신 실제 광부·연속 갱도·타격·광석·장비 화면을
+  배포한다. 웹은 모든 장비 Lv.1·자동 DPS 0에서 시작하고 첫 광차 Lv.2 ◆180을 직접 저축한다
+- Pages용 Vite 정적 build와 `/Deepmine/` base-aware 에셋 경로를 추가했다. Vinext 기본
+  화면과 Pages가 같은 `MinePrototype`을 사용한다
 
 - 집중 세션 복구 전, 시작 버튼의 비동기 준비 구간과 활성 집중 중에는 홈 자동 채굴과
   오프라인 정산을 함께 멈춘다. 한 시간의 집중 귀환 보상과 숨은 홈 생산을 동시에 지급하지 않는다

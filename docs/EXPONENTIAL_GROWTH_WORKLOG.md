@@ -51,3 +51,11 @@ GitHub Actions Validation run #60:
 - Core/iOS job: 실행 중
 
 Pages 전용 워크플로는 저장소에 등록하고 자동 활성화 옵션까지 설정했다. 현재 사용 가능한 GitHub 커넥터는 PR 이벤트 Validation run만 조회하므로 Pages deploy run과 공개 URL 응답은 별도 확인이 필요하다.
+
+## 2026-08-03 Pages 사용자 표면 교정
+
+위 `pages-static` 결과표는 배포 파이프라인 검증에는 성공했지만 사용자가 플레이할 게임은
+아니었다. Vinext 기본 화면과 Pages artifact를 `MinePrototype`으로 되돌리고, Pages는 Vite
+정적 build로 패키징한다. 최신 Core 계약대로 장비 Lv.1·자동 DPS 0·첫 광차 Lv.2 ◆180
+저축에서 시작하도록 교정했다. 로컬 브라우저에서 직접 타격, 광석 증가, 첫 광차 구매,
+자동 하강과 390px 무가로-overflow를 확인했다.

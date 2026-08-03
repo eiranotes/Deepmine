@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { UnifiedMinePrototype } from "./UnifiedMinePrototype";
+import { MinePrototype } from "./MinePrototype";
 
 export const metadata: Metadata = {
-  title: "DeepMine — 통합 성장 로직",
-  description: "iOS DeepMineCore와 동일한 암반, 장비, 자동화, 정련 규칙을 실행하는 웹 프로토타입",
+  title: "DeepMine — 플레이어블 웹 데모",
+  description: "암반을 직접 깨고 장비를 강화하며 자동 채굴을 여는 DeepMine 웹 데모",
 };
 
 export default function Home() {
-  return <UnifiedMinePrototype />;
+  return <MinePrototype />;
 }
