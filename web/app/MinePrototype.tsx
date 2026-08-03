@@ -30,7 +30,12 @@ import {
   upgradeCost as coreUpgradeCost,
 } from "./coreBalance";
 import { assetPath } from "./assetPath";
-import { miningCameraPose, MINING_PIXELS_PER_METER } from "./miningCamera";
+import {
+  MINING_PIXELS_PER_METER,
+  partitionDigPose,
+  partitionFallMotion,
+  type PartitionFallMotion,
+} from "./partitionFall";
 import styles from "./mine.module.css";
 import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
 import { useMiningAudio } from "./useMiningAudio";
@@ -58,6 +63,12 @@ type UpgradeEvent = {
   level: number;
   detail: string;
 };
+type PartitionFallBatch = {
+  segments: number;
+  fromDepth: number;
+  toDepth: number;
+};
+type PartitionFallEvent = PartitionFallBatch & PartitionFallMotion & { id: number };
 
 const METERS_PER_LAYER = METERS_PER_SEGMENT;
 const PIXELS_PER_METER = MINING_PIXELS_PER_METER;
@@ -215,10 +226,10 @@ export function MinePrototype() {
   const [specializations, setSpecializations] =
     useState<Specializations>(initialSpecializations);
   const [hitPulse, setHitPulse] = useState(0);
-  const [collapsePulse, setCollapsePulse] = useState(0);
   const [lastGain, setLastGain] = useState<number | null>(null);
   const [strikeVariant, setStrikeVariant] = useState<StrikeVariant>("quick");
-  const [isBreaking, setIsBreaking] = useState(false);
+  const [fallEvent, setFallEvent] = useState<PartitionFallEvent | null>(null);
+  const [fallAnnouncement, setFallAnnouncement] = useState("");
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
   const [upgradeEvent, setUpgradeEvent] = useState<UpgradeEvent | null>(null);
@@ -237,7 +248,11 @@ export function MinePrototype() {
     y: number;
     cancelled: boolean;
   } | null>(null);
-  const breakTimerRef = useRef<number | null>(null);
+  const fallTimerRef = useRef<number | null>(null);
+  const fallSequenceRef = useRef(0);
+  const activeFallRef = useRef<PartitionFallEvent | null>(null);
+  const pendingFallRef = useRef<PartitionFallBatch | null>(null);
+  const startFallRef = useRef<((batch: PartitionFallBatch) => void) | null>(null);
   const upgradeTimerRef = useRef<number | null>(null);
   const strikeTimersRef = useRef<Set<number>>(new Set());
   const manualStrikeCountRef = useRef(0);
@@ -260,8 +275,8 @@ export function MinePrototype() {
   const {
     cameraDepth,
     headDepth,
-    headScreenOffsetPx,
-  } = miningCameraPose(mine.depth, progress, METERS_PER_LAYER);
+  } = partitionDigPose(mine.depth, progress, METERS_PER_LAYER);
+  const displayedHeadDepth = fallEvent?.fromDepth ?? headDepth;
   const expectedLayerOre = layerOreAt(mine.depth, oreMultiplier);
   const remainingIntegrity = Math.max(0, integrity - mine.damage);
   const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
@@ -334,6 +349,58 @@ export function MinePrototype() {
     [],
   );
 
+  const startPartitionFall = useCallback(
+    (batch: PartitionFallBatch) => {
+      const motion = partitionFallMotion(
+        batch.segments,
+        METERS_PER_LAYER,
+        reducedMotion,
+      );
+      const event: PartitionFallEvent = {
+        id: ++fallSequenceRef.current,
+        ...batch,
+        ...motion,
+      };
+
+      activeFallRef.current = event;
+      setFallEvent(event);
+      setFallAnnouncement(
+        `${event.segments}개 구간 돌파, ${event.meters}미터 하강`,
+      );
+      playCollapseSound();
+
+      if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
+      fallTimerRef.current = window.setTimeout(() => {
+        activeFallRef.current = null;
+        setFallEvent(null);
+        fallTimerRef.current = null;
+
+        const pending = pendingFallRef.current;
+        pendingFallRef.current = null;
+        if (pending !== null) {
+          window.requestAnimationFrame(() => startFallRef.current?.(pending));
+        }
+      }, motion.totalDurationMs);
+    },
+    [playCollapseSound, reducedMotion],
+  );
+
+  useEffect(() => {
+    startFallRef.current = startPartitionFall;
+  }, [startPartitionFall]);
+
+  useEffect(() => {
+    if (!reducedMotion || activeFallRef.current === null) return;
+    if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
+    fallTimerRef.current = null;
+    activeFallRef.current = null;
+    setFallEvent(null);
+
+    const pending = pendingFallRef.current;
+    pendingFallRef.current = null;
+    if (pending !== null) startFallRef.current?.(pending);
+  }, [reducedMotion]);
+
   const queueStrike = useCallback(
     (
       rawDamage: number,
@@ -383,17 +450,32 @@ export function MinePrototype() {
 
   useEffect(() => {
     if (mine.brokenLayers <= previousBrokenLayersRef.current) return;
+    const brokenSegments = mine.brokenLayers - previousBrokenLayersRef.current;
     previousBrokenLayersRef.current = mine.brokenLayers;
-    setCollapsePulse((value) => value + 1);
-    setIsBreaking(true);
-    playCollapseSound();
-    if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
-    breakTimerRef.current = window.setTimeout(() => setIsBreaking(false), 560);
-  }, [mine.brokenLayers, playCollapseSound]);
+    const batch: PartitionFallBatch = {
+      segments: brokenSegments,
+      fromDepth: mine.depth - brokenSegments * METERS_PER_LAYER,
+      toDepth: mine.depth,
+    };
+
+    if (activeFallRef.current === null) {
+      startPartitionFall(batch);
+      return;
+    }
+
+    const pending = pendingFallRef.current;
+    pendingFallRef.current = pending === null
+      ? batch
+      : {
+          segments: pending.segments + batch.segments,
+          fromDepth: pending.fromDepth,
+          toDepth: batch.toDepth,
+        };
+  }, [mine.brokenLayers, mine.depth, startPartitionFall]);
 
   useEffect(
     () => () => {
-      if (breakTimerRef.current !== null) window.clearTimeout(breakTimerRef.current);
+      if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
       if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
       for (const timer of strikeTimersRef.current) window.clearTimeout(timer);
       strikeTimersRef.current.clear();
@@ -503,7 +585,6 @@ export function MinePrototype() {
     () =>
       ({
         "--break-progress": progress.toFixed(3),
-        "--head-screen-offset": `${headScreenOffsetPx.toFixed(2)}px`,
         "--cut-width": `${24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)}%`,
         "--frontier-width": `${Math.min(88, (24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)) * 2.35)}%`,
         "--lamp-radius": `${18 + Math.min(20, equipment.lamp * 2.4) + (specializations.lamp === "reach" ? 8 : 0)}%`,
@@ -517,13 +598,21 @@ export function MinePrototype() {
         "--cart-duration": `${Math.max(1.9, 4.8 - equipment.cart * 0.18 - (specializations.cart === "fleet" ? 0.65 : 0))}s`,
         "--rig-scale": `${1 + (equipmentTier(equipment.drill) - 1) * 0.12}`,
         "--impact-kick": `${specializations.drill === "impact" ? 1.34 : 1}`,
+        "--partition-fall-distance": `${fallEvent?.visualDistancePx ?? 0}px`,
+        "--partition-strata-travel": `${fallEvent?.strataTravelPx ?? 0}px`,
+        "--partition-actor-drop-raw": `${fallEvent?.actorDropPx ?? 0}px`,
+        "--partition-actor-drop-half-raw": `${(fallEvent?.actorDropPx ?? 0) * 0.55}px`,
+        "--partition-break-duration": `${fallEvent?.breakDurationMs ?? 0}ms`,
+        "--partition-travel-duration": `${fallEvent?.travelDurationMs ?? 0}ms`,
+        "--partition-landing-duration": `${fallEvent?.landingDurationMs ?? 0}ms`,
+        "--partition-total-duration": `${fallEvent?.totalDurationMs ?? 0}ms`,
       }) as CSSProperties,
     [
       equipment.drill,
       equipment.cart,
       equipment.lamp,
       cameraDepth,
-      headScreenOffsetPx,
+      fallEvent,
       progress,
       specializations.drill,
       specializations.cart,
@@ -618,12 +707,12 @@ export function MinePrototype() {
         <section className={styles.shaftSection} aria-labelledby="shaft-heading">
           <div className={styles.shaftHeading}>
             <div>
-              <p className={styles.sectionLabel}>하나로 이어진 암반</p>
-              <h2 id="shaft-heading">통로 끝을 계속 굴착</h2>
+              <p className={styles.sectionLabel}>4m 파티션 파쇄</p>
+              <h2 id="shaft-heading">끝까지 부수고 다음 막장으로 낙하</h2>
             </div>
             <div className={styles.faceProgress}>
-              <span>다음 4m</span>
-              <strong>{Math.round(progress * 100)}%</strong>
+              <span>{fallEvent !== null ? "파티션 돌파" : "다음 4m"}</span>
+              <strong>{fallEvent !== null ? `${fallEvent.segments}구간` : `${Math.round(progress * 100)}%`}</strong>
             </div>
           </div>
 
@@ -633,7 +722,7 @@ export function MinePrototype() {
 
           <div className={styles.shaftStage}>
             <div
-              className={`${styles.shaft} ${strikeClass} ${commissioningClass} ${strikeVariant === "critical" ? styles.critical : ""} ${isBreaking ? styles.breaking : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+              className={`${styles.shaft} ${strikeClass} ${commissioningClass} ${strikeVariant === "critical" ? styles.critical : ""} ${fallEvent !== null ? styles.partitionFalling : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
               style={sceneStyle}
               data-strike-variant={strikeVariant}
               data-strike-source={lastStrikeSource}
@@ -646,20 +735,21 @@ export function MinePrototype() {
               data-infrastructure-tier={crewCount}
               data-impact-coverage="wide"
               data-camera-depth={cameraDepth.toFixed(2)}
-              data-head-screen-offset={headScreenOffsetPx.toFixed(1)}
+              data-fall-segments={fallEvent?.segments ?? 0}
+              data-fall-distance={fallEvent?.visualDistancePx ?? 0}
               role="img"
-              aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}, 내실 ${crewCount}단계, 작업조 ${crewCount}명, 광차 ${cartCount}대, 작업등 ${serviceLights}기`}
+              aria-label={`파티션 단위 연속 갱도. 굴착 헤드 ${displayedHeadDepth.toFixed(1)}미터, 현재 4미터 파티션 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}, 내실 ${crewCount}단계, 작업조 ${crewCount}명, 광차 ${cartCount}대, 작업등 ${serviceLights}기`}
             >
-            <div className={styles.rockWorld} aria-hidden="true" />
+            <div className={styles.worldMotion} aria-hidden="true">
+              <div className={styles.rockWorld} />
 
-            <img
-              className={styles.continuousSurface}
-              src={assetPath("assets/shaft/ShaftSurface.png")}
-              width={320}
-              height={90}
-              alt=""
-              aria-hidden="true"
-            />
+              <img
+                className={styles.continuousSurface}
+                src={assetPath("assets/shaft/ShaftSurface.png")}
+                width={320}
+                height={90}
+                alt=""
+              />
 
             <div className={styles.openShaft} aria-hidden="true">
               <span className={styles.tunnelVoid} />
@@ -761,9 +851,10 @@ export function MinePrototype() {
                 </div>
               ))}
             </div>
+            </div>
 
             <div className={styles.shaftStatus} aria-label="현재 채굴 상태">
-              <div><span>현재 심도</span><strong>{headDepth.toFixed(1)}m</strong></div>
+              <div><span>현재 심도</span><strong>{displayedHeadDepth.toFixed(1)}m</strong></div>
               <div><span>최고 심도</span><strong>{Math.max(mine.recordDepth, headDepth).toFixed(1)}m</strong></div>
               <div><span>탭 위력</span><strong>{formatNumber(tap)}</strong></div>
               <div><span>자동 굴착</span><strong>{formatNumber(automation)}/초</strong></div>
@@ -841,15 +932,22 @@ export function MinePrototype() {
               {lastGain !== null && <span className={styles.continuousOreGain}>+{lastGain} 광석</span>}
             </div>
 
-            {isBreaking && (
+            {fallEvent !== null && (
               <div
-                className={`${styles.collapseBand} ${mine.brokenLayers % 2 === 0 ? styles.collapseAlternate : ""}`}
+                className={`${styles.collapseBand} ${fallEvent.toDepth % (METERS_PER_LAYER * 2) === 0 ? styles.collapseAlternate : ""}`}
                 aria-hidden="true"
-                key={`collapse-${collapsePulse}`}
+                key={`collapse-${fallEvent.id}`}
               >
                 <span className={styles.collapseLeft} />
                 <span className={styles.collapseRight} />
                 <span className={styles.collapseGap} />
+              </div>
+            )}
+
+            {fallEvent !== null && (
+              <div className={styles.partitionFallCue} aria-hidden="true">
+                <span>{fallEvent.segments === 1 ? "파티션 돌파" : `${fallEvent.segments}개 파티션 연쇄 돌파`}</span>
+                <strong>{fallEvent.meters}m 낙하</strong>
               </div>
             )}
 
@@ -868,10 +966,14 @@ export function MinePrototype() {
             </div>
 
             <div className={styles.descentIndicator} aria-hidden="true">
-              <span>자동 하강</span>
-              <strong>{headDepth.toFixed(1)}m</strong>
-              <i>↓</i>
+              <span>{fallEvent !== null ? "낙하 중" : "현재 파티션"}</span>
+              <strong>{fallEvent !== null ? `${fallEvent.segments}구간 · ${fallEvent.meters}m` : `${Math.round(progress * 100)}%`}</strong>
+              <i>{fallEvent !== null ? "↓" : "▾"}</i>
             </div>
+
+            <p className={styles.visuallyHidden} role="status" aria-live="polite">
+              {fallAnnouncement}
+            </p>
 
             {upgradeEvent !== null && (
               <span

@@ -1217,13 +1217,18 @@
 
 .shaft {
   --workline: 36%;
-  --head-screen-offset: 0px;
   --rock-image: url("/assets/shaft/ShaftRock_entry.png");
   --rock-phase: 0px;
   --surface-y: 0px;
   --fracture-reveal: 24px;
   --strike-duration: 560ms;
   --strike-contact-delay: 202ms;
+  --partition-fall-distance: 0px;
+  --partition-strata-travel: 0px;
+  --partition-actor-drop-raw: 0px;
+  --partition-actor-drop: var(--partition-actor-drop-raw);
+  --partition-actor-drop-half-raw: 0px;
+  --partition-actor-drop-half: var(--partition-actor-drop-half-raw);
   position: relative;
   height: clamp(520px, calc(100svh - 176px), 680px);
   min-height: 520px;
@@ -1233,6 +1238,18 @@
   transition: filter 80ms ease, transform 80ms ease;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.worldMotion {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.partitionFalling .worldMotion {
+  animation: partition-world-fall var(--partition-travel-duration) cubic-bezier(0.2, 0.68, 0.22, 1) var(--partition-break-duration) both;
 }
 
 .heavyStrike {
@@ -1273,6 +1290,11 @@
   transition: background-position 120ms linear;
 }
 
+.partitionFalling .rockWorld {
+  transition: none;
+  animation: partition-rock-fall var(--partition-travel-duration) linear var(--partition-break-duration) both;
+}
+
 .rockWorld::after {
   position: absolute;
   inset: 0;
@@ -1301,7 +1323,7 @@
   top: 0;
   left: 50%;
   width: var(--cut-width);
-  height: calc(var(--workline) + var(--head-screen-offset) + 26px);
+  height: calc(var(--workline) + 26px);
   transform: translateX(-50%);
   overflow: hidden;
   background:
@@ -1641,19 +1663,12 @@
 .workLine {
   position: absolute;
   z-index: 10;
-  top: calc(var(--workline) + var(--head-screen-offset));
+  top: var(--workline);
   left: 50%;
   width: 100%;
   height: 202px;
   transform: translate(-50%, -18px);
   pointer-events: none;
-  transition: top 160ms cubic-bezier(0.2, 0.72, 0.24, 1);
-}
-
-.breaking .workLine,
-.breaking .openShaft {
-  transition-duration: 520ms;
-  transition-timing-function: cubic-bezier(0.16, 0.72, 0.2, 1);
 }
 
 .strikeArc {
@@ -1828,6 +1843,11 @@
   animation-name: miner-critical-strike;
 }
 
+.partitionFalling .miningActor {
+  background-image: url("/assets/shaft/MinerDescentStrip.png");
+  animation: miner-partition-fall var(--partition-total-duration) linear both;
+}
+
 .continuousDrill {
   position: absolute;
   z-index: 4;
@@ -1840,6 +1860,18 @@
   filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75));
   image-rendering: pixelated;
   opacity: 0.82;
+}
+
+.partitionFalling .continuousDrill {
+  animation: drill-partition-fall var(--partition-total-duration) linear both;
+}
+
+.partitionFalling .frontierLip,
+.partitionFalling .excavationKerf,
+.partitionFalling .fractureClip,
+.partitionFalling .workRewardPromise,
+.partitionFalling .continuousWeakPoint {
+  animation: partition-face-swap var(--partition-total-duration) steps(1, end) both;
 }
 
 .contactFlash {
@@ -1967,7 +1999,7 @@
 .collapseBand {
   position: absolute;
   z-index: 9;
-  top: calc(var(--workline) + var(--head-screen-offset) - 8px);
+  top: calc(var(--workline) - 8px);
   left: 0;
   width: 100%;
   height: 118px;
@@ -1991,14 +2023,14 @@
 .collapseLeft {
   left: 0;
   clip-path: polygon(0 0, 100% 0, 91% 17%, 98% 38%, 86% 61%, 95% 83%, 80% 100%, 0 100%);
-  animation: collapse-left 560ms cubic-bezier(0.16, 0.72, 0.2, 1) both;
+  animation: collapse-left var(--partition-break-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
 }
 
 .collapseRight {
   right: 0;
   background-position-x: right;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 18% 100%, 5% 82%, 14% 62%, 2% 39%, 10% 18%);
-  animation: collapse-right 560ms cubic-bezier(0.16, 0.72, 0.2, 1) both;
+  animation: collapse-right var(--partition-break-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
 }
 
 .collapseGap {
@@ -2009,7 +2041,7 @@
   height: 100%;
   transform: translateX(-50%);
   background: #080807;
-  animation: collapse-gap 520ms ease-out both;
+  animation: collapse-gap var(--partition-break-duration) ease-out both;
 }
 
 .collapseAlternate .collapseLeft {
@@ -2026,7 +2058,7 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% calc(var(--workline) + var(--head-screen-offset)), transparent 0 var(--lamp-radius), rgb(10 10 9 / 0.28) calc(var(--lamp-radius) + 12%), rgb(10 10 9 / 0.86) calc(var(--lamp-radius) + 33%)),
+    radial-gradient(circle at 50% var(--workline), transparent 0 var(--lamp-radius), rgb(10 10 9 / 0.28) calc(var(--lamp-radius) + 12%), rgb(10 10 9 / 0.86) calc(var(--lamp-radius) + 33%)),
     linear-gradient(to bottom, transparent 0 54%, rgb(10 10 9 / 0.08) 62%, rgb(10 10 9 / 0.68) 100%);
 }
 
@@ -2063,10 +2095,14 @@
   font-weight: 900;
 }
 
+.partitionFalling .continuousDepthOverlay {
+  animation: partition-depth-swap var(--partition-total-duration) steps(1, end) both;
+}
+
 .descentIndicator {
   position: absolute;
   z-index: 18;
-  top: calc(var(--workline) + var(--head-screen-offset) + 66px);
+  top: calc(var(--workline) + 66px);
   right: 10px;
   display: grid;
   justify-items: end;
@@ -2082,7 +2118,7 @@
   top: 52px;
   left: 50%;
   width: calc(var(--cut-width) + 96px);
-  height: calc(var(--workline) + var(--head-screen-offset) - 22px);
+  height: calc(var(--workline) - 22px);
   transform: translateX(-50%);
   border-inline: 3px solid rgb(210 147 49 / 0.72);
   background: linear-gradient(90deg, transparent, rgb(210 147 49 / 0.08) 22% 78%, transparent);
@@ -2124,7 +2160,39 @@
   color: var(--brass-bright);
   font-size: 1rem;
   font-style: normal;
+}
+
+.partitionFalling .descentIndicator i {
   animation: descent-arrow 720ms ease-in-out infinite;
+}
+
+.partitionFallCue {
+  position: absolute;
+  z-index: 19;
+  top: calc(var(--workline) - 78px);
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  min-width: 164px;
+  padding: 7px 12px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(240 189 93 / 0.72);
+  background: rgb(10 10 9 / 0.86);
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.45);
+  pointer-events: none;
+  animation: partition-fall-cue var(--partition-total-duration) steps(5, end) both;
+}
+
+.partitionFallCue span {
+  color: var(--limestone);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+}
+
+.partitionFallCue strong {
+  color: var(--brass-bright);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .resonanceLayer {
@@ -2601,6 +2669,63 @@
   100% { opacity: var(--fracture-opacity); filter: brightness(1); transform: scaleY(1); transform-origin: top; }
 }
 
+@keyframes partition-world-fall {
+  from { transform: translateY(var(--partition-fall-distance)); }
+  to { transform: translateY(0); }
+}
+
+@keyframes partition-rock-fall {
+  from { background-position: center calc(var(--rock-phase) + var(--partition-strata-travel)); }
+  to { background-position: center var(--rock-phase); }
+}
+
+@keyframes miner-partition-fall {
+  0%, 12% {
+    background-position: 0 0;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+  24%, 46% {
+    background-position: -152px 0;
+    transform: translateY(var(--partition-actor-drop-half)) rotate(-1deg) scale(0.98);
+  }
+  47%, 76% {
+    background-position: -304px 0;
+    transform: translateY(var(--partition-actor-drop)) rotate(1deg) scale(0.98);
+  }
+  77%, 90% {
+    background-position: -456px 0;
+    transform: translateY(var(--partition-actor-drop)) scale(1.08, 0.82);
+  }
+  100% {
+    background-position: -456px 0;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes drill-partition-fall {
+  0%, 12% { transform: translateY(0) rotate(18deg) scale(var(--rig-scale)); }
+  47%, 76% { transform: translateY(var(--partition-actor-drop)) rotate(4deg) scale(var(--rig-scale)); }
+  77%, 90% { transform: translateY(var(--partition-actor-drop)) rotate(12deg) scale(var(--rig-scale), 0.84); }
+  100% { transform: translateY(0) rotate(18deg) scale(var(--rig-scale)); }
+}
+
+@keyframes partition-face-swap {
+  0%, 12% { opacity: 1; }
+  13%, 78% { opacity: 0; }
+  79%, 100% { opacity: 1; }
+}
+
+@keyframes partition-fall-cue {
+  0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  12%, 76% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+}
+
+@keyframes partition-depth-swap {
+  0%, 90% { opacity: 0; }
+  91%, 100% { opacity: 1; }
+}
+
 @keyframes collapse-left {
   0% { opacity: 1; transform: translate(0, 0) rotate(0); }
   100% { opacity: 0; transform: translate(-42px, 54px) rotate(-9deg); }
@@ -2675,6 +2800,8 @@
   .progressTrack { margin-bottom: 5px; }
   .shaft {
     --workline: 35%;
+    --partition-actor-drop: min(56px, var(--partition-actor-drop-raw));
+    --partition-actor-drop-half: min(31px, var(--partition-actor-drop-half-raw));
     height: clamp(520px, calc(100dvh - 108px), 680px);
     min-height: 520px;
   }
@@ -2770,6 +2897,10 @@
 
   .strikeArc,
   .impactField {
+    display: none;
+  }
+
+  .collapseBand {
     display: none;
   }
 

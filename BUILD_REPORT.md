@@ -1,6 +1,20 @@
 # Build Report
 
-업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 원격 closeout)
+업데이트: 2026-08-03 (웹 파티션 완파·다중 낙하 로컬 closeout)
+
+## 2026-08-03 partition-break fall closeout
+
+| 항목 | 현재 결과 | 근거/경계 |
+|---|---|---|
+| Pro 협업 | **완료** | 별도 ChatGPT 프로젝트 `DeepMine — 굴착감 개선`에 최신 `applyDamage` 다중 파쇄 루프와 D-081 문제를 담은 `2026-08-03_PARTITION_FALL_PRO_CONTEXT.md`를 추가. ChatGPT Pro와 독립 `gpt-5.6-sol` 리뷰가 진행 중 연속 하강을 완파 후 단일 낙하로 대체하고 N개 파쇄를 한 이벤트로 합칠 것을 일치 권고 |
+| 파티션 상태 | **구현·브라우저 통과** | 진행 0→89%에서 광부 top과 `cameraDepth` 변화 0px/0m. `partitionDigPose`는 숫자상 헤드 진행만 보존하고 화면 이동은 완파 이벤트로 제한 |
+| 단일·다중 낙하 | **5/5 순수 계약 통과** | N=1/2/5/20의 화면 거리 112/162/228/300px, 총 시간 760/940/1178/1538ms. `brokenLayers` delta 하나가 N개를 한 이벤트로 만들고 활성 낙하 중 추가 파괴는 다음 합산 batch 하나로 축약 |
+| 전용 자산 | **생성·편입** | 기존 `MinerMiningStrip`을 참조해 ImageGen으로 release/fall A/fall B/landing 4프레임을 만들고 크로마키 제거·셀 중심 정렬 후 `MinerDescentStrip.png` 384×96 RGBA로 편입. 기존 암반·립·균열은 유지 |
+| 웹 전체 | **22/22 통과** | `npm test`: Vinext production, Pages Vite build, 패리티 7, 파티션 낙하 5, 프로토타입 계약 10. `npm run lint` 통과 |
+| 데스크톱 브라우저 | **통과(1280×720)** | 0→89% 광부 top 221.77px 고정, camera 8.00m 고정. 완파 중 `data-fall-segments=1`, 112px 월드 이동, 광부 약 45.36px 낙하, 종료 뒤 camera 12.00m·광부 오프셋 약 1px로 정착 |
+| 모바일 브라우저 | **통과(390×844)** | 완파 중 광부 약 45.36px 낙하, `scrollWidth=clientWidth=390`, 112px/4m cue와 행동대 유지, 가로 overflow 없음 |
+| Reduce Motion | **코드·계약 통과** | N·총 미터·ARIA 결과는 유지하고 공간 이동과 duration은 0px/1ms로 축소. 실제 OS 설정 감각은 실기기 게이트 |
+| Pages | **원격 배포 전** | 로컬 `/Deepmine/` Pages bundle은 통과. commit/push 후 Actions와 공개 URL을 별도 확인해야 함 |
 
 ## 2026-08-03 web descent and camera closeout
 

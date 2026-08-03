@@ -9,7 +9,7 @@ const styles = readFileSync(join(projectRoot, "app/mine.module.css"), "utf8");
 const resonance = readFileSync(join(projectRoot, "app/useResonanceEvent.ts"), "utf8");
 const resonanceView = readFileSync(join(projectRoot, "app/ResonanceEvent.tsx"), "utf8");
 const strikeFeedback = readFileSync(join(projectRoot, "app/strikeFeedback.ts"), "utf8");
-const miningCamera = readFileSync(join(projectRoot, "app/miningCamera.ts"), "utf8");
+const partitionFall = readFileSync(join(projectRoot, "app/partitionFall.ts"), "utf8");
 const miningAudio = readFileSync(join(projectRoot, "app/useMiningAudio.ts"), "utf8");
 const pagesEntry = readFileSync(join(projectRoot, "pages-game/main.tsx"), "utf8");
 const pagesConfig = readFileSync(join(projectRoot, "vite.pages.config.ts"), "utf8");
@@ -30,22 +30,24 @@ test("the playable web game begins before automation and follows the Core recomm
   assert.match(prototype, /automation > 0 \? "자동 굴착 중" : "직접 타격"/);
 });
 
-test("continuous shaft contract remains explicit", () => {
+test("partition break and fall contract remains explicit", () => {
   assert.match(prototype, /boreHistory/);
   assert.match(prototype, /--rock-phase/);
   assert.doesNotMatch(prototype, /cameraDepth \* PIXELS_PER_METER\) % 320/);
   assert.match(prototype, /--surface-y/);
   assert.match(prototype, /data-camera-depth=\{cameraDepth\.toFixed\(2\)\}/);
-  assert.match(prototype, /data-head-screen-offset=\{headScreenOffsetPx\.toFixed\(1\)\}/);
+  assert.match(prototype, /data-fall-segments=\{fallEvent\?\.segments \?\? 0\}/);
   assert.match(prototype, /\(depth - cameraDepth\) \* PIXELS_PER_METER/);
-  assert.match(prototype, /miningCameraPose\(mine\.depth, progress, METERS_PER_LAYER\)/);
-  assert.match(miningCamera, /CAMERA_FOLLOW_START_PROGRESS = 0\.65/);
+  assert.match(prototype, /partitionDigPose\(mine\.depth, progress, METERS_PER_LAYER\)/);
+  assert.match(prototype, /partitionFallMotion/);
+  assert.match(partitionFall, /Math\.log2\(segments\)/);
   assert.match(prototype, /passageHistory/);
   assert.match(prototype, /styles\.openShaft/);
   assert.match(prototype, /styles\.workLine/);
-  assert.match(prototype, /headDepth\.toFixed\(1\)/);
+  assert.match(prototype, /displayedHeadDepth\.toFixed\(1\)/);
   assert.match(styles, /\.rockWorld/);
-  assert.match(styles, /top: calc\(var\(--workline\) \+ var\(--head-screen-offset\)\)/);
+  assert.match(styles, /@keyframes partition-world-fall/);
+  assert.match(styles, /@keyframes miner-partition-fall/);
   assert.match(styles, /background-position: center var\(--rock-phase\)/);
   assert.doesNotMatch(prototype, /다음 약속|연속 일수|출정 횟수/);
 });
@@ -179,6 +181,7 @@ test("all prototype art is project-local and deployable", () => {
     "public/assets/shaft/ShaftFractureVertical_medium.png",
     "public/assets/shaft/ShaftFractureVertical_heavy.png",
     "public/assets/shaft/MinerMiningStrip.png",
+    "public/assets/shaft/MinerDescentStrip.png",
     "public/assets/shaft/ShaftFrontierLip.png",
     "public/assets/events/ResonanceNode.png",
     "public/og/deepmine-shaft-social.png",
