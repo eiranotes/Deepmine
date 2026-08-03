@@ -1,6 +1,19 @@
 # Build Report
 
-업데이트: 2026-08-03 (현재 코드·원격 배포 closeout)
+업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 로컬 closeout)
+
+## 2026-08-03 web descent and camera closeout
+
+| 항목 | 현재 결과 | 근거/경계 |
+|---|---|---|
+| 원인 감사 | **완료** | 공개판 8.0→10.1→12.3m에서 광부 220→223→223px, 립 247px 고정과 암반 `-224→-284→-24px` 순환을 실측. 별도 ChatGPT Pro 프로젝트와 독립 코드 감사가 좌표계·modulo를 P0로 일치 판정 |
+| 자산 판정 | **기존 에셋 충분** | `MinerMiningStrip`, `ShaftFrontierLip`, 세로 균열과 암반 원본을 재검토. 새 공격/암반 이미지는 좌표 결함을 가리므로 추가하지 않음. 착지 프레임은 좌표 개선 뒤에도 결과감이 약할 때만 후속 |
+| 카메라 수식 | **3/3 통과** | 첫 65% 카메라 고정, 최대 72.8px 헤드 하강, 후반 smoothstep 추종, 카메라 선행 금지, 4m 끝 오프셋 0 |
+| 웹 전체 | **20/20 통과** | `npm test`: Vinext production, Pages Vite build, 패리티 7, 카메라 3, 프로토타입 계약 10. `npm run lint` 통과 |
+| 데스크톱 브라우저 | **통과(1280×720)** | 54%에서 광부 상대 top 약 56→118px, 립 82→142px. 후반 cameraDepth 8.36→11.11m와 head offset 70.0→12.9px. 암반 위상 `-224→-234→-311→-336px` 단조 이동 |
+| 모바일 브라우저 | **통과(390×844)** | 54%에서 광부 상대 top 92.5→153.5px, 립 117.5→177.5px. `scrollWidth=clientWidth=390`, 잘림·가로 overflow 없음 |
+| Reduce Motion | **코드·계약 통과** | 같은 파생 위치와 균열·깊이·보상 의미를 유지하며 전환을 1ms로 줄인다. 실제 OS 설정 감각은 실기기 게이트 |
+| Pages | **재배포 대기** | 로컬 Pages artifact 검증 완료. 공개 URL은 이 변경을 `main`에 push한 뒤 다시 검증해야 함 |
 
 ## 2026-08-03 current-audit and remote-deployment closeout
 
@@ -19,7 +32,7 @@
 | 정련 실화면 | **1/1 통과** | `testRefinementExplainsTierLeapAndActualOutputImpact`; R0→R1 저장, 전용 notice, 실제 출력 변화. xcresult `/tmp/deepmine-growth-feedback-tests/Logs/Test/Test-DeepMineApp-2026.08.02_23-32-49-+0900.xcresult` |
 | 생산/정련 계산 집중 회귀 | **17/17 통과** | `WorkFaceForecastTests`; 잠긴 행은 최소 해금 레벨 preview, 램프는 실제 총 치명타 배율 비율 |
 | generic iOS device build | **통과** | code signing 비활성 build exit 0. 기존 `OfflineSettlement.swift`·`ShaftView.swift`의 unused `try?` warning은 남음 |
-| 웹 | **17/17 통과** | Vinext production과 실제 Pages Vite 게임 build, 패리티/계약 테스트 및 `npm run lint` 통과. 웹은 JavaScript `number`이므로 앱의 `BigNumber` 범위 증거가 아님 |
+| 웹 | **20/20 통과** | Vinext production과 실제 Pages Vite 게임 build, 패리티/카메라/계약 테스트 및 `npm run lint` 통과. 웹은 JavaScript `number`이므로 앱의 `BigNumber` 범위 증거가 아님 |
 | Pages 플레이어블 로컬 | **통과** | `MinePrototype`을 `/Deepmine/` base로 정적 번들. 직접 타격으로 8.0m→63.0m·광석 100→192, 광차 Lv.2 구매 뒤 자동 0.6/초·광차 1대와 무입력 하강 확인 |
 | 장기 진행 에셋 | **7/7 통과** | strict PNG/SHA/정확한 ID 집합/카탈로그/웹 복사본과 provenance ID·raw-source 대응 검사 |
 | Swift 파일 크기 | **통과** | 이번 변경 파일은 모두 300줄 이하. 기존 baseline `GameActivitySurfaceContent.swift` 302줄만 남음 |

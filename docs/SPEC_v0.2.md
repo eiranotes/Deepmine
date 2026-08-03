@@ -64,7 +64,7 @@
 - 시뮬레이터 병합 증거와 실기기 출시 증거를 구분한다. Core/App 테스트와 generic build 성공은
   FamilyControls, AlarmKit, Live Activity, 실제 VoiceOver/Reduce Motion/햅틱을 증명하지 않는다.
 - 2026-08-02 로컬 closeout은 Core 282/282, App 단위 150/150, 정련 XCUITest 1/1,
-  웹 15/15, 에셋 7/7과 generic iOS device build 통과다. 2026-08-03에는 merge commit
+  웹 20/20, 에셋 7/7과 generic iOS device build 통과다. 2026-08-03에는 merge commit
   `228f31d`의 `main` validation과 Pages Actions 배포가 성공했고 공개 harness와 배포 모듈의
   HTTP 200·스모크를 확인했다. 당시 공개 artifact가 로직 보고서였던 문제는 D-080으로 교정해
   플레이어블 build의 로컬 직접 타격→광차 구매→자동 굴착과 390px 렌더를 확인했다. commit
@@ -327,6 +327,14 @@ enum MinePlan: String, Codable {
   목의 파쇄 립, 아래로 자라는 절삭 홈, 세로 균열은 같은 중심 접점에서 최소 1px 이상 겹친다.
 - 수동 탭과 자동 굴착은 같은 준비→전신 하강→접촉→반동 타임라인을 쓴다. 캐릭터의 몸이
   멈춘 채 도구만 움직이거나, 데미지가 접촉 프레임과 별도 주기로 적용되는 표현을 금지한다.
+- 웹은 경제 상태를 늘리지 않고 진행도에서 `headDepth`, `cameraDepth`, `headScreenOffset`을
+  파생한다. 진행도 0~65%에는 카메라를 고정해 광부·드릴·파쇄 립·균열이 28px/m 기준 최대
+  72.8px 실제 하강하고, 65~100%에는 smoothstep 카메라 추종으로 다음 작업선에 정착한다.
+- 웹 암반·지표·과거 지지대·심도 눈금은 `cameraDepth`, 현재 작업 그룹과 열린 통로 끝은
+  `headScreenOffset`을 사용한다. repeat-y 암반의 위상은 modulo 없이 원시 월드 좌표로 계속
+  감소해야 하며 순환 경계에서 반대 방향으로 보간해서는 안 된다.
+- Reduce Motion도 현재 헤드와 최종 통로의 공간 상태는 유지한다. 위치 전환·붕괴 이동만
+  즉시 반영하고 균열 단계·깊이·보상·접근성 상태를 생략하지 않는다.
 
 ## 4.7 첫 뷰포트 경제 폐루프
 

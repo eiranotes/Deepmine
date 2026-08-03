@@ -30,6 +30,7 @@ import {
   upgradeCost as coreUpgradeCost,
 } from "./coreBalance";
 import { assetPath } from "./assetPath";
+import { miningCameraPose, MINING_PIXELS_PER_METER } from "./miningCamera";
 import styles from "./mine.module.css";
 import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
 import { useMiningAudio } from "./useMiningAudio";
@@ -59,7 +60,7 @@ type UpgradeEvent = {
 };
 
 const METERS_PER_LAYER = METERS_PER_SEGMENT;
-const PIXELS_PER_METER = 28;
+const PIXELS_PER_METER = MINING_PIXELS_PER_METER;
 const AUTO_STRIKE_MS = 820;
 
 const equipmentCopy: Record<
@@ -256,7 +257,11 @@ export function MinePrototype() {
   ) * resonanceMultiplier;
   const chance = criticalChance(equipment.lamp, specializations.lamp === "fortune");
   const oreMultiplier = freightOreMultiplier(specializations.cart === "freight");
-  const headDepth = mine.depth + progress * METERS_PER_LAYER;
+  const {
+    cameraDepth,
+    headDepth,
+    headScreenOffsetPx,
+  } = miningCameraPose(mine.depth, progress, METERS_PER_LAYER);
   const expectedLayerOre = layerOreAt(mine.depth, oreMultiplier);
   const remainingIntegrity = Math.max(0, integrity - mine.damage);
   const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
@@ -498,12 +503,13 @@ export function MinePrototype() {
     () =>
       ({
         "--break-progress": progress.toFixed(3),
+        "--head-screen-offset": `${headScreenOffsetPx.toFixed(2)}px`,
         "--cut-width": `${24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)}%`,
         "--frontier-width": `${Math.min(88, (24 + Math.min(9, equipment.drill * 0.9) + (specializations.drill === "wide" ? 8 : 0)) * 2.35)}%`,
         "--lamp-radius": `${18 + Math.min(20, equipment.lamp * 2.4) + (specializations.lamp === "reach" ? 8 : 0)}%`,
-        "--rock-image": `url("${rockAssetAt(headDepth)}")`,
-        "--rock-phase": `${-((headDepth * PIXELS_PER_METER) % 320)}px`,
-        "--surface-y": `${16 - headDepth * PIXELS_PER_METER}px`,
+        "--rock-image": `url("${rockAssetAt(cameraDepth)}")`,
+        "--rock-phase": `${-(cameraDepth * PIXELS_PER_METER)}px`,
+        "--surface-y": `${16 - cameraDepth * PIXELS_PER_METER}px`,
         "--fracture-reveal": `${progress <= 0 ? 0 : 18 + progress * 142}px`,
         "--fracture-opacity": `${progress <= 0 ? 0 : 0.58 + progress * 0.42}`,
         "--kerf-depth": `${progress <= 0 ? 0 : 10 + progress * 116}px`,
@@ -516,7 +522,8 @@ export function MinePrototype() {
       equipment.drill,
       equipment.cart,
       equipment.lamp,
-      headDepth,
+      cameraDepth,
+      headScreenOffsetPx,
       progress,
       specializations.drill,
       specializations.cart,
@@ -557,9 +564,9 @@ export function MinePrototype() {
       : strikeVariant === "heavy" ? `강타 −${tap}` : `−${tap}`;
 
   const depthMarks = useMemo(() => {
-    const first = Math.max(0, Math.floor(headDepth / METERS_PER_LAYER) * METERS_PER_LAYER - 16);
+    const first = Math.max(0, Math.floor(cameraDepth / METERS_PER_LAYER) * METERS_PER_LAYER - 16);
     return Array.from({ length: 10 }, (_, index) => first + index * METERS_PER_LAYER);
-  }, [headDepth]);
+  }, [cameraDepth]);
 
   const passageHistory = useMemo(
     () =>
@@ -638,6 +645,8 @@ export function MinePrototype() {
               data-service-light-count={serviceLights}
               data-infrastructure-tier={crewCount}
               data-impact-coverage="wide"
+              data-camera-depth={cameraDepth.toFixed(2)}
+              data-head-screen-offset={headScreenOffsetPx.toFixed(1)}
               role="img"
               aria-label={`자동 굴착 중인 연속 갱도. 굴착 헤드 ${headDepth.toFixed(1)}미터, 다음 지층 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}, 내실 ${crewCount}단계, 작업조 ${crewCount}명, 광차 ${cartCount}대, 작업등 ${serviceLights}기`}
             >
@@ -725,7 +734,7 @@ export function MinePrototype() {
                 <div
                   className={styles.supportFrame}
                   style={{
-                    "--history-offset": `${(depth - headDepth) * PIXELS_PER_METER}px`,
+                    "--history-offset": `${(depth - cameraDepth) * PIXELS_PER_METER}px`,
                     "--history-width": `${24 + Math.min(9, drillLevel * 0.9)}%`,
                   } as CSSProperties}
                   key={`${depth}-${drillLevel}`}
@@ -850,7 +859,7 @@ export function MinePrototype() {
               {depthMarks.map((depth) => (
                 <span
                   className={Math.abs(depth - headDepth) < 2 ? styles.currentDepthMark : ""}
-                  style={{ top: `calc(var(--workline) + ${(depth - headDepth) * PIXELS_PER_METER}px)` }}
+                  style={{ top: `calc(var(--workline) + ${(depth - cameraDepth) * PIXELS_PER_METER}px)` }}
                   key={depth}
                 >
                   {depth}m

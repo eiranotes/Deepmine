@@ -1,6 +1,6 @@
 # Tasks
 
-업데이트: 2026-08-03 (current audit and remote deployment closeout)
+업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 로컬 closeout)
 
 ## 2026-08-02 current audit closeout
 
@@ -25,6 +25,11 @@
 - [x] 플레이어블 Pages artifact의 `main` 원격 배포와 공개 URL 직접 타격 재검증
 - [x] Vinext Sites 플러그인을 clean checkout에도 존재하는 추적 소스로 이동
 - [x] 변경 Swift 파일을 모두 300줄 이하로 분리하고 persistence/명령 큐 23/23 재검증
+- [x] 별도 ChatGPT Pro 프로젝트에 웹 렌더러·밸런스·타격 로직과 핵심 에셋을 넣고 굴착감 원인 감사
+- [x] 고정 작업선을 파생 `headDepth → cameraDepth → headScreenOffset` 좌표로 대체
+- [x] 320px 암반 위상 modulo를 제거해 CSS 배경의 순환 경계 역보간 방지
+- [x] 기존 스트립·파쇄 립·균열로 데스크톱 약 62px, 모바일 약 61px 실제 하강과 가로 overflow 0 검증
+- [x] 카메라가 헤드를 앞서지 않고 4m 끝에서 같은 깊이로 정착하는 순수 수식 회귀 3건 추가
 
 열림:
 
@@ -37,6 +42,7 @@
 - [ ] JavaScript `number` 범위를 넘는 앱 경제는 웹이 아닌 Core 회귀로 계속 검증
 - [ ] 프레스티지의 정련 손실 고지와 홈 진입/재구축 UX 실화면 회귀
 - [ ] 전체 `DeepMineAppUITests`와 FamilyControls/AlarmKit/Live Activity 실기기 릴리스 게이트
+- [ ] D-081 플레이어블 Pages 재배포와 공개 URL의 실제 하강·단조 암반 위상 재검증
 
 ## Gameplay-complete MVP — implemented
 
