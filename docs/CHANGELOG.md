@@ -4,6 +4,8 @@
 
 ### Deployed
 
+- commit `6980f41`의 파티션 완파·단일/다중 낙하 build를 Pages run `30779832654`로 배포했다.
+  공개 URL에서 0→98% 광부·카메라 고정, 완파 중 112px/약 45px 낙하와 12m 정착을 확인했다
 - commit `d36fd9f`의 실제 광부 하강·카메라 추종 build를 Pages run `30775979619`로 배포했다.
   공개 URL에서 54% 진행 광부 61px·립 60px 하강과 암반 위상의 단조 이동을 확인했다
 - PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. 기존 로직 검증

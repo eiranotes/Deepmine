@@ -75,7 +75,10 @@
   이동을 확인했다. 같은 commit의 validation run `30775979660`은 Core·App 단위·unsigned
   iOS build·웹·에셋·Swift 파일 크기 job이 모두 성공했다. 이후 사용자 실화면 판정에 따라
   D-082가 진행 중 연속 하강을 파티션 완파 뒤 단일 낙하로 대체했다. 로컬 웹 22/22와
-  1280×720·390×844 완파 낙하는 통과했으며 원격 Pages 증거는 이번 main 배포 전이다.
+  1280×720·390×844 완파 낙하가 통과했다. commit `6980f41`의 Pages run `30779832654`도
+  성공했고 공개 1280×720에서 0→98% 위치 고정, 완파 중 112px/약 45px 낙하, 12m 정착과
+  콘솔 오류 0건을 확인했다. validation `30779832662`의 Core·App unit·unsigned iOS build·
+  Swift file-size·웹·생성 에셋 job도 모두 성공했다.
 
 ## 0.4 아직 열린 제품 계약
 

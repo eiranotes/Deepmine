@@ -14,7 +14,8 @@
 | 데스크톱 브라우저 | **통과(1280×720)** | 0→89% 광부 top 221.77px 고정, camera 8.00m 고정. 완파 중 `data-fall-segments=1`, 112px 월드 이동, 광부 약 45.36px 낙하, 종료 뒤 camera 12.00m·광부 오프셋 약 1px로 정착 |
 | 모바일 브라우저 | **통과(390×844)** | 완파 중 광부 약 45.36px 낙하, `scrollWidth=clientWidth=390`, 112px/4m cue와 행동대 유지, 가로 overflow 없음 |
 | Reduce Motion | **코드·계약 통과** | N·총 미터·ARIA 결과는 유지하고 공간 이동과 duration은 0px/1ms로 축소. 실제 OS 설정 감각은 실기기 게이트 |
-| Pages | **원격 배포 전** | 로컬 `/Deepmine/` Pages bundle은 통과. commit/push 후 Actions와 공개 URL을 별도 확인해야 함 |
+| Pages | **배포·공개 검증 통과** | commit `6980f41`, Pages run `30779832654` build/deploy 성공. 공개 1280×720에서 0→98% 광부 top 221.77px·camera 8.00m 고정, 완파 중 112px/약 45.36px 낙하, 종료 뒤 camera 12.00m·위치 오차 약 1px, 콘솔 오류 0건 |
+| 원격 validation | **통과** | run `30779832662`의 DeepMineCore·App unit·unsigned iOS build·Swift file-size·웹·생성 에셋 job이 모두 성공 |
 
 ## 2026-08-03 web descent and camera closeout
 

@@ -36,7 +36,7 @@
 - [x] 1/2/5/20구간 낙하 거리·시간·Reduce Motion 순수 회귀 5건 추가
 - [x] ImageGen 참조 생성으로 release/fall A/fall B/landing 4프레임 `MinerDescentStrip` 편입
 - [x] 데스크톱·390px에서 진행 중 위치 0px, 완파 후 약 45px 낙하·정착과 모바일 overflow 0 확인
-- [ ] D-082 플레이어블 Pages 배포와 공개 URL의 실제 완파→낙하 재검증
+- [x] D-082 플레이어블 Pages 배포와 공개 URL의 실제 완파→낙하 재검증
 
 열림:
 
