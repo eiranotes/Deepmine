@@ -9,6 +9,7 @@ import Foundation
 enum GameArtCatalog {
     static let promptDocumentPath = "docs/ROCK_ART_PROMPTS.md"
     static let shaftPromptDocumentPath = "docs/SHAFT_ART_PROMPTS.md"
+    static let rigPromptDocumentPath = "artifacts/imagegen/suspended-rig-v1/PROMPTS.md"
     static let prestigeMemoryRingName = "PrestigeMemoryRing"
 
     static func refinementBadgeName(kind: String) -> String {
@@ -122,6 +123,52 @@ enum GameArtCatalog {
 
     static let minerMiningFrameCount = 4
 
+    static let suspendedRigFrame = GameArtEntry(
+        name: "SuspendedRigFrame",
+        promptID: "suspended-rig-frame",
+        placeholder: .shaftGantry
+    )
+
+    static func rigDrill(tier: Int) -> GameArtEntry {
+        let tier = min(3, max(1, tier))
+        return GameArtEntry(
+            name: "RigDrill_tier\(tier)",
+            promptID: "rig-drill-tier-\(tier)",
+            placeholder: .miningPickaxe
+        )
+    }
+
+    static func rigHousing(variant: Int) -> GameArtEntry {
+        let variant = min(4, max(1, variant))
+        return GameArtEntry(
+            name: "RigHousing_generation\(variant)",
+            promptID: "rig-housing-generation-\(variant)",
+            placeholder: .shaftGantry
+        )
+    }
+
+    static func rigModification(_ rawValue: String) -> GameArtEntry {
+        let known = [
+            "drillWide", "drillImpact", "cartFleet",
+            "cartFreight", "lampReach", "lampFortune"
+        ]
+        let value = known.contains(rawValue) ? rawValue : "drillWide"
+        let promptSuffix: String = switch value {
+        case "drillWide": "drill-wide"
+        case "drillImpact": "drill-impact"
+        case "cartFleet": "cart-fleet"
+        case "cartFreight": "cart-freight"
+        case "lampReach": "lamp-reach"
+        case "lampFortune": "lamp-fortune"
+        default: "drill-wide"
+        }
+        return GameArtEntry(
+            name: "RigModification_\(value)",
+            promptID: "rig-modification-\(promptSuffix)",
+            placeholder: .miningPickaxe
+        )
+    }
+
     static var allEntries: [GameArtEntry] {
         var entries: [GameArtEntry] = []
         for region in ["entry", "crystal", "ruins", "abyss"] {
@@ -157,8 +204,25 @@ enum GameArtCatalog {
         minerMiningStrip,
     ]
 
+    static let rigEntries = [
+        suspendedRigFrame,
+        rigDrill(tier: 1),
+        rigDrill(tier: 2),
+        rigDrill(tier: 3),
+        rigHousing(variant: 1),
+        rigHousing(variant: 2),
+        rigHousing(variant: 3),
+        rigHousing(variant: 4),
+        rigModification("drillWide"),
+        rigModification("drillImpact"),
+        rigModification("cartFleet"),
+        rigModification("cartFreight"),
+        rigModification("lampReach"),
+        rigModification("lampFortune"),
+    ]
+
     static var installedEntries: [GameArtEntry] {
-        allEntries + shaftEntries
+        allEntries + shaftEntries + rigEntries
     }
 
     private static func deepGeologyKey(depthMeters: Double) -> String? {

@@ -16,8 +16,13 @@ extension EquipmentView {
                 .foregroundStyle(DeepMinePalette.brass.color)
             }
             .accessibilityIdentifier("equipment-notice-success")
-        case let .purchase(equipment, impact, crewSize):
-            purchaseNotice(equipment: equipment, impact: impact, crewSize: crewSize)
+        case let .purchase(equipment, physical, impact, crewSize):
+            purchaseNotice(
+                equipment: equipment,
+                physical: physical,
+                impact: impact,
+                crewSize: crewSize
+            )
         case let .refinement(impact):
             refinementNotice(impact)
         case let .insufficient(required, available):
@@ -46,18 +51,13 @@ extension EquipmentView {
 
     private func purchaseNotice(
         equipment: EquipmentKind,
+        physical: RigUpgradePhysicalPresentation,
         impact: PurchaseImpact?,
         crewSize: Int?
     ) -> some View {
         DeepMineRivetedPanel {
             HStack(alignment: .top, spacing: 12) {
-                DeepMinePixelImage(
-                    name: DeepMineArt.equipment(
-                        equipment,
-                        level: EquipmentEngine.level(of: equipment, in: player.equipment)
-                    ),
-                    size: 44
-                )
+                RigGenerationHousing(visual: physical.visual, size: 54)
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 5) {
                     Label(
@@ -68,6 +68,10 @@ extension EquipmentView {
                     .foregroundStyle(DeepMinePalette.brass.color)
                     Text(DeepMineStrings.text(DeepMineProgressLabels.equipmentKey(equipment)))
                         .font(.caption.weight(.semibold))
+                    Text(physical.detail)
+                        .font(.caption.monospacedDigit().weight(.bold))
+                        .foregroundStyle(DeepMinePalette.brass.color)
+                        .fixedSize(horizontal: false, vertical: true)
                     if let impact { impactRows(impact) }
                     if let crewSize {
                         Label(

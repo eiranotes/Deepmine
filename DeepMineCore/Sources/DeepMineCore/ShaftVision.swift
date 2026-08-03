@@ -34,6 +34,11 @@ public struct ShaftScene: Equatable, Sendable {
     public let strata: [ShaftStratum]
     public let boreHistory: [BoreRecord]
 
+    /// The suspended rig stays clamped to the current face while its tool cuts into it.
+    /// `headDepthMeters` is economic cut progress; renderers anchor the cage, crew, rails,
+    /// light boundary and impact effects to this stable workline instead.
+    public var worklineDepthMeters: Double { faceDepthMeters }
+
     public var heightPoints: Double {
         (bottomDepthMeters - topDepthMeters) * Balance.shaftPointsPerMeter
     }

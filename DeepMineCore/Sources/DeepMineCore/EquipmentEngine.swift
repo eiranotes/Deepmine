@@ -124,8 +124,8 @@ public struct UpgradeRecommendation: Codable, Equatable, Sendable {
 public enum EquipmentEngine {
     public static func visualTier(level: Int) -> Int {
         switch max(Balance.minimumEquipmentLevel, level) {
-        case ...4: 1
-        case ...14: 2
+        case ...1: 1
+        case ...4: 2
         default: 3
         }
     }

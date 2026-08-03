@@ -10,12 +10,31 @@ final class ShaftVisionTests: XCTestCase {
         let scene = ShaftSceneEngine.scene(for: PlayerState(mineFace: face))
 
         XCTAssertEqual(scene.faceDepthMeters, 160)
+        XCTAssertEqual(scene.worklineDepthMeters, 160)
         XCTAssertEqual(scene.headDepthMeters, 163, accuracy: 0.001)
         XCTAssertEqual(
             scene.y(forDepthMeters: scene.headDepthMeters)
                 - scene.y(forDepthMeters: scene.faceDepthMeters),
             3 * Balance.shaftPointsPerMeter,
             accuracy: 0.001
+        )
+    }
+
+    func testRigWorklineStaysFixedWhileEconomicHeadCutsTheFace() {
+        let start = ShaftSceneEngine.scene(for: PlayerState(mineFace: MineFaceState(
+            segmentIndex: 40,
+            remainingIntegrity: RockGenerator.segment(at: 40).maximumIntegrity
+        )))
+        let almostBroken = ShaftSceneEngine.scene(for: PlayerState(mineFace: MineFaceState(
+            segmentIndex: 40,
+            remainingIntegrity: RockGenerator.segment(at: 40).maximumIntegrity * 0.01
+        )))
+
+        XCTAssertEqual(start.worklineDepthMeters, almostBroken.worklineDepthMeters)
+        XCTAssertGreaterThan(almostBroken.headDepthMeters, start.headDepthMeters)
+        XCTAssertLessThanOrEqual(
+            almostBroken.headDepthMeters,
+            almostBroken.faceDepthMeters + Double(Balance.metersPerSegment)
         )
     }
 

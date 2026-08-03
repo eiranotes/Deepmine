@@ -1,0 +1,338 @@
+[
+  {
+    "id": "SuspendedRigFrame",
+    "raw": "SuspendedRigFrame",
+    "source_frames": 1,
+    "frame": 0,
+    "logical_size": [
+      320,
+      128
+    ],
+    "maximum_brass_ratio": 0.18,
+    "prompt_id": "suspended-rig-frame",
+    "prompt": "Front-facing suspended underground mining rig chassis with two hoist cables, guide-rail clamps, a riveted crossbeam, operator bay, ore chute and a clear central tool socket; premium chunky 16-bit DeepMine pixel art on flat chroma key.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/SuspendedRigFrame.png",
+    "raw_sha256": "93082c68e75f2a85df09b83a41fa2ab7d876d824216022c6e5939a25931cb767",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/SuspendedRigFrame.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/SuspendedRigFrame.png",
+    "web_source": "web/public/assets/rig/SuspendedRigFrame.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/SuspendedRigFrame.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigDrill_tier1",
+    "raw": "RigDrillTierStrip",
+    "source_frames": 3,
+    "frame": 0,
+    "logical_size": [
+      96,
+      96
+    ],
+    "maximum_brass_ratio": 0.22,
+    "prompt_id": "rig-drill-tier-1",
+    "prompt": "Three equal front-facing rig tools with a shared mount: reciprocating chisel, hydraulic piston hammer and twin rotary cutter; increasingly heavy silhouettes.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigDrillTierStrip.png",
+    "raw_sha256": "8fa8b3d739afb0e970625259dbf5bad622d15c018a5985efa36e268194c1d8cd",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigDrillTierStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigDrill_tier1.png",
+    "web_source": "web/public/assets/rig/RigDrill_tier1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigDrill_tier1.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigDrill_tier2",
+    "raw": "RigDrillTierStrip",
+    "source_frames": 3,
+    "frame": 1,
+    "logical_size": [
+      96,
+      96
+    ],
+    "maximum_brass_ratio": 0.22,
+    "prompt_id": "rig-drill-tier-2",
+    "prompt": "Three equal front-facing rig tools with a shared mount: reciprocating chisel, hydraulic piston hammer and twin rotary cutter; increasingly heavy silhouettes.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigDrillTierStrip.png",
+    "raw_sha256": "8fa8b3d739afb0e970625259dbf5bad622d15c018a5985efa36e268194c1d8cd",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigDrillTierStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigDrill_tier2.png",
+    "web_source": "web/public/assets/rig/RigDrill_tier2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigDrill_tier2.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigDrill_tier3",
+    "raw": "RigDrillTierStrip",
+    "source_frames": 3,
+    "frame": 2,
+    "logical_size": [
+      96,
+      96
+    ],
+    "maximum_brass_ratio": 0.22,
+    "prompt_id": "rig-drill-tier-3",
+    "prompt": "Three equal front-facing rig tools with a shared mount: reciprocating chisel, hydraulic piston hammer and twin rotary cutter; increasingly heavy silhouettes.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigDrillTierStrip.png",
+    "raw_sha256": "8fa8b3d739afb0e970625259dbf5bad622d15c018a5985efa36e268194c1d8cd",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigDrillTierStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigDrill_tier3.png",
+    "web_source": "web/public/assets/rig/RigDrill_tier3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigDrill_tier3.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_drillWide",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 0,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-drill-wide",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_drillWide.png",
+    "web_source": "web/public/assets/rig/RigModification_drillWide.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_drillWide.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_drillImpact",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 1,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-drill-impact",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_drillImpact.png",
+    "web_source": "web/public/assets/rig/RigModification_drillImpact.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_drillImpact.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_cartFleet",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 2,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-cart-fleet",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_cartFleet.png",
+    "web_source": "web/public/assets/rig/RigModification_cartFleet.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_cartFleet.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_cartFreight",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 3,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-cart-freight",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_cartFreight.png",
+    "web_source": "web/public/assets/rig/RigModification_cartFreight.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_cartFreight.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_lampReach",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 4,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-lamp-reach",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_lampReach.png",
+    "web_source": "web/public/assets/rig/RigModification_lampReach.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_lampReach.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigModification_lampFortune",
+    "raw": "RigSpecializationStrip",
+    "source_frames": 6,
+    "frame": 5,
+    "logical_size": [
+      64,
+      64
+    ],
+    "maximum_brass_ratio": 0.28,
+    "prompt_id": "rig-modification-lamp-fortune",
+    "prompt": "Six equal specialization modules: wide double chisel, impact accumulator, fleet rail coupling, freight hopper, reach reflector and fortune scanning lens.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigSpecializationStrip.png",
+    "raw_sha256": "e7340ff72040d35148ae7b2eb5cf4294291b498f62baed5e81e0288a6b9347cf",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigSpecializationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigModification_lampFortune.png",
+    "web_source": "web/public/assets/rig/RigModification_lampFortune.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigModification_lampFortune.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigHousing_generation1",
+    "raw": "RigHousingGenerationStrip",
+    "source_frames": 4,
+    "frame": 0,
+    "logical_size": [
+      80,
+      80
+    ],
+    "maximum_brass_ratio": 0.3,
+    "prompt_id": "rig-housing-generation-1",
+    "prompt": "Four front-facing generation housings for the same rig socket: compact chassis, wide ribbed chassis, tall side-pod chassis and heavy shock-armored chassis; four unmistakably different silhouettes that remain readable at 64 pixels.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigHousingGenerationStrip.png",
+    "raw_sha256": "c68a337ceeb7eae7c5e0f9c761bbae65cd652b39aa0f027dbff28ae3b6828677",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigHousingGenerationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigHousing_generation1.png",
+    "web_source": "web/public/assets/rig/RigHousing_generation1.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigHousing_generation1.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigHousing_generation2",
+    "raw": "RigHousingGenerationStrip",
+    "source_frames": 4,
+    "frame": 1,
+    "logical_size": [
+      80,
+      80
+    ],
+    "maximum_brass_ratio": 0.3,
+    "prompt_id": "rig-housing-generation-2",
+    "prompt": "Four front-facing generation housings for the same rig socket: compact chassis, wide ribbed chassis, tall side-pod chassis and heavy shock-armored chassis; four unmistakably different silhouettes that remain readable at 64 pixels.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigHousingGenerationStrip.png",
+    "raw_sha256": "c68a337ceeb7eae7c5e0f9c761bbae65cd652b39aa0f027dbff28ae3b6828677",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigHousingGenerationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigHousing_generation2.png",
+    "web_source": "web/public/assets/rig/RigHousing_generation2.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigHousing_generation2.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigHousing_generation3",
+    "raw": "RigHousingGenerationStrip",
+    "source_frames": 4,
+    "frame": 2,
+    "logical_size": [
+      80,
+      80
+    ],
+    "maximum_brass_ratio": 0.3,
+    "prompt_id": "rig-housing-generation-3",
+    "prompt": "Four front-facing generation housings for the same rig socket: compact chassis, wide ribbed chassis, tall side-pod chassis and heavy shock-armored chassis; four unmistakably different silhouettes that remain readable at 64 pixels.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigHousingGenerationStrip.png",
+    "raw_sha256": "c68a337ceeb7eae7c5e0f9c761bbae65cd652b39aa0f027dbff28ae3b6828677",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigHousingGenerationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigHousing_generation3.png",
+    "web_source": "web/public/assets/rig/RigHousing_generation3.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigHousing_generation3.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "RigHousing_generation4",
+    "raw": "RigHousingGenerationStrip",
+    "source_frames": 4,
+    "frame": 3,
+    "logical_size": [
+      80,
+      80
+    ],
+    "maximum_brass_ratio": 0.3,
+    "prompt_id": "rig-housing-generation-4",
+    "prompt": "Four front-facing generation housings for the same rig socket: compact chassis, wide ribbed chassis, tall side-pod chassis and heavy shock-armored chassis; four unmistakably different silhouettes that remain readable at 64 pixels.",
+    "raw_source": "artifacts/imagegen/suspended-rig-v1/raw/RigHousingGenerationStrip.png",
+    "raw_sha256": "c68a337ceeb7eae7c5e0f9c761bbae65cd652b39aa0f027dbff28ae3b6828677",
+    "extracted_source": "artifacts/imagegen/suspended-rig-v1/extracted/RigHousingGenerationStrip.png",
+    "processed_source": "artifacts/imagegen/suspended-rig-v1/processed/RigHousing_generation4.png",
+    "web_source": "web/public/assets/rig/RigHousing_generation4.png",
+    "imageset": "DeepMineProbe/Shared/SharedAssets.xcassets/RigHousing_generation4.imageset",
+    "scales": [
+      1,
+      2,
+      3
+    ]
+  }
+]

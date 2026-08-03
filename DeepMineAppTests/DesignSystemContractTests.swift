@@ -127,21 +127,47 @@ final class DesignSystemContractTests: XCTestCase {
         XCTAssertNotNil(DeepMineMotion.pressAnimation(reduceMotion: false))
     }
 
-    /// The clicker pivot moved the sprite boundaries from 20/40 to 4/14 so an upgrade is
-    /// seen within the first minutes of play. The art itself is still three tiers, so the
-    /// contract this test guards is the clamp, not the old session-era thresholds.
+    /// Every meaningful equipment beat must be visible: the first purchase installs tier 2,
+    /// while the level-5 specialization beat installs tier 3 and its branch module.
     func testEquipmentArtTierBoundariesClampToShippedRange() {
         XCTAssertEqual(DeepMineArt.equipmentTier(level: -4), 1)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 1), 1)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 4), 1)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 5), 2)
-        XCTAssertEqual(DeepMineArt.equipmentTier(level: 14), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 2), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 4), 2)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 5), 3)
+        XCTAssertEqual(DeepMineArt.equipmentTier(level: 14), 3)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 15), 3)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: Balance.equipmentLevelArithmeticBound), 3)
         XCTAssertEqual(DeepMineArt.equipmentTier(level: 600), 3)
         XCTAssertEqual(
             DeepMineArt.equipment(.drill, level: 5),
-            "Equipment_drill_tier2"
+            "Equipment_drill_tier3"
         )
+    }
+
+    func testRigPlateKeepsEveryUpgradeReadableAndAccessible() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let plate = try String(
+            contentsOf: root.appending(path: "DeepMineApp/Views/RigEquipmentPlate.swift"),
+            encoding: .utf8
+        )
+        let rig = try String(
+            contentsOf: root.appending(path: "DeepMineApp/Views/SuspendedMiningRigView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(plate.contains("Text(\"\\(code)\\(visual.level)\")"))
+        XCTAssertTrue(plate.contains("Text(\"G\\(visual.generation)\")"))
+        XCTAssertTrue(plate.contains("Text(\"R\\(visual.refinementTier)\")"))
+        XCTAssertTrue(plate.contains("size: 9"))
+        XCTAssertTrue(plate.contains("frame(width: 5, height: 5)"))
+        XCTAssertTrue(plate.contains("GameArtCatalog.rigHousing(variant: visual.housingVariant)"))
+        XCTAssertTrue(rig.contains("정비 셀 \\(visual.upgradeCells)/"))
+        XCTAssertTrue(rig.contains("\\(visual.housingVariant)형 하우징"))
+        XCTAssertTrue(rig.contains("UIAccessibility.post(notification: .announcement"))
+        XCTAssertTrue(rig.contains(".easeIn(duration: 0.14)"))
+        XCTAssertTrue(rig.contains(".easeOut(duration: 0.16)"))
     }
 }

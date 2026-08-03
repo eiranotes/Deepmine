@@ -35,7 +35,8 @@ struct ShaftView: View {
     private var plant: MineInfrastructure {
         MineInfrastructureEngine.infrastructure(
             equipment: player.equipment,
-            modifications: player.equipmentModifications
+            modifications: player.equipmentModifications,
+            refinements: player.refinementTiers
         )
     }
 
@@ -83,7 +84,7 @@ struct ShaftView: View {
                 }
                 .position(
                     x: resonance.prefersTrailingEdge ? proxy.size.width - 52 : 52,
-                    y: max(46, ShaftGeometry.y(for: scene.headDepthMeters, in: scene) - 74)
+                    y: max(46, ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene) - 74)
                 )
                 depthRuler(width: proxy.size.width)
                 regionPlates(width: proxy.size.width)
@@ -95,7 +96,7 @@ struct ShaftView: View {
                 )
                 .position(
                     x: proxy.size.width / 2,
-                    y: ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+                    y: ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
                 )
             }
         }
@@ -108,7 +109,8 @@ struct ShaftView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("mine-shaft")
         .accessibilityLabel(
-            "\(DeepMineStrings.text(.homeCrewLabel)) \(plant.crew), "
+            "드릴 \(plant.drillTier)티어, "
+                + "\(DeepMineStrings.text(.homeCrewLabel)) \(plant.crew), "
                 + "\(DeepMineStrings.text(.gameCart)) \(plant.carts), "
                 + "\(DeepMineStrings.text(.gameLamp)) \(plant.serviceLamps)"
         )

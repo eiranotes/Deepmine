@@ -281,6 +281,11 @@ extension EquipmentView {
         let afterCrew = MineCrew.size(drillLevel: after.equipment.drill)
         return .purchase(
             equipment: equipment,
+            physical: RigUpgradePhysicalPresentation(
+                equipment: equipment,
+                before: before,
+                after: after
+            ),
             impact: PurchaseImpact(before: before, after: after, equipment: equipment),
             crewSize: equipment == .drill && afterCrew > beforeCrew ? afterCrew : nil
         )

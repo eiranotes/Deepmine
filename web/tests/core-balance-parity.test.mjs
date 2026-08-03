@@ -11,6 +11,11 @@ const swift = [
   readFileSync(join(coreSources, "Balance+Clicker.swift"), "utf8"),
 ].join("\n");
 const equipmentEngine = readFileSync(join(coreSources, "EquipmentEngine.swift"), "utf8");
+const infrastructureEngine = readFileSync(join(coreSources, "MineInfrastructure.swift"), "utf8");
+const appRigPresentation = readFileSync(
+  join(repoRoot, "DeepMineApp/Views/GrowthFeedbackPresentation.swift"),
+  "utf8",
+);
 const web = readFileSync(join(projectRoot, "app/coreBalance.ts"), "utf8");
 
 function swiftConstant(name) {
@@ -68,6 +73,8 @@ const mirroredConstants = {
   maximumCarts: "MAXIMUM_CARTS",
   maximumCargoSlots: "MAXIMUM_CARGO_SLOTS",
   maximumServiceLamps: "MAXIMUM_SERVICE_LAMPS",
+  rigUpgradeCellsPerGeneration: "RIG_UPGRADE_CELLS_PER_GENERATION",
+  maximumVisibleRefinementBands: "MAXIMUM_VISIBLE_REFINEMENT_BANDS",
   cartGrowthLevelStep: "CART_GROWTH_LEVEL_STEP",
   equipmentModificationUnlockLevel: "EQUIPMENT_MODIFICATION_UNLOCK_LEVEL",
   drillModificationCost: "DRILL_MODIFICATION_COST",
@@ -90,7 +97,7 @@ test("every mirrored constant equals the current Swift Balance value", () => {
 
 test("equipment sprite tiers use the same boundaries as EquipmentEngine.visualTier", () => {
   const boundaries = [...equipmentEngine.matchAll(/case \.\.\.(\d+):/g)].map((match) => Number(match[1]));
-  assert.deepEqual(boundaries.slice(0, 2), [4, 14]);
+  assert.deepEqual(boundaries.slice(0, 2), [1, 4]);
   const webBoundaries = [...web.matchAll(/clamped <= (\d+)\) return \d/g)].map((match) => Number(match[1]));
   assert.deepEqual(webBoundaries, boundaries.slice(0, 2));
 });
@@ -101,6 +108,45 @@ test("infrastructure counts are derived in one place for both surfaces", () => {
   assert.match(web, /if \(clamped <= MINIMUM_EQUIPMENT_LEVEL\) return 0;/);
   assert.match(engine, /total - Balance\.supportCrewLevelOffset/);
   assert.match(web, /total - SUPPORT_CREW_LEVEL_OFFSET/);
+});
+
+test("every equipment level changes the canonical physical tool state", async () => {
+  const { rigToolVisualState } = await import("../app/coreBalance.ts");
+  let previous = rigToolVisualState(1);
+  for (let level = 2; level <= 40; level += 1) {
+    const current = rigToolVisualState(level);
+    const previousPhysicalSignature = `${previous.artTier}:${previous.upgradeCells}:${previous.generation}:${previous.housingVariant}`;
+    const currentPhysicalSignature = `${current.artTier}:${current.upgradeCells}:${current.generation}:${current.housingVariant}`;
+    assert.notEqual(currentPhysicalSignature, previousPhysicalSignature, `level ${level} must change visible hardware`);
+    if (current.generation !== previous.generation) {
+      assert.notEqual(current.housingVariant, previous.housingVariant, `generation ${current.generation} must swap housing art`);
+    }
+    assert.equal(current.level, level);
+    previous = current;
+  }
+});
+
+test("the app mirrors the web-first housing and installation contract", () => {
+  assert.match(
+    infrastructureEngine,
+    /housingVariant: investment \/ Balance\.rigUpgradeCellsPerGeneration % 4 \+ 1/,
+  );
+  assert.match(
+    web,
+    /housingVariant: Math\.floor\(investment \/ RIG_UPGRADE_CELLS_PER_GENERATION\) % 4 \+ 1/,
+  );
+  assert.match(appRigPresentation, /G\\\(afterVisual\.generation\).*형 하우징 교체/s);
+  assert.match(appRigPresentation, /T\\\(beforeVisual\.artTier\)→T\\\(afterVisual\.artTier\) 본체 교체/s);
+  assert.match(appRigPresentation, /정비 셀 \\\(beforeVisual\.upgradeCells\)→/);
+});
+
+test("refinement keeps its exact stamped tier after decorative bands cap", async () => {
+  const { rigToolVisualState } = await import("../app/coreBalance.ts");
+  for (let tier = 1; tier <= 12; tier += 1) {
+    const visual = rigToolVisualState(80, tier);
+    assert.equal(visual.refinementTier, tier);
+    assert.equal(visual.refinementBands, Math.min(3, tier));
+  }
 });
 
 test("the prototype reads the economy from coreBalance rather than its own numbers", () => {

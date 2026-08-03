@@ -16,7 +16,7 @@ struct ShaftWorkFaceView: View {
     @State private var impactFlash = false
     private var groundWidth: CGFloat { max(180, width - 18) }
     private let groundHeight: CGFloat = 134
-    private let groundTop: CGFloat = 100
+    private let groundTop: CGFloat = 126
     /// The lip is drawn at its own aspect and then cropped from the top: the shoulders and
     /// the throat live in its lower half, and that is the part that has to meet the rock.
     private var lipHeight: CGFloat { 66 }
@@ -25,13 +25,12 @@ struct ShaftWorkFaceView: View {
     private let lipOverlap: CGFloat = 3
     var body: some View {
         ZStack(alignment: .topLeading) {
-            // The gantry is overhead support for the passage, not a thing the miner stands
-            // in. At its old size it ran straight through the actor's head.
-            GameArtView(
-                entry: GameArtCatalog.shaftGantry,
-                fill: CGSize(width: min(width - 30, 280), height: 44)
+            SuspendedMiningRigView(
+                player: player,
+                strikeSignal: strikeSignal,
+                strikeVariant: strikeVariant
             )
-            .position(x: width / 2, y: 24)
+            .position(x: width / 2, y: 66)
 
             groundButton
                 .position(x: width / 2, y: groundTop + groundHeight / 2)
@@ -39,26 +38,11 @@ struct ShaftWorkFaceView: View {
             frontierLip
                 .position(x: width / 2, y: groundTop - lipHeight / 2 + lipOverlap)
 
-            // One actor: the drill sprite is no longer a separate image beside the miner,
-            // because two objects on two timelines is exactly what D-055 removed.
-            ShaftMiningActorView(
-                strikeSignal: strikeSignal,
-                variant: strikeVariant,
-                height: 92
-            )
-                .position(x: width / 2 - 18, y: groundTop - 46)
-
-            DeepMinePixelImage(
-                name: DeepMineArt.equipment(.lamp, level: player.equipment.lamp),
-                size: 25
-            )
-            .position(x: width - 35, y: 34)
-
             if let point = player.mineFace.segment.weakPoint {
                 weakPoint(point)
             }
         }
-        .frame(width: width, height: 236)
+        .frame(width: width, height: 262)
         // The face reacts when the pickaxe arrives, not when the input happens. Reduce
         // Motion shortens the whole timeline rather than removing the beat, so the hit is
         // still legible without the travel.

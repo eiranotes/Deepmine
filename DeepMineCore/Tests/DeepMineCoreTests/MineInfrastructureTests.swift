@@ -15,6 +15,9 @@ final class MineInfrastructureTests: XCTestCase {
         XCTAssertEqual(plant.cargoSlots, 0)
         XCTAssertEqual(plant.serviceLamps, 1)
         XCTAssertEqual(plant.tier, 1)
+        XCTAssertEqual(plant.drillTier, 1)
+        XCTAssertNil(plant.drillBranchModule)
+        XCTAssertEqual(plant.railLanes, 0)
     }
 
     /// The first cart upgrade is the beat where the mine starts running on its own, so it
@@ -54,6 +57,88 @@ final class MineInfrastructureTests: XCTestCase {
             MineInfrastructureEngine.carts(level: 4, modification: .cartFreight),
             MineInfrastructureEngine.carts(level: 4, modification: nil)
         )
+    }
+
+    func testEveryBranchInstallsAnExplicitSceneModule() {
+        for modification in EquipmentModificationKind.allCases {
+            let plant = MineInfrastructureEngine.infrastructure(
+                equipment: levels(5, 5, 5),
+                modifications: EquipmentModifications(
+                    drill: modification.equipment == .drill ? modification : nil,
+                    cart: modification.equipment == .cart ? modification : nil,
+                    lamp: modification.equipment == .lamp ? modification : nil
+                )
+            )
+            XCTAssertEqual(
+                [plant.drillBranchModule, plant.cartBranchModule, plant.lampBranchModule]
+                    .compactMap { $0 },
+                [modification]
+            )
+        }
+        let fleet = MineInfrastructureEngine.infrastructure(
+            equipment: levels(5, 5, 5),
+            modifications: EquipmentModifications(cart: .cartFleet)
+        )
+        XCTAssertEqual(fleet.railLanes, 2)
+    }
+
+    func testLevelsSwapTheMountedDrillAndRefinementAddsVisibleBands() {
+        XCTAssertEqual(
+            MineInfrastructureEngine.infrastructure(equipment: levels(1, 1, 1)).drillTier,
+            1
+        )
+        XCTAssertEqual(
+            MineInfrastructureEngine.infrastructure(equipment: levels(2, 1, 1)).drillTier,
+            2
+        )
+        XCTAssertEqual(
+            MineInfrastructureEngine.infrastructure(equipment: levels(5, 1, 1)).drillTier,
+            3
+        )
+        let refined = MineInfrastructureEngine.infrastructure(
+            equipment: levels(15, 15, 15),
+            refinements: RefinementTiers(drill: 2, cart: 4, lamp: 1)
+        )
+        XCTAssertEqual(refined.drillRefinementBands, 2)
+        XCTAssertEqual(refined.cartRefinementBands, Balance.maximumVisibleRefinementBands)
+        XCTAssertEqual(refined.lampRefinementBands, 1)
+        XCTAssertEqual(refined.drillVisual.refinementTier, 2)
+        XCTAssertEqual(refined.cartVisual.refinementTier, 4)
+    }
+
+    func testEveryEquipmentLevelChangesItsPhysicalToolState() {
+        var previous = MineInfrastructureEngine.visualState(level: 1)
+        for level in 2...40 {
+            let current = MineInfrastructureEngine.visualState(level: level)
+            XCTAssertNotEqual(current, previous, "level \(level) must change the rig")
+            XCTAssertTrue(
+                current.upgradeCells != previous.upgradeCells
+                    || current.generation != previous.generation
+                    || current.housingVariant != previous.housingVariant
+                    || current.artTier != previous.artTier,
+                "level \(level) needs a physical delta"
+            )
+            if current.generation != previous.generation {
+                XCTAssertNotEqual(
+                    current.housingVariant,
+                    previous.housingVariant,
+                    "generation \(current.generation) must replace the housing silhouette"
+                )
+            }
+            XCTAssertEqual(current.level, level)
+            previous = current
+        }
+    }
+
+    func testEveryRefinementKeepsItsExactPhysicalPlatePastThreeBands() {
+        for tier in 1...12 {
+            let visual = MineInfrastructureEngine.visualState(level: 80, refinementTier: tier)
+            XCTAssertEqual(visual.refinementTier, tier)
+            XCTAssertEqual(
+                visual.refinementBands,
+                min(tier, Balance.maximumVisibleRefinementBands)
+            )
+        }
     }
 
     func testCrewFollowsTotalInvestmentSoNoSinglePathLeavesThePassageEmpty() {

@@ -30,7 +30,8 @@
 		1F57385B71A5565BFAF77A31 /* GameActivityComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6783352927B80927EECEEB50 /* GameActivityComponents.swift */; };
 		22A17382FB00762259D1EDE1 /* GameSurfaceCommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9776C94B6BCEAC40A31B2 /* GameSurfaceCommandRunner.swift */; };
 		23257BB82DC20C8ACE4D880D /* ProbeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA8DCFBD2960810BB8E3FCA /* ProbeConstants.swift */; };
-		2615953CEFA55867090F4EB7 /* ShaftMiningActorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74204CB792640D5432D7B3B /* ShaftMiningActorView.swift */; };
+		F4C8B1A2D3E4567890ABCDEE /* SuspendedMiningRigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C8B1A2D3E4567890ABCDEF /* SuspendedMiningRigView.swift */; };
+		F4C8B1A2D3E4567890ABCD01 /* RigEquipmentPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C8B1A2D3E4567890ABCD02 /* RigEquipmentPlate.swift */; };
 		2618CBDD1205F07D8FAF5409 /* GameSurfaceCommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9776C94B6BCEAC40A31B2 /* GameSurfaceCommandRunner.swift */; };
 		26452B6652A55D24C87D5F5F /* ProjectMembershipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D8C7F943055333A1C47591 /* ProjectMembershipTests.swift */; };
 		2847A44AF004C6C4EA632C76 /* SettingsSystemBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3AF1CF182F6E6E56A42C8D3 /* SettingsSystemBridge.swift */; };
@@ -299,6 +300,8 @@
 		227D43619A91203D7469CBF5 /* ReturnReportView+Beats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReturnReportView+Beats.swift"; sourceTree = "<group>"; };
 		25DB86935865A668F4EEFC1E /* ActiveMineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMineView.swift; sourceTree = "<group>"; };
 		271A7AA7F7A80C829A66F2E3 /* ShaftGroundFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaftGroundFaceView.swift; sourceTree = "<group>"; };
+		F4C8B1A2D3E4567890ABCDEF /* SuspendedMiningRigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuspendedMiningRigView.swift; sourceTree = "<group>"; };
+		F4C8B1A2D3E4567890ABCD02 /* RigEquipmentPlate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigEquipmentPlate.swift; sourceTree = "<group>"; };
 		28E56C775EA0E83150D32684 /* GamePassiveSurfaceRefreshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePassiveSurfaceRefreshTests.swift; sourceTree = "<group>"; };
 		2AD42AB37658ABB40DBC7477 /* DeepMineCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DeepMineCore; path = DeepMineCore; sourceTree = SOURCE_ROOT; };
 		2F68F4F71483FF708972C7E3 /* GameFeedbackPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFeedbackPreferenceTests.swift; sourceTree = "<group>"; };
@@ -421,7 +424,6 @@
 		E0D43E90C1EA27821BBA3A46 /* ReturnReportUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReportUITests.swift; sourceTree = "<group>"; };
 		E37B72D0BA2B69E49716A690 /* PrestigeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrestigeView.swift; sourceTree = "<group>"; };
 		E48F2C3D3F28E3EC43518BDC /* GameWaitingSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWaitingSurfaceTests.swift; sourceTree = "<group>"; };
-		E74204CB792640D5432D7B3B /* ShaftMiningActorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaftMiningActorView.swift; sourceTree = "<group>"; };
 		E7922E610F15F3D4FCFDBABF /* ShaftLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaftLayerView.swift; sourceTree = "<group>"; };
 		E93F24EE8E74C255D28D9189 /* GamePassiveSurfaceRefresher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePassiveSurfaceRefresher.swift; sourceTree = "<group>"; };
 		E98F3A42E5F8BC9E98B81D85 /* DeepMinePrestigeLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepMinePrestigeLabels.swift; sourceTree = "<group>"; };
@@ -613,7 +615,8 @@
 				271A7AA7F7A80C829A66F2E3 /* ShaftGroundFaceView.swift */,
 				21F88019A4E4A7EFEED3DE94 /* ShaftHUDView.swift */,
 				E7922E610F15F3D4FCFDBABF /* ShaftLayerView.swift */,
-				E74204CB792640D5432D7B3B /* ShaftMiningActorView.swift */,
+				F4C8B1A2D3E4567890ABCDEF /* SuspendedMiningRigView.swift */,
+				F4C8B1A2D3E4567890ABCD02 /* RigEquipmentPlate.swift */,
 				456FF782DDE43990AAE7970C /* ShaftView.swift */,
 				DE3390533E9EE92958A42B4B /* ShaftView+Effects.swift */,
 				BC95D6F465C4C30D95563AB5 /* ShaftView+Overlays.swift */,
@@ -1208,7 +1211,8 @@
 				A66837E8090D53908089D530 /* ShaftGroundFaceView.swift in Sources */,
 				87D9D0E2AC4411A2CB6DC3C6 /* ShaftHUDView.swift in Sources */,
 				D626F69D942E7199C97987AC /* ShaftLayerView.swift in Sources */,
-				2615953CEFA55867090F4EB7 /* ShaftMiningActorView.swift in Sources */,
+				F4C8B1A2D3E4567890ABCDEE /* SuspendedMiningRigView.swift in Sources */,
+				F4C8B1A2D3E4567890ABCD01 /* RigEquipmentPlate.swift in Sources */,
 				7E2AF52BEE56EB9C601C119F /* ShaftView+Effects.swift in Sources */,
 				A22111337CD01BF71463DCFA /* ShaftView+Overlays.swift in Sources */,
 				1276237104FDAF3997BE09D8 /* ShaftView.swift in Sources */,

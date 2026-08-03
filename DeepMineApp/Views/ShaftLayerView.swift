@@ -129,12 +129,13 @@ struct ShaftGeologyView: View {
     private var plant: MineInfrastructure {
         MineInfrastructureEngine.infrastructure(
             equipment: player.equipment,
-            modifications: player.equipmentModifications
+            modifications: player.equipmentModifications,
+            refinements: player.refinementTiers
         )
     }
 
     private func workCrew(width: CGFloat) -> some View {
-        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
         return ForEach(1..<max(2, plant.crew), id: \.self) { index in
             let x = width / 2 + (index.isMultiple(of: 2) ? 54 : -58) + CGFloat(index) * 4
             let y = max(30, headY - 26 - CGFloat(index % 2) * 34)
@@ -152,7 +153,7 @@ struct ShaftGeologyView: View {
     }
 
     private func serviceLamps(width: CGFloat) -> some View {
-        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
         let span = max(40, headY - 30)
         return ForEach(0..<plant.serviceLamps, id: \.self) { index in
             let ratio = CGFloat(index + 1) / CGFloat(plant.serviceLamps + 1)
@@ -220,7 +221,7 @@ struct ShaftGeologyView: View {
     }
 
     private func rail(width: CGFloat) -> some View {
-        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
         return HStack(spacing: 34) {
             Rectangle().fill(DeepMinePalette.brass.color.opacity(0.48)).frame(width: 2)
             Rectangle().fill(DeepMinePalette.brass.color.opacity(0.48)).frame(width: 2)
@@ -239,7 +240,7 @@ struct ShaftGeologyView: View {
     }
 
     private var futureDarkness: some View {
-        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
         return LinearGradient(
             colors: [.clear, DeepMinePalette.coal.color.opacity(0.94)],
             startPoint: .top,
@@ -252,7 +253,7 @@ struct ShaftGeologyView: View {
     }
 
     private func currentFace(width: CGFloat) -> some View {
-        let headY = ShaftGeometry.y(for: scene.headDepthMeters, in: scene)
+        let headY = ShaftGeometry.y(for: scene.worklineDepthMeters, in: scene)
         return ShaftWorkFaceView(
             width: width,
             player: player,

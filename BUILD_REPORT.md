@@ -1,6 +1,22 @@
 # Build Report
 
-업데이트: 2026-08-03 (웹 파티션 완파·다중 낙하 로컬 closeout)
+업데이트: 2026-08-03 (현수식 채굴 리그·물리 강화 계약 로컬 closeout)
+
+## 2026-08-03 suspended-rig and physical-upgrade closeout
+
+| 항목 | 현재 결과 | 근거/경계 |
+|---|---|---|
+| Pro 협업 | **최종 SHIP·P0/P1 없음** | 독립 `gpt-5.6-sol`이 낙하 아바타보다 고정 가이드 리그를 권고. 첫 재감사의 후기 세대 실루엣 부재를 생성 하우징 4종, 웹 우선 설치 문구, 앱 parity로 보완한 뒤 최우선 물리 업그레이드 조건 충족 판정 |
+| 생성 에셋 | **14/14 검증** | ImageGen raw 4장으로 프레임 1, 드릴 3티어, 분기 모듈 6종, 서로 다른 세대 하우징 4종을 추출. `uv run --with pillow python scripts/process_suspended_rig_assets.py --validate-only`가 정확한 ID·RGBA·hash·prompt/raw provenance와 앱/웹 복사본을 통과 |
+| 장비 물리 상태 | **Core 11/11 통과** | Lv.1~40의 연속 상태가 모두 다르고 정확한 레벨판·4칸 정비 셀·4종 하우징 순환으로 표현됨. 매 4레벨 세대 경계는 실제 PNG를 교체하며 R1~R12는 정확한 R단계 각인판을 보존. 분기 6종은 각각 고유 scene module |
+| 고정 작업선 | **Core 8/8·브라우저 통과** | `headDepth`는 절삭 진행을 보존하고 `worklineDepth=faceDepth`는 프레임·막장·레일·조명·효과를 고정. 웹 한 타격 뒤 경제 헤드 8.0→8.4m, progress 10%, camera 8.00m, advance 0구간 |
+| 자연스러운 동작 | **코드·계약 통과** | 드릴 quick/heavy/critical은 같은 `StrikeTimeline` 접촉 202/249/274ms에 도달. 완파는 퍼센트 근사가 아니라 140ms 클램프 해제, 320~900ms `log2(N)` 윈치 이동, 160ms 재체결의 독립 phase와 7~14px 프레임 dip. 취소 시 중간 pose를 초기화하고 Reduce Motion은 즉시 최종 상태와 완료 발표를 남김 |
+| 웹 우선 계약 | **정본 확정** | `rigVisual.ts`가 하우징 asset과 구매 직후 물리 설치 문구를 소유한다. T1→T2 본체 교체, 셀 1→2 증설, G1·2형 하우징 교체를 정확히 검사하고 웹이 통과한 뒤 앱 표현을 같은 문구로 미러링했다 |
+| 웹 전체 | **29/29 통과** | rig advance, rig visual, Core parity/물리 상태·앱 parity, prototype contract를 포함. `npm run lint`와 `npm test`의 Vinext·Pages build를 통과 |
+| 웹 실화면 | **이전 단계 통과·최신 합성 재캡처 대기** | 1280×720에서 프레임·D/C/L와 Lv.1→2 T1→T2·셀 0→1은 확인했다. 이후 추가한 4종 하우징은 contact sheet와 실제 DOM/CSS·production build로 확인했으나 최신 1280/390 합성은 다시 캡처하지 않았다 |
+| App 아트/디자인 runtime | **이전 24/24·최신 실행 차단** | 하우징 추가 전 xcresult `Test-DeepMineApp-2026.08.03_18-58-56-+0900.xcresult`는 24/24였다. 최신 소스의 실행은 CoreSimulator가 두 번 `Mach error -308 - (ipc/mig) server died`로 종료해 통과로 표시하지 않는다 |
+| iOS compile | **generic Simulator build-for-testing 통과** | 최신 14-slot 카탈로그, 세대 하우징 scene, 웹과 같은 설치 문구 및 관련 테스트 소스가 arm64/x86_64용으로 컴파일됨 |
+| 웹 배포 | **main/Pages 배포 대상** | 사용자의 배포 요청에 따라 검증된 D-083 웹 build를 `main` push와 Pages workflow로 게시한다. 공개 URL 확인과 실제 iPhone VoiceOver/Reduce Motion/햅틱 검증은 별도 증거로 구분 |
 
 ## 2026-08-03 partition-break fall closeout
 

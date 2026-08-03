@@ -60,11 +60,22 @@ export const SUPPORT_CREW_LEVEL_OFFSET = 10;
 export const MAXIMUM_CARTS = 4;
 export const MAXIMUM_CARGO_SLOTS = 3;
 export const MAXIMUM_SERVICE_LAMPS = 5;
+export const RIG_UPGRADE_CELLS_PER_GENERATION = 4;
+export const MAXIMUM_VISIBLE_REFINEMENT_BANDS = 3;
 const CART_GROWTH_LEVEL_STEP = 2;
 
 export type EquipmentKind = "drill" | "cart" | "lamp";
 export type MineRegion = "entry" | "crystal" | "ruins" | "abyss";
 export type EquipmentLevels = Record<EquipmentKind, number>;
+export type RigToolVisualState = {
+  level: number;
+  artTier: number;
+  upgradeCells: number;
+  generation: number;
+  housingVariant: number;
+  refinementTier: number;
+  refinementBands: number;
+};
 
 function safeLevel(level: number) {
   return Math.max(MINIMUM_EQUIPMENT_LEVEL, Math.floor(level));
@@ -249,9 +260,33 @@ export function recommendMiningUpgrade(
 
 export function equipmentTier(level: number) {
   const clamped = safeLevel(level);
-  if (clamped <= 4) return 1;
-  if (clamped <= 14) return 2;
+  if (clamped <= 1) return 1;
+  if (clamped <= 4) return 2;
   return 3;
+}
+
+/**
+ * Canonical physical state for one rig subsystem. Major levels swap generated art;
+ * every in-between level fills a service cell or advances the stamped housing
+ * generation. The exact level and refinement tier remain visible after the small
+ * decorative bands reach their readability cap.
+ */
+export function rigToolVisualState(
+  level: number,
+  refinementTier = 0,
+): RigToolVisualState {
+  const clamped = safeLevel(level);
+  const investment = clamped - MINIMUM_EQUIPMENT_LEVEL;
+  const exactRefinement = Math.max(0, Math.floor(refinementTier));
+  return {
+    level: clamped,
+    artTier: equipmentTier(clamped),
+    upgradeCells: investment % RIG_UPGRADE_CELLS_PER_GENERATION,
+    generation: Math.floor(investment / RIG_UPGRADE_CELLS_PER_GENERATION),
+    housingVariant: Math.floor(investment / RIG_UPGRADE_CELLS_PER_GENERATION) % 4 + 1,
+    refinementTier: exactRefinement,
+    refinementBands: Math.min(MAXIMUM_VISIBLE_REFINEMENT_BANDS, exactRefinement),
+  };
 }
 
 export function supportCrewSize(drill: number, cart: number, lamp: number) {

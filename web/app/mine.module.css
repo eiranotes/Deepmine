@@ -882,6 +882,12 @@
   color: var(--coal);
 }
 
+.equipmentCard > .refinementButton {
+  margin-top: 7px;
+  border-color: var(--limestone-muted);
+  background: linear-gradient(90deg, var(--coal), var(--shale-light));
+}
+
 .footer {
   display: flex;
   justify-content: space-between;
@@ -1223,12 +1229,10 @@
   --fracture-reveal: 24px;
   --strike-duration: 560ms;
   --strike-contact-delay: 202ms;
-  --partition-fall-distance: 0px;
-  --partition-strata-travel: 0px;
-  --partition-actor-drop-raw: 0px;
-  --partition-actor-drop: var(--partition-actor-drop-raw);
-  --partition-actor-drop-half-raw: 0px;
-  --partition-actor-drop-half: var(--partition-actor-drop-half-raw);
+  --rig-world-travel: 0px;
+  --rig-strata-travel: 0px;
+  --rig-dip-raw: 0px;
+  --rig-dip: var(--rig-dip-raw);
   position: relative;
   height: clamp(520px, calc(100svh - 176px), 680px);
   min-height: 520px;
@@ -1248,8 +1252,8 @@
   will-change: transform;
 }
 
-.partitionFalling .worldMotion {
-  animation: partition-world-fall var(--partition-travel-duration) cubic-bezier(0.2, 0.68, 0.22, 1) var(--partition-break-duration) both;
+.rigAdvancing .worldMotion {
+  animation: rig-world-advance var(--rig-travel-duration) cubic-bezier(0.2, 0.68, 0.22, 1) var(--rig-unlock-duration) both;
 }
 
 .heavyStrike {
@@ -1290,9 +1294,9 @@
   transition: background-position 120ms linear;
 }
 
-.partitionFalling .rockWorld {
+.rigAdvancing .rockWorld {
   transition: none;
-  animation: partition-rock-fall var(--partition-travel-duration) linear var(--partition-break-duration) both;
+  animation: rig-rock-advance var(--rig-travel-duration) linear var(--rig-unlock-duration) both;
 }
 
 .rockWorld::after {
@@ -1535,7 +1539,7 @@
   animation: lamp-commission 620ms steps(4, end) both;
 }
 
-.commissioningDrill .continuousDrill {
+.commissioningDrill .rigMountedDrill {
   animation: drill-commission 560ms steps(4, end) both;
 }
 
@@ -1818,60 +1822,212 @@
   animation: vertical-crack-hit 260ms ease-out var(--strike-contact-delay) both;
 }
 
-.miningActor {
+.suspendedRig {
   position: absolute;
   z-index: 8;
-  top: -123px;
-  left: calc(50% - 128px);
-  width: 152px;
-  height: 152px;
-  background-image: url("/assets/shaft/MinerMiningStrip.png");
-  background-position: 0 0;
-  background-repeat: no-repeat;
-  background-size: 608px 152px;
-  filter: drop-shadow(3px 4px 0 rgb(0 0 0 / 0.72));
-  image-rendering: pixelated;
-  transform-origin: 56% 92%;
-  animation: miner-quick-strike var(--strike-duration) linear both;
+  top: -142px;
+  left: 50%;
+  width: 320px;
+  height: 142px;
+  transform: translateX(-50%);
+  transform-origin: 50% 16%;
+  filter: drop-shadow(0 7px 0 rgb(0 0 0 / 0.58));
+  will-change: transform;
 }
 
-.heavyStrike .miningActor {
-  animation-name: miner-heavy-strike;
-}
-
-.criticalStrike .miningActor {
-  animation-name: miner-critical-strike;
-}
-
-.partitionFalling .miningActor {
-  background-image: url("/assets/shaft/MinerDescentStrip.png");
-  animation: miner-partition-fall var(--partition-total-duration) linear both;
-}
-
-.continuousDrill {
+.rigUnlockFrame,
+.rigLockFrame {
   position: absolute;
-  z-index: 4;
-  top: -47px;
-  left: calc(50% + 56px);
+  inset: 0;
+  transform-origin: 50% 16%;
+}
+
+.rigFrame {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 320px;
+  height: 128px;
+  object-fit: fill;
+  image-rendering: pixelated;
+}
+
+.rigGuideCable {
+  position: absolute;
+  z-index: 1;
+  top: -78px;
+  width: 5px;
+  height: 112px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--limestone) 0 5px,
+    var(--shale) 5px 10px
+  );
+  box-shadow: 2px 0 0 rgb(0 0 0 / 0.54);
+}
+
+.rigGuideCableLeft { left: 76px; }
+.rigGuideCableRight { right: 76px; }
+
+.rigOperator {
+  position: absolute;
+  z-index: 3;
+  top: 49px;
+  left: 61px;
   width: 38px;
   height: 38px;
-  transform: rotate(18deg) scale(var(--rig-scale));
-  transform-origin: left center;
-  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75));
+  object-fit: contain;
   image-rendering: pixelated;
-  opacity: 0.82;
 }
 
-.partitionFalling .continuousDrill {
-  animation: drill-partition-fall var(--partition-total-duration) linear both;
+.rigDrillMount {
+  position: absolute;
+  z-index: 4;
+  top: 62px;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translateX(-50%);
+  transform-origin: 50% 12%;
+  animation: rig-drill-strike var(--strike-duration) linear both;
 }
 
-.partitionFalling .frontierLip,
-.partitionFalling .excavationKerf,
-.partitionFalling .fractureClip,
-.partitionFalling .workRewardPromise,
-.partitionFalling .continuousWeakPoint {
-  animation: partition-face-swap var(--partition-total-duration) steps(1, end) both;
+.rigMountedDrill {
+  position: absolute;
+  inset: 0;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.72));
+  image-rendering: pixelated;
+}
+
+.rigDrillHousing,
+.rigCartHousing,
+.rigLampHousing {
+  position: absolute;
+  z-index: 3;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.72));
+  image-rendering: pixelated;
+}
+
+.rigDrillHousing {
+  inset: -4px;
+  width: 104px;
+  height: 104px;
+}
+
+.rigCartHousing {
+  top: 50px;
+  right: 14px;
+  width: 70px;
+  height: 70px;
+}
+
+.rigLampHousing {
+  top: 1px;
+  right: -1px;
+  width: 58px;
+  height: 58px;
+}
+
+.rigMountedDrill { z-index: 4; }
+
+.rigDrillBranch,
+.rigCartBranch,
+.rigLampBranch {
+  position: absolute;
+  z-index: 6;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.68));
+  image-rendering: pixelated;
+  animation: module-commission 420ms steps(4, end) both;
+}
+
+.rigDrillBranch { top: 24px; right: -28px; }
+.rigCartBranch { top: 59px; right: 23px; }
+.rigLampBranch { top: 13px; right: 4px; }
+
+.rigSubsystemPlate {
+  position: absolute;
+  z-index: 7;
+  display: grid;
+  min-width: 50px;
+  gap: 3px;
+  padding: 4px 5px;
+  border: 1px solid var(--brass);
+  background: rgb(12 12 10 / 0.94);
+  box-shadow: 1px 2px 0 rgb(0 0 0 / 0.7);
+  color: var(--limestone);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rigDrillPlate { top: 66px; left: 174px; }
+.rigCartPlate { top: 94px; right: 15px; }
+.rigLampPlate { top: 19px; right: 5px; }
+
+.rigPlateLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.rigPlateLabel small {
+  color: var(--limestone-muted);
+  font-size: inherit;
+}
+
+.rigPlateLabel em {
+  color: var(--brass-bright);
+  font-style: normal;
+}
+
+.rigCellBank {
+  display: flex;
+  gap: 2px;
+}
+
+.rigCellBank i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgb(233 227 210 / 0.24);
+  background: var(--shale);
+}
+
+.rigCellBank .rigCellActive {
+  border-color: var(--brass);
+  background: var(--brass-bright);
+  box-shadow: 0 0 3px rgb(240 189 93 / 0.5);
+}
+
+.heavyStrike .rigDrillMount { animation-name: rig-drill-heavy-strike; }
+.criticalStrike .rigDrillMount { animation-name: rig-drill-critical-strike; }
+
+.rigAdvancing .suspendedRig {
+  animation: rig-cage-travel var(--rig-travel-duration) cubic-bezier(0.2, 0.68, 0.22, 1) var(--rig-unlock-duration) both;
+}
+
+.rigAdvancing .rigUnlockFrame {
+  animation: rig-cage-unlock var(--rig-unlock-duration) ease-in forwards;
+}
+
+.rigAdvancing .rigLockFrame {
+  animation: rig-cage-lock var(--rig-lock-duration) ease-out calc(var(--rig-unlock-duration) + var(--rig-travel-duration)) forwards;
+}
+
+.rigAdvancing .frontierLip,
+.rigAdvancing .excavationKerf,
+.rigAdvancing .fractureClip,
+.rigAdvancing .workRewardPromise,
+.rigAdvancing .continuousWeakPoint {
+  animation: rig-face-swap var(--rig-total-duration) steps(1, end) both;
 }
 
 .contactFlash {
@@ -2023,14 +2179,14 @@
 .collapseLeft {
   left: 0;
   clip-path: polygon(0 0, 100% 0, 91% 17%, 98% 38%, 86% 61%, 95% 83%, 80% 100%, 0 100%);
-  animation: collapse-left var(--partition-break-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
+  animation: collapse-left var(--rig-unlock-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
 }
 
 .collapseRight {
   right: 0;
   background-position-x: right;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 18% 100%, 5% 82%, 14% 62%, 2% 39%, 10% 18%);
-  animation: collapse-right var(--partition-break-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
+  animation: collapse-right var(--rig-unlock-duration) cubic-bezier(0.16, 0.72, 0.2, 1) both;
 }
 
 .collapseGap {
@@ -2041,7 +2197,7 @@
   height: 100%;
   transform: translateX(-50%);
   background: #080807;
-  animation: collapse-gap var(--partition-break-duration) ease-out both;
+  animation: collapse-gap var(--rig-unlock-duration) ease-out both;
 }
 
 .collapseAlternate .collapseLeft {
@@ -2095,8 +2251,8 @@
   font-weight: 900;
 }
 
-.partitionFalling .continuousDepthOverlay {
-  animation: partition-depth-swap var(--partition-total-duration) steps(1, end) both;
+.rigAdvancing .continuousDepthOverlay {
+  animation: rig-depth-swap var(--rig-total-duration) steps(1, end) both;
 }
 
 .descentIndicator {
@@ -2162,11 +2318,11 @@
   font-style: normal;
 }
 
-.partitionFalling .descentIndicator i {
+.rigAdvancing .descentIndicator i {
   animation: descent-arrow 720ms ease-in-out infinite;
 }
 
-.partitionFallCue {
+.rigAdvanceCue {
   position: absolute;
   z-index: 19;
   top: calc(var(--workline) - 78px);
@@ -2180,16 +2336,16 @@
   background: rgb(10 10 9 / 0.86);
   box-shadow: 4px 4px 0 rgb(0 0 0 / 0.45);
   pointer-events: none;
-  animation: partition-fall-cue var(--partition-total-duration) steps(5, end) both;
+  animation: rig-advance-cue var(--rig-total-duration) steps(5, end) both;
 }
 
-.partitionFallCue span {
+.rigAdvanceCue span {
   color: var(--limestone);
   font-size: 0.56rem;
   letter-spacing: 0.06em;
 }
 
-.partitionFallCue strong {
+.rigAdvanceCue strong {
   color: var(--brass-bright);
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
@@ -2582,9 +2738,9 @@
 }
 
 @keyframes drill-commission {
-  0% { filter: brightness(0.75); transform: rotate(18deg) scale(var(--rig-scale)); }
-  42% { filter: brightness(1.7) drop-shadow(0 0 7px var(--brass-bright)); transform: rotate(14deg) scale(calc(var(--rig-scale) * 1.18)); }
-  100% { filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75)); transform: rotate(18deg) scale(var(--rig-scale)); }
+  0% { filter: brightness(0.75); transform: scale(0.82); }
+  42% { filter: brightness(1.7) drop-shadow(0 0 7px var(--brass-bright)); transform: scale(1.16); }
+  100% { filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.75)); transform: scale(1); }
 }
 
 @keyframes strike-arc {
@@ -2625,27 +2781,6 @@
   100% { opacity: 0; transform: translateX(-50%) scaleX(1.04); filter: brightness(1); }
 }
 
-@keyframes miner-quick-strike {
-  0%, 14% { background-position: 0 0; transform: translate(0, 0) rotate(0); }
-  14.1%, 36% { background-position: -152px 0; transform: translate(-7px, -9px) rotate(-2deg); }
-  36.1%, 54% { background-position: -304px 0; transform: translate(6px, 16px) rotate(2deg) scale(1.025); }
-  54.1%, 100% { background-position: -456px 0; transform: translate(1px, 2px) rotate(0); }
-}
-
-@keyframes miner-heavy-strike {
-  0%, 11% { background-position: 0 0; transform: translate(2px, 1px) rotate(0); }
-  11.1%, 36% { background-position: -152px 0; transform: translate(-14px, -15px) rotate(-5deg) scale(1.035); }
-  36.1%, 58% { background-position: -304px 0; transform: translate(10px, 23px) rotate(4deg) scale(1.07); }
-  58.1%, 100% { background-position: -456px 0; transform: translate(2px, 3px) rotate(0); }
-}
-
-@keyframes miner-critical-strike {
-  0%, 9% { background-position: 0 0; transform: translate(3px, 2px) rotate(1deg) scale(1.02); }
-  9.1%, 36% { background-position: -152px 0; transform: translate(-19px, -18px) rotate(-7deg) scale(1.08); }
-  36.1%, 62% { background-position: -304px 0; transform: translate(14px, 28px) rotate(5deg) scale(1.12); filter: brightness(1.4); }
-  62.1%, 100% { background-position: -456px 0; transform: translate(2px, 3px) rotate(0) scale(1); filter: brightness(1); }
-}
-
 @keyframes frontier-impact {
   0%, 35% { filter: brightness(1) drop-shadow(0 6px 0 rgb(0 0 0 / 0.26)); transform: translateX(-50%) translateY(0) scaleY(1); }
   36%, 45% { filter: brightness(1.22) drop-shadow(0 3px 0 rgb(0 0 0 / 0.32)); transform: translateX(-50%) translateY(3px) scaleY(0.965); }
@@ -2669,59 +2804,71 @@
   100% { opacity: var(--fracture-opacity); filter: brightness(1); transform: scaleY(1); transform-origin: top; }
 }
 
-@keyframes partition-world-fall {
-  from { transform: translateY(var(--partition-fall-distance)); }
+@keyframes rig-world-advance {
+  from { transform: translateY(var(--rig-world-travel)); }
   to { transform: translateY(0); }
 }
 
-@keyframes partition-rock-fall {
-  from { background-position: center calc(var(--rock-phase) + var(--partition-strata-travel)); }
+@keyframes rig-rock-advance {
+  from { background-position: center calc(var(--rock-phase) + var(--rig-strata-travel)); }
   to { background-position: center var(--rock-phase); }
 }
 
-@keyframes miner-partition-fall {
-  0%, 12% {
-    background-position: 0 0;
-    transform: translateY(0) rotate(0) scale(1);
-  }
-  24%, 46% {
-    background-position: -152px 0;
-    transform: translateY(var(--partition-actor-drop-half)) rotate(-1deg) scale(0.98);
-  }
-  47%, 76% {
-    background-position: -304px 0;
-    transform: translateY(var(--partition-actor-drop)) rotate(1deg) scale(0.98);
-  }
-  77%, 90% {
-    background-position: -456px 0;
-    transform: translateY(var(--partition-actor-drop)) scale(1.08, 0.82);
-  }
-  100% {
-    background-position: -456px 0;
-    transform: translateY(0) scale(1);
-  }
+@keyframes rig-cage-unlock {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.985); }
 }
 
-@keyframes drill-partition-fall {
-  0%, 12% { transform: translateY(0) rotate(18deg) scale(var(--rig-scale)); }
-  47%, 76% { transform: translateY(var(--partition-actor-drop)) rotate(4deg) scale(var(--rig-scale)); }
-  77%, 90% { transform: translateY(var(--partition-actor-drop)) rotate(12deg) scale(var(--rig-scale), 0.84); }
-  100% { transform: translateY(0) rotate(18deg) scale(var(--rig-scale)); }
+@keyframes rig-cage-travel {
+  from { transform: translateX(-50%) translateY(0); }
+  to { transform: translateX(-50%) translateY(var(--rig-dip)); }
 }
 
-@keyframes partition-face-swap {
+@keyframes rig-cage-lock {
+  from { transform: translateY(0) scaleY(1); }
+  to { transform: translateY(calc(-1 * var(--rig-dip))) scaleY(1.0153); }
+}
+
+@keyframes rig-drill-strike {
+  0%, 27% { transform: translateX(-50%) translateY(0) scaleY(1); }
+  28%, 35% { transform: translateX(-50%) translateY(-5px) scaleY(1.02); }
+  36%, 48% { transform: translateX(-50%) translateY(13px) scaleY(0.94); }
+  66%, 100% { transform: translateX(-50%) translateY(0) scaleY(1); }
+}
+
+@keyframes rig-drill-heavy-strike {
+  0%, 27% { transform: translateX(-50%) translateY(0) scaleY(1); }
+  28%, 35% { transform: translateX(-50%) translateY(-7px) scaleY(1.03); }
+  36%, 51% { transform: translateX(-50%) translateY(18px) scaleY(0.9); }
+  69%, 100% { transform: translateX(-50%) translateY(0) scaleY(1); }
+}
+
+@keyframes rig-drill-critical-strike {
+  0%, 27% { transform: translateX(-50%) translateY(0) scaleY(1); }
+  28%, 35% { transform: translateX(-50%) translateY(-9px) scaleY(1.04); }
+  36%, 53% { transform: translateX(-50%) translateY(23px) scale(1.05, 0.86); }
+  72%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes module-commission {
+  0% { opacity: 0; transform: scale(0.64); filter: brightness(2); }
+  62% { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rig-face-swap {
   0%, 12% { opacity: 1; }
   13%, 78% { opacity: 0; }
   79%, 100% { opacity: 1; }
 }
 
-@keyframes partition-fall-cue {
+@keyframes rig-advance-cue {
   0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
   12%, 76% { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
 }
 
-@keyframes partition-depth-swap {
+@keyframes rig-depth-swap {
   0%, 90% { opacity: 0; }
   91%, 100% { opacity: 1; }
 }
@@ -2800,8 +2947,7 @@
   .progressTrack { margin-bottom: 5px; }
   .shaft {
     --workline: 35%;
-    --partition-actor-drop: min(56px, var(--partition-actor-drop-raw));
-    --partition-actor-drop-half: min(31px, var(--partition-actor-drop-half-raw));
+    --rig-dip: min(56px, var(--rig-dip-raw));
     height: clamp(520px, calc(100dvh - 108px), 680px);
     min-height: 520px;
   }
@@ -2821,8 +2967,8 @@
     padding: 5px 7px;
   }
   .operationsReadout small { font-size: 0.46rem; }
-  .miningActor { left: calc(50% - 122px); }
-  .continuousDrill { left: calc(50% + 33px); }
+  .suspendedRig { width: 300px; }
+  .rigFrame { width: 300px; }
   .workRewardPromise {
     left: calc(50% + 48px);
     min-width: 92px;
@@ -2891,7 +3037,7 @@
   }
 
   .frontierLip,
-  .miningActor {
+  .rigDrillMount {
     animation-duration: var(--strike-duration) !important;
   }
 
@@ -2920,7 +3066,7 @@
   .newestCart,
   .newestCrew,
   .newestLamp,
-  .commissioningDrill .continuousDrill,
+  .commissioningDrill .rigMountedDrill,
   .installationToast {
     animation: none;
   }

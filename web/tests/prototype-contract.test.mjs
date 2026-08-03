@@ -9,7 +9,8 @@ const styles = readFileSync(join(projectRoot, "app/mine.module.css"), "utf8");
 const resonance = readFileSync(join(projectRoot, "app/useResonanceEvent.ts"), "utf8");
 const resonanceView = readFileSync(join(projectRoot, "app/ResonanceEvent.tsx"), "utf8");
 const strikeFeedback = readFileSync(join(projectRoot, "app/strikeFeedback.ts"), "utf8");
-const partitionFall = readFileSync(join(projectRoot, "app/partitionFall.ts"), "utf8");
+const rigAdvance = readFileSync(join(projectRoot, "app/rigAdvance.ts"), "utf8");
+const rigVisual = readFileSync(join(projectRoot, "app/rigVisual.ts"), "utf8");
 const miningAudio = readFileSync(join(projectRoot, "app/useMiningAudio.ts"), "utf8");
 const pagesEntry = readFileSync(join(projectRoot, "pages-game/main.tsx"), "utf8");
 const pagesConfig = readFileSync(join(projectRoot, "vite.pages.config.ts"), "utf8");
@@ -30,24 +31,28 @@ test("the playable web game begins before automation and follows the Core recomm
   assert.match(prototype, /automation > 0 \? "자동 굴착 중" : "직접 타격"/);
 });
 
-test("partition break and fall contract remains explicit", () => {
+test("partition breaks drive an explicit suspended-rig lowering cycle", () => {
   assert.match(prototype, /boreHistory/);
   assert.match(prototype, /--rock-phase/);
   assert.doesNotMatch(prototype, /cameraDepth \* PIXELS_PER_METER\) % 320/);
   assert.match(prototype, /--surface-y/);
   assert.match(prototype, /data-camera-depth=\{cameraDepth\.toFixed\(2\)\}/);
-  assert.match(prototype, /data-fall-segments=\{fallEvent\?\.segments \?\? 0\}/);
+  assert.match(prototype, /data-advance-segments=\{advanceEvent\?\.segments \?\? 0\}/);
   assert.match(prototype, /\(depth - cameraDepth\) \* PIXELS_PER_METER/);
-  assert.match(prototype, /partitionDigPose\(mine\.depth, progress, METERS_PER_LAYER\)/);
-  assert.match(prototype, /partitionFallMotion/);
-  assert.match(partitionFall, /Math\.log2\(segments\)/);
+  assert.match(prototype, /rigDigPose\(mine\.depth, progress, METERS_PER_LAYER\)/);
+  assert.match(prototype, /rigAdvanceMotion/);
+  assert.match(rigAdvance, /Math\.log2\(segments\)/);
   assert.match(prototype, /passageHistory/);
   assert.match(prototype, /styles\.openShaft/);
   assert.match(prototype, /styles\.workLine/);
   assert.match(prototype, /displayedHeadDepth\.toFixed\(1\)/);
   assert.match(styles, /\.rockWorld/);
-  assert.match(styles, /@keyframes partition-world-fall/);
-  assert.match(styles, /@keyframes miner-partition-fall/);
+  assert.match(styles, /@keyframes rig-world-advance/);
+  assert.match(styles, /@keyframes rig-cage-unlock/);
+  assert.match(styles, /@keyframes rig-cage-travel/);
+  assert.match(styles, /@keyframes rig-cage-lock/);
+  assert.match(styles, /var\(--rig-unlock-duration\) \+ var\(--rig-travel-duration\)/);
+  assert.doesNotMatch(prototype, /MinerDescentStrip|낙하 중|m 낙하/);
   assert.match(styles, /background-position: center var\(--rock-phase\)/);
   assert.doesNotMatch(prototype, /다음 약속|연속 일수|출정 횟수/);
 });
@@ -76,8 +81,8 @@ test("strike poses, contact feedback, and damage share one timing contract", () 
   assert.match(prototype, /playCollapseSound\(\)/);
   assert.match(prototype, /aria-pressed=\{soundEnabled\}/);
   assert.match(styles, /--strike-contact-delay/);
-  assert.match(styles, /miner-heavy-strike/);
-  assert.match(styles, /miner-critical-strike/);
+  assert.match(styles, /rig-drill-heavy-strike/);
+  assert.match(styles, /rig-drill-critical-strike/);
   assert.match(prototype, /data-impact-coverage="wide"/);
   assert.match(prototype, /styles\.strikeArc/);
   assert.match(prototype, /styles\.impactField/);
@@ -124,9 +129,21 @@ test("each equipment owns a visible scene effect and a branch choice", () => {
   }
   assert.match(prototype, /continuousLamp/);
   assert.match(prototype, /continuousCart/);
-  assert.match(prototype, /continuousDrill/);
+  assert.match(prototype, /rigMountedDrill/);
   assert.match(prototype, /continuousDebris/);
-  assert.match(prototype, /miningActor/);
+  assert.match(prototype, /suspendedRig/);
+  assert.match(prototype, /SuspendedRigFrame/);
+  assert.match(prototype, /RigDrill_tier/);
+  assert.match(prototype, /rigHousingAssetName\(drillVisual\)/);
+  assert.match(prototype, /rigHousingAssetName\(cartVisual\)/);
+  assert.match(prototype, /rigHousingAssetName\(lampVisual\)/);
+  assert.match(rigVisual, /RigHousing_generation\$\{visual\.housingVariant\}/);
+  assert.match(prototype, /data-drill-housing=\{drillVisual\.housingVariant\}/);
+  assert.match(prototype, /data-cart-housing=\{cartVisual\.housingVariant\}/);
+  assert.match(prototype, /data-lamp-housing=\{lampVisual\.housingVariant\}/);
+  for (const branch of ["drillWide", "drillImpact", "cartFleet", "cartFreight", "lampReach", "lampFortune"]) {
+    assert.match(prototype, new RegExp(`RigModification_${branch}`));
+  }
   assert.match(prototype, /frontierLip/);
   assert.doesNotMatch(prototype, /styles\.miningPickaxe/);
   assert.match(styles, /--cart-duration/);
@@ -146,9 +163,25 @@ test("equipment upgrades accumulate visible production infrastructure", () => {
   assert.match(prototype, /data-crew-count=\{crewCount\}/);
   assert.match(prototype, /data-service-light-count=\{serviceLights\}/);
   assert.match(prototype, /data-infrastructure-tier=\{crewCount\}/);
+  assert.match(prototype, /rigToolVisualState\(equipment\.drill, refinements\.drill\)/);
+  assert.match(prototype, /data-drill-level=\{drillVisual\.level\}/);
+  assert.match(prototype, /data-cart-level=\{cartVisual\.level\}/);
+  assert.match(prototype, /data-lamp-level=\{lampVisual\.level\}/);
+  assert.match(prototype, /RigSubsystemPlate/);
+  assert.match(prototype, /<small>G\{visual\.generation\}<\/small>/);
+  assert.match(prototype, /정비 셀 \$\{visual\.upgradeCells\}\/4/);
+  assert.match(prototype, /\$\{visual\.housingVariant\}형 하우징/);
+  assert.match(prototype, /rigToolAccessibility\("드릴"/);
+  assert.match(prototype, /rigToolAccessibility\("광차"/);
+  assert.match(prototype, /rigToolAccessibility\("조명"/);
+  assert.match(prototype, /refinementTiersUnlocked/);
+  assert.match(prototype, /정제판 R\$\{nextTier\} 장착/);
   assert.match(prototype, /설비 증설 완료/);
   assert.match(prototype, /specializationInstallationDetail/);
+  assert.match(prototype, /equipment\[kind\] < EQUIPMENT_MODIFICATION_UNLOCK_LEVEL/);
+  assert.match(prototype, /levelLocked \? `Lv\.\$\{EQUIPMENT_MODIFICATION_UNLOCK_LEVEL\} 필요`/);
   assert.match(prototype, /presentInstallation/);
+  assert.match(prototype, /rigUpgradePhysicalDetail\(kind, before\[kind\], after\[kind\]\)/);
   assert.match(prototype, /styles\.cartRun/);
   assert.match(prototype, /styles\.serviceCrew/);
   assert.match(prototype, /styles\.serviceLights/);
@@ -163,6 +196,10 @@ test("equipment upgrades accumulate visible production infrastructure", () => {
   assert.match(styles, /\.expandedRail/);
   assert.match(styles, /\.operationsReadout/);
   assert.match(styles, /\.constructionPulse/);
+  assert.match(styles, /\.rigSubsystemPlate/);
+  assert.match(styles, /\.rigCellBank/);
+  assert.match(styles, /font-size: 10px/);
+  assert.match(styles, /width: 6px;\s+height: 6px/);
   assert.match(styles, /transform: translateY\(var\(--cart-rest\)\)/);
 });
 
@@ -181,10 +218,13 @@ test("all prototype art is project-local and deployable", () => {
     "public/assets/shaft/ShaftFractureVertical_medium.png",
     "public/assets/shaft/ShaftFractureVertical_heavy.png",
     "public/assets/shaft/MinerMiningStrip.png",
-    "public/assets/shaft/MinerDescentStrip.png",
     "public/assets/shaft/ShaftFrontierLip.png",
     "public/assets/events/ResonanceNode.png",
     "public/og/deepmine-shaft-social.png",
+    "public/assets/rig/RigHousing_generation1.png",
+    "public/assets/rig/RigHousing_generation2.png",
+    "public/assets/rig/RigHousing_generation3.png",
+    "public/assets/rig/RigHousing_generation4.png",
   ];
 
   for (const asset of assets) {

@@ -13,7 +13,9 @@ import {
 import { ResonanceEvent } from "./ResonanceEvent";
 import {
   METERS_PER_SEGMENT,
+  EQUIPMENT_MODIFICATION_UNLOCK_LEVEL,
   criticalChance,
+  criticalMultiplier,
   automationDamagePerSecond,
   type EquipmentKind,
   equipmentTier,
@@ -26,17 +28,22 @@ import {
   cartCargoSlots,
   cartFleetSize,
   recommendMiningUpgrade,
+  refinementCost,
+  refinementTiersUnlocked,
+  rigToolVisualState,
+  type RigToolVisualState,
   tapDamage,
   upgradeCost as coreUpgradeCost,
 } from "./coreBalance";
 import { assetPath } from "./assetPath";
 import {
   MINING_PIXELS_PER_METER,
-  partitionDigPose,
-  partitionFallMotion,
-  type PartitionFallMotion,
-} from "./partitionFall";
+  rigDigPose,
+  rigAdvanceMotion,
+  type RigAdvanceMotion,
+} from "./rigAdvance";
 import styles from "./mine.module.css";
+import { rigHousingAssetName, rigUpgradePhysicalDetail } from "./rigVisual";
 import { strikeTiming, type StrikeVariant } from "./strikeFeedback";
 import { useMiningAudio } from "./useMiningAudio";
 import { useReducedMotionPreference } from "./useReducedMotionPreference";
@@ -52,6 +59,7 @@ type MineState = {
 };
 
 type EquipmentState = Record<EquipmentKind, number>;
+type RefinementState = Record<EquipmentKind, number>;
 type Specializations = {
   drill: "wide" | "impact" | null;
   cart: "fleet" | "freight" | null;
@@ -63,16 +71,25 @@ type UpgradeEvent = {
   level: number;
   detail: string;
 };
-type PartitionFallBatch = {
+type RigAdvanceBatch = {
   segments: number;
   fromDepth: number;
   toDepth: number;
 };
-type PartitionFallEvent = PartitionFallBatch & PartitionFallMotion & { id: number };
+type RigAdvanceEvent = RigAdvanceBatch & RigAdvanceMotion & { id: number };
 
 const METERS_PER_LAYER = METERS_PER_SEGMENT;
 const PIXELS_PER_METER = MINING_PIXELS_PER_METER;
 const AUTO_STRIKE_MS = 820;
+
+const rigModificationAssets = {
+  drillWide: assetPath("assets/rig/RigModification_drillWide.png"),
+  drillImpact: assetPath("assets/rig/RigModification_drillImpact.png"),
+  cartFleet: assetPath("assets/rig/RigModification_cartFleet.png"),
+  cartFreight: assetPath("assets/rig/RigModification_cartFreight.png"),
+  lampReach: assetPath("assets/rig/RigModification_lampReach.png"),
+  lampFortune: assetPath("assets/rig/RigModification_lampFortune.png"),
+} as const;
 
 const equipmentCopy: Record<
   EquipmentKind,
@@ -98,6 +115,7 @@ const equipmentCopy: Record<
 /// Match a fresh Core save: the player performs the real first strikes and saves for cart Lv.2
 /// before automation begins.
 const initialEquipment: EquipmentState = { drill: 1, cart: 1, lamp: 1 };
+const initialRefinements: RefinementState = { drill: 0, cart: 0, lamp: 0 };
 const initialSpecializations: Specializations = { drill: null, cart: null, lamp: null };
 const equipmentKinds: EquipmentKind[] = ["drill", "cart", "lamp"];
 
@@ -115,6 +133,54 @@ const specializationOptions = {
     { id: "fortune", title: "광맥 렌즈", detail: "급소 확률 +8%p" },
   ],
 } as const;
+
+function RigSubsystemPlate({
+  code,
+  visual,
+  positionClass,
+}: {
+  code: string;
+  visual: RigToolVisualState;
+  positionClass: string;
+}) {
+  return (
+    <span
+      className={`${styles.rigSubsystemPlate} ${positionClass}`}
+      data-level={visual.level}
+      data-refinement={visual.refinementTier}
+      data-generation={visual.generation}
+      data-cells={visual.upgradeCells}
+      aria-hidden="true"
+    >
+      <span className={styles.rigPlateLabel}>
+        <b>{code}{visual.level}</b>
+        <small>G{visual.generation}</small>
+        {visual.refinementTier > 0 && <em>R{visual.refinementTier}</em>}
+      </span>
+      <span className={styles.rigCellBank}>
+        {Array.from({ length: 4 }, (_, index) => (
+          <i className={index < visual.upgradeCells ? styles.rigCellActive : ""} key={index} />
+        ))}
+      </span>
+    </span>
+  );
+}
+
+function rigModuleLabel(kind: EquipmentKind, module: string | null) {
+  if (module === null) return "분기 모듈 없음";
+  if (kind === "drill") return module === "wide" ? "확폭 비트 장착" : "충격 비트 장착";
+  if (kind === "cart") return module === "fleet" ? "쌍선 레일 장착" : "대형 호퍼 장착";
+  return module === "reach" ? "장거리 반사경 장착" : "광맥 렌즈 장착";
+}
+
+function rigToolAccessibility(
+  name: string,
+  kind: EquipmentKind,
+  visual: RigToolVisualState,
+  module: string | null,
+) {
+  return `${name} 레벨 ${visual.level}, 티어 ${visual.artTier}, 세대 ${visual.generation}, ${visual.housingVariant}형 하우징, 정비 셀 ${visual.upgradeCells}/4, 정제 R${visual.refinementTier}, ${rigModuleLabel(kind, module)}`;
+}
 
 /// Core rock is addressed by segment index; the prototype tracks metres because the scene
 /// scrolls in metres. Both agree because the conversion is Core's own.
@@ -141,16 +207,18 @@ function upgradeCost(kind: EquipmentKind, level: number) {
 
 function installationDetail(
   kind: EquipmentKind,
-  equipment: EquipmentState,
+  before: EquipmentState,
+  after: EquipmentState,
   specializations: Specializations,
 ) {
+  const physical = rigUpgradePhysicalDetail(kind, before[kind], after[kind]);
   if (kind === "drill") {
-    return `작업조 ${supportCrewSize(equipment.drill, equipment.cart, equipment.lamp)}명 · 비트 티어 ${equipmentTier(equipment.drill)}`;
+    return `${physical} · 작업조 ${supportCrewSize(after.drill, after.cart, after.lamp)}명`;
   }
   if (kind === "cart") {
-    return `운행 ${cartFleetSize(equipment.cart, specializations.cart === "fleet")}대 · 적재 ${cartCargoSlots(equipment.cart, specializations.cart === "freight")}칸`;
+    return `${physical} · 운행 ${cartFleetSize(after.cart, specializations.cart === "fleet")}대 · 적재 ${cartCargoSlots(after.cart, specializations.cart === "freight")}칸`;
   }
-  return `작업등 ${serviceLampCount(equipment.lamp, specializations.lamp === "reach")}기 · 급소 ${Math.round(criticalChance(equipment.lamp) * 100)}%`;
+  return `${physical} · 작업등 ${serviceLampCount(after.lamp, specializations.lamp === "reach")}기 · 급소 ${Math.round(criticalChance(after.lamp) * 100)}%`;
 }
 
 function specializationInstallationDetail(
@@ -186,12 +254,12 @@ function formatSeconds(value: number) {
   return `${Math.ceil(value)}초`;
 }
 
-function upgradeEffect(kind: EquipmentKind, level: number) {
+function upgradeEffect(kind: EquipmentKind, level: number, refinementTier = 0) {
   if (kind === "drill") {
-    return `탭 ${formatNumber(tapDamage(level))} → ${formatNumber(tapDamage(level + 1))}`;
+    return `탭 ${formatNumber(tapDamage(level, false, refinementTier))} → ${formatNumber(tapDamage(level + 1, false, refinementTier))}`;
   }
   if (kind === "cart") {
-    return `자동 ${formatNumber(automationDamagePerSecond(level))} → ${formatNumber(automationDamagePerSecond(level + 1))}/초`;
+    return `자동 ${formatNumber(automationDamagePerSecond(level, false, refinementTier))} → ${formatNumber(automationDamagePerSecond(level + 1, false, refinementTier))}/초`;
   }
   return `급소 ${Math.round(criticalChance(level) * 100)} → ${Math.round(criticalChance(level + 1) * 100)}%`;
 }
@@ -223,13 +291,14 @@ export function MinePrototype() {
     boreHistory: [1, 1],
   });
   const [equipment, setEquipment] = useState<EquipmentState>(initialEquipment);
+  const [refinements, setRefinements] = useState<RefinementState>(initialRefinements);
   const [specializations, setSpecializations] =
     useState<Specializations>(initialSpecializations);
   const [hitPulse, setHitPulse] = useState(0);
   const [lastGain, setLastGain] = useState<number | null>(null);
   const [strikeVariant, setStrikeVariant] = useState<StrikeVariant>("quick");
-  const [fallEvent, setFallEvent] = useState<PartitionFallEvent | null>(null);
-  const [fallAnnouncement, setFallAnnouncement] = useState("");
+  const [advanceEvent, setAdvanceEvent] = useState<RigAdvanceEvent | null>(null);
+  const [advanceAnnouncement, setAdvanceAnnouncement] = useState("");
   const [isPressing, setIsPressing] = useState(false);
   const [lastStrikeSource, setLastStrikeSource] = useState<"manual" | "auto">("auto");
   const [upgradeEvent, setUpgradeEvent] = useState<UpgradeEvent | null>(null);
@@ -248,11 +317,11 @@ export function MinePrototype() {
     y: number;
     cancelled: boolean;
   } | null>(null);
-  const fallTimerRef = useRef<number | null>(null);
-  const fallSequenceRef = useRef(0);
-  const activeFallRef = useRef<PartitionFallEvent | null>(null);
-  const pendingFallRef = useRef<PartitionFallBatch | null>(null);
-  const startFallRef = useRef<((batch: PartitionFallBatch) => void) | null>(null);
+  const advanceTimerRef = useRef<number | null>(null);
+  const advanceSequenceRef = useRef(0);
+  const activeAdvanceRef = useRef<RigAdvanceEvent | null>(null);
+  const pendingAdvanceRef = useRef<RigAdvanceBatch | null>(null);
+  const startAdvanceRef = useRef<((batch: RigAdvanceBatch) => void) | null>(null);
   const upgradeTimerRef = useRef<number | null>(null);
   const strikeTimersRef = useRef<Set<number>>(new Set());
   const manualStrikeCountRef = useRef(0);
@@ -264,19 +333,25 @@ export function MinePrototype() {
   const integrity = integrityAt(mine.depth);
   const progress = Math.min(1, mine.damage / integrity);
   const resonanceMultiplier = resonance.boostActive ? RESONANCE_MULTIPLIER : 1;
-  const tap = tapDamage(equipment.drill, specializations.drill === "impact")
+  const tap = tapDamage(
+    equipment.drill,
+    specializations.drill === "impact",
+    refinements.drill,
+  )
     * resonanceMultiplier;
   const automation = automationDamagePerSecond(
     equipment.cart,
     specializations.cart === "fleet",
+    refinements.cart,
   ) * resonanceMultiplier;
   const chance = criticalChance(equipment.lamp, specializations.lamp === "fortune");
+  const criticalPower = criticalMultiplier(equipment.lamp, refinements.lamp);
   const oreMultiplier = freightOreMultiplier(specializations.cart === "freight");
   const {
     cameraDepth,
     headDepth,
-  } = partitionDigPose(mine.depth, progress, METERS_PER_LAYER);
-  const displayedHeadDepth = fallEvent?.fromDepth ?? headDepth;
+  } = rigDigPose(mine.depth, progress, METERS_PER_LAYER);
+  const displayedHeadDepth = advanceEvent?.fromDepth ?? headDepth;
   const expectedLayerOre = layerOreAt(mine.depth, oreMultiplier);
   const remainingIntegrity = Math.max(0, integrity - mine.damage);
   const automaticBreakEta = automation > 0 ? remainingIntegrity / automation : null;
@@ -294,6 +369,9 @@ export function MinePrototype() {
     specializations.lamp === "reach",
   );
   const crewCount = supportCrewSize(equipment.drill, equipment.cart, equipment.lamp);
+  const drillVisual = rigToolVisualState(equipment.drill, refinements.drill);
+  const cartVisual = rigToolVisualState(equipment.cart, refinements.cart);
+  const lampVisual = rigToolVisualState(equipment.lamp, refinements.lamp);
   const installedLampCount = Math.min(
     7,
     Math.max(1, equipmentTier(equipment.lamp) + 1)
@@ -304,6 +382,15 @@ export function MinePrototype() {
     3 + equipmentTier(equipment.drill) * 2
       + (specializations.drill === "wide" ? 2 : 0),
   );
+  const drillBranchAsset = specializations.drill === null
+    ? null
+    : rigModificationAssets[specializations.drill === "wide" ? "drillWide" : "drillImpact"];
+  const cartBranchAsset = specializations.cart === null
+    ? null
+    : rigModificationAssets[specializations.cart === "fleet" ? "cartFleet" : "cartFreight"];
+  const lampBranchAsset = specializations.lamp === null
+    ? null
+    : rigModificationAssets[specializations.lamp === "reach" ? "lampReach" : "lampFortune"];
 
   const applyDamage = useCallback(
     (
@@ -349,36 +436,36 @@ export function MinePrototype() {
     [],
   );
 
-  const startPartitionFall = useCallback(
-    (batch: PartitionFallBatch) => {
-      const motion = partitionFallMotion(
+  const startRigAdvance = useCallback(
+    (batch: RigAdvanceBatch) => {
+      const motion = rigAdvanceMotion(
         batch.segments,
         METERS_PER_LAYER,
         reducedMotion,
       );
-      const event: PartitionFallEvent = {
-        id: ++fallSequenceRef.current,
+      const event: RigAdvanceEvent = {
+        id: ++advanceSequenceRef.current,
         ...batch,
         ...motion,
       };
 
-      activeFallRef.current = event;
-      setFallEvent(event);
-      setFallAnnouncement(
-        `${event.segments}개 구간 돌파, ${event.meters}미터 하강`,
+      activeAdvanceRef.current = event;
+      setAdvanceEvent(event);
+      setAdvanceAnnouncement(
+        `암반 ${event.segments}개 구간 돌파, 윈치로 ${event.meters}미터 하강`,
       );
       playCollapseSound();
 
-      if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
-      fallTimerRef.current = window.setTimeout(() => {
-        activeFallRef.current = null;
-        setFallEvent(null);
-        fallTimerRef.current = null;
+      if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = window.setTimeout(() => {
+        activeAdvanceRef.current = null;
+        setAdvanceEvent(null);
+        advanceTimerRef.current = null;
 
-        const pending = pendingFallRef.current;
-        pendingFallRef.current = null;
+        const pending = pendingAdvanceRef.current;
+        pendingAdvanceRef.current = null;
         if (pending !== null) {
-          window.requestAnimationFrame(() => startFallRef.current?.(pending));
+          window.requestAnimationFrame(() => startAdvanceRef.current?.(pending));
         }
       }, motion.totalDurationMs);
     },
@@ -386,19 +473,19 @@ export function MinePrototype() {
   );
 
   useEffect(() => {
-    startFallRef.current = startPartitionFall;
-  }, [startPartitionFall]);
+    startAdvanceRef.current = startRigAdvance;
+  }, [startRigAdvance]);
 
   useEffect(() => {
-    if (!reducedMotion || activeFallRef.current === null) return;
-    if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
-    fallTimerRef.current = null;
-    activeFallRef.current = null;
-    setFallEvent(null);
+    if (!reducedMotion || activeAdvanceRef.current === null) return;
+    if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
+    advanceTimerRef.current = null;
+    activeAdvanceRef.current = null;
+    setAdvanceEvent(null);
 
-    const pending = pendingFallRef.current;
-    pendingFallRef.current = null;
-    if (pending !== null) startFallRef.current?.(pending);
+    const pending = pendingAdvanceRef.current;
+    pendingAdvanceRef.current = null;
+    if (pending !== null) startAdvanceRef.current?.(pending);
   }, [reducedMotion]);
 
   const queueStrike = useCallback(
@@ -452,30 +539,30 @@ export function MinePrototype() {
     if (mine.brokenLayers <= previousBrokenLayersRef.current) return;
     const brokenSegments = mine.brokenLayers - previousBrokenLayersRef.current;
     previousBrokenLayersRef.current = mine.brokenLayers;
-    const batch: PartitionFallBatch = {
+    const batch: RigAdvanceBatch = {
       segments: brokenSegments,
       fromDepth: mine.depth - brokenSegments * METERS_PER_LAYER,
       toDepth: mine.depth,
     };
 
-    if (activeFallRef.current === null) {
-      startPartitionFall(batch);
+    if (activeAdvanceRef.current === null) {
+      startRigAdvance(batch);
       return;
     }
 
-    const pending = pendingFallRef.current;
-    pendingFallRef.current = pending === null
+    const pending = pendingAdvanceRef.current;
+    pendingAdvanceRef.current = pending === null
       ? batch
       : {
           segments: pending.segments + batch.segments,
           fromDepth: pending.fromDepth,
           toDepth: batch.toDepth,
         };
-  }, [mine.brokenLayers, mine.depth, startPartitionFall]);
+  }, [mine.brokenLayers, mine.depth, startRigAdvance]);
 
   useEffect(
     () => () => {
-      if (fallTimerRef.current !== null) window.clearTimeout(fallTimerRef.current);
+      if (advanceTimerRef.current !== null) window.clearTimeout(advanceTimerRef.current);
       if (upgradeTimerRef.current !== null) window.clearTimeout(upgradeTimerRef.current);
       for (const timer of strikeTimersRef.current) window.clearTimeout(timer);
       strikeTimersRef.current.clear();
@@ -496,7 +583,7 @@ export function MinePrototype() {
     manualStrikeGuardUntilRef.current = performance.now() + timing.durationMs + 80;
     primeMiningAudio();
     queueStrike(
-      critical ? tap * 3 : tap,
+      critical ? tap * criticalPower : tap,
       variant,
       "manual",
       equipment.drill,
@@ -558,12 +645,13 @@ export function MinePrototype() {
       id: `${kind}-${currentLevel + 1}`,
       kind,
       level: currentLevel + 1,
-      detail: installationDetail(kind, nextEquipment, specializations),
+      detail: installationDetail(kind, equipment, nextEquipment, specializations),
     });
   };
 
   const specialize = (kind: EquipmentKind, option: string) => {
     if (specializations[kind] !== null) return;
+    if (equipment[kind] < EQUIPMENT_MODIFICATION_UNLOCK_LEVEL) return;
     const cost = { drill: 460, cart: 560, lamp: 660 }[kind];
     if (mine.ore < cost) return;
     const nextSpecializations = { ...specializations, [kind]: option } as Specializations;
@@ -578,6 +666,22 @@ export function MinePrototype() {
         option,
         equipment,
       ),
+    });
+  };
+
+  const refine = (kind: EquipmentKind) => {
+    const nextTier = refinements[kind] + 1;
+    if (nextTier > refinementTiersUnlocked(equipment[kind])) return;
+    const cost = refinementCost(kind, nextTier);
+    if (mine.ore < cost) return;
+    const nextRefinements = { ...refinements, [kind]: nextTier };
+    setMine((current) => ({ ...current, ore: current.ore - cost }));
+    setRefinements(nextRefinements);
+    presentInstallation({
+      id: `${kind}-refinement-${nextTier}`,
+      kind,
+      level: equipment[kind],
+      detail: `${equipmentCopy[kind].name} 정제판 R${nextTier} 장착`,
     });
   };
 
@@ -598,21 +702,20 @@ export function MinePrototype() {
         "--cart-duration": `${Math.max(1.9, 4.8 - equipment.cart * 0.18 - (specializations.cart === "fleet" ? 0.65 : 0))}s`,
         "--rig-scale": `${1 + (equipmentTier(equipment.drill) - 1) * 0.12}`,
         "--impact-kick": `${specializations.drill === "impact" ? 1.34 : 1}`,
-        "--partition-fall-distance": `${fallEvent?.visualDistancePx ?? 0}px`,
-        "--partition-strata-travel": `${fallEvent?.strataTravelPx ?? 0}px`,
-        "--partition-actor-drop-raw": `${fallEvent?.actorDropPx ?? 0}px`,
-        "--partition-actor-drop-half-raw": `${(fallEvent?.actorDropPx ?? 0) * 0.55}px`,
-        "--partition-break-duration": `${fallEvent?.breakDurationMs ?? 0}ms`,
-        "--partition-travel-duration": `${fallEvent?.travelDurationMs ?? 0}ms`,
-        "--partition-landing-duration": `${fallEvent?.landingDurationMs ?? 0}ms`,
-        "--partition-total-duration": `${fallEvent?.totalDurationMs ?? 0}ms`,
+        "--rig-world-travel": `${advanceEvent?.visualDistancePx ?? 0}px`,
+        "--rig-strata-travel": `${advanceEvent?.strataTravelPx ?? 0}px`,
+        "--rig-dip-raw": `${advanceEvent?.rigDipPx ?? 0}px`,
+        "--rig-unlock-duration": `${advanceEvent?.unlockDurationMs ?? 0}ms`,
+        "--rig-travel-duration": `${advanceEvent?.travelDurationMs ?? 0}ms`,
+        "--rig-lock-duration": `${advanceEvent?.lockDurationMs ?? 0}ms`,
+        "--rig-total-duration": `${advanceEvent?.totalDurationMs ?? 0}ms`,
       }) as CSSProperties,
     [
       equipment.drill,
       equipment.cart,
       equipment.lamp,
       cameraDepth,
-      fallEvent,
+      advanceEvent,
       progress,
       specializations.drill,
       specializations.cart,
@@ -649,7 +752,7 @@ export function MinePrototype() {
   const hitLabel = lastStrikeSource === "auto"
     ? strikeVariant === "heavy" ? "자동 강타" : "자동 굴착"
     : strikeVariant === "critical"
-      ? `급소 −${tap * 3}`
+      ? `급소 −${formatNumber(tap * criticalPower)}`
       : strikeVariant === "heavy" ? `강타 −${tap}` : `−${tap}`;
 
   const depthMarks = useMemo(() => {
@@ -707,12 +810,12 @@ export function MinePrototype() {
         <section className={styles.shaftSection} aria-labelledby="shaft-heading">
           <div className={styles.shaftHeading}>
             <div>
-              <p className={styles.sectionLabel}>4m 파티션 파쇄</p>
-              <h2 id="shaft-heading">끝까지 부수고 다음 막장으로 낙하</h2>
+              <p className={styles.sectionLabel}>현수식 채굴 리그</p>
+              <h2 id="shaft-heading">암반을 부수고 윈치로 다음 작업면 하강</h2>
             </div>
             <div className={styles.faceProgress}>
-              <span>{fallEvent !== null ? "파티션 돌파" : "다음 4m"}</span>
-              <strong>{fallEvent !== null ? `${fallEvent.segments}구간` : `${Math.round(progress * 100)}%`}</strong>
+              <span>{advanceEvent !== null ? "파티션 돌파" : "다음 4m"}</span>
+              <strong>{advanceEvent !== null ? `${advanceEvent.segments}구간` : `${Math.round(progress * 100)}%`}</strong>
             </div>
           </div>
 
@@ -722,7 +825,7 @@ export function MinePrototype() {
 
           <div className={styles.shaftStage}>
             <div
-              className={`${styles.shaft} ${strikeClass} ${commissioningClass} ${strikeVariant === "critical" ? styles.critical : ""} ${fallEvent !== null ? styles.partitionFalling : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
+              className={`${styles.shaft} ${strikeClass} ${commissioningClass} ${strikeVariant === "critical" ? styles.critical : ""} ${advanceEvent !== null ? styles.rigAdvancing : ""} ${isPressing ? styles.shaftPressed : ""} ${specializations.drill === "impact" ? styles.impactBuild : ""} ${specializations.lamp === "fortune" ? styles.fortuneBuild : ""}`}
               style={sceneStyle}
               data-strike-variant={strikeVariant}
               data-strike-source={lastStrikeSource}
@@ -733,12 +836,24 @@ export function MinePrototype() {
               data-crew-count={crewCount}
               data-service-light-count={serviceLights}
               data-infrastructure-tier={crewCount}
+              data-drill-level={drillVisual.level}
+              data-drill-cells={drillVisual.upgradeCells}
+              data-drill-housing={drillVisual.housingVariant}
+              data-drill-refinement={drillVisual.refinementTier}
+              data-cart-level={cartVisual.level}
+              data-cart-cells={cartVisual.upgradeCells}
+              data-cart-housing={cartVisual.housingVariant}
+              data-cart-refinement={cartVisual.refinementTier}
+              data-lamp-level={lampVisual.level}
+              data-lamp-cells={lampVisual.upgradeCells}
+              data-lamp-housing={lampVisual.housingVariant}
+              data-lamp-refinement={lampVisual.refinementTier}
               data-impact-coverage="wide"
               data-camera-depth={cameraDepth.toFixed(2)}
-              data-fall-segments={fallEvent?.segments ?? 0}
-              data-fall-distance={fallEvent?.visualDistancePx ?? 0}
+              data-advance-segments={advanceEvent?.segments ?? 0}
+              data-advance-distance={advanceEvent?.visualDistancePx ?? 0}
               role="img"
-              aria-label={`파티션 단위 연속 갱도. 굴착 헤드 ${displayedHeadDepth.toFixed(1)}미터, 현재 4미터 파티션 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}, 내실 ${crewCount}단계, 작업조 ${crewCount}명, 광차 ${cartCount}대, 작업등 ${serviceLights}기`}
+              aria-label={`현수식 채굴 리그. 작업면 ${displayedHeadDepth.toFixed(1)}미터, 현재 암반 ${Math.round(progress * 100)}퍼센트 굴착, 파쇄 보상 광석 ${formatNumber(expectedLayerOre)}. ${rigToolAccessibility("드릴", "drill", drillVisual, specializations.drill)}. ${rigToolAccessibility("광차", "cart", cartVisual, specializations.cart)}. ${rigToolAccessibility("조명", "lamp", lampVisual, specializations.lamp)}. 작업조 ${crewCount}명, 광차 ${cartCount}대, 레일 ${specializations.cart === "fleet" ? 2 : cartCount > 0 ? 1 : 0}선, 작업등 ${serviceLights}기`}
             >
             <div className={styles.worldMotion} aria-hidden="true">
               <div className={styles.rockWorld} />
@@ -861,9 +976,9 @@ export function MinePrototype() {
             </div>
 
             <div className={styles.operationsReadout} aria-hidden="true">
-              <span>갱도 내실</span>
-              <strong>{crewCount}단계</strong>
-              <small>작업조 {crewCount} · 광차 {cartCount} · 조명 {serviceLights}</small>
+              <span>설비 구성</span>
+              <strong>드릴 T{drillVisual.artTier} · D{drillVisual.level}{drillVisual.refinementTier > 0 ? ` · R${drillVisual.refinementTier}` : ""}</strong>
+              <small>작업조 {crewCount} · 광차 C{cartVisual.level}/{cartCount}대 · 레일 {specializations.cart === "fleet" ? 2 : cartCount > 0 ? 1 : 0}선 · 조명 L{lampVisual.level}/{serviceLights}기</small>
             </div>
 
             <div className={styles.workLine} aria-hidden="true">
@@ -894,14 +1009,100 @@ export function MinePrototype() {
                   key={`${fractureAsset}-${hitPulse}`}
                 />
               </div>
-              <span className={styles.miningActor} key={`mining-actor-${hitPulse}`} />
-              <img
-                className={styles.continuousDrill}
-                src={assetPath(`assets/equipment/Equipment_drill_tier${equipmentTier(equipment.drill)}.png`)}
-                width={64}
-                height={64}
-                alt=""
-              />
+              <div className={styles.suspendedRig}>
+                <div className={styles.rigUnlockFrame}>
+                  <div className={styles.rigLockFrame}>
+                    <span className={`${styles.rigGuideCable} ${styles.rigGuideCableLeft}`} />
+                    <span className={`${styles.rigGuideCable} ${styles.rigGuideCableRight}`} />
+                    <img
+                      className={styles.rigFrame}
+                      src={assetPath("assets/rig/SuspendedRigFrame.png")}
+                      width={320}
+                      height={128}
+                      alt=""
+                    />
+                    <img
+                      className={styles.rigOperator}
+                      src={assetPath("assets/miner.png")}
+                      width={72}
+                      height={72}
+                      alt=""
+                    />
+                    <span className={styles.rigDrillMount} key={`rig-drill-${hitPulse}`}>
+                      <img
+                        className={styles.rigDrillHousing}
+                        src={assetPath(rigHousingAssetName(drillVisual))}
+                        width={96}
+                        height={96}
+                        alt=""
+                      />
+                      <img
+                        className={styles.rigMountedDrill}
+                        src={assetPath(`assets/rig/RigDrill_tier${equipmentTier(equipment.drill)}.png`)}
+                        width={96}
+                        height={96}
+                        alt=""
+                      />
+                      {drillBranchAsset !== null && (
+                        <img
+                          className={styles.rigDrillBranch}
+                          src={drillBranchAsset}
+                          width={64}
+                          height={64}
+                          alt=""
+                        />
+                      )}
+                    </span>
+                    <img
+                      className={styles.rigCartHousing}
+                      src={assetPath(rigHousingAssetName(cartVisual))}
+                      width={70}
+                      height={70}
+                      alt=""
+                    />
+                    <img
+                      className={styles.rigLampHousing}
+                      src={assetPath(rigHousingAssetName(lampVisual))}
+                      width={58}
+                      height={58}
+                      alt=""
+                    />
+                    {cartBranchAsset !== null && (
+                      <img
+                        className={styles.rigCartBranch}
+                        src={cartBranchAsset}
+                        width={64}
+                        height={64}
+                        alt=""
+                      />
+                    )}
+                    {lampBranchAsset !== null && (
+                      <img
+                        className={styles.rigLampBranch}
+                        src={lampBranchAsset}
+                        width={64}
+                        height={64}
+                        alt=""
+                      />
+                    )}
+                    <RigSubsystemPlate
+                      code="D"
+                      visual={drillVisual}
+                      positionClass={styles.rigDrillPlate}
+                    />
+                    <RigSubsystemPlate
+                      code="C"
+                      visual={cartVisual}
+                      positionClass={styles.rigCartPlate}
+                    />
+                    <RigSubsystemPlate
+                      code="L"
+                      visual={lampVisual}
+                      positionClass={styles.rigLampPlate}
+                    />
+                  </div>
+                </div>
+              </div>
               <span className={styles.contactFlash} key={`contact-${hitPulse}`} />
               <div className={styles.continuousDebris} key={`continuous-debris-${hitPulse}`}>
                 {Array.from({ length: debrisCount }, (_, index) => (
@@ -932,11 +1133,11 @@ export function MinePrototype() {
               {lastGain !== null && <span className={styles.continuousOreGain}>+{lastGain} 광석</span>}
             </div>
 
-            {fallEvent !== null && (
+            {advanceEvent !== null && (
               <div
-                className={`${styles.collapseBand} ${fallEvent.toDepth % (METERS_PER_LAYER * 2) === 0 ? styles.collapseAlternate : ""}`}
+                className={`${styles.collapseBand} ${advanceEvent.toDepth % (METERS_PER_LAYER * 2) === 0 ? styles.collapseAlternate : ""}`}
                 aria-hidden="true"
-                key={`collapse-${fallEvent.id}`}
+                key={`collapse-${advanceEvent.id}`}
               >
                 <span className={styles.collapseLeft} />
                 <span className={styles.collapseRight} />
@@ -944,10 +1145,10 @@ export function MinePrototype() {
               </div>
             )}
 
-            {fallEvent !== null && (
-              <div className={styles.partitionFallCue} aria-hidden="true">
-                <span>{fallEvent.segments === 1 ? "파티션 돌파" : `${fallEvent.segments}개 파티션 연쇄 돌파`}</span>
-                <strong>{fallEvent.meters}m 낙하</strong>
+            {advanceEvent !== null && (
+              <div className={styles.rigAdvanceCue} aria-hidden="true">
+                <span>{advanceEvent.segments === 1 ? "파티션 돌파" : `${advanceEvent.segments}개 파티션 연쇄 돌파`}</span>
+                <strong>윈치 하강 · {advanceEvent.meters}m</strong>
               </div>
             )}
 
@@ -966,13 +1167,13 @@ export function MinePrototype() {
             </div>
 
             <div className={styles.descentIndicator} aria-hidden="true">
-              <span>{fallEvent !== null ? "낙하 중" : "현재 파티션"}</span>
-              <strong>{fallEvent !== null ? `${fallEvent.segments}구간 · ${fallEvent.meters}m` : `${Math.round(progress * 100)}%`}</strong>
-              <i>{fallEvent !== null ? "↓" : "▾"}</i>
+              <span>{advanceEvent !== null ? "윈치 하강 중" : "현재 작업면"}</span>
+              <strong>{advanceEvent !== null ? `${advanceEvent.segments}구간 · ${advanceEvent.meters}m` : `${Math.round(progress * 100)}%`}</strong>
+              <i>{advanceEvent !== null ? "↓" : "▾"}</i>
             </div>
 
             <p className={styles.visuallyHidden} role="status" aria-live="polite">
-              {fallAnnouncement}
+              {advanceAnnouncement}
             </p>
 
             {upgradeEvent !== null && (
@@ -1049,7 +1250,7 @@ export function MinePrototype() {
                   {equipmentCopy[recommendedUpgrade.kind].name} Lv.{recommendedUpgrade.level + 1}
                 </strong>
                 <small>
-                  {upgradeEffect(recommendedUpgrade.kind, recommendedUpgrade.level)} · ◆{formatNumber(recommendedUpgrade.cost)}
+                  {upgradeEffect(recommendedUpgrade.kind, recommendedUpgrade.level, refinements[recommendedUpgrade.kind])} · ◆{formatNumber(recommendedUpgrade.cost)}
                 </small>
               </button>
             </aside>
@@ -1070,7 +1271,11 @@ export function MinePrototype() {
               const level = equipment[kind];
               const cost = upgradeCost(kind, level);
               const affordable = mine.ore >= cost;
-              const visualValue = upgradeEffect(kind, level);
+              const visualValue = upgradeEffect(kind, level, refinements[kind]);
+              const refinementTier = refinements[kind];
+              const nextRefinement = refinementTier + 1;
+              const refinementUnlocked = nextRefinement <= refinementTiersUnlocked(level);
+              const nextRefinementCost = refinementCost(kind, nextRefinement);
 
               return (
                 <article className={styles.equipmentCard} key={kind}>
@@ -1084,7 +1289,7 @@ export function MinePrototype() {
                       />
                     </div>
                     <div>
-                      <span>Lv. {level}</span>
+                      <span>Lv. {level} · R{refinementTier}</span>
                       <h3>{equipmentCopy[kind].name}</h3>
                     </div>
                   </div>
@@ -1102,6 +1307,18 @@ export function MinePrototype() {
                     <span>Lv. {level + 1} 강화</span>
                     <strong>◆ {formatNumber(cost)}</strong>
                   </button>
+                  {refinementUnlocked && (
+                    <button
+                      className={styles.refinementButton}
+                      type="button"
+                      onClick={() => refine(kind)}
+                      disabled={mine.ore < nextRefinementCost}
+                      aria-label={`${equipmentCopy[kind].name} 정제 R${nextRefinement}, 광석 ${nextRefinementCost}`}
+                    >
+                      <span>정제 R{nextRefinement}</span>
+                      <strong>◆ {formatNumber(nextRefinementCost)}</strong>
+                    </button>
+                  )}
                 </article>
               );
             })}
@@ -1126,12 +1343,13 @@ export function MinePrototype() {
                       {specializationOptions[kind].map((option) => {
                         const active = selected === option.id;
                         const locked = selected !== null && !active;
+                        const levelLocked = equipment[kind] < EQUIPMENT_MODIFICATION_UNLOCK_LEVEL;
                         return (
                           <button
                             type="button"
                             className={active ? styles.selectedSpecialization : ""}
                             onClick={() => specialize(kind, option.id)}
-                            disabled={locked || (selected === null && mine.ore < cost)}
+                            disabled={locked || levelLocked || (selected === null && mine.ore < cost)}
                             aria-pressed={active}
                             key={option.id}
                           >
@@ -1139,7 +1357,7 @@ export function MinePrototype() {
                               <strong>{option.title}</strong>
                               <small>{option.detail}</small>
                             </span>
-                            <em>{active ? "설치됨" : locked ? "선택 잠김" : `◆ ${cost}`}</em>
+                            <em>{active ? "설치됨" : locked ? "선택 잠김" : levelLocked ? `Lv.${EQUIPMENT_MODIFICATION_UNLOCK_LEVEL} 필요` : `◆ ${cost}`}</em>
                           </button>
                         );
                       })}

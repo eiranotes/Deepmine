@@ -54,3 +54,41 @@ struct PurchaseImpactPresentation: Equatable {
 
     var transition: String { "\(label)  \(beforeValue) → \(afterValue)" }
 }
+
+/// Mirrors the web-first rig installation contract. A successful purchase names the
+/// exact piece of hardware that appeared, not only its production percentage.
+struct RigUpgradePhysicalPresentation: Equatable {
+    let visual: RigToolVisualState
+    let detail: String
+
+    init(equipment: EquipmentKind, before: PlayerState, after: PlayerState) {
+        let beforeLevel = EquipmentEngine.level(of: equipment, in: before.equipment)
+        let afterLevel = EquipmentEngine.level(of: equipment, in: after.equipment)
+        let beforeVisual = MineInfrastructureEngine.visualState(level: beforeLevel)
+        let afterVisual = MineInfrastructureEngine.visualState(level: afterLevel)
+        visual = afterVisual
+
+        if let module = after.equipmentModifications.selected(for: equipment),
+           module != before.equipmentModifications.selected(for: equipment) {
+            detail = module.rigDisplayName
+            return
+        }
+
+        let code: String = switch equipment {
+        case .drill: "D"
+        case .cart: "C"
+        case .lamp: "L"
+        }
+        let prefix = "\(code)\(afterVisual.level)"
+        if afterVisual.generation != beforeVisual.generation {
+            detail = "\(prefix) · G\(afterVisual.generation) · "
+                + "\(afterVisual.housingVariant)형 하우징 교체"
+        } else if afterVisual.artTier != beforeVisual.artTier {
+            detail = "\(prefix) · T\(beforeVisual.artTier)→T\(afterVisual.artTier) 본체 교체 · "
+                + "정비 셀 \(afterVisual.upgradeCells)/\(Balance.rigUpgradeCellsPerGeneration)"
+        } else {
+            detail = "\(prefix) · 정비 셀 \(beforeVisual.upgradeCells)→"
+                + "\(afterVisual.upgradeCells)/\(Balance.rigUpgradeCellsPerGeneration) 증설"
+        }
+    }
+}

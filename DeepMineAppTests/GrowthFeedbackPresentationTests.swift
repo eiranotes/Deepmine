@@ -69,4 +69,38 @@ final class GrowthFeedbackPresentationTests: XCTestCase {
         XCTAssertTrue(korean.changeValue.hasPrefix("+"))
         XCTAssertTrue(korean.changeValue.hasSuffix("%"))
     }
+
+    func testRigUpgradeNamesTheSamePhysicalChangesAsTheWebContract() {
+        func player(_ level: Int) -> PlayerState {
+            PlayerState(
+                equipment: EquipmentLevels(drill: level),
+                onboardingStage: .complete
+            )
+        }
+
+        XCTAssertEqual(
+            RigUpgradePhysicalPresentation(
+                equipment: .drill,
+                before: player(1),
+                after: player(2)
+            ).detail,
+            "D2 · T1→T2 본체 교체 · 정비 셀 1/4"
+        )
+        XCTAssertEqual(
+            RigUpgradePhysicalPresentation(
+                equipment: .drill,
+                before: player(2),
+                after: player(3)
+            ).detail,
+            "D3 · 정비 셀 1→2/4 증설"
+        )
+        XCTAssertEqual(
+            RigUpgradePhysicalPresentation(
+                equipment: .drill,
+                before: player(4),
+                after: player(5)
+            ).detail,
+            "D5 · G1 · 2형 하우징 교체"
+        )
+    }
 }

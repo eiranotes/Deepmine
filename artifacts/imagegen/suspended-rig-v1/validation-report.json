@@ -1,0 +1,86 @@
+[
+  {
+    "id": "SuspendedRigFrame",
+    "valid": true,
+    "coverage": 0.3600341796875,
+    "brass_ratio": 0.10775072896182275
+  },
+  {
+    "id": "RigDrill_tier1",
+    "valid": true,
+    "coverage": 0.19173177083333334,
+    "brass_ratio": 0.1211092246745897
+  },
+  {
+    "id": "RigDrill_tier2",
+    "valid": true,
+    "coverage": 0.3449435763888889,
+    "brass_ratio": 0.1277131173324945
+  },
+  {
+    "id": "RigDrill_tier3",
+    "valid": true,
+    "coverage": 0.5023871527777778,
+    "brass_ratio": 0.09784017278617711
+  },
+  {
+    "id": "RigModification_drillWide",
+    "valid": true,
+    "coverage": 0.46630859375,
+    "brass_ratio": 0.22774869109947643
+  },
+  {
+    "id": "RigModification_drillImpact",
+    "valid": true,
+    "coverage": 0.6591796875,
+    "brass_ratio": 0.19592592592592592
+  },
+  {
+    "id": "RigModification_cartFleet",
+    "valid": true,
+    "coverage": 0.519775390625,
+    "brass_ratio": 0.12588069516204792
+  },
+  {
+    "id": "RigModification_cartFreight",
+    "valid": true,
+    "coverage": 0.622802734375,
+    "brass_ratio": 0.10584084672677381
+  },
+  {
+    "id": "RigModification_lampReach",
+    "valid": true,
+    "coverage": 0.39794921875,
+    "brass_ratio": 0.24355828220858897
+  },
+  {
+    "id": "RigModification_lampFortune",
+    "valid": true,
+    "coverage": 0.45947265625,
+    "brass_ratio": 0.2545164718384697
+  },
+  {
+    "id": "RigHousing_generation1",
+    "valid": true,
+    "coverage": 0.40671875,
+    "brass_ratio": 0.11179408374951978
+  },
+  {
+    "id": "RigHousing_generation2",
+    "valid": true,
+    "coverage": 0.50265625,
+    "brass_ratio": 0.09822816288467516
+  },
+  {
+    "id": "RigHousing_generation3",
+    "valid": true,
+    "coverage": 0.73390625,
+    "brass_ratio": 0.10048967426016607
+  },
+  {
+    "id": "RigHousing_generation4",
+    "valid": true,
+    "coverage": 0.7875,
+    "brass_ratio": 0.15892857142857142
+  }
+]

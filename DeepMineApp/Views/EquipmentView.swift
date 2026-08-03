@@ -5,7 +5,12 @@ import SwiftUI
 struct EquipmentView: View {
     enum Notice: Equatable {
         case success
-        case purchase(equipment: EquipmentKind, impact: PurchaseImpact?, crewSize: Int?)
+        case purchase(
+            equipment: EquipmentKind,
+            physical: RigUpgradePhysicalPresentation,
+            impact: PurchaseImpact?,
+            crewSize: Int?
+        )
         case refinement(RefinementImpact)
         case insufficient(required: BigNumber, available: BigNumber)
         case storageFailure
@@ -185,7 +190,11 @@ extension EquipmentView {
             && notice != .storageFailure
         return Button { purchaseModification(option) } label: {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
+                HStack(spacing: 7) {
+                    GameArtView(
+                        entry: GameArtCatalog.rigModification(option.rawValue),
+                        size: 34
+                    )
                     Text(DeepMineStrings.text(DeepMineProgressLabels.modificationTitleKey(option)))
                         .font(.caption.weight(.bold))
                     if isSelected { Image(systemName: "checkmark.circle.fill") }
@@ -200,7 +209,7 @@ extension EquipmentView {
                 .font(.caption2.monospacedDigit().weight(.bold))
                 .foregroundStyle(DeepMinePalette.brass.color)
             }
-            .frame(maxWidth: .infinity, minHeight: 78, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: 94, alignment: .topLeading)
             .padding(9)
             .background(
                 isSelected ? DeepMinePalette.shale.color : DeepMinePalette.coal.color,

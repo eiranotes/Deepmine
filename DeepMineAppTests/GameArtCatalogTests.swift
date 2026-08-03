@@ -28,9 +28,22 @@ final class GameArtCatalogTests: XCTestCase {
         }
     }
 
+    private var rigPromptDocument: String {
+        get throws {
+            let root = URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+            return try String(
+                contentsOf: root.appending(path: GameArtCatalog.rigPromptDocumentPath),
+                encoding: .utf8
+            )
+        }
+    }
+
     func testCatalogCoversTheFullPlannedSlotCount() {
         XCTAssertEqual(GameArtCatalog.allEntries.count, 24)
         XCTAssertEqual(GameArtCatalog.shaftEntries.count, 16)
+        XCTAssertEqual(GameArtCatalog.rigEntries.count, 14)
     }
 
     func testSlotNamesAreUnique() {
@@ -123,6 +136,23 @@ final class GameArtCatalogTests: XCTestCase {
                 "missing asset name \(entry.name)"
             )
         }
+    }
+
+    func testEverySuspendedRigSlotHasGeneratedPromptProvenance() throws {
+        let document = try rigPromptDocument
+        let manifestURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "artifacts/imagegen/suspended-rig-v1/manifest.json")
+        let manifest = try String(contentsOf: manifestURL, encoding: .utf8)
+        for entry in GameArtCatalog.rigEntries {
+            XCTAssertTrue(manifest.contains("\"id\": \"\(entry.name)\""), entry.name)
+            XCTAssertTrue(manifest.contains("\"prompt_id\": \"\(entry.promptID)\""), entry.promptID)
+        }
+        XCTAssertTrue(document.contains("SuspendedRigFrame"))
+        XCTAssertTrue(document.contains("RigDrillTierStrip"))
+        XCTAssertTrue(document.contains("RigSpecializationStrip"))
+        XCTAssertTrue(document.contains("RigHousingGenerationStrip"))
     }
 
     func testAvailabilityDistinguishesInstalledFromAbsent() {

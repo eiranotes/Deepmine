@@ -1,6 +1,6 @@
 # Tasks
 
-업데이트: 2026-08-03 (웹 파티션 완파·다중 낙하 로컬 closeout)
+업데이트: 2026-08-03 (현수식 채굴 리그·물리 강화 계약 로컬 closeout)
 
 ## 2026-08-02 current audit closeout
 
@@ -37,6 +37,20 @@
 - [x] ImageGen 참조 생성으로 release/fall A/fall B/landing 4프레임 `MinerDescentStrip` 편입
 - [x] 데스크톱·390px에서 진행 중 위치 0px, 완파 후 약 45px 낙하·정착과 모바일 overflow 0 확인
 - [x] D-082 플레이어블 Pages 배포와 공개 URL의 실제 완파→낙하 재검증
+- [x] Pro 제품·코드 리뷰로 낙하형 아바타와 고정 현수식 설비를 구현성·플레이성 양쪽에서 재선정
+- [x] 앱·웹의 절삭 중 작업선을 face depth에 고정하고 경제 head depth만 진행하도록 분리
+- [x] 완파 N구간을 클램프 해제→압축 윈치 이동→재체결 한 사이클로 표현하고 Reduce Motion 보존
+- [x] ImageGen 현수식 프레임·드릴 3티어·장비 분기 6종·세대 하우징 4종 생성, 14/14 추출·알파·해시·provenance 검증
+- [x] `RigToolVisualState`로 모든 장비 레벨의 D/C/L 각인판·정비 셀·하우징 세대 변화를 보장
+- [x] 모든 정제 단계의 정확한 R 각인판과 3개까지의 장식 밴드, 분기별 고유 장착 모듈 구현
+- [x] 드릴 Lv.1→2의 T1→T2·D1→D2·셀 0→1 변화와 절삭 중 camera 고정을 실제 브라우저에서 확인
+- [x] D/C/L 표찰을 앱 9pt·웹 10px, 정비 셀을 5pt·6px로 확대하고 정확한 G세대·R정제 상시 표기
+- [x] 세 도구의 레벨·티어·세대·셀·R·분기와 윈치 시작/완료를 VoiceOver·ARIA 상태로 제공
+- [x] 윈치 해제 140ms·이동 320~900ms·체결 160ms를 독립 phase로 구현하고 물리 상태 서명 회귀 추가
+- [x] 웹 `rigVisual.ts`를 장비 asset·물리 설치 문구의 정본으로 만들고 웹 테스트를 앱보다 먼저 통과
+- [x] 매 4레벨 G 경계에서 1~4형 생성 하우징 PNG를 실제 교체하고 후기 G1~G4 순환을 회귀로 고정
+- [x] `T1→T2 본체 교체`, `정비 셀 1→2/4 증설`, `G1 · 2형 하우징 교체`를 구매 직후 명시
+- [x] 앱 Core·Scene·구매 피드백을 웹 기준과 동일하게 포팅하고 generic Simulator build-for-testing 통과
 
 열림:
 

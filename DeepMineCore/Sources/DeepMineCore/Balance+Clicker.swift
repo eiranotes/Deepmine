@@ -177,6 +177,13 @@ extension Balance {
     public static let maximumCarts = 4
     public static let maximumCargoSlots = 3
     public static let maximumServiceLamps = 5
+    /// Four visible service cells are folded into a heavier housing generation. Together
+    /// with the exact stamped level plate this makes every equipment purchase a persistent
+    /// physical state change instead of one of only three sprites.
+    public static let rigUpgradeCellsPerGeneration = 4
+    /// Refinement continues mathematically, but more than three collars becomes visual
+    /// noise on a 64pt module. The badge/count carries tiers above this cap.
+    public static let maximumVisibleRefinementBands = 3
     /// Levels between each additional cart or cargo slot.
     public static let cartGrowthLevelStep = 2
 
