@@ -67,8 +67,10 @@
   웹 15/15, 에셋 7/7과 generic iOS device build 통과다. 2026-08-03에는 merge commit
   `228f31d`의 `main` validation과 Pages Actions 배포가 성공했고 공개 harness와 배포 모듈의
   HTTP 200·스모크를 확인했다. 당시 공개 artifact가 로직 보고서였던 문제는 D-080으로 교정해
-  플레이어블 build의 로컬 직접 타격→광차 구매→자동 굴착과 390px 렌더를 확인했으며 원격
-  교체는 `main` push 전이다. 시스템 표면은 실기기 전이므로 미검증이다.
+  플레이어블 build의 로컬 직접 타격→광차 구매→자동 굴착과 390px 렌더를 확인했다. commit
+  `631fe8c`의 Pages run `30774403756`에서 원격 build/deploy가 성공했고 공개 URL에서도 직접
+  타격 8.0m→8.4m·0%→9%와 콘솔 오류 0건을 확인했다. 시스템 표면은 실기기 전이므로
+  미검증이다.
 
 ## 0.4 아직 열린 제품 계약
 

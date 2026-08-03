@@ -1026,7 +1026,7 @@
 
 ## D-080 — Pages의 사용자 표면은 검증 보고서가 아니라 플레이 가능한 게임이다
 
-- 상태: 승인됨·로컬 구현 및 브라우저 검증, 원격 배포 대기 (2026-08-03)
+- 상태: 승인됨·구현 및 원격 브라우저 검증됨 (2026-08-03)
 - 결정: `pages-static`의 11개 로직 결과 화면은 Pages artifact로 배포하지 않는다. CI의 공식
   패리티 테스트는 유지하되, 공개 URL은 `MinePrototype`을 Vite 정적 build로 패키징해 광부,
   연속 갱도, 직접 타격, 광석 보상, 장비 구매와 자동 굴착을 실제로 조작하게 한다.
@@ -1035,3 +1035,6 @@
 - 배포 경계: GitHub project Pages의 `/Deepmine/` base를 적용하고 모든 런타임 에셋 URL을
   base-aware하게 만든다. PR은 build/contract만, `main` push만 deploy하는 D-077 권한 정책은
   유지한다.
+- 원격 증거: commit `631fe8c`의 Pages run `30774403756`에서 build/deploy가 성공했다.
+  공개 URL에서 플레이어블 제목과 shaft 에셋 HTTP 200, 직접 타격 8.0m→8.4m·0%→9%,
+  브라우저 콘솔 오류 0건을 확인했다.

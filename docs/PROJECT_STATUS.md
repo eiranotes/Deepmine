@@ -26,11 +26,11 @@
 - 장기 진행 PNG 7종은 CRC/zlib·크기·네 안료·알파·SHA·카탈로그/웹 복사 계약으로 검증한다.
   pressure와 cart 2종은 이번 ImageGen 원본, 나머지 5종은 이전 PR 원본 정규화다.
 - Pages PR은 build/smoke만 수행하고 main push만 배포한다. PR #3을 merge commit
-  `228f31d`로 병합한 뒤 `main` validation run `30770681257`이 전부 통과했고, Pages
-  Actions source를 활성화한 뒤 deploy run `30770681254` attempt 2가 성공했다. 공개 URL은
-  `https://eiranotes.github.io/Deepmine/`이다. 다만 그 artifact는 플레이 화면이 아니라
-  `pages-static` 로직 보고서였다. 현재 코드는 `MinePrototype`의 광부·갱도·타격·설비 화면을
-  Pages Vite build로 바꿨고, 원격 교체는 다음 `main` push에서 검증한다 (D-080).
+  `228f31d`로 병합한 뒤 `main` validation run `30770681257`이 전부 통과했다. 기존
+  `pages-static` 로직 보고서는 `MinePrototype`의 광부·갱도·타격·설비 화면으로 교체했고,
+  commit `631fe8c`의 Pages run `30774403756`에서 build/deploy가 성공했다. 공개 URL
+  `https://eiranotes.github.io/Deepmine/`에서 직접 타격 후 8.0m→8.4m·0%→9%와 콘솔 오류
+  0건을 확인했다 (D-080).
 
 계속 열린 핵심은 실제 UI 구매 정책 30/90/180일 시뮬레이션, 집중 보상을 실제
 `MiningLoop` 가속으로 통합하는 구조, 정련 MAX/기억 정련 재설치, `NextStepPlanner`의
@@ -40,10 +40,10 @@ harness다. JavaScript `number` 범위를 iOS `BigNumber`와 동일하다고 판
 
 현재 검증은 Core **282/282**, App 단위 **150/150**, 최종 persistence/명령 큐 **23/23**,
 정련 focused XCUITest **1/1**,
-웹 **17/17**, 장기 진행 에셋 **7/7**, generic iOS device build 통과다. 실제 Pages 게임은
-로컬 데스크톱·390px 렌더와 직접 타격→광석→광차 구매→자동 굴착을 통과했다. 기존 원격
-validation/Pages 인프라는 성공했지만 새 플레이 artifact의 원격 교체는 push 전이다. 실기기
-시스템 표면은 여전히 미검증이다. 자세한 명령·xcresult·경계는 `BUILD_REPORT.md` 최상단
+웹 **17/17**, 장기 진행 에셋 **7/7**, generic iOS device build 통과다. Pages 게임은
+로컬 데스크톱·390px 렌더와 직접 타격→광석→광차 구매→자동 굴착을 통과했고, 원격 공개
+URL에서도 직접 타격 진행과 에셋 HTTP 200을 확인했다. 실기기 시스템 표면은 여전히
+미검증이다. 자세한 명령·xcresult·경계는 `BUILD_REPORT.md` 최상단
 current-audit closeout을 따른다.
 
 ## Current state

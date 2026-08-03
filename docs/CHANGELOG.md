@@ -4,9 +4,9 @@
 
 ### Deployed
 
-- PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. `main` validation과
-  Pages build/deploy 인프라가 성공했다. 기존 공개 artifact는 로직 검증 보고서였으며 아래
-  플레이어블 artifact로 교체한다
+- PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. 기존 로직 검증
+  보고서를 commit `631fe8c`의 플레이어블 artifact로 교체했고 Pages run `30774403756`에서
+  build/deploy와 공개 URL 직접 타격을 확인했다
 
 ### Changed
 

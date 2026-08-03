@@ -25,7 +25,7 @@
 | Swift 파일 크기 | **통과** | 이번 변경 파일은 모두 300줄 이하. 기존 baseline `GameActivitySurfaceContent.swift` 302줄만 남음 |
 | 웹 브라우저 | **데스크톱·390px 통과** | 실제 광부/갱도/설비 렌더, 첫 타격 0→9%, 모바일 `scrollWidth=innerWidth=390`, 가로 문서 overflow 없음 |
 | 원격 `main` 검증 | **통과** | merge commit `228f31d`; Actions run `30770681257`에서 Core·App 단위·unsigned iOS build·Swift 파일 크기·웹·에셋 job 전부 성공 |
-| GitHub Pages | **기존 검증 화면 배포됨·교체 대기** | Actions source와 URL은 정상이나 공개 표면이 `pages-static` 로직 보고서였음을 재확인. 실제 게임 artifact는 로컬 완료, `main` push 뒤 원격 교체 검증 필요 |
+| GitHub Pages | **플레이어블 원격 배포 통과** | commit `631fe8c`, Pages run `30774403756` build/deploy 성공. 공개 URL의 제목·게임 JS·shaft 에셋 HTTP 200, 브라우저 직접 타격 8.0m→8.4m·0%→9%, 콘솔 오류 0건 확인 |
 | 실기기 | **미검증** | FamilyControls·AlarmKit·Live Activity, 실제 VoiceOver/Reduce Motion/햅틱은 출시 차단 게이트 |
 
 ## Historical verification log
