@@ -4,6 +4,8 @@
 
 ### Deployed
 
+- commit `d36fd9f`의 실제 광부 하강·카메라 추종 build를 Pages run `30775979619`로 배포했다.
+  공개 URL에서 54% 진행 광부 61px·립 60px 하강과 암반 위상의 단조 이동을 확인했다
 - PR #3을 `main`에 병합하고 GitHub Pages의 Actions source를 활성화했다. 기존 로직 검증
   보고서를 commit `631fe8c`의 플레이어블 artifact로 교체했고 Pages run `30774403756`에서
   build/deploy와 공개 URL 직접 타격을 확인했다

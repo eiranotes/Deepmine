@@ -1,6 +1,6 @@
 # Build Report
 
-업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 로컬 closeout)
+업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 원격 closeout)
 
 ## 2026-08-03 web descent and camera closeout
 
@@ -13,7 +13,8 @@
 | 데스크톱 브라우저 | **통과(1280×720)** | 54%에서 광부 상대 top 약 56→118px, 립 82→142px. 후반 cameraDepth 8.36→11.11m와 head offset 70.0→12.9px. 암반 위상 `-224→-234→-311→-336px` 단조 이동 |
 | 모바일 브라우저 | **통과(390×844)** | 54%에서 광부 상대 top 92.5→153.5px, 립 117.5→177.5px. `scrollWidth=clientWidth=390`, 잘림·가로 overflow 없음 |
 | Reduce Motion | **코드·계약 통과** | 같은 파생 위치와 균열·깊이·보상 의미를 유지하며 전환을 1ms로 줄인다. 실제 OS 설정 감각은 실기기 게이트 |
-| Pages | **재배포 대기** | 로컬 Pages artifact 검증 완료. 공개 URL은 이 변경을 `main`에 push한 뒤 다시 검증해야 함 |
+| Pages | **배포·공개 검증 통과** | commit `d36fd9f`, Pages run `30775979619` build/deploy 성공. 공개 1280×720에서 시작→54% 광부 61px·립 60px 하강, 후반 암반 `-224→-311→-336px` 단조 이동, 돌파 뒤 다음 세그먼트 연속성 확인 |
+| 원격 validation | **전 job 통과** | run `30775979660`: Core, App 단위, unsigned iOS build, Swift 파일 크기, 웹 lint/build/test, 생성 에셋 계약 성공 |
 
 ## 2026-08-03 current-audit and remote-deployment closeout
 

@@ -3,7 +3,7 @@
 ## 결론과 반영 결과
 
 - 별도 ChatGPT 프로젝트: `DeepMine — 굴착감 개선`
-- Pro 채팅: <https://chatgpt.com/c/6a6fe3ff-b194-83ee-b85c-bf985e321150>
+- Pro 채팅: [2026-08-03|DeepMine 캐릭터 굴착감 개선](https://chatgpt.com/c/6a6fe3ff-b194-83ee-b85c-bf985e321150)
 - ChatGPT Pro와 독립 코드 감사의 공통 판정은 새 에셋 부족이 아니라 고정 작업선·혼합 좌표계와
   320px modulo 배경 위상이 P0라는 것이다.
 - `web/app/miningCamera.ts`에 상태를 소유하지 않는 파생 카메라 수식을 추가했다. 첫 65%에는
@@ -12,6 +12,8 @@
 - 기존 `MinerMiningStrip`, `ShaftFrontierLip`, 세로 균열로 목표를 충족해 새 이미지는 만들지
   않았다. 1280×720과 390×844의 54% 진행에서 광부가 각각 약 62px·61px 내려갔다.
 - 웹 20/20, lint, Vinext production, Pages build와 모바일 가로 overflow 0을 확인했다.
+- commit `d36fd9f`를 Pages run `30775979619`로 배포했고 공개 URL에서도 54% 진행 광부
+  61px·립 60px 하강과 `-224→-311→-336px` 단조 암반 위상을 재확인했다.
 
 ## 요청과 현재 증상
 

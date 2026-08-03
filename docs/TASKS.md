@@ -1,6 +1,6 @@
 # Tasks
 
-업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 로컬 closeout)
+업데이트: 2026-08-03 (웹 캐릭터 하강·카메라 개선 원격 closeout)
 
 ## 2026-08-02 current audit closeout
 
@@ -30,6 +30,7 @@
 - [x] 320px 암반 위상 modulo를 제거해 CSS 배경의 순환 경계 역보간 방지
 - [x] 기존 스트립·파쇄 립·균열로 데스크톱 약 62px, 모바일 약 61px 실제 하강과 가로 overflow 0 검증
 - [x] 카메라가 헤드를 앞서지 않고 4m 끝에서 같은 깊이로 정착하는 순수 수식 회귀 3건 추가
+- [x] D-081 플레이어블 Pages 재배포와 공개 URL의 실제 하강·단조 암반 위상 재검증
 
 열림:
 
@@ -42,7 +43,6 @@
 - [ ] JavaScript `number` 범위를 넘는 앱 경제는 웹이 아닌 Core 회귀로 계속 검증
 - [ ] 프레스티지의 정련 손실 고지와 홈 진입/재구축 UX 실화면 회귀
 - [ ] 전체 `DeepMineAppUITests`와 FamilyControls/AlarmKit/Live Activity 실기기 릴리스 게이트
-- [ ] D-081 플레이어블 Pages 재배포와 공개 URL의 실제 하강·단조 암반 위상 재검증
 
 ## Gameplay-complete MVP — implemented
 
