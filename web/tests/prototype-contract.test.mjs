@@ -20,6 +20,7 @@ test("GitHub Pages ships the playable React game instead of the logic report", (
   assert.match(pagesWorkflow, /npm run build:pages/);
   assert.match(pagesWorkflow, /DEEPMINE \/ PLAYABLE WEB/);
   assert.doesNotMatch(pagesWorkflow, /cp pages-static/);
+  assert.doesNotMatch(pagesWorkflow, /rg -q/);
 });
 
 test("the playable web game begins before automation and follows the Core recommendation", () => {

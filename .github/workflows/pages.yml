@@ -36,8 +36,8 @@ jobs:
           test -s pages-dist/assets/shaft/ShaftRock_pressure-v2.png
           test -n "$(find pages-dist/assets -maxdepth 1 -name '*.js' -print -quit)"
           test -n "$(find pages-dist/assets -maxdepth 1 -name '*.css' -print -quit)"
-          rg -q '/Deepmine/assets/' pages-dist/index.html
-          rg -q 'DEEPMINE / PLAYABLE WEB' pages-dist/assets/*.js
+          grep -q '/Deepmine/assets/' pages-dist/index.html
+          grep -q 'DEEPMINE / PLAYABLE WEB' pages-dist/assets/*.js
           touch pages-dist/.nojekyll
         working-directory: web
       - uses: actions/upload-pages-artifact@v3
